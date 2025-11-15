@@ -26,6 +26,18 @@ class SecureStorageService {
     return await _storage.read(key: AppConstants.refreshTokenKey);
   }
 
+  Future<void> deleteAccessToken() async {
+    await _storage.delete(key: AppConstants.accessTokenKey);
+  }
+
+  Future<void> deleteRefreshToken() async {
+    await _storage.delete(key: AppConstants.refreshTokenKey);
+  }
+
+  Future<void> deleteUserEmail() async {
+    await _storage.delete(key: AppConstants.userEmailKey);
+  }
+
   Future<void> clearTokens() async {
     await _storage.delete(key: AppConstants.accessTokenKey);
     await _storage.delete(key: AppConstants.refreshTokenKey);

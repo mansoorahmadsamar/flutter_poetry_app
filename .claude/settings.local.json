@@ -3,7 +3,16 @@
     "allow": [
       "Bash(flutter pub get:*)",
       "Bash(flutter analyze:*)",
-      "Bash(flutter pub run build_runner build:*)"
+      "Bash(flutter pub run build_runner build:*)",
+      "Bash(tree:*)",
+      "Bash(flutter run:*)",
+      "Bash(curl -v 'http://localhost:8080/oauth2/authorization/google?platform=mobile')",
+      "Bash(curl:*)",
+      "Bash(chmod:*)",
+      "Bash(flutter clean:*)",
+      "Bash(nc:*)",
+      "Bash(keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android:*)",
+      "Bash(mvn clean compile:*)"
     ],
     "deny": [],
     "ask": []

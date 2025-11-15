@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'core/config/app_config.dart';
 import 'core/design_system/app_theme.dart';
 import 'core/storage/preferences_service.dart';
+import 'core/routing/app_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,57 +31,15 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return MaterialApp(
+    final router = ref.watch(routerProvider);
+
+    return MaterialApp.router(
       title: appConfig.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme(context),
       darkTheme: AppTheme.darkTheme(context),
       themeMode: ThemeMode.system,
-      home: const HomeScreen(),
-    );
-  }
-}
-
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(appConfig.appName),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.auto_stories,
-              size: 100,
-              color: Colors.blue,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Poetry App Foundation',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Setup Complete!',
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Environment: ${appConfig.environment.name}',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            Text(
-              'Base URL: ${appConfig.baseApiUrl}',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-          ],
-        ),
-      ),
+      routerConfig: router,
     );
   }
 }

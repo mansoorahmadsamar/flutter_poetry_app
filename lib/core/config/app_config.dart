@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import '../utils/platform_utils.dart';
 
 /// Application environment configuration
 enum AppEnvironment {
@@ -19,6 +20,7 @@ class AppConfig {
   final bool enableLogging;
   final bool enableAnalytics;
   final String googleOAuthRedirectUri;
+  final String? googleWebClientId; // Web Client ID for native Google Sign-In
 
   const AppConfig._({
     required this.environment,
@@ -30,20 +32,26 @@ class AppConfig {
     required this.enableLogging,
     required this.enableAnalytics,
     required this.googleOAuthRedirectUri,
+    this.googleWebClientId,
   });
 
   /// Development environment configuration
   factory AppConfig.dev() {
-    return const AppConfig._(
+    // Get platform-specific localhost URL
+    final baseUrl = PlatformUtils.getLocalhostUrl(8080);
+
+    return AppConfig._(
       environment: AppEnvironment.dev,
       appName: 'Poetry DEV',
-      baseApiUrl: 'http://localhost:8080',
+      baseApiUrl: baseUrl,
       apiTimeout: 30000, // 30 seconds
       feedTTL: 300, // 5 minutes
       poemTTL: 1800, // 30 minutes
       enableLogging: true,
       enableAnalytics: false,
       googleOAuthRedirectUri: 'http://localhost:3000/auth/callback',
+      // Web Client ID from Google Cloud Console (used for native Google Sign-In)
+      googleWebClientId: '461228119902-8s3jjf9m60ql21odr0sfsc583cqrnds0.apps.googleusercontent.com',
     );
   }
 
@@ -59,6 +67,7 @@ class AppConfig {
       enableLogging: true,
       enableAnalytics: true,
       googleOAuthRedirectUri: 'https://stage.poetry.app/auth/callback',
+      googleWebClientId: null, // TODO: Add staging Web Client ID
     );
   }
 
@@ -74,6 +83,7 @@ class AppConfig {
       enableLogging: false,
       enableAnalytics: true,
       googleOAuthRedirectUri: 'https://poetry.app/auth/callback',
+      googleWebClientId: null, // TODO: Add production Web Client ID
     );
   }
 

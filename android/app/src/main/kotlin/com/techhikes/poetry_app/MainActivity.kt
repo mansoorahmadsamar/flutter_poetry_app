@@ -1,4 +1,4 @@
-package com.example.flutter_poetry_app
+package com.techhikes.poetry_app
 
 import io.flutter.embedding.android.FlutterActivity
 
