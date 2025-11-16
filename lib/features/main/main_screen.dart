@@ -1,186 +1,122 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/auth/auth_provider.dart';
 import '../../core/design_system/app_colors.dart';
+import 'tabs/feed_tab.dart';
+import 'tabs/search_tab.dart';
+import 'tabs/bookmarks_tab.dart';
+import 'tabs/poets_tab.dart';
+import 'tabs/profile_tab.dart';
 
-/// Main screen after successful authentication
-class MainScreen extends ConsumerWidget {
+/// Tab configuration data
+class TabConfig {
+  final String label;
+  final IconData icon;
+  final IconData activeIcon;
+  final Widget screen;
+
+  const TabConfig({
+    required this.label,
+    required this.icon,
+    required this.activeIcon,
+    required this.screen,
+  });
+}
+
+/// Main screen with bottom navigation tabs
+class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
 
-  Future<void> _handleLogout(BuildContext context, WidgetRef ref) async {
-    // Show confirmation dialog
-    final shouldLogout = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to logout?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Logout'),
-          ),
-        ],
-      ),
-    );
+  @override
+  ConsumerState<MainScreen> createState() => _MainScreenState();
+}
 
-    if (shouldLogout == true && context.mounted) {
-      final authNotifier = ref.read(authProvider.notifier);
-      await authNotifier.logout();
+class _MainScreenState extends ConsumerState<MainScreen> {
+  int _currentIndex = 0;
 
-      // Show success message
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Logged out successfully'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-    }
-  }
+  // Tab configurations
+  static const List<TabConfig> _tabs = [
+    TabConfig(
+      label: 'Feed',
+      icon: Icons.home_outlined,
+      activeIcon: Icons.home,
+      screen: FeedTab(),
+    ),
+    TabConfig(
+      label: 'Search',
+      icon: Icons.search_outlined,
+      activeIcon: Icons.search,
+      screen: SearchTab(),
+    ),
+    TabConfig(
+      label: 'Bookmarks',
+      icon: Icons.bookmark_border,
+      activeIcon: Icons.bookmark,
+      screen: BookmarksTab(),
+    ),
+    TabConfig(
+      label: 'Poets',
+      icon: Icons.person_outline,
+      activeIcon: Icons.person,
+      screen: PoetsTab(),
+    ),
+    TabConfig(
+      label: 'Profile',
+      icon: Icons.account_circle_outlined,
+      activeIcon: Icons.account_circle,
+      screen: ProfileTab(),
+    ),
+  ];
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authProvider);
-
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Poetry App'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            onPressed: authState.isLoading
-                ? null
-                : () => _handleLogout(context, ref),
-            icon: authState.isLoading
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  )
-                : const Icon(Icons.logout),
-            tooltip: 'Logout',
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _tabs.map((tab) => tab.screen).toList(),
+      ),
+      bottomNavigationBar: _buildBottomNavigationBar(),
+    );
+  }
+
+  Widget _buildBottomNavigationBar() {
+    return Container(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
           ),
         ],
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Welcome icon
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Icon(
-                  Icons.check_circle,
-                  size: 60,
-                  color: AppColors.primary,
-                ),
+      child: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
+        selectedItemColor: AppColors.primary,
+        unselectedItemColor: Colors.grey[600],
+        selectedFontSize: 12,
+        unselectedFontSize: 12,
+        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
+        elevation: 0,
+        items: _tabs.map((tab) {
+          final isSelected = _tabs[_currentIndex] == tab;
+          return BottomNavigationBarItem(
+            icon: Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Icon(
+                isSelected ? tab.activeIcon : tab.icon,
+                size: 24,
               ),
-              const SizedBox(height: 32),
-
-              // Welcome text
-              Text(
-                'Welcome!',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-              const SizedBox(height: 8),
-
-              if (authState.userEmail != null) ...[
-                Text(
-                  authState.userEmail!,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Colors.grey[600],
-                      ),
-                ),
-                const SizedBox(height: 16),
-              ],
-
-              Text(
-                'You are successfully logged in',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.grey[600],
-                    ),
-              ),
-              const SizedBox(height: 48),
-
-              // Info card
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.blue[50],
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.blue[100]!),
-                ),
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.info_outline,
-                      color: Colors.blue[700],
-                      size: 32,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Main Screen Placeholder',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue[900],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'This is a placeholder for the main screen. Features will be implemented here.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.blue[700],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 32),
-
-              // Logout button
-              OutlinedButton.icon(
-                onPressed: authState.isLoading
-                    ? null
-                    : () => _handleLogout(context, ref),
-                icon: const Icon(Icons.logout),
-                label: Text(
-                  authState.isLoading ? 'Logging out...' : 'Logout',
-                  style: const TextStyle(fontSize: 16),
-                ),
-                style: OutlinedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                  side: const BorderSide(color: Colors.red, width: 2),
-                  foregroundColor: Colors.red,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+            ),
+            label: tab.label,
+          );
+        }).toList(),
       ),
     );
   }
