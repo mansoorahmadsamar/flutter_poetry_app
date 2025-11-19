@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/auth/auth_provider.dart';
 import '../../../core/design_system/app_colors.dart';
+import '../../../core/providers/user_provider.dart';
 
 /// Profile tab - User profile and settings
 class ProfileTab extends ConsumerWidget {
@@ -46,6 +48,7 @@ class ProfileTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
+    final userProfile = ref.watch(userProfileProvider);
 
     return CustomScrollView(
       slivers: [
@@ -65,37 +68,15 @@ class ProfileTab extends ConsumerWidget {
         SliverToBoxAdapter(
           child: Column(
             children: [
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
 
-              // Profile picture
-              CircleAvatar(
-                radius: 60,
-                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                child: const Icon(
-                  Icons.person,
-                  size: 60,
-                  color: AppColors.primary,
-                ),
+              // Profile header card with user info
+              userProfile.when(
+                data: (user) => _buildProfileHeader(context, user),
+                loading: () => _buildProfileHeaderSkeleton(context),
+                error: (error, stackTrace) => _buildProfileHeaderError(context),
               ),
-              const SizedBox(height: 16),
 
-              // User email
-              if (authState.userEmail != null) ...[
-                Text(
-                  authState.userEmail!,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                const SizedBox(height: 8),
-              ],
-
-              Text(
-                'Poetry Enthusiast',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.grey[600],
-                    ),
-              ),
               const SizedBox(height: 32),
 
               // Profile sections
@@ -231,6 +212,268 @@ class ProfileTab extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+
+  /// Build profile header with all user information
+  Widget _buildProfileHeader(BuildContext context, dynamic user) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColors.primary.withValues(alpha: 0.8),
+                AppColors.primary.withValues(alpha: 0.6),
+              ],
+            ),
+          ),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              // Profile picture
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white,
+                    width: 4,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.4),
+                      blurRadius: 12,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: user.profileImageUrl != null
+                    ? CircleAvatar(
+                        radius: 56,
+                        backgroundImage: CachedNetworkImageProvider(
+                          user.profileImageUrl,
+                        ),
+                      )
+                    : CircleAvatar(
+                        radius: 56,
+                        backgroundColor: Colors.white.withValues(alpha: 0.3),
+                        child: const Icon(
+                          Icons.person,
+                          size: 56,
+                          color: Colors.white,
+                        ),
+                      ),
+              ),
+              const SizedBox(height: 20),
+
+              // Full name
+              Text(
+                user.fullName,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+
+              // Username
+              Text(
+                '@${user.username}',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      fontStyle: FontStyle.italic,
+                    ),
+              ),
+              const SizedBox(height: 16),
+
+              // Divider
+              Container(
+                height: 1,
+                color: Colors.white.withValues(alpha: 0.2),
+              ),
+              const SizedBox(height: 16),
+
+              // User info details
+              Column(
+                children: [
+                  _buildProfileInfoRow(
+                    context,
+                    icon: Icons.email_outlined,
+                    label: 'Email',
+                    value: user.email,
+                  ),
+                  const SizedBox(height: 12),
+                  _buildProfileInfoRow(
+                    context,
+                    icon: Icons.verified_user_outlined,
+                    label: 'Provider',
+                    value: user.provider,
+                  ),
+                  const SizedBox(height: 12),
+                  _buildProfileInfoRow(
+                    context,
+                    icon: user.isActive
+                        ? Icons.check_circle_outline
+                        : Icons.cancel_outlined,
+                    label: 'Status',
+                    value: user.isActive ? 'Active' : 'Inactive',
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Build a row showing profile info
+  Widget _buildProfileInfoRow(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, color: Colors.white.withValues(alpha: 0.8), size: 20),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: Colors.white.withValues(alpha: 0.7),
+                    ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Build profile header skeleton (loading state)
+  Widget _buildProfileHeaderSkeleton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColors.primary.withValues(alpha: 0.8),
+                AppColors.primary.withValues(alpha: 0.6),
+              ],
+            ),
+          ),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              Container(
+                width: 112,
+                height: 112,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.2),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                width: 150,
+                height: 20,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(4),
+                  color: Colors.white.withValues(alpha: 0.2),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                width: 100,
+                height: 16,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(4),
+                  color: Colors.white.withValues(alpha: 0.2),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Build profile header error state
+  Widget _buildProfileHeaderError(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColors.primary.withValues(alpha: 0.8),
+                AppColors.primary.withValues(alpha: 0.6),
+              ],
+            ),
+          ),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              CircleAvatar(
+                radius: 56,
+                backgroundColor: Colors.white.withValues(alpha: 0.3),
+                child: const Icon(
+                  Icons.person,
+                  size: 56,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Unable to load profile',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.white.withValues(alpha: 0.8),
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
