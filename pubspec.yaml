@@ -72,6 +72,13 @@ dependencies:
   app_links: ^6.3.4  # Replacement for deprecated uni_links
   google_sign_in: ^6.2.1  # Native Google Sign-In for Android/iOS
 
+  # Firebase Authentication
+  firebase_core: ^3.8.1
+  firebase_auth: ^5.3.4
+
+  # HTTP client for Firebase token verification
+  http: ^1.2.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

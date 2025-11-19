@@ -215,6 +215,10 @@ class LoginScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
+                      '🔥 Firebase Auth Enabled',
+                      style: TextStyle(fontSize: 12, color: Colors.blue[700]),
+                    ),
+                    Text(
                       'Platform: ${PlatformUtils.platformName}',
                       style: TextStyle(fontSize: 12, color: Colors.blue[700]),
                     ),
@@ -224,10 +228,10 @@ class LoginScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Make sure your backend is running!',
+                      '✅ Backend running + Firebase configured',
                       style: TextStyle(
                         fontSize: 11,
-                        color: Colors.orange[700],
+                        color: Colors.green[700],
                         fontWeight: FontWeight.w500,
                       ),
                     ),

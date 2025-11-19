@@ -12,7 +12,9 @@
       "Bash(flutter clean:*)",
       "Bash(nc:*)",
       "Bash(keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android:*)",
-      "Bash(mvn clean compile:*)"
+      "Bash(mvn clean compile:*)",
+      "Bash(dart pub global activate:*)",
+      "Bash($HOME/.pub-cache/bin/flutterfire configure:*)"
     ],
     "deny": [],
     "ask": []

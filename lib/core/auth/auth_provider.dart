@@ -1,12 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import '../storage/secure_storage.dart';
-import '../config/app_config.dart';
+import 'firebase_auth_service.dart';
 import 'auth_state.dart';
 
 /// Authentication provider for managing auth state
+/// Uses Firebase Authentication with backend JWT verification
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   final secureStorage = ref.watch(secureStorageProvider);
   return AuthNotifier(secureStorage);
@@ -14,28 +14,18 @@ final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
 
 class AuthNotifier extends StateNotifier<AuthState> {
   final SecureStorageService _secureStorage;
-  final Dio _dio = Dio();
   final Logger _logger = Logger();
-
-  // Google Sign-In instance for native authentication
-  late final GoogleSignIn _googleSignIn;
+  late final FirebaseAuthService _firebaseAuthService;
 
   AuthNotifier(this._secureStorage) : super(const AuthState()) {
-    // Initialize Google Sign-In with optional server client ID
-    _googleSignIn = GoogleSignIn(
-      scopes: [
-        'email',
-        'profile',
-        'openid',
-      ],
-      // Server client ID is required to get ID tokens for backend verification
-      serverClientId: appConfig.googleWebClientId,
-    );
+    // Initialize Firebase Auth Service
+    _firebaseAuthService = FirebaseAuthService(_secureStorage);
     _checkAuthStatus();
   }
 
   /// Check if user is already authenticated on app start
   Future<void> _checkAuthStatus() async {
+    _logger.i('🔍 Checking authentication status on app start...');
     state = state.copyWith(isLoading: true);
 
     try {
@@ -44,6 +34,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final userEmail = await _secureStorage.getUserEmail();
 
       if (accessToken != null && refreshToken != null) {
+        _logger.i('✅ User is authenticated, restoring session');
         state = state.copyWith(
           isAuthenticated: true,
           isLoading: false,
@@ -52,9 +43,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
           userEmail: userEmail,
         );
       } else {
+        _logger.i('⚠️  No stored tokens found, user is not authenticated');
         state = state.copyWith(isLoading: false);
       }
     } catch (e) {
+      _logger.e('❌ Error checking auth status: $e');
       state = state.copyWith(
         isLoading: false,
         errorMessage: 'Failed to check authentication status',
@@ -62,167 +55,132 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  /// Sign in with Google using native SDK
+  /// Sign in with Google using Firebase Auth
+  /// This now uses Firebase Authentication with backend verification
   Future<void> signInWithGoogle() async {
+    _logger.i('');
     _logger.i('═══════════════════════════════════════════════════════');
-    _logger.i('🔐 AUTH PROVIDER - STARTING GOOGLE SIGN-IN');
+    _logger.i('🔐 AUTH NOTIFIER - STARTING FIREBASE GOOGLE SIGN-IN');
     _logger.i('═══════════════════════════════════════════════════════');
 
     try {
       _logger.i('⏳ Setting loading state...');
       state = state.copyWith(isLoading: true, errorMessage: null);
-      _logger.i('✅ Loading state set');
 
       _logger.i('');
-      _logger.i('📱 Triggering native Google Sign-In...');
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      _logger.i('🔥 Calling Firebase Auth Service...');
+      final result = await _firebaseAuthService.signInWithGoogle();
 
-      if (googleUser == null) {
-        _logger.w('⚠️ User cancelled the sign-in');
+      if (result.isEmpty) {
+        _logger.w('⚠️  User cancelled the sign-in');
         state = state.copyWith(isLoading: false);
         return;
       }
 
-      _logger.i('✅ Google user signed in: ${googleUser.email}');
+      final accessToken = result['accessToken'] as String?;
+      final refreshToken = result['refreshToken'] as String?;
+      final email = result['email'] as String?;
 
-      _logger.i('');
-      _logger.i('🔑 Getting authentication details...');
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-
-      final String? idToken = googleAuth.idToken;
-
-      if (idToken == null) {
-        _logger.e('❌ Failed to get ID token');
-        throw Exception('Failed to get ID token from Google');
+      if (accessToken == null || refreshToken == null) {
+        throw Exception('Backend did not return required tokens');
       }
 
-      _logger.i('✅ Got ID token (length: ${idToken.length})');
-
-      // Send ID token to backend
       _logger.i('');
-      _logger.i('📤 Sending ID token to backend...');
-      _logger.i('   API URL: ${appConfig.baseApiUrl}/api/auth/google/android');
-
-      final response = await _dio.post(
-        '${appConfig.baseApiUrl}/api/auth/google/android',
-        data: {
-          'idToken': idToken,
-          'deviceType': 'android',
-        },
-        options: Options(
-          headers: {'Content-Type': 'application/json'},
-        ),
+      _logger.i('📝 Updating auth state...');
+      state = state.copyWith(
+        isAuthenticated: true,
+        isLoading: false,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        userEmail: email,
+        errorMessage: null,
       );
 
-      _logger.i('📡 Backend response:');
-      _logger.i('   Status Code: ${response.statusCode}');
-      _logger.i('   Response Data: ${response.data}');
-
-      if (response.statusCode == 200 && response.data['success'] == true) {
-        final tokens = response.data['data'];
-        final accessToken = tokens['accessToken'] as String;
-        final refreshToken = tokens['refreshToken'] as String;
-        final userEmail = tokens['email'] as String?;
-
-        _logger.i('');
-        _logger.i('✅ Authentication successful!');
-        _logger.i('   Email: $userEmail');
-
-        // Store tokens securely
-        _logger.i('');
-        _logger.i('💾 Storing tokens in secure storage...');
-        await _secureStorage.saveAccessToken(accessToken);
-        await _secureStorage.saveRefreshToken(refreshToken);
-        if (userEmail != null) {
-          await _secureStorage.saveUserEmail(userEmail);
-        }
-        _logger.i('✅ Tokens stored successfully');
-
-        // Update state
-        _logger.i('');
-        _logger.i('📝 Updating auth state...');
-        state = state.copyWith(
-          isAuthenticated: true,
-          isLoading: false,
-          accessToken: accessToken,
-          refreshToken: refreshToken,
-          userEmail: userEmail,
-        );
-        _logger.i('✅ Auth state updated successfully');
-
-        _logger.i('');
-        _logger.i('═══════════════════════════════════════════════════════');
-        _logger.i('✅ GOOGLE SIGN-IN COMPLETED SUCCESSFULLY');
-        _logger.i('   Authenticated: ${state.isAuthenticated}');
-        _logger.i('   User Email: ${state.userEmail ?? "Not available"}');
-        _logger.i('═══════════════════════════════════════════════════════');
-      } else {
-        throw Exception(
-            response.data['message'] ?? 'Authentication failed');
-      }
+      _logger.i('');
+      _logger.i('═══════════════════════════════════════════════════════');
+      _logger.i('✅ FIREBASE SIGN-IN COMPLETED - AUTH STATE UPDATED');
+      _logger.i('   Email: $email');
+      _logger.i('═══════════════════════════════════════════════════════');
+      _logger.i('');
+    } on FirebaseAuthException catch (e) {
+      _logger.e('❌ Firebase Auth Exception: ${e.code} - ${e.message}');
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Firebase Auth failed: ${e.message}',
+      );
     } catch (e, stackTrace) {
       _logger.e('');
       _logger.e('═══════════════════════════════════════════════════════');
-      _logger.e('❌ ERROR IN GOOGLE SIGN-IN');
+      _logger.e('❌ ERROR IN FIREBASE SIGN-IN');
       _logger.e('   Error: $e');
       _logger.e('   Stack Trace: $stackTrace');
       _logger.e('═══════════════════════════════════════════════════════');
 
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Failed to sign in with Google: ${e.toString()}',
+        errorMessage: 'Failed to sign in: ${e.toString()}',
       );
 
-      // Sign out from Google on error
-      await _googleSignIn.signOut();
+      // Sign out from Firebase on error to clean up state
+      await _firebaseAuthService.signOut();
     }
   }
 
-  /// Logout user and clear tokens
+  /// Refresh access token
+  Future<bool> refreshAccessToken() async {
+    _logger.i('🔄 Auth Notifier - Refreshing access token...');
+
+    try {
+      final newAccessToken = await _firebaseAuthService.refreshAccessToken();
+
+      if (newAccessToken != null) {
+        state = state.copyWith(accessToken: newAccessToken);
+        _logger.i('✅ Access token refreshed successfully');
+        return true;
+      } else {
+        _logger.e('❌ Token refresh failed');
+        // Token refresh failed, force logout
+        await logout();
+        return false;
+      }
+    } catch (e) {
+      _logger.e('❌ Token refresh error: $e');
+      await logout();
+      return false;
+    }
+  }
+
+  /// Logout
   Future<void> logout() async {
+    _logger.i('');
+    _logger.i('═══════════════════════════════════════════════════════');
+    _logger.i('🔐 LOGGING OUT USER');
+    _logger.i('═══════════════════════════════════════════════════════');
+
     try {
       state = state.copyWith(isLoading: true);
 
-      final refreshToken = await _secureStorage.getRefreshToken();
+      _logger.i('   Calling Firebase Auth Service logout...');
+      await _firebaseAuthService.signOut();
 
-      // Call logout API if refresh token exists
-      if (refreshToken != null) {
-        try {
-          await _dio.post(
-            '${appConfig.baseApiUrl}/api/auth/logout',
-            data: {'refreshToken': refreshToken},
-            options: Options(
-              headers: {'Content-Type': 'application/json'},
-            ),
-          );
-        } catch (e) {
-          // Continue with local logout even if API call fails
-          _logger.w('Logout API call failed: $e');
-        }
-      }
+      _logger.i('✅ Logout successful');
 
-      // Sign out from Google
-      await _googleSignIn.signOut();
+      state = const AuthState();
 
-      // Clear stored tokens
-      await _secureStorage.deleteAccessToken();
-      await _secureStorage.deleteRefreshToken();
-      await _secureStorage.deleteUserEmail();
-
-      // Reset state
-      state = const AuthState(isLoading: false);
-
-      _logger.i('✅ Logged out successfully');
+      _logger.i('═══════════════════════════════════════════════════════');
+      _logger.i('✅ USER LOGGED OUT - STATE CLEARED');
+      _logger.i('═══════════════════════════════════════════════════════');
+      _logger.i('');
     } catch (e) {
+      _logger.e('❌ Logout error: $e');
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Failed to logout: ${e.toString()}',
+        errorMessage: 'Logout failed: $e',
       );
     }
   }
 
-  /// Clear any error messages
+  /// Clear error message
   void clearError() {
     state = state.copyWith(errorMessage: null);
   }

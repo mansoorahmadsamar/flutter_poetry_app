@@ -25,8 +25,9 @@ class DioClient {
     );
 
     // Add interceptors
+    // Auth interceptor must be added first to intercept requests
     _dio.interceptors.addAll([
-      AuthInterceptor(secureStorage),
+      AuthInterceptor(secureStorage, _dio),
       if (appConfig.enableLogging) LoggingInterceptor(),
     ]);
   }

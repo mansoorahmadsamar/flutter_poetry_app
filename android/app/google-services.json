@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "381838704656",
+    "project_id": "poetry-world-eaf6c",
+    "storage_bucket": "poetry-world-eaf6c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:381838704656:android:aaa0ddbf1692003ee88a95",
+        "android_client_info": {
+          "package_name": "com.techhikes.poetry_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "381838704656-4mhqe5ej6tjhtj9p16l4uvoc9bij95dq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.techhikes.poetry_app",
+            "certificate_hash": "95b6a72ce7403675b19b7bb6eef6aa4486493765"
+          }
+        },
+        {
+          "client_id": "381838704656-7d1r4avegn7vf56413lg8c3nqgvehvbq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVBApwjZn4OSgON5Ja36n5-PLQUigbjY4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "381838704656-7d1r4avegn7vf56413lg8c3nqgvehvbq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

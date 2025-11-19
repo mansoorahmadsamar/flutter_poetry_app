@@ -51,7 +51,7 @@ class AppConfig {
       enableAnalytics: false,
       googleOAuthRedirectUri: 'http://localhost:3000/auth/callback',
       // Web Client ID from Google Cloud Console (used for native Google Sign-In)
-      googleWebClientId: '461228119902-8s3jjf9m60ql21odr0sfsc583cqrnds0.apps.googleusercontent.com',
+      googleWebClientId: '461228119902-ofi032jvtvsqrenp0349rs06rahfpkru.apps.googleusercontent.com',
     );
   }
 
