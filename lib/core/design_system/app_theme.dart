@@ -5,6 +5,8 @@ import 'app_typography.dart';
 
 /// Application theme configuration
 /// Provides light and dark themes with consistent styling
+/// Supports dynamic theme switching via ThemeProvider
+/// See: theme_provider.dart and theme_config.dart for theme management
 class AppTheme {
   AppTheme._();
 
