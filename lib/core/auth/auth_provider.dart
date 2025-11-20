@@ -9,7 +9,7 @@ import 'auth_state.dart';
 /// Uses Firebase Authentication with backend JWT verification
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   final secureStorage = ref.watch(secureStorageProvider);
-  return AuthNotifier(secureStorage);
+  return AuthNotifier(secureStorage, ref);
 });
 
 class AuthNotifier extends StateNotifier<AuthState> {
@@ -17,7 +17,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   final Logger _logger = Logger();
   late final FirebaseAuthService _firebaseAuthService;
 
-  AuthNotifier(this._secureStorage) : super(const AuthState()) {
+  AuthNotifier(this._secureStorage, Ref ref) : super(const AuthState()) {
     // Initialize Firebase Auth Service
     _firebaseAuthService = FirebaseAuthService(_secureStorage);
     _checkAuthStatus();
@@ -102,6 +102,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
       _logger.i('   Email: $email');
       _logger.i('═══════════════════════════════════════════════════════');
       _logger.i('');
+
+      // Note: Profile provider will automatically re-fetch due to auth state change
+      // since it watches authProvider for isAuthenticated changes
     } on FirebaseAuthException catch (e) {
       _logger.e('❌ Firebase Auth Exception: ${e.code} - ${e.message}');
       state = state.copyWith(

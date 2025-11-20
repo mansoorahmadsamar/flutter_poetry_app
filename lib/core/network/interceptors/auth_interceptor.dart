@@ -119,7 +119,7 @@ class AuthInterceptor extends Interceptor {
       }
     } else {
       // Handle other errors
-      _handleErrorResponse(err);
+      await _handleErrorResponse(err);
       handler.next(err);
     }
   }
@@ -145,14 +145,25 @@ class AuthInterceptor extends Interceptor {
   }
 
   /// Log detailed error information
-  void _handleErrorResponse(DioException err) {
+  Future<void> _handleErrorResponse(DioException err) async {
+    final authHeader = err.requestOptions.headers[AppConstants.authorizationHeader];
+
     _logger.e('');
     _logger.e('═══════════════════════════════════════════════════════');
     _logger.e('❌ API REQUEST ERROR');
     _logger.e('   Status Code: ${err.response?.statusCode}');
     _logger.e('   Message: ${err.message}');
     _logger.e('   Path: ${err.requestOptions.path}');
+    _logger.e('   Method: ${err.requestOptions.method}');
     _logger.e('   Type: ${err.type.name}');
+    _logger.e('');
+    _logger.e('   🔐 Authentication Info:');
+    if (authHeader != null && authHeader.isNotEmpty) {
+      _logger.e('      Token Attached: ✅ YES');
+      _logger.e('      Header Length: ${authHeader.length} characters');
+    } else {
+      _logger.e('      Token Attached: ❌ NO');
+    }
     _logger.e('═══════════════════════════════════════════════════════');
   }
 }

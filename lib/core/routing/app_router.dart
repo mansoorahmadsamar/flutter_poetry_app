@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/auth/login_screen.dart';
 import '../../features/main/main_screen.dart';
+import '../../features/main/tabs/poets/screens/poet_detail_screen.dart';
 import '../auth/auth_provider.dart';
 
 /// App routes
@@ -59,6 +60,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.main,
         builder: (context, state) => const MainScreen(),
+        routes: [
+          GoRoute(
+            path: 'poets/:publicId',
+            builder: (context, state) => PoetDetailScreen(
+              publicId: state.pathParameters['publicId']!,
+            ),
+          ),
+        ],
       ),
     ],
   );

@@ -1,5 +1,40 @@
 # Poetry App - API Documentation for Flutter Team
 
+## Recent Updates (November 2025)
+
+### Backend Fixes - Security Configuration
+**Date:** November 20, 2025
+
+The following critical issues have been fixed in the backend:
+
+1. **Fixed OAuth2 Redirect Loop Issue**
+   - **Problem:** API endpoints (especially `/api/poets`) were redirecting to OAuth2 login instead of returning 401 Unauthorized
+   - **Solution:** Updated `SecurityConfig.java` to properly scope the OAuth2 filter chain to only `/oauth2/**`, `/login/**`, and `/actuator/**` paths
+   - **Impact:** All `/api/**` endpoints now correctly return JSON error responses instead of redirects
+
+2. **Improved `/api/auth/me` Endpoint**
+   - **Problem:** Endpoint was returning 404 "User not found" for valid authenticated users
+   - **Solution:** Added better error handling, logging, and anonymous user detection
+   - **Impact:** More informative error messages and better debugging capabilities
+
+3. **Fixed Missing Repository Methods**
+   - Added `findByTagType(TagType tagType)` method to `TagRepository`
+   - Fixed `LanguageController` to use correct repository method `findByIsActiveTrueOrderByDisplayOrder()`
+
+4. **Fixed 500 Error on `/api/poets` Endpoint**
+   - **Problem:** Default sort parameter was `name` which doesn't exist on Poet entity (names stored in PoetDetails)
+   - **Solution:** Changed default sort to `viewCount` (most popular poets first)
+   - **Valid Sort Fields:** `viewCount`, `poemCount`, `followerCount`, `birthYear`, `deathYear`, `createdAt`, `updatedAt`
+   - **Impact:** Main poets listing endpoint now works correctly
+
+**Action Required:**
+- Backend server must be restarted for these changes to take effect
+- Flutter team should test authentication flow after backend restart
+- The redirect loop and 500 error issues should now be resolved
+- Update any Flutter code that explicitly passes `sortBy=name` to use valid fields
+
+---
+
 ## Base URLs by Environment
 
 Configure these base URLs in your Flutter app based on the environment:
@@ -88,6 +123,43 @@ Include the access token in the Authorization header for all protected endpoints
 ```
 Authorization: Bearer <access_token>
 ```
+
+### Common Authentication Issues & Solutions
+
+#### Issue 1: Getting 302 Redirect Instead of 401/403
+**Symptom:** API returns redirect to OAuth2 login page instead of JSON error response
+**Cause:** Old backend code with misconfigured security filters
+**Solution:** Ensure backend is running the latest code (restart required after Nov 20, 2025 fixes)
+
+#### Issue 2: 404 "User not found" on `/api/auth/me`
+**Symptom:** Valid JWT token but `/api/auth/me` returns 404
+**Possible Causes:**
+- JWT token contains email that doesn't exist in database (token from different environment)
+- User was deleted from database but token is still valid
+- Token was issued before user record was created
+**Solution:**
+- Check backend logs for detailed error message
+- Verify user exists in database with the email in JWT token
+- Generate fresh token by logging in again
+
+#### Issue 3: Redirect Loop on Protected Endpoints
+**Symptom:** App gets stuck in redirect loop when calling `/api/poets` or other protected endpoints
+**Cause:** Fixed in backend update (Nov 20, 2025)
+**Solution:** Ensure backend server is restarted with latest code
+
+#### Expected Error Response Format
+When authentication fails, the backend returns:
+```json
+{
+  "success": false,
+  "message": "User not authenticated",
+  "data": null
+}
+```
+**Status Codes:**
+- `401 Unauthorized`: No token or invalid token
+- `403 Forbidden`: Valid token but insufficient permissions
+- `404 Not Found`: Token valid but user record not found
 
 ---
 
@@ -1271,7 +1343,7 @@ Example: `GET /api/poets?lang=en` will return poet names and bios in English.
 
 ### 5.1.1 Get All Poets
 
-**Endpoint:** `GET /api/poets?page=0&size=10&lang=ur&sortBy=name&sortDir=asc`
+**Endpoint:** `GET /api/poets?page=0&size=10&lang=ur&sortBy=viewCount&sortDir=desc`
 
 **Authentication Required:** Yes
 
@@ -1284,8 +1356,10 @@ Authorization: Bearer <access_token>
 - `page` (optional): Page number (default: 0)
 - `size` (optional): Items per page (default: 10)
 - `lang` (optional): Language code - ur/en/hi (default: ur)
-- `sortBy` (optional): Sort field (default: name)
-- `sortDir` (optional): Sort direction - asc/desc (default: asc)
+- `sortBy` (optional): Sort field (default: viewCount)
+  - Valid values: `viewCount`, `poemCount`, `followerCount`, `birthYear`, `deathYear`, `createdAt`, `updatedAt`
+  - **Note:** Cannot sort by `name` directly as names are stored in multiple languages
+- `sortDir` (optional): Sort direction - asc/desc (default: desc)
 
 **Success Response (200):**
 ```json

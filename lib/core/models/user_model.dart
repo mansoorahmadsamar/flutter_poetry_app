@@ -6,7 +6,7 @@ part 'user_model.g.dart';
 /// User model representing the authenticated user
 @JsonSerializable()
 class UserModel extends Equatable {
-  final int id;
+  final String id;
   final String email;
   final String fullName;
   final String username;
