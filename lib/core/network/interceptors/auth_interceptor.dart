@@ -11,7 +11,7 @@ class AuthInterceptor extends Interceptor {
 
   // Lock to prevent concurrent token refresh attempts
   bool _isRefreshing = false;
-  final List<RequestInterceptorHandler> _pendingRequests = [];
+  final List<({DioException error, ErrorInterceptorHandler handler})> _pendingRequests = [];
 
   AuthInterceptor(this._secureStorage, this._dio);
 
@@ -51,7 +51,7 @@ class AuthInterceptor extends Interceptor {
       if (_isRefreshing) {
         _logger.i('⏳ Token refresh already in progress, queueing request...');
         // Queue this request to be retried after token refresh
-        _pendingRequests.add(handler as RequestInterceptorHandler);
+        _pendingRequests.add((error: err, handler: handler));
         return;
       }
 
@@ -139,14 +139,23 @@ class AuthInterceptor extends Interceptor {
   }
 
   /// Retry all queued requests with new token
-  void _retryQueuedRequests(String newAccessToken) {
+  void _retryQueuedRequests(String newAccessToken) async {
     if (_pendingRequests.isNotEmpty) {
       _logger.i('🔁 Retrying ${_pendingRequests.length} queued requests...');
       _logger.i('   New Token Length: ${newAccessToken.length} chars');
 
       for (int i = 0; i < _pendingRequests.length; i++) {
+        final pending = _pendingRequests[i];
         _logger.i('   [${i + 1}/${_pendingRequests.length}] Retrying queued request...');
-        _pendingRequests[i].next(RequestOptions(path: ''));
+        // Update request with new token and retry
+        pending.error.requestOptions.headers[AppConstants.authorizationHeader] =
+            '${AppConstants.bearerPrefix} $newAccessToken';
+        try {
+          final response = await _dio.fetch(pending.error.requestOptions);
+          pending.handler.resolve(response);
+        } catch (e) {
+          pending.handler.reject(pending.error);
+        }
       }
       _pendingRequests.clear();
       _logger.i('✅ All queued requests retried');
@@ -159,8 +168,8 @@ class AuthInterceptor extends Interceptor {
       _logger.e('❌ Clearing ${_pendingRequests.length} pending requests');
       _logger.e('   Error: ${err.message}');
 
-      for (final handler in _pendingRequests) {
-        handler.reject(err);
+      for (final pending in _pendingRequests) {
+        pending.handler.reject(err);
       }
       _pendingRequests.clear();
       _logger.e('   All pending requests cleared');
