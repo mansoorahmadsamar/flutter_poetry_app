@@ -114,7 +114,7 @@ class _PoetDetailScreenState extends ConsumerState<PoetDetailScreen>
           children: [
             // Background Image
             CachedNetworkImage(
-              imageUrl: poetProfile.profileImageUrl,
+              imageUrl: poetProfile.profileImageUrl ?? '',
               fit: BoxFit.cover,
               placeholder: (context, url) => Container(
                 color: isDark ? Colors.grey[800] : Colors.grey[300],
@@ -362,10 +362,10 @@ class _TabBarDelegate extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  double get maxExtent => 50;
+  double get maxExtent => 48;
 
   @override
-  double get minExtent => 50;
+  double get minExtent => 48;
 
   @override
   bool shouldRebuild(_TabBarDelegate oldDelegate) {

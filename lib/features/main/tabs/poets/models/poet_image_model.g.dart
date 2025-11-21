@@ -10,8 +10,8 @@ _$PoetImageModelImpl _$$PoetImageModelImplFromJson(Map<String, dynamic> json) =>
     _$PoetImageModelImpl(
       publicId: json['publicId'] as String,
       imageUrl: json['imageUrl'] as String,
-      thumbnailUrl: json['thumbnailUrl'] as String,
-      caption: json['caption'] as String,
+      thumbnailUrl: json['thumbnailUrl'] as String?,
+      caption: json['caption'] as String?,
       altText: json['altText'] as String,
       displayOrder: (json['displayOrder'] as num).toInt(),
       isProfileImage: json['isProfileImage'] as bool,

@@ -48,7 +48,7 @@ class PoetCard extends StatelessWidget {
                 child: Stack(
                   children: [
                     CachedNetworkImage(
-                      imageUrl: poet.profileImageUrl,
+                      imageUrl: poet.profileImageUrl ?? '',
                       fit: BoxFit.cover,
                       height: 150,
                       width: double.infinity,

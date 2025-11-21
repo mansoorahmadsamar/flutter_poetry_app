@@ -27,7 +27,7 @@ mixin _$PoetModel {
   int get birthYear => throw _privateConstructorUsedError;
   int? get deathYear => throw _privateConstructorUsedError;
   @JsonKey(name: 'profileImageUrl')
-  String get profileImageUrl => throw _privateConstructorUsedError;
+  String? get profileImageUrl => throw _privateConstructorUsedError;
   String get gender =>
       throw _privateConstructorUsedError; // MALE, FEMALE, OTHER
   String get era =>
@@ -62,7 +62,7 @@ abstract class $PoetModelCopyWith<$Res> {
       @JsonKey(name: 'shortBio') String shortBio,
       int birthYear,
       int? deathYear,
-      @JsonKey(name: 'profileImageUrl') String profileImageUrl,
+      @JsonKey(name: 'profileImageUrl') String? profileImageUrl,
       String gender,
       String era,
       int poemCount,
@@ -92,7 +92,7 @@ class _$PoetModelCopyWithImpl<$Res, $Val extends PoetModel>
     Object? shortBio = null,
     Object? birthYear = null,
     Object? deathYear = freezed,
-    Object? profileImageUrl = null,
+    Object? profileImageUrl = freezed,
     Object? gender = null,
     Object? era = null,
     Object? poemCount = null,
@@ -122,10 +122,10 @@ class _$PoetModelCopyWithImpl<$Res, $Val extends PoetModel>
           ? _value.deathYear
           : deathYear // ignore: cast_nullable_to_non_nullable
               as int?,
-      profileImageUrl: null == profileImageUrl
+      profileImageUrl: freezed == profileImageUrl
           ? _value.profileImageUrl
           : profileImageUrl // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       gender: null == gender
           ? _value.gender
           : gender // ignore: cast_nullable_to_non_nullable
@@ -172,7 +172,7 @@ abstract class _$$PoetModelImplCopyWith<$Res>
       @JsonKey(name: 'shortBio') String shortBio,
       int birthYear,
       int? deathYear,
-      @JsonKey(name: 'profileImageUrl') String profileImageUrl,
+      @JsonKey(name: 'profileImageUrl') String? profileImageUrl,
       String gender,
       String era,
       int poemCount,
@@ -200,7 +200,7 @@ class __$$PoetModelImplCopyWithImpl<$Res>
     Object? shortBio = null,
     Object? birthYear = null,
     Object? deathYear = freezed,
-    Object? profileImageUrl = null,
+    Object? profileImageUrl = freezed,
     Object? gender = null,
     Object? era = null,
     Object? poemCount = null,
@@ -230,10 +230,10 @@ class __$$PoetModelImplCopyWithImpl<$Res>
           ? _value.deathYear
           : deathYear // ignore: cast_nullable_to_non_nullable
               as int?,
-      profileImageUrl: null == profileImageUrl
+      profileImageUrl: freezed == profileImageUrl
           ? _value.profileImageUrl
           : profileImageUrl // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       gender: null == gender
           ? _value.gender
           : gender // ignore: cast_nullable_to_non_nullable
@@ -275,7 +275,7 @@ class _$PoetModelImpl implements _PoetModel {
       @JsonKey(name: 'shortBio') required this.shortBio,
       required this.birthYear,
       this.deathYear,
-      @JsonKey(name: 'profileImageUrl') required this.profileImageUrl,
+      @JsonKey(name: 'profileImageUrl') this.profileImageUrl,
       required this.gender,
       required this.era,
       required this.poemCount,
@@ -301,7 +301,7 @@ class _$PoetModelImpl implements _PoetModel {
   final int? deathYear;
   @override
   @JsonKey(name: 'profileImageUrl')
-  final String profileImageUrl;
+  final String? profileImageUrl;
   @override
   final String gender;
 // MALE, FEMALE, OTHER
@@ -404,7 +404,7 @@ abstract class _PoetModel implements PoetModel {
       @JsonKey(name: 'shortBio') required final String shortBio,
       required final int birthYear,
       final int? deathYear,
-      @JsonKey(name: 'profileImageUrl') required final String profileImageUrl,
+      @JsonKey(name: 'profileImageUrl') final String? profileImageUrl,
       required final String gender,
       required final String era,
       required final int poemCount,
@@ -429,7 +429,7 @@ abstract class _PoetModel implements PoetModel {
   int? get deathYear;
   @override
   @JsonKey(name: 'profileImageUrl')
-  String get profileImageUrl;
+  String? get profileImageUrl;
   @override
   String get gender; // MALE, FEMALE, OTHER
   @override

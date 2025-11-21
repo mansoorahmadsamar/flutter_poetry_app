@@ -29,7 +29,7 @@ _$PoetProfileModelImpl _$$PoetProfileModelImplFromJson(
       viewCount: (json['viewCount'] as num).toInt(),
       followerCount: (json['followerCount'] as num).toInt(),
       poemCount: (json['poemCount'] as num).toInt(),
-      profileImageUrl: json['profileImageUrl'] as String,
+      profileImageUrl: json['profileImageUrl'] as String?,
       gallery: (json['gallery'] as List<dynamic>?)
           ?.map((e) => PoetImageModel.fromJson(e as Map<String, dynamic>))
           .toList(),

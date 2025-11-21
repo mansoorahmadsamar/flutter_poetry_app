@@ -30,7 +30,7 @@ class PoetProfileModel with _$PoetProfileModel {
     @JsonKey(name: 'viewCount') required int viewCount,
     @JsonKey(name: 'followerCount') required int followerCount,
     @JsonKey(name: 'poemCount') required int poemCount,
-    @JsonKey(name: 'profileImageUrl') required String profileImageUrl,
+    @JsonKey(name: 'profileImageUrl') String? profileImageUrl,
     List<PoetImageModel>? gallery,
     List<PoetBookModel>? books,
     List<PoetVideoModel>? videos,

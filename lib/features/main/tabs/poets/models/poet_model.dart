@@ -11,7 +11,7 @@ class PoetModel with _$PoetModel {
     @JsonKey(name: 'shortBio') required String shortBio,
     required int birthYear,
     int? deathYear,
-    @JsonKey(name: 'profileImageUrl') required String profileImageUrl,
+    @JsonKey(name: 'profileImageUrl') String? profileImageUrl,
     required String gender, // MALE, FEMALE, OTHER
     required String era, // CLASSICAL, MODERN, CONTEMPORARY, EMERGING
     required int poemCount,

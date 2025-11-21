@@ -43,7 +43,7 @@ class PoetGalleryTab extends ConsumerWidget {
                   fit: StackFit.expand,
                   children: [
                     CachedNetworkImage(
-                      imageUrl: image.thumbnailUrl,
+                      imageUrl: image.thumbnailUrl ?? image.imageUrl,
                       fit: BoxFit.cover,
                       placeholder: (context, url) => Container(
                         color: isDark ? Colors.grey[800] : Colors.grey[300],

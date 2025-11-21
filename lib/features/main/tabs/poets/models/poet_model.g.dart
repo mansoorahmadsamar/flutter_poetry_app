@@ -13,7 +13,7 @@ _$PoetModelImpl _$$PoetModelImplFromJson(Map<String, dynamic> json) =>
       shortBio: json['shortBio'] as String,
       birthYear: (json['birthYear'] as num).toInt(),
       deathYear: (json['deathYear'] as num?)?.toInt(),
-      profileImageUrl: json['profileImageUrl'] as String,
+      profileImageUrl: json['profileImageUrl'] as String?,
       gender: json['gender'] as String,
       era: json['era'] as String,
       poemCount: (json['poemCount'] as num).toInt(),

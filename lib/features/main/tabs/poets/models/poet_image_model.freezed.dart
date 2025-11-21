@@ -24,8 +24,8 @@ mixin _$PoetImageModel {
   @JsonKey(name: 'imageUrl')
   String get imageUrl => throw _privateConstructorUsedError;
   @JsonKey(name: 'thumbnailUrl')
-  String get thumbnailUrl => throw _privateConstructorUsedError;
-  String get caption => throw _privateConstructorUsedError;
+  String? get thumbnailUrl => throw _privateConstructorUsedError;
+  String? get caption => throw _privateConstructorUsedError;
   @JsonKey(name: 'altText')
   String get altText => throw _privateConstructorUsedError;
   @JsonKey(name: 'displayOrder')
@@ -54,8 +54,8 @@ abstract class $PoetImageModelCopyWith<$Res> {
   $Res call(
       {String publicId,
       @JsonKey(name: 'imageUrl') String imageUrl,
-      @JsonKey(name: 'thumbnailUrl') String thumbnailUrl,
-      String caption,
+      @JsonKey(name: 'thumbnailUrl') String? thumbnailUrl,
+      String? caption,
       @JsonKey(name: 'altText') String altText,
       @JsonKey(name: 'displayOrder') int displayOrder,
       @JsonKey(name: 'isProfileImage') bool isProfileImage,
@@ -79,8 +79,8 @@ class _$PoetImageModelCopyWithImpl<$Res, $Val extends PoetImageModel>
   $Res call({
     Object? publicId = null,
     Object? imageUrl = null,
-    Object? thumbnailUrl = null,
-    Object? caption = null,
+    Object? thumbnailUrl = freezed,
+    Object? caption = freezed,
     Object? altText = null,
     Object? displayOrder = null,
     Object? isProfileImage = null,
@@ -95,14 +95,14 @@ class _$PoetImageModelCopyWithImpl<$Res, $Val extends PoetImageModel>
           ? _value.imageUrl
           : imageUrl // ignore: cast_nullable_to_non_nullable
               as String,
-      thumbnailUrl: null == thumbnailUrl
+      thumbnailUrl: freezed == thumbnailUrl
           ? _value.thumbnailUrl
           : thumbnailUrl // ignore: cast_nullable_to_non_nullable
-              as String,
-      caption: null == caption
+              as String?,
+      caption: freezed == caption
           ? _value.caption
           : caption // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       altText: null == altText
           ? _value.altText
           : altText // ignore: cast_nullable_to_non_nullable
@@ -134,8 +134,8 @@ abstract class _$$PoetImageModelImplCopyWith<$Res>
   $Res call(
       {String publicId,
       @JsonKey(name: 'imageUrl') String imageUrl,
-      @JsonKey(name: 'thumbnailUrl') String thumbnailUrl,
-      String caption,
+      @JsonKey(name: 'thumbnailUrl') String? thumbnailUrl,
+      String? caption,
       @JsonKey(name: 'altText') String altText,
       @JsonKey(name: 'displayOrder') int displayOrder,
       @JsonKey(name: 'isProfileImage') bool isProfileImage,
@@ -157,8 +157,8 @@ class __$$PoetImageModelImplCopyWithImpl<$Res>
   $Res call({
     Object? publicId = null,
     Object? imageUrl = null,
-    Object? thumbnailUrl = null,
-    Object? caption = null,
+    Object? thumbnailUrl = freezed,
+    Object? caption = freezed,
     Object? altText = null,
     Object? displayOrder = null,
     Object? isProfileImage = null,
@@ -173,14 +173,14 @@ class __$$PoetImageModelImplCopyWithImpl<$Res>
           ? _value.imageUrl
           : imageUrl // ignore: cast_nullable_to_non_nullable
               as String,
-      thumbnailUrl: null == thumbnailUrl
+      thumbnailUrl: freezed == thumbnailUrl
           ? _value.thumbnailUrl
           : thumbnailUrl // ignore: cast_nullable_to_non_nullable
-              as String,
-      caption: null == caption
+              as String?,
+      caption: freezed == caption
           ? _value.caption
           : caption // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       altText: null == altText
           ? _value.altText
           : altText // ignore: cast_nullable_to_non_nullable
@@ -207,8 +207,8 @@ class _$PoetImageModelImpl implements _PoetImageModel {
   const _$PoetImageModelImpl(
       {required this.publicId,
       @JsonKey(name: 'imageUrl') required this.imageUrl,
-      @JsonKey(name: 'thumbnailUrl') required this.thumbnailUrl,
-      required this.caption,
+      @JsonKey(name: 'thumbnailUrl') this.thumbnailUrl,
+      this.caption,
       @JsonKey(name: 'altText') required this.altText,
       @JsonKey(name: 'displayOrder') required this.displayOrder,
       @JsonKey(name: 'isProfileImage') required this.isProfileImage,
@@ -224,9 +224,9 @@ class _$PoetImageModelImpl implements _PoetImageModel {
   final String imageUrl;
   @override
   @JsonKey(name: 'thumbnailUrl')
-  final String thumbnailUrl;
+  final String? thumbnailUrl;
   @override
-  final String caption;
+  final String? caption;
   @override
   @JsonKey(name: 'altText')
   final String altText;
@@ -292,8 +292,8 @@ abstract class _PoetImageModel implements PoetImageModel {
   const factory _PoetImageModel(
           {required final String publicId,
           @JsonKey(name: 'imageUrl') required final String imageUrl,
-          @JsonKey(name: 'thumbnailUrl') required final String thumbnailUrl,
-          required final String caption,
+          @JsonKey(name: 'thumbnailUrl') final String? thumbnailUrl,
+          final String? caption,
           @JsonKey(name: 'altText') required final String altText,
           @JsonKey(name: 'displayOrder') required final int displayOrder,
           @JsonKey(name: 'isProfileImage') required final bool isProfileImage,
@@ -310,9 +310,9 @@ abstract class _PoetImageModel implements PoetImageModel {
   String get imageUrl;
   @override
   @JsonKey(name: 'thumbnailUrl')
-  String get thumbnailUrl;
+  String? get thumbnailUrl;
   @override
-  String get caption;
+  String? get caption;
   @override
   @JsonKey(name: 'altText')
   String get altText;

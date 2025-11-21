@@ -8,8 +8,8 @@ class PoetImageModel with _$PoetImageModel {
   const factory PoetImageModel({
     required String publicId,
     @JsonKey(name: 'imageUrl') required String imageUrl,
-    @JsonKey(name: 'thumbnailUrl') required String thumbnailUrl,
-    required String caption,
+    @JsonKey(name: 'thumbnailUrl') String? thumbnailUrl,
+    String? caption,
     @JsonKey(name: 'altText') required String altText,
     @JsonKey(name: 'displayOrder') required int displayOrder,
     @JsonKey(name: 'isProfileImage') required bool isProfileImage,

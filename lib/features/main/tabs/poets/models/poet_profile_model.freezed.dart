@@ -53,7 +53,7 @@ mixin _$PoetProfileModel {
   @JsonKey(name: 'poemCount')
   int get poemCount => throw _privateConstructorUsedError;
   @JsonKey(name: 'profileImageUrl')
-  String get profileImageUrl => throw _privateConstructorUsedError;
+  String? get profileImageUrl => throw _privateConstructorUsedError;
   List<PoetImageModel>? get gallery => throw _privateConstructorUsedError;
   List<PoetBookModel>? get books => throw _privateConstructorUsedError;
   List<PoetVideoModel>? get videos => throw _privateConstructorUsedError;
@@ -101,7 +101,7 @@ abstract class $PoetProfileModelCopyWith<$Res> {
       @JsonKey(name: 'viewCount') int viewCount,
       @JsonKey(name: 'followerCount') int followerCount,
       @JsonKey(name: 'poemCount') int poemCount,
-      @JsonKey(name: 'profileImageUrl') String profileImageUrl,
+      @JsonKey(name: 'profileImageUrl') String? profileImageUrl,
       List<PoetImageModel>? gallery,
       List<PoetBookModel>? books,
       List<PoetVideoModel>? videos,
@@ -146,7 +146,7 @@ class _$PoetProfileModelCopyWithImpl<$Res, $Val extends PoetProfileModel>
     Object? viewCount = null,
     Object? followerCount = null,
     Object? poemCount = null,
-    Object? profileImageUrl = null,
+    Object? profileImageUrl = freezed,
     Object? gallery = freezed,
     Object? books = freezed,
     Object? videos = freezed,
@@ -236,10 +236,10 @@ class _$PoetProfileModelCopyWithImpl<$Res, $Val extends PoetProfileModel>
           ? _value.poemCount
           : poemCount // ignore: cast_nullable_to_non_nullable
               as int,
-      profileImageUrl: null == profileImageUrl
+      profileImageUrl: freezed == profileImageUrl
           ? _value.profileImageUrl
           : profileImageUrl // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       gallery: freezed == gallery
           ? _value.gallery
           : gallery // ignore: cast_nullable_to_non_nullable
@@ -301,7 +301,7 @@ abstract class _$$PoetProfileModelImplCopyWith<$Res>
       @JsonKey(name: 'viewCount') int viewCount,
       @JsonKey(name: 'followerCount') int followerCount,
       @JsonKey(name: 'poemCount') int poemCount,
-      @JsonKey(name: 'profileImageUrl') String profileImageUrl,
+      @JsonKey(name: 'profileImageUrl') String? profileImageUrl,
       List<PoetImageModel>? gallery,
       List<PoetBookModel>? books,
       List<PoetVideoModel>? videos,
@@ -344,7 +344,7 @@ class __$$PoetProfileModelImplCopyWithImpl<$Res>
     Object? viewCount = null,
     Object? followerCount = null,
     Object? poemCount = null,
-    Object? profileImageUrl = null,
+    Object? profileImageUrl = freezed,
     Object? gallery = freezed,
     Object? books = freezed,
     Object? videos = freezed,
@@ -434,10 +434,10 @@ class __$$PoetProfileModelImplCopyWithImpl<$Res>
           ? _value.poemCount
           : poemCount // ignore: cast_nullable_to_non_nullable
               as int,
-      profileImageUrl: null == profileImageUrl
+      profileImageUrl: freezed == profileImageUrl
           ? _value.profileImageUrl
           : profileImageUrl // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       gallery: freezed == gallery
           ? _value._gallery
           : gallery // ignore: cast_nullable_to_non_nullable
@@ -494,7 +494,7 @@ class _$PoetProfileModelImpl implements _PoetProfileModel {
       @JsonKey(name: 'viewCount') required this.viewCount,
       @JsonKey(name: 'followerCount') required this.followerCount,
       @JsonKey(name: 'poemCount') required this.poemCount,
-      @JsonKey(name: 'profileImageUrl') required this.profileImageUrl,
+      @JsonKey(name: 'profileImageUrl') this.profileImageUrl,
       final List<PoetImageModel>? gallery,
       final List<PoetBookModel>? books,
       final List<PoetVideoModel>? videos,
@@ -565,7 +565,7 @@ class _$PoetProfileModelImpl implements _PoetProfileModel {
   final int poemCount;
   @override
   @JsonKey(name: 'profileImageUrl')
-  final String profileImageUrl;
+  final String? profileImageUrl;
   final List<PoetImageModel>? _gallery;
   @override
   List<PoetImageModel>? get gallery {
@@ -755,7 +755,7 @@ abstract class _PoetProfileModel implements PoetProfileModel {
       @JsonKey(name: 'viewCount') required final int viewCount,
       @JsonKey(name: 'followerCount') required final int followerCount,
       @JsonKey(name: 'poemCount') required final int poemCount,
-      @JsonKey(name: 'profileImageUrl') required final String profileImageUrl,
+      @JsonKey(name: 'profileImageUrl') final String? profileImageUrl,
       final List<PoetImageModel>? gallery,
       final List<PoetBookModel>? books,
       final List<PoetVideoModel>? videos,
@@ -822,7 +822,7 @@ abstract class _PoetProfileModel implements PoetProfileModel {
   int get poemCount;
   @override
   @JsonKey(name: 'profileImageUrl')
-  String get profileImageUrl;
+  String? get profileImageUrl;
   @override
   List<PoetImageModel>? get gallery;
   @override
