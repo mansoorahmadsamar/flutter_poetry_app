@@ -187,7 +187,7 @@ class _PoetsListScreenState extends ConsumerState<PoetsListScreen> {
                   final poet = result.content[index];
                   return PoetCard(
                     poet: poet,
-                    onTap: () => context.push('/poets/${poet.publicId}'),
+                    onTap: () => context.push('/main/poets/${poet.publicId}'),
                   );
                 },
               );
@@ -240,7 +240,7 @@ class _PoetsListScreenState extends ConsumerState<PoetsListScreen> {
                 final poet = result.content[index];
                 return PoetCard(
                   poet: poet,
-                  onTap: () => context.push('/poets/${poet.publicId}'),
+                  onTap: () => context.push('/main/poets/${poet.publicId}'),
                 );
               },
               childCount: result.content.length,
