@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/auth/auth_provider.dart';
 import '../../../core/design_system/app_colors.dart';
 import '../../../core/providers/user_provider.dart';
+import '../../../core/providers/language_provider.dart';
 
 /// Profile tab - User profile and settings
 class ProfileTab extends ConsumerWidget {
@@ -100,15 +101,7 @@ class ProfileTab extends ConsumerWidget {
                       // TODO: Navigate to notifications settings
                     },
                   ),
-                  _buildListTile(
-                    context,
-                    icon: Icons.language,
-                    title: 'Language',
-                    subtitle: 'English',
-                    onTap: () {
-                      // TODO: Show language picker
-                    },
-                  ),
+                  _buildLanguageTile(context, ref),
                 ],
               ),
 
@@ -518,6 +511,150 @@ class ProfileTab extends ConsumerWidget {
       subtitle: subtitle != null ? Text(subtitle) : null,
       trailing: trailing ?? const Icon(Icons.arrow_forward_ios, size: 16),
       onTap: onTap,
+    );
+  }
+
+  /// Build language selection tile with current language display
+  Widget _buildLanguageTile(BuildContext context, WidgetRef ref) {
+    final selectedLanguageState = ref.watch(selectedLanguageNotifierProvider);
+    final languagesAsync = ref.watch(availableLanguagesProvider);
+
+    // Get the display name of currently selected language
+    final languageDisplayName = languagesAsync.when(
+      data: (languages) {
+        final selected = languages.where((l) => l.code == selectedLanguageState.code).firstOrNull;
+        return selected?.name ?? selectedLanguageState.code.toUpperCase();
+      },
+      loading: () => selectedLanguageState.code.toUpperCase(),
+      error: (_, __) => selectedLanguageState.code.toUpperCase(),
+    );
+
+    return ListTile(
+      leading: const Icon(Icons.language, color: AppColors.primary),
+      title: const Text('Language'),
+      subtitle: Text(languageDisplayName),
+      trailing: selectedLanguageState.isLoading
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : const Icon(Icons.arrow_forward_ios, size: 16),
+      onTap: selectedLanguageState.isLoading
+          ? null
+          : () => _showLanguageBottomSheet(context, ref),
+    );
+  }
+
+  /// Show language selection bottom sheet
+  void _showLanguageBottomSheet(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => _LanguageBottomSheet(),
+    );
+  }
+}
+
+/// Bottom sheet widget for language selection
+class _LanguageBottomSheet extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final languagesAsync = ref.watch(availableLanguagesProvider);
+    final selectedLanguageState = ref.watch(selectedLanguageNotifierProvider);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Row(
+            children: [
+              const Icon(Icons.language, color: AppColors.primary),
+              const SizedBox(width: 12),
+              Text(
+                'Select Language',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Choose your preferred language for content',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.grey[600],
+                ),
+          ),
+          const Divider(height: 24),
+
+          // Language list
+          languagesAsync.when(
+            data: (languages) => Column(
+              children: languages.map((language) {
+                final isSelected = language.code == selectedLanguageState.code;
+                return ListTile(
+                  leading: Text(
+                    language.direction == 'RTL' ? '🌐' : '🌍',
+                    style: const TextStyle(fontSize: 24),
+                  ),
+                  title: Text(
+                    language.name,
+                    style: TextStyle(
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  ),
+                  subtitle: Text(language.nativeName),
+                  trailing: isSelected
+                      ? const Icon(Icons.check_circle, color: AppColors.primary)
+                      : null,
+                  onTap: () async {
+                    await ref
+                        .read(selectedLanguageNotifierProvider.notifier)
+                        .setLanguage(language.code);
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Language changed to ${language.name}'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
+                  },
+                );
+              }).toList(),
+            ),
+            loading: () => const Padding(
+              padding: EdgeInsets.all(32),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            error: (error, _) => Padding(
+              padding: const EdgeInsets.all(32),
+              child: Center(
+                child: Column(
+                  children: [
+                    const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                    const SizedBox(height: 16),
+                    Text('Failed to load languages'),
+                    const SizedBox(height: 8),
+                    ElevatedButton(
+                      onPressed: () => ref.invalidate(availableLanguagesProvider),
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
     );
   }
 }

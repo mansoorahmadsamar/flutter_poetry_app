@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:flutter_poetry_app/core/network/dio_client.dart';
+import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import '../services/poet_service.dart';
 import '../models/poet_model.dart';
 import '../models/poet_profile_model.dart';
@@ -9,6 +10,10 @@ import '../models/poet_book_model.dart';
 import '../models/poet_video_model.dart';
 import 'package:flutter_poetry_app/core/network/dto/api_response.dart';
 
+// Re-export from core language_provider for backward compatibility
+export 'package:flutter_poetry_app/core/providers/language_provider.dart'
+    show selectedLanguageProvider;
+
 final Logger _logger = Logger();
 
 // ============= SERVICE PROVIDER =============
@@ -16,9 +21,6 @@ final poetServiceProvider = Provider<PoetService>((ref) {
   final dioClient = ref.watch(dioClientProvider);
   return PoetService(dioClient.dio);
 });
-
-// ============= LANGUAGE PROVIDER =============
-final selectedLanguageProvider = StateProvider<String>((ref) => 'ur');
 
 // ============= SEARCH & FILTER STATE =============
 
