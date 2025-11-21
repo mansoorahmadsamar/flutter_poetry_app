@@ -27,6 +27,9 @@ class AuthInterceptor extends Interceptor {
     if (accessToken != null && accessToken.isNotEmpty) {
       options.headers[AppConstants.authorizationHeader] =
           '${AppConstants.bearerPrefix} $accessToken';
+      _logger.i('🔐 Authorization token added (${accessToken.length} chars)');
+    } else {
+      _logger.w('⚠️  No authorization token available');
     }
 
     // Ensure content type is set
@@ -66,6 +69,8 @@ class AuthInterceptor extends Interceptor {
         }
 
         _logger.i('🔄 Refreshing access token...');
+        _logger.i('   Refresh Token Length: ${refreshToken.length} chars');
+        _logger.i('   Original Request: ${err.requestOptions.method} ${err.requestOptions.path}');
 
         final response = await _dio.post(
           '/api/auth/refresh',
@@ -76,6 +81,9 @@ class AuthInterceptor extends Interceptor {
             headers: {'Content-Type': 'application/json'},
           ),
         );
+
+        _logger.i('   Refresh Response Status: ${response.statusCode}');
+        _logger.i('   Refresh Response Body: ${response.data}');
 
         if (response.statusCode == 200 &&
             response.data is Map &&
@@ -91,6 +99,8 @@ class AuthInterceptor extends Interceptor {
             await _secureStorage.saveRefreshToken(newRefreshToken);
 
             _logger.i('✅ Token refreshed successfully');
+            _logger.i('   New Access Token Length: ${newAccessToken.length} chars');
+            _logger.i('   New Refresh Token Length: ${newRefreshToken.length} chars');
 
             // Update the original request with new token
             err.requestOptions.headers[AppConstants.authorizationHeader] =
@@ -98,6 +108,7 @@ class AuthInterceptor extends Interceptor {
 
             // Retry the original request with new token
             _isRefreshing = false;
+            _logger.i('🔁 Retrying original request: ${err.requestOptions.method} ${err.requestOptions.path}');
             final retryResponse = await _dio.fetch(err.requestOptions);
             handler.resolve(retryResponse);
 
@@ -108,11 +119,14 @@ class AuthInterceptor extends Interceptor {
         }
 
         _logger.e('❌ Token refresh failed');
+        _logger.e('   Status Code: ${response.statusCode}');
+        _logger.e('   Response: ${response.data}');
         _isRefreshing = false;
         handler.reject(err);
         _clearPendingRequests(err);
-      } catch (refreshError) {
+      } catch (refreshError, stackTrace) {
         _logger.e('❌ Token refresh error: $refreshError');
+        _logger.e('   Stack Trace: $stackTrace');
         _isRefreshing = false;
         handler.reject(err);
         _clearPendingRequests(err);
@@ -126,22 +140,31 @@ class AuthInterceptor extends Interceptor {
 
   /// Retry all queued requests with new token
   void _retryQueuedRequests(String newAccessToken) {
-    _logger.i('🔁 Retrying ${_pendingRequests.length} queued requests...');
+    if (_pendingRequests.isNotEmpty) {
+      _logger.i('🔁 Retrying ${_pendingRequests.length} queued requests...');
+      _logger.i('   New Token Length: ${newAccessToken.length} chars');
 
-    for (final handler in _pendingRequests) {
-      handler.next(RequestOptions(path: ''));
+      for (int i = 0; i < _pendingRequests.length; i++) {
+        _logger.i('   [${i + 1}/${_pendingRequests.length}] Retrying queued request...');
+        _pendingRequests[i].next(RequestOptions(path: ''));
+      }
+      _pendingRequests.clear();
+      _logger.i('✅ All queued requests retried');
     }
-    _pendingRequests.clear();
   }
 
   /// Clear pending requests on error
   void _clearPendingRequests(DioException err) {
-    _logger.e('❌ Clearing ${_pendingRequests.length} pending requests');
+    if (_pendingRequests.isNotEmpty) {
+      _logger.e('❌ Clearing ${_pendingRequests.length} pending requests');
+      _logger.e('   Error: ${err.message}');
 
-    for (final handler in _pendingRequests) {
-      handler.reject(err);
+      for (final handler in _pendingRequests) {
+        handler.reject(err);
+      }
+      _pendingRequests.clear();
+      _logger.e('   All pending requests cleared');
     }
-    _pendingRequests.clear();
   }
 
   /// Log detailed error information
