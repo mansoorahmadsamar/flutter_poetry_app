@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../models/poet_model.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
-import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 
@@ -25,156 +24,231 @@ class PoetCard extends ConsumerWidget {
 
     return GestureDetector(
       onTap: onTap,
-      child: Card(
-        elevation: AppSpacing.elevationMd,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-                isDark ? AppColors.surfaceDark.withValues(alpha: 0.8) : AppColors.surfaceLight,
-              ],
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: isDark
+                  ? Colors.black.withValues(alpha: 0.3)
+                  : Colors.black.withValues(alpha: 0.08),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
+              spreadRadius: 0,
             ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Stack(
             children: [
-              // Poet Image
-              ClipRRect(
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(AppSpacing.radiusMd),
-                ),
-                child: Stack(
-                  children: [
-                    CachedNetworkImage(
-                      imageUrl: poet.profileImageUrl ?? '',
-                      fit: BoxFit.cover,
-                      height: 150,
-                      width: double.infinity,
-                      placeholder: (context, url) => Container(
-                        height: 150,
-                        color: isDark ? Colors.grey[800] : Colors.grey[300],
-                        child: const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        height: 150,
-                        color: isDark ? Colors.grey[800] : Colors.grey[300],
-                        child: Icon(
-                          Icons.person_outline,
-                          size: 60,
-                          color: isDark ? Colors.grey[600] : Colors.grey[400],
+              // Background Image with Gradient Overlay
+              Positioned.fill(
+                child: CachedNetworkImage(
+                  imageUrl: poet.profileImageUrl ?? '',
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Container(
+                    color: isDark ? Colors.grey[850] : Colors.grey[200],
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          AppColors.secondary,
                         ),
                       ),
                     ),
-                    // Era Badge
-                    Positioned(
-                      top: AppSpacing.md,
-                      right: AppSpacing.md,
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: AppSpacing.sm,
-                          vertical: AppSpacing.xs,
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          _getEraBadgeColor(poet.era).withValues(alpha: 0.3),
+                          _getEraBadgeColor(poet.era).withValues(alpha: 0.1),
+                        ],
+                      ),
+                    ),
+                    child: Center(
+                      child: Icon(
+                        Icons.person_outline,
+                        size: 80,
+                        color: isDark ? Colors.grey[700] : Colors.grey[400],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Gradient Overlay for better text readability
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withValues(alpha: 0.3),
+                        Colors.black.withValues(alpha: 0.85),
+                      ],
+                      stops: const [0.0, 0.5, 1.0],
+                    ),
+                  ),
+                ),
+              ),
+
+              // Content
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Era Badge
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
                         ),
                         decoration: BoxDecoration(
                           color: _getEraBadgeColor(poet.era),
-                          borderRadius:
-                              BorderRadius.circular(AppSpacing.radiusSm),
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: _getEraBadgeColor(poet.era)
+                                  .withValues(alpha: 0.4),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
                         child: Text(
                           _getEraLabel(poet.era),
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
+                          style: const TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
                             color: Colors.white,
+                            letterSpacing: 0.5,
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              // Content
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.all(AppSpacing.md),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                      const SizedBox(height: 8),
+
                       // Poet Name
                       Text(
                         poet.name,
-                        maxLines: 2,
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: isUrdu
-                            ? AppTypography.urduPoetNameStyle
-                            : Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            ? AppTypography.urduPoetNameStyle.copyWith(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.black.withValues(alpha: 0.5),
+                                    offset: const Offset(0, 1),
+                                    blurRadius: 3,
+                                  ),
+                                ],
+                              )
+                            : TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                                height: 1.2,
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.black.withValues(alpha: 0.5),
+                                    offset: const Offset(0, 1),
+                                    blurRadius: 3,
+                                  ),
+                                ],
+                              ),
                       ),
-                      SizedBox(height: AppSpacing.sm),
+                      const SizedBox(height: 4),
+
                       // Bio
                       Text(
                         poet.shortBio,
-                        maxLines: 2,
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: isUrdu
-                            ? AppTypography.getUrduTextTheme(context).bodySmall?.copyWith(
-                                color: isDark ? Colors.grey[400] : Colors.grey[600],
-                              )
+                            ? AppTypography.getUrduTextTheme(context)
+                                .bodySmall
+                                ?.copyWith(
+                                  color: Colors.white.withValues(alpha: 0.85),
+                                  fontSize: 10,
+                                  height: 1.3,
+                                )
                             : TextStyle(
-                                fontSize: 12,
-                                color: isDark ? Colors.grey[400] : Colors.grey[600],
-                                height: 1.4,
+                                fontSize: 10,
+                                color: Colors.white.withValues(alpha: 0.85),
+                                height: 1.3,
+                                fontWeight: FontWeight.w400,
                               ),
                       ),
-                      const Spacer(),
-                      // Stats
+                      const SizedBox(height: 8),
+
+                      // Stats and Trending
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _StatItem(
-                            icon: Icons.edit,
-                            label: '${poet.poemCount}',
-                            isDark: isDark,
+                          // Stats
+                          Row(
+                            children: [
+                              _ModernStatItem(
+                                icon: Icons.auto_stories_rounded,
+                                label: '${poet.poemCount}',
+                              ),
+                              const SizedBox(width: 8),
+                              _ModernStatItem(
+                                icon: Icons.visibility_rounded,
+                                label: _formatNumber(poet.viewCount),
+                              ),
+                            ],
                           ),
-                          _StatItem(
-                            icon: Icons.visibility,
-                            label: _formatNumber(poet.viewCount),
-                            isDark: isDark,
-                          ),
+
+                          // Trending Badge
                           if (poet.isTrending)
                             Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: AppSpacing.sm,
-                                vertical: 2,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 3,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.orange.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(
-                                    AppSpacing.radiusSm),
+                                color: Colors.orange.withValues(alpha: 0.9),
+                                borderRadius: BorderRadius.circular(8),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color:
+                                        Colors.orange.withValues(alpha: 0.4),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
                               ),
                               child: Row(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(
-                                    Icons.trending_up,
-                                    size: 12,
-                                    color: Colors.orange,
+                                  const Icon(
+                                    Icons.local_fire_department_rounded,
+                                    size: 10,
+                                    color: Colors.white,
                                   ),
-                                  SizedBox(width: 2),
+                                  const SizedBox(width: 2),
                                   Text(
-                                    'Trending',
+                                    'Hot',
                                     style: TextStyle(
-                                      fontSize: 10,
-                                      color: Colors.orange,
-                                      fontWeight: FontWeight.bold,
+                                      fontSize: 8,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 0.3,
                                     ),
                                   ),
                                 ],
@@ -186,6 +260,32 @@ class PoetCard extends ConsumerWidget {
                   ),
                 ),
               ),
+
+              // Featured Star Badge (top-left corner)
+              if (poet.isFeatured)
+                Positioned(
+                  top: 12,
+                  left: 12,
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.shade400,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.amber.withValues(alpha: 0.5),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.star_rounded,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
@@ -196,30 +296,30 @@ class PoetCard extends ConsumerWidget {
   Color _getEraBadgeColor(String era) {
     switch (era) {
       case 'CLASSICAL':
-        return Colors.purple;
+        return const Color(0xFF8B5CF6); // Purple
       case 'MODERN':
-        return Colors.blue;
+        return const Color(0xFF3B82F6); // Blue
       case 'CONTEMPORARY':
-        return Colors.green;
+        return const Color(0xFF10B981); // Green
       case 'EMERGING':
-        return Colors.teal;
+        return const Color(0xFF14B8A6); // Teal
       default:
-        return Colors.grey;
+        return const Color(0xFF6B7280); // Gray
     }
   }
 
   String _getEraLabel(String era) {
     switch (era) {
       case 'CLASSICAL':
-        return 'Classical';
+        return 'CLASSICAL';
       case 'MODERN':
-        return 'Modern';
+        return 'MODERN';
       case 'CONTEMPORARY':
-        return 'Contemporary';
+        return 'CONTEMPORARY';
       case 'EMERGING':
-        return 'Emerging';
+        return 'EMERGING';
       default:
-        return era;
+        return era.toUpperCase();
     }
   }
 
@@ -233,36 +333,47 @@ class PoetCard extends ConsumerWidget {
   }
 }
 
-class _StatItem extends StatelessWidget {
+class _ModernStatItem extends StatelessWidget {
   final IconData icon;
   final String label;
-  final bool isDark;
 
-  const _StatItem({
-    super.key,
+  const _ModernStatItem({
     required this.icon,
     required this.label,
-    required this.isDark,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(
-          icon,
-          size: 12,
-          color: isDark ? Colors.grey[500] : Colors.grey[600],
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.2),
+          width: 0.5,
         ),
-        SizedBox(width: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 11,
-            color: isDark ? Colors.grey[500] : Colors.grey[600],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 11,
+            color: Colors.white.withValues(alpha: 0.95),
           ),
-        ),
-      ],
+          const SizedBox(width: 3),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 9,
+              color: Colors.white.withValues(alpha: 0.95),
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.2,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
