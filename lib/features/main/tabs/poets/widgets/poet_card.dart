@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../models/poet_model.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
+import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
+import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 
-class PoetCard extends StatelessWidget {
+class PoetCard extends ConsumerWidget {
   final PoetModel poet;
   final VoidCallback onTap;
 
@@ -15,8 +18,10 @@ class PoetCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final lang = ref.watch(selectedLanguageProvider);
+    final isUrdu = lang == 'ur';
 
     return GestureDetector(
       onTap: onTap,
@@ -108,9 +113,11 @@ class PoetCard extends StatelessWidget {
                         poet.name,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                        style: isUrdu
+                            ? AppTypography.urduPoetNameStyle
+                            : Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
                       SizedBox(height: AppSpacing.sm),
                       // Bio
@@ -118,13 +125,15 @@ class PoetCard extends StatelessWidget {
                         poet.shortBio,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: isDark
-                              ? Colors.grey[400]
-                              : Colors.grey[600],
-                          height: 1.4,
-                        ),
+                        style: isUrdu
+                            ? AppTypography.getUrduTextTheme(context).bodySmall?.copyWith(
+                                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                              )
+                            : TextStyle(
+                                fontSize: 12,
+                                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                height: 1.4,
+                              ),
                       ),
                       const Spacer(),
                       // Stats
@@ -148,7 +157,7 @@ class PoetCard extends StatelessWidget {
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.orange.withOpacity(0.2),
+                                color: Colors.orange.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(
                                     AppSpacing.radiusSm),
                               ),

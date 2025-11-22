@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../providers/poet_providers.dart';
 import '../providers/poets_pagination_provider.dart';
 import '../widgets/poet_card.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
@@ -15,7 +14,6 @@ class PoetsListScreen extends ConsumerStatefulWidget {
 }
 
 class _PoetsListScreenState extends ConsumerState<PoetsListScreen> {
-  final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   PoetsFilterType _selectedFilter = PoetsFilterType.all;
 
@@ -27,7 +25,6 @@ class _PoetsListScreenState extends ConsumerState<PoetsListScreen> {
 
   @override
   void dispose() {
-    _searchController.dispose();
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
@@ -79,13 +76,16 @@ class _PoetsListScreenState extends ConsumerState<PoetsListScreen> {
                 'Poets',
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
-            ),
-            // Search Bar
-            SliverPadding(
-              padding: EdgeInsets.all(AppSpacing.md),
-              sliver: SliverToBoxAdapter(
-                child: _buildSearchBar(context, isDark),
-              ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.search),
+                  onPressed: () {
+                    context.push('/main/poets-search');
+                  },
+                  tooltip: 'Search poets',
+                ),
+                const SizedBox(width: AppSpacing.xs),
+              ],
             ),
             // Discovery Tags
             SliverPadding(
@@ -132,39 +132,6 @@ class _PoetsListScreenState extends ConsumerState<PoetsListScreen> {
     );
   }
 
-  Widget _buildSearchBar(BuildContext context, bool isDark) {
-    return TextField(
-      controller: _searchController,
-      decoration: InputDecoration(
-        hintText: 'Search poets by name...',
-        prefixIcon: Icon(Icons.search),
-        suffixIcon: _searchController.text.isNotEmpty
-            ? IconButton(
-                icon: Icon(Icons.clear),
-                onPressed: () {
-                  _searchController.clear();
-                  setState(() {});
-                },
-              )
-            : null,
-        filled: true,
-        fillColor: isDark ? AppColors.surfaceDark : AppColors.backgroundLight,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-          borderSide: BorderSide.none,
-        ),
-        contentPadding: EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.md,
-        ),
-      ),
-      onChanged: (value) {
-        setState(() {});
-        ref.read(poetsSearchQueryProvider.notifier).state = value;
-      },
-    );
-  }
-
   Widget _buildDiscoveryTags(BuildContext context) {
     final tags = [
       ('Trending', PoetsFilterType.trending),
@@ -202,11 +169,6 @@ class _PoetsListScreenState extends ConsumerState<PoetsListScreen> {
     bool isDark,
     PoetsPaginationState paginationState,
   ) {
-    // Handle search results separately
-    if (_searchController.text.isNotEmpty) {
-      return _buildSearchResults();
-    }
-
     // Initial loading state
     if (paginationState.isLoading && paginationState.poets.isEmpty) {
       return SliverToBoxAdapter(
@@ -274,62 +236,5 @@ class _PoetsListScreenState extends ConsumerState<PoetsListScreen> {
         ),
       ),
     );
-  }
-
-  Widget _buildSearchResults() {
-    return ref.watch(searchPoetsProvider).when(
-          data: (result) {
-            if (result.content.isEmpty) {
-              return SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.all(AppSpacing.lg),
-                  child: Center(child: Text('No poets found')),
-                ),
-              );
-            }
-
-            return SliverPadding(
-              padding: EdgeInsets.all(AppSpacing.md),
-              sliver: SliverGrid(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final poet = result.content[index];
-                    return PoetCard(
-                      poet: poet,
-                      onTap: () => context.push('/main/poets/${poet.publicId}'),
-                    );
-                  },
-                  childCount: result.content.length,
-                ),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.65,
-                  crossAxisSpacing: AppSpacing.md,
-                  mainAxisSpacing: AppSpacing.md,
-                ),
-              ),
-            );
-          },
-          loading: () => SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.all(AppSpacing.lg),
-              child: Center(child: CircularProgressIndicator()),
-            ),
-          ),
-          error: (error, stack) => SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.all(AppSpacing.lg),
-              child: Center(
-                child: Column(
-                  children: [
-                    Icon(Icons.error_outline, size: 48, color: Colors.red),
-                    SizedBox(height: AppSpacing.md),
-                    Text('Error loading poets'),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
   }
 }
