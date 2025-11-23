@@ -8,7 +8,7 @@ class AppTypography {
 
   // Font Families
   static const String englishFontFamily = 'Roboto';
-  static const String urduFontFamily = 'NotoNaskhArabic'; // Good for Urdu
+  static const String urduFontFamily = 'Jameel Noori Nastaleeq'; // Traditional Nastaleeq for Urdu
 
   /// Get text theme for English content
   static TextTheme getEnglishTextTheme(BuildContext context) {
@@ -116,85 +116,101 @@ class AppTypography {
   }
 
   /// Get text theme for Urdu content
-  /// Uses Noto Nasakh Arabic which supports Urdu ligatures properly
+  /// Uses Jameel Noori Nastaleeq which is the traditional Nastaleeq style for Urdu
   static TextTheme getUrduTextTheme(BuildContext context) {
-    return GoogleFonts.notoNaskhArabicTextTheme(Theme.of(context).textTheme).copyWith(
+    final baseTheme = Theme.of(context).textTheme;
+    return baseTheme.copyWith(
       // For Urdu, we need better line height for proper ligature rendering
-      displayLarge: GoogleFonts.notoNaskhArabic(
+      displayLarge: const TextStyle(
+        fontFamily: urduFontFamily,
         fontSize: 57,
         fontWeight: FontWeight.w400,
         height: 1.8, // Increased height for Urdu
       ),
-      displayMedium: GoogleFonts.notoNaskhArabic(
+      displayMedium: const TextStyle(
+        fontFamily: urduFontFamily,
         fontSize: 45,
         fontWeight: FontWeight.w400,
         height: 1.8,
       ),
-      displaySmall: GoogleFonts.notoNaskhArabic(
+      displaySmall: const TextStyle(
+        fontFamily: urduFontFamily,
         fontSize: 36,
         fontWeight: FontWeight.w400,
         height: 1.8,
       ),
 
-      headlineLarge: GoogleFonts.notoNaskhArabic(
+      headlineLarge: const TextStyle(
+        fontFamily: urduFontFamily,
         fontSize: 32,
         fontWeight: FontWeight.w600,
         height: 1.8,
       ),
-      headlineMedium: GoogleFonts.notoNaskhArabic(
+      headlineMedium: const TextStyle(
+        fontFamily: urduFontFamily,
         fontSize: 28,
         fontWeight: FontWeight.w600,
         height: 1.8,
       ),
-      headlineSmall: GoogleFonts.notoNaskhArabic(
+      headlineSmall: const TextStyle(
+        fontFamily: urduFontFamily,
         fontSize: 24,
         fontWeight: FontWeight.w600,
         height: 1.8,
       ),
 
-      titleLarge: GoogleFonts.notoNaskhArabic(
+      titleLarge: const TextStyle(
+        fontFamily: urduFontFamily,
         fontSize: 22,
         fontWeight: FontWeight.w500,
         height: 1.8,
       ),
-      titleMedium: GoogleFonts.notoNaskhArabic(
+      titleMedium: const TextStyle(
+        fontFamily: urduFontFamily,
         fontSize: 16,
         fontWeight: FontWeight.w500,
         height: 1.8,
       ),
-      titleSmall: GoogleFonts.notoNaskhArabic(
+      titleSmall: const TextStyle(
+        fontFamily: urduFontFamily,
         fontSize: 14,
         fontWeight: FontWeight.w500,
         height: 1.8,
       ),
 
-      bodyLarge: GoogleFonts.notoNaskhArabic(
+      bodyLarge: const TextStyle(
+        fontFamily: urduFontFamily,
         fontSize: 16,
         fontWeight: FontWeight.w400,
         height: 2.0, // Poetry needs even more height
       ),
-      bodyMedium: GoogleFonts.notoNaskhArabic(
+      bodyMedium: const TextStyle(
+        fontFamily: urduFontFamily,
         fontSize: 14,
         fontWeight: FontWeight.w400,
         height: 2.0,
       ),
-      bodySmall: GoogleFonts.notoNaskhArabic(
+      bodySmall: const TextStyle(
+        fontFamily: urduFontFamily,
         fontSize: 12,
         fontWeight: FontWeight.w400,
         height: 1.8,
       ),
 
-      labelLarge: GoogleFonts.notoNaskhArabic(
+      labelLarge: const TextStyle(
+        fontFamily: urduFontFamily,
         fontSize: 14,
         fontWeight: FontWeight.w500,
         height: 1.6,
       ),
-      labelMedium: GoogleFonts.notoNaskhArabic(
+      labelMedium: const TextStyle(
+        fontFamily: urduFontFamily,
         fontSize: 12,
         fontWeight: FontWeight.w500,
         height: 1.6,
       ),
-      labelSmall: GoogleFonts.notoNaskhArabic(
+      labelSmall: const TextStyle(
+        fontFamily: urduFontFamily,
         fontSize: 11,
         fontWeight: FontWeight.w500,
         height: 1.6,
@@ -203,7 +219,8 @@ class AppTypography {
   }
 
   /// Special style for Urdu poetry verses
-  static TextStyle urduVerseStyle = GoogleFonts.notoNaskhArabic(
+  static const TextStyle urduVerseStyle = TextStyle(
+    fontFamily: urduFontFamily,
     fontSize: 20,
     fontWeight: FontWeight.w400,
     height: 2.2,
@@ -211,7 +228,8 @@ class AppTypography {
   );
 
   /// Special style for poet names in Urdu
-  static TextStyle urduPoetNameStyle = GoogleFonts.notoNaskhArabic(
+  static const TextStyle urduPoetNameStyle = TextStyle(
+    fontFamily: urduFontFamily,
     fontSize: 18,
     fontWeight: FontWeight.w600,
     height: 1.8,

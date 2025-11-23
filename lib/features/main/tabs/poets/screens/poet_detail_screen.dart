@@ -9,6 +9,8 @@ import '../widgets/poet_videos_tab.dart';
 import '../widgets/poet_poetry_tab.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
+import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
+import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 
 class PoetDetailScreen extends ConsumerStatefulWidget {
   final String publicId;
@@ -42,16 +44,18 @@ class _PoetDetailScreenState extends ConsumerState<PoetDetailScreen>
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final poetProfile = ref.watch(poetDetailProvider(widget.publicId));
+    final selectedLanguage = ref.watch(selectedLanguageProvider);
+    final isUrdu = selectedLanguage == 'ur';
 
     return poetProfile.when(
       data: (poet) => Scaffold(
         body: CustomScrollView(
           slivers: [
             // Hero Header
-            _buildHeroHeader(context, poet, isDark),
+            _buildHeroHeader(context, poet, isDark, isUrdu),
             // Poet Info Card
             SliverToBoxAdapter(
-              child: _buildPoetInfoCard(context, poet, isDark),
+              child: _buildPoetInfoCard(context, poet, isDark, isUrdu),
             ),
             // Tab Bar
             SliverPersistentHeader(
@@ -102,7 +106,7 @@ class _PoetDetailScreenState extends ConsumerState<PoetDetailScreen>
     );
   }
 
-  Widget _buildHeroHeader(BuildContext context, poetProfile, bool isDark) {
+  Widget _buildHeroHeader(BuildContext context, poetProfile, bool isDark, bool isUrdu) {
     return SliverAppBar(
       expandedHeight: 300,
       pinned: true,
@@ -154,7 +158,10 @@ class _PoetDetailScreenState extends ConsumerState<PoetDetailScreen>
                 children: [
                   Text(
                     poetProfile.name,
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    style: (isUrdu
+                        ? AppTypography.urduPoetNameStyle
+                        : Theme.of(context).textTheme.headlineMedium
+                    )?.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
@@ -211,7 +218,7 @@ class _PoetDetailScreenState extends ConsumerState<PoetDetailScreen>
     );
   }
 
-  Widget _buildPoetInfoCard(BuildContext context, poetProfile, bool isDark) {
+  Widget _buildPoetInfoCard(BuildContext context, poetProfile, bool isDark, bool isUrdu) {
     return Container(
       transform: Matrix4.translationValues(0, -30, 0),
       margin: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
@@ -233,7 +240,10 @@ class _PoetDetailScreenState extends ConsumerState<PoetDetailScreen>
           // Bio
           Text(
             poetProfile.shortBio,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+            style: (isUrdu
+                ? AppTypography.getUrduTextTheme(context).bodyLarge
+                : Theme.of(context).textTheme.bodyLarge
+            )?.copyWith(
                   fontWeight: FontWeight.w500,
                 ),
           ),
@@ -265,8 +275,11 @@ class _PoetDetailScreenState extends ConsumerState<PoetDetailScreen>
           if (poetProfile.biography != null)
             Text(
               poetProfile.biography!,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    height: 1.6,
+              style: (isUrdu
+                  ? AppTypography.getUrduTextTheme(context).bodyMedium
+                  : Theme.of(context).textTheme.bodyMedium
+              )?.copyWith(
+                    height: isUrdu ? 2.0 : 1.6,
                   ),
               maxLines: 4,
               overflow: TextOverflow.ellipsis,

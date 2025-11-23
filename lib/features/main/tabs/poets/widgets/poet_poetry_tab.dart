@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_poetry_app/core/network/dio_client.dart';
 import 'package:flutter_poetry_app/core/network/dto/api_response.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
+import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
+import '../providers/poet_providers.dart';
 
 class PoetPoetryTab extends ConsumerStatefulWidget {
   final String publicId;
@@ -61,6 +63,8 @@ class _PoetPoetryTabState extends ConsumerState<PoetPoetryTab> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final selectedLanguage = ref.watch(selectedLanguageProvider);
+    final isUrdu = selectedLanguage == 'ur';
 
     return Column(
       children: [
@@ -126,7 +130,7 @@ class _PoetPoetryTabState extends ConsumerState<PoetPoetryTab> {
                 itemCount: filteredPoems.length,
                 itemBuilder: (context, index) {
                   final poem = filteredPoems[index];
-                  return _buildPoemCard(context, poem, isDark);
+                  return _buildPoemCard(context, poem, isDark, isUrdu);
                 },
               );
             },
@@ -150,7 +154,7 @@ class _PoetPoetryTabState extends ConsumerState<PoetPoetryTab> {
   }
 
   Widget _buildPoemCard(
-      BuildContext context, PoemItem poem, bool isDark) {
+      BuildContext context, PoemItem poem, bool isDark, bool isUrdu) {
     return Card(
       margin: EdgeInsets.only(bottom: AppSpacing.md),
       child: InkWell(
@@ -163,17 +167,20 @@ class _PoetPoetryTabState extends ConsumerState<PoetPoetryTab> {
               // Title
               Text(
                 poem.title,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(fontWeight: FontWeight.bold),
+                style: (isUrdu
+                    ? AppTypography.getUrduTextTheme(context).titleMedium
+                    : Theme.of(context).textTheme.titleMedium
+                )?.copyWith(fontWeight: FontWeight.bold),
               ),
               SizedBox(height: AppSpacing.sm),
               // Content Preview
               Text(
                 poem.content,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      height: 1.6,
+                style: (isUrdu
+                    ? AppTypography.urduVerseStyle
+                    : Theme.of(context).textTheme.bodyMedium
+                )?.copyWith(
+                      height: isUrdu ? 2.2 : 1.6,
                       color: isDark ? Colors.grey[400] : Colors.grey[600],
                     ),
                 maxLines: 3,

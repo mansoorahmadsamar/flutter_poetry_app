@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../providers/poet_providers.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
+import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
 
 class PoetBooksTab extends ConsumerWidget {
   final String publicId;
@@ -13,6 +14,8 @@ class PoetBooksTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final books = ref.watch(poetBooksProvider(publicId));
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final selectedLanguage = ref.watch(selectedLanguageProvider);
+    final isUrdu = selectedLanguage == 'ur';
 
     return books.when(
       data: (bookList) {
@@ -85,10 +88,10 @@ class PoetBooksTab extends ConsumerWidget {
                         children: [
                           Text(
                             book.title,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
+                            style: (isUrdu
+                                ? AppTypography.getUrduTextTheme(context).titleMedium
+                                : Theme.of(context).textTheme.titleMedium
+                            )?.copyWith(fontWeight: FontWeight.bold),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -96,10 +99,10 @@ class PoetBooksTab extends ConsumerWidget {
                             SizedBox(height: 4),
                             Text(
                               book.subtitle!,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(fontStyle: FontStyle.italic),
+                              style: (isUrdu
+                                  ? AppTypography.getUrduTextTheme(context).bodySmall
+                                  : Theme.of(context).textTheme.bodySmall
+                              )?.copyWith(fontStyle: FontStyle.italic),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -135,9 +138,12 @@ class PoetBooksTab extends ConsumerWidget {
                             SizedBox(height: AppSpacing.sm),
                             Text(
                               book.description!,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall,
+                              style: (isUrdu
+                                  ? AppTypography.getUrduTextTheme(context).bodySmall
+                                  : Theme.of(context).textTheme.bodySmall
+                              )?.copyWith(
+                                height: isUrdu ? 1.8 : null,
+                              ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
