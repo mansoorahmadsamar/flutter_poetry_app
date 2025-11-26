@@ -35,6 +35,69 @@ The following critical issues have been fixed in the backend:
 
 ---
 
+### Test Data Available - Poem Migration Completed
+**Date:** November 25, 2025
+
+The backend now has comprehensive test data ready for Flutter UI development and testing:
+
+**📊 Available Test Data:**
+- **374 Poems** with real Urdu poetry content from famous poets
+- **50 Poets** processed (can be expanded to all 1,993 poets later)
+- **1,792 Verses** automatically parsed from Ghazals for verse-level search
+- **1,110 Poem-Tag associations** (average 3 tags per poem)
+
+**📝 Poetry Type Distribution:**
+```
+GHAZAL       224 poems (60%)  - Couplet-based poetry with verse parsing
+NAZAM         74 poems (20%)  - Continuous poetry
+VERSE         48 poems (13%)  - Standalone verses
+RUBAI         11 poems (3%)   - Quatrains
+AZAD_NAZAM     5 poems (1%)   - Free verse
+QATTA          4 poems (1%)   - Fragment poetry
+MARSIYA        4 poems (1%)   - Elegy
+HAMD           3 poems (1%)   - Praise poetry
+NAAT           1 poem  (<1%)  - Prophet's praise
+```
+
+**✨ Real Urdu Poetry Content From:**
+- Mirza Ghalib (ہزاروں خواہشیں ایسی، دل کی ویرانی کا کیا مذکور ہے)
+- Allama Iqbal (لب پہ آتی ہے دعا، شکوہ)
+- Faiz Ahmed Faiz (مجھ سے پہلی سی محبت، بول کہ لب آزاد ہیں)
+- Mir Taqi Mir, Momin Khan Momin, Josh Malihabadi
+
+**🏷️ Tag Distribution:**
+```
+romantic-poet     283 poems
+classical-poet    280 poems
+ghazal-master     228 poems
+patriotic-poet     79 poems
+progressive-poet   79 poems
+nazm-writer        79 poems
+nature-poet        48 poems
+sufi-mystic        15 poems
+```
+
+**✅ Ready to Test:**
+1. Poem browsing and listing endpoints
+2. Poem search with Elasticsearch (or PostgreSQL fallback)
+3. Verse-level search for Ghazals
+4. Filtering by poet, category, poetry type, tags
+5. Multilingual content (Urdu poetry in Arabic script)
+6. Pagination across all endpoints
+
+**🚀 Next Steps for Flutter Team:**
+- Start building UI with real data
+- Test search functionality with real Urdu queries (e.g., محبت، دل، عشق)
+- Test verse-level search for Ghazals (returns specific couplets)
+- Test pagination and filtering
+- Verify tag-based discovery
+
+**📖 Reference:**
+- See `DATA_MIGRATION_GUIDE.md` for migration details
+- To expand data: Change `.limit(50)` in `PoemDataMigration.java` and re-run
+
+---
+
 ## Base URLs by Environment
 
 Configure these base URLs in your Flutter app based on the environment:
@@ -948,9 +1011,9 @@ Authorization: Bearer <access_token>
 
 ---
 
-### 4.3 Search Poems
+### 4.3 Search Poems (Enhanced with Elasticsearch)
 
-**Endpoint:** `GET /api/poems/search?query=محبت&language=ur&page=0&size=10`
+**Endpoint:** `GET /api/poems/search?query=محبت&lang=ur&script=ARABIC&page=0&size=10`
 
 **Authentication Required:** Yes
 
@@ -959,11 +1022,26 @@ Authorization: Bearer <access_token>
 Authorization: Bearer <access_token>
 ```
 
+**Description:**
+Enhanced search with Elasticsearch and PostgreSQL fallback. Searches across poem titles, content, and poet names with multilingual support.
+
 **Query Parameters:**
-- `query` (required): Search query
-- `language` (optional): Filter by language
+- `query` (required): Search query (supports fuzzy matching for typos)
+- `lang` (optional): Language code - `ur`, `en`, `hi` (default: `ur`)
+- `script` (optional): Script filter - `ARABIC`, `ROMAN`, `DEVANAGARI`, `LATIN`
+- `poetId` (optional): Filter by poet publicId
+- `categoryId` (optional): Filter by category publicId
+- `poetryType` (optional): Filter by poetry type - `GHAZAL`, `NAZM`, `RUBAI`, etc.
 - `page` (optional): Page number (default: 0)
 - `size` (optional): Items per page (default: 10)
+
+**Examples:**
+```
+GET /api/poems/search?query=محبت
+GET /api/poems/search?query=dil&lang=ur&script=ROMAN
+GET /api/poems/search?query=love&poetId=ghalib-123
+GET /api/poems/search?query=ghazal&poetryType=GHAZAL&lang=ur
+```
 
 **Success Response (200):**
 ```json
@@ -975,11 +1053,17 @@ Authorization: Bearer <access_token>
       {
         "id": 123,
         "publicId": "poem_xyz789",
-        "title": "محبت کی راہیں",
-        "content": "محبت کی راہیں...",
+        "poetryType": "GHAZAL",
+        "isPublic": true,
         "poet": {
-          "name": "Mirza Ghalib"
-        }
+          "name": "Mirza Ghalib",
+          "publicId": "poet_ghalib123"
+        },
+        "category": {
+          "name": "Romance",
+          "publicId": "cat_romance"
+        },
+        "yearWritten": 1850
       }
     ],
     "totalElements": 45,
@@ -987,6 +1071,83 @@ Authorization: Bearer <access_token>
   }
 }
 ```
+
+**Notes:**
+- Uses Elasticsearch for fast, relevant search with BM25 scoring
+- Falls back to PostgreSQL LIKE queries if Elasticsearch is unavailable
+- Supports fuzzy matching with AUTO fuzziness for typo tolerance
+- Searches across multilingual content simultaneously
+
+---
+
+### 4.3.1 Search Verses (Verse-Level Search)
+
+**Endpoint:** `GET /api/poems/verses/search?query=دل&lang=ur&page=0&size=20`
+
+**Authentication Required:** Yes
+
+**Request Headers:**
+```
+Authorization: Bearer <access_token>
+```
+
+**Description:**
+Search for specific verses within poems (critical for Ghazal poetry). Returns individual verses with poem and poet context.
+
+**Query Parameters:**
+- `query` (required): Search query
+- `lang` (optional): Language code - `ur`, `en`, `hi` (default: `ur`)
+- `verseType` (optional): Filter by verse type - `MATLA`, `MAQTA`, `REGULAR`
+- `page` (optional): Page number (default: 0)
+- `size` (optional): Items per page (default: 20)
+
+**Examples:**
+```
+GET /api/poems/verses/search?query=دل
+GET /api/poems/verses/search?query=mohabbat&verseType=MATLA
+GET /api/poems/verses/search?query=love&lang=en
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Found 127 verses matching 'دل'",
+  "data": {
+    "content": [
+      {
+        "verse": {
+          "publicId": "verse_abc123",
+          "verseText": "دل کی ویرانی کا کیا مذکور ہے",
+          "verseNumber": 1,
+          "coupletNumber": 1,
+          "verseType": "MATLA"
+        },
+        "poem": {
+          "publicId": "poem_xyz789",
+          "poetryType": "GHAZAL"
+        },
+        "poet": {
+          "publicId": "poet_ghalib123",
+          "name": "Mirza Ghalib"
+        },
+        "verseNumber": 1,
+        "coupletNumber": 1,
+        "positionInCouplet": 1,
+        "verseText": "دل کی ویرانی کا کیا مذکور ہے"
+      }
+    ],
+    "totalElements": 127,
+    "totalPages": 7
+  }
+}
+```
+
+**Notes:**
+- Returns verses with full poem and poet context
+- Ideal for finding specific couplets or verses in Ghazals
+- Uses Elasticsearch for precise verse-level matching
+- Falls back to PostgreSQL verse search if needed
 
 ---
 
@@ -1264,7 +1425,14 @@ Authorization: Bearer <access_token>
 
 **Endpoint:** `POST /api/poems/add-poem`
 
-**Description:** Upload a new poem (requires authentication)
+**Description:** Upload a new poem with automatic Ghazal parsing (requires authentication)
+
+**⚠️ BREAKING CHANGES (Updated November 2025):**
+- `language` → `languageCode` (string)
+- `script` → Script enum value (ARABIC/ROMAN/DEVANAGARI/LATIN)
+- `form` → `poetryType` enum (GHAZAL/NAZAM/VERSE/NASAR/AFSANA/etc.)
+- `categoryId` is now optional
+- Ghazals are automatically parsed into verses
 
 **Request Headers:**
 ```
@@ -1279,12 +1447,12 @@ Content-Type: application/json
   "poetId": "poet_abc123",
   "categoryId": "cat_def456",
   "content": "یہ ایک نئی نظم ہے...",
+  "poetryType": "GHAZAL",
   "contentType": "TEXT",
   "imageUrl": null,
   "thumbnailUrl": null,
-  "language": "ur",
-  "script": "arabic",
-  "form": "ghazal",
+  "languageCode": "ur",
+  "script": "ARABIC",
   "yearWritten": 2024,
   "source": "Original",
   "license": "public_domain",
@@ -1292,6 +1460,21 @@ Content-Type: application/json
   "tagIds": ["tag_123", "tag_456"]
 }
 ```
+
+**Poetry Types:**
+- `GHAZAL` - Couplet-based poetry (automatically parsed into MATLA/MAQTA/REGULAR verses)
+- `NAZAM` - Continuous poetry (stored as-is, no parsing)
+- `AZAD_NAZAM` - Free verse (no parsing)
+- `VERSE` - Single verse or couplet (no parsing)
+- `NASAR` - Prose (no parsing)
+- `AFSANA` - Story/Fiction (no parsing)
+- `QATTA`, `RUBAI`, `MASNAVI`, `QASIDA`, `MARSIYA`, `HAMD`, `NAAT`, `MANQABAT`, `DOHA`, `FREE_VERSE`
+
+**Script Values:**
+- `ARABIC` - Arabic script (RTL) - عربی
+- `ROMAN` - Roman/Latin script (LTR)
+- `DEVANAGARI` - Devanagari script (LTR) - देवनागरी
+- `LATIN` - Latin script (LTR)
 
 **Success Response (201):**
 ```json
@@ -1301,10 +1484,8 @@ Content-Type: application/json
   "data": {
     "id": 789,
     "publicId": "poem_new123",
-    "title": "New Poem Title",
-    "content": "یہ ایک نئی نظم ہے...",
+    "poetryType": "GHAZAL",
     "contentType": "TEXT",
-    "language": "ur",
     "isPublic": true,
     "createdAt": "2024-01-15T14:30:00"
   }
@@ -1319,6 +1500,107 @@ Content-Type: application/json
   "data": null
 }
 ```
+
+**Note:** For Ghazals, the backend automatically:
+- Parses content into individual verses
+- Creates couplets (2 verses each)
+- Identifies first couplet as MATLA (opening)
+- Identifies last couplet as MAQTA (closing with poet's name)
+- Tags all other couplets as REGULAR
+
+---
+
+## 4.12 Poem Content Architecture (November 2025 Update)
+
+### Multilingual Poem System
+
+**Overview:**
+The poem system now supports **multilingual content** and **automatic Ghazal parsing** for verse-level search.
+
+**Key Features:**
+1. **Multilingual Support**: Same poem can exist in multiple languages and scripts
+   - Example: Urdu (Arabic script), Roman Urdu, English translation, Hindi translation
+2. **Verse-Level Granularity**: Ghazals are parsed into individual verses for precise search
+   - Searching "dil" returns specific verses, not just full poems
+3. **Schema-Based Parsing**: Only Ghazals are parsed initially (other types stored as-is)
+
+**Database Structure:**
+
+```
+poems                 (Metadata only)
+  ├── id, publicId
+  ├── poet_id
+  ├── poetry_type (GHAZAL, NAZAM, etc.)
+  ├── category_id (optional)
+  └── view_count, like_count, etc.
+
+poem_contents         (Multilingual text storage)
+  ├── id, publicId
+  ├── poem_id (FK → poems)
+  ├── language_id (FK → languages)
+  ├── script (ARABIC, ROMAN, DEVANAGARI, LATIN)
+  ├── title (translated title)
+  ├── full_text (complete poem)
+  ├── is_original (boolean)
+  └── translated_by, notes
+
+poem_verses           (Parsed verses for Ghazals)
+  ├── id, publicId
+  ├── content_id (FK → poem_contents)
+  ├── verse_number (1, 2, 3...)
+  ├── couplet_number (1, 2, 3...)
+  ├── verse_type (MATLA, MAQTA, REGULAR)
+  └── verse_text (individual verse)
+```
+
+**Unique Constraints:**
+- `poem_contents`: (poem_id, language_id, script) - One entry per language+script combination
+- Full text always preserved even after parsing
+
+**Example Data Flow:**
+```
+Upload Ghazal:
+  Title: "Har Ek Baat Pe"
+  Content: "ہر ایک بات پہ کہتے ہو تم کہ تو کیا ہے\n..."
+  Poetry Type: GHAZAL
+  Language: ur, Script: ARABIC
+
+Backend Processing:
+  1. Creates Poem record (metadata only)
+  2. Creates PoemContent record (Urdu Arabic)
+  3. Parses 6 couplets = 12 verses:
+     - Verses 1-2: MATLA (opening couplet)
+     - Verses 3-10: REGULAR (middle couplets)
+     - Verses 11-12: MAQTA (closing with "Ghalib")
+```
+
+---
+
+## 4.13 Breaking Changes Summary (November 2025)
+
+### Removed Endpoints:
+- ❌ `GET /api/poems/language/{language}` - Removed (language filtering handled differently)
+
+### Modified Endpoints:
+
+**POST /api/poems/add-poem:**
+| Old Field | New Field | Type | Notes |
+|-----------|-----------|------|-------|
+| `language` | `languageCode` | String | Same values: "ur", "en", "hi" |
+| `script` | `script` | Enum | Now: "ARABIC", "ROMAN", "DEVANAGARI", "LATIN" |
+| `form` | `poetryType` | Enum | Now: "GHAZAL", "NAZAM", "VERSE", etc. |
+| `categoryId` | `categoryId` | String | Now optional (can be null) |
+
+**GET /api/poems/search:**
+- ❌ Removed `language` query parameter
+- Now searches across all poem content (all languages/scripts)
+- Will be replaced with Elasticsearch for verse-level search
+
+**Future Enhancements (Coming Soon):**
+- Enhanced DTOs with multilingual content
+- Verse-level search using Elasticsearch + BM25
+- Translation management endpoints
+- Script transliteration support
 
 ---
 
@@ -1685,13 +1967,14 @@ Authorization: Bearer <access_token>
 
 ---
 
-### 5.1.7 Search Poets
+### 5.1.7 Search Poets (Enhanced with Elasticsearch)
 
 **Endpoint:** `GET /api/poets/search?query=iqbal&lang=ur&page=0&size=10`
 
 **Authentication Required:** Yes
 
-**Description:** Search poets by name in specified language
+**Description:**
+Enhanced search with Elasticsearch and PostgreSQL fallback. Searches across poet names, biographies, and details in multiple languages and scripts.
 
 **Request Headers:**
 ```
@@ -1699,12 +1982,18 @@ Authorization: Bearer <access_token>
 ```
 
 **Query Parameters:**
-- `query` (required): Search query
-- `lang` (optional): Language code - ur/en/hi (default: ur)
+- `query` (required): Search query (supports fuzzy matching)
+- `lang` (optional): Language code - `ur`, `en`, `hi` (default: `ur`)
 - `page` (optional): Page number (default: 0)
 - `size` (optional): Items per page (default: 10)
 
-**Example:** `GET /api/poets/search?query=Iqbal&lang=en`
+**Examples:**
+```
+GET /api/poets/search?query=غالب
+GET /api/poets/search?query=mirza&lang=en
+GET /api/poets/search?query=ghalib&lang=ur
+GET /api/poets/search?query=iqbal&page=0&size=20
+```
 
 **Success Response (200):**
 ```json
@@ -1720,8 +2009,10 @@ Authorization: Bearer <access_token>
         "birthYear": 1877,
         "deathYear": 1938,
         "era": "MODERN",
+        "gender": "MALE",
         "poemCount": 234,
-        "viewCount": 15234
+        "viewCount": 15234,
+        "topTags": ["Philosophy", "Nationalism", "Ghazal"]
       }
     ],
     "totalElements": 1,
@@ -1729,6 +2020,13 @@ Authorization: Bearer <access_token>
   }
 }
 ```
+
+**Notes:**
+- Uses Elasticsearch for fast, relevant search with BM25 scoring
+- Searches across poet names, biographies, and short bios
+- Falls back to PostgreSQL if Elasticsearch is unavailable
+- Supports fuzzy matching for typo tolerance
+- Multi-field search with boosted name field (highest relevance)
 
 ---
 
@@ -2839,6 +3137,182 @@ Authorization: Bearer <access_token>
    - Most endpoints support sorting via `sortBy` and `sortDir`
    - Common sort fields: name, birthYear, poemCount, viewCount
    - Sort direction: asc or desc
+
+---
+
+---
+
+## 5.7 Global Search Endpoint (NEW)
+
+### 5.7.1 Unified Search
+
+**Endpoint:** `GET /api/search?q=محبت&type=all&lang=ur&page=0&size=10`
+
+**Authentication Required:** Yes
+
+**Description:**
+Unified search across ALL content types: poems, verses, poets, and categories simultaneously.
+This is the primary search endpoint for the application - provides comprehensive search results in a single request.
+
+**Base Path:** `/api/search`
+
+**Request Headers:**
+```
+Authorization: Bearer <access_token>
+```
+
+**Query Parameters:**
+- `q` (required): Search query
+- `type` (optional): Search type - `all`, `poems`, `verses`, `poets`, `categories` (default: `all`)
+- `lang` (optional): Language code - `ur`, `en`, `hi` (default: `ur`)
+- `script` (optional): Script filter - `ARABIC`, `ROMAN`, `DEVANAGARI`, `LATIN`
+- `page` (optional): Page number (default: 0)
+- `size` (optional): Items per page (default: 10, applied per content type)
+
+**Examples:**
+```
+GET /api/search?q=محبت&type=all&lang=ur
+GET /api/search?q=dil&type=verses&lang=ur&script=ROMAN
+GET /api/search?q=غالب&type=poets
+GET /api/search?q=love&type=poems&lang=en&page=0&size=20
+```
+
+**Success Response (200) - Type: ALL:**
+```json
+{
+  "success": true,
+  "message": "Found 247 total results (12 poems, 127 verses, 3 poets)",
+  "data": {
+    "poems": [
+      {
+        "publicId": "poem_xyz789",
+        "poetryType": "GHAZAL",
+        "poet": {
+          "name": "Mirza Ghalib",
+          "publicId": "poet_ghalib123"
+        }
+      }
+    ],
+    "verses": [
+      {
+        "verse": {
+          "publicId": "verse_abc123",
+          "verseText": "دل کی ویرانی کا کیا مذکور ہے",
+          "verseNumber": 1,
+          "coupletNumber": 1
+        },
+        "poem": {
+          "publicId": "poem_xyz789",
+          "poetryType": "GHAZAL"
+        },
+        "poet": {
+          "publicId": "poet_ghalib123",
+          "name": "Mirza Ghalib"
+        }
+      }
+    ],
+    "poets": [
+      {
+        "publicId": "poet_ghalib123",
+        "name": "Mirza Ghalib",
+        "era": "CLASSICAL",
+        "poemCount": 312
+      }
+    ],
+    "categories": [],
+    "totalResults": 247,
+    "poemCount": 12,
+    "verseCount": 127,
+    "poetCount": 3,
+    "categoryCount": 0
+  }
+}
+```
+
+**Success Response (200) - Type: VERSES_ONLY:**
+```json
+{
+  "success": true,
+  "message": "Found 127 total results (0 poems, 127 verses, 0 poets)",
+  "data": {
+    "poems": [],
+    "verses": [
+      {
+        "verse": {
+          "publicId": "verse_abc123",
+          "verseText": "دل کی ویرانی کا کیا مذکور ہے",
+          "verseNumber": 1,
+          "verseType": "MATLA"
+        },
+        "poem": {
+          "publicId": "poem_xyz789"
+        },
+        "poet": {
+          "name": "Mirza Ghalib"
+        }
+      }
+    ],
+    "poets": [],
+    "categories": [],
+    "totalResults": 127,
+    "verseCount": 127
+  }
+}
+```
+
+**Notes:**
+- **Primary search endpoint** - Use this for the main search functionality
+- Searches across all content types in parallel
+- Uses Elasticsearch with BM25 scoring for relevance
+- Falls back to PostgreSQL for each content type if Elasticsearch is unavailable
+- Results are grouped by type (poems, verses, poets, categories)
+- Pagination is applied **per content type**, not globally
+- Provides counts for each content type in the response
+- When `type=all`, all content types are searched simultaneously
+- When `type=verses`, only verses are searched (faster, more focused)
+
+**Search Types:**
+- `all` - Search across all content types (default)
+- `poems` - Search only poems
+- `verses` - Search only verses (ideal for finding specific couplets)
+- `poets` - Search only poets
+- `categories` - Search only categories
+
+**Use Cases:**
+- **General search bar**: Use `type=all` for comprehensive results
+- **Find specific verse**: Use `type=verses` with the verse text
+- **Find poet's work**: Use `type=poems` with `poetId` filter
+- **Discover poets**: Use `type=poets` with poet name
+
+---
+
+### 5.7.2 Quick Search
+
+**Endpoint:** `GET /api/search/quick?q=محبت&lang=ur`
+
+**Authentication Required:** Yes
+
+**Description:**
+Simplified version of unified search with fewer parameters. Always searches all content types.
+
+**Request Headers:**
+```
+Authorization: Bearer <access_token>
+```
+
+**Query Parameters:**
+- `q` (required): Search query
+- `lang` (optional): Language code (default: `ur`)
+
+**Example:** `GET /api/search/quick?q=دل`
+
+**Success Response (200):**
+Same as unified search with `type=all`, `page=0`, `size=10`
+
+**Notes:**
+- Convenience endpoint for simple searches
+- Always returns results from all content types
+- Uses default pagination (page 0, size 10)
 
 ---
 

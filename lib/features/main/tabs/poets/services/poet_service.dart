@@ -6,6 +6,7 @@ import '../models/poet_profile_model.dart';
 import '../models/poet_image_model.dart';
 import '../models/poet_book_model.dart';
 import '../models/poet_video_model.dart';
+import '../models/poem_model.dart';
 
 class PoetService {
   final Dio _dio;
@@ -459,6 +460,69 @@ class PoetService {
       }
     } on DioException catch (e) {
       _logger.e('❌ Error fetching poet videos: ${e.message}');
+      rethrow;
+    }
+  }
+
+  /// Get poems by poet with optional poetry type filtering
+  Future<PaginatedResponse<PoemModel>> getPoemsByPoet({
+    required String poetPublicId,
+    String? poetryType,
+    int page = 0,
+    int size = 20,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{
+        'page': page,
+        'size': size,
+      };
+      if (poetryType != null) {
+        queryParams['poetryType'] = poetryType;
+      }
+
+      final response = await _dio.get(
+        '/api/poems/poet/$poetPublicId',
+        queryParameters: queryParams,
+      );
+
+      final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+        response.data,
+        (json) => json as Map<String, dynamic>,
+      );
+
+      if (apiResponse.success && apiResponse.data != null) {
+        _logger.i('✅ Poems fetched - Poet: $poetPublicId, Type: $poetryType, Page: $page');
+        return PaginatedResponse<PoemModel>.fromJson(
+          apiResponse.data!,
+          (json) => PoemModel.fromJson(json as Map<String, dynamic>),
+        );
+      } else {
+        throw Exception(apiResponse.message ?? 'Failed to fetch poems');
+      }
+    } on DioException catch (e) {
+      _logger.e('❌ Error fetching poems: ${e.message}');
+      rethrow;
+    }
+  }
+
+  /// Get single poem detail
+  Future<PoemModel> getPoemById(String publicId) async {
+    try {
+      final response = await _dio.get('/api/poems/$publicId');
+
+      final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+        response.data,
+        (json) => json as Map<String, dynamic>,
+      );
+
+      if (apiResponse.success && apiResponse.data != null) {
+        _logger.i('✅ Poem detail fetched: $publicId');
+        return PoemModel.fromJson(apiResponse.data!);
+      } else {
+        throw Exception(apiResponse.message ?? 'Failed to fetch poem');
+      }
+    } on DioException catch (e) {
+      _logger.e('❌ Error fetching poem detail: ${e.message}');
       rethrow;
     }
   }
