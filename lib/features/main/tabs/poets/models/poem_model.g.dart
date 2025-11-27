@@ -40,6 +40,8 @@ _$PoemModelImpl _$$PoemModelImplFromJson(Map<String, dynamic> json) =>
           ? null
           : PoemContentModel.fromJson(
               json['originalContent'] as Map<String, dynamic>),
+      title: json['title'] as String?,
+      excerpt: json['excerpt'] as String?,
     );
 
 Map<String, dynamic> _$$PoemModelImplToJson(_$PoemModelImpl instance) =>
@@ -67,6 +69,8 @@ Map<String, dynamic> _$$PoemModelImplToJson(_$PoemModelImpl instance) =>
       'tags': instance.tags,
       'contents': instance.contents,
       'originalContent': instance.originalContent,
+      'title': instance.title,
+      'excerpt': instance.excerpt,
     };
 
 _$PoemContentModelImpl _$$PoemContentModelImplFromJson(

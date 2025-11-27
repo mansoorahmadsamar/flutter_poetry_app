@@ -42,7 +42,10 @@ mixin _$PoemModel {
   int get likeCount => throw _privateConstructorUsedError;
   List<TagModel> get tags => throw _privateConstructorUsedError;
   List<PoemContentModel> get contents => throw _privateConstructorUsedError;
-  PoemContentModel? get originalContent => throw _privateConstructorUsedError;
+  PoemContentModel? get originalContent =>
+      throw _privateConstructorUsedError; // Simple list API fields (for backward compatibility)
+  String? get title => throw _privateConstructorUsedError;
+  String? get excerpt => throw _privateConstructorUsedError;
 
   /// Serializes this PoemModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -82,7 +85,9 @@ abstract class $PoemModelCopyWith<$Res> {
       int likeCount,
       List<TagModel> tags,
       List<PoemContentModel> contents,
-      PoemContentModel? originalContent});
+      PoemContentModel? originalContent,
+      String? title,
+      String? excerpt});
 
   $PoemContentModelCopyWith<$Res>? get originalContent;
 }
@@ -125,6 +130,8 @@ class _$PoemModelCopyWithImpl<$Res, $Val extends PoemModel>
     Object? tags = null,
     Object? contents = null,
     Object? originalContent = freezed,
+    Object? title = freezed,
+    Object? excerpt = freezed,
   }) {
     return _then(_value.copyWith(
       publicId: null == publicId
@@ -219,6 +226,14 @@ class _$PoemModelCopyWithImpl<$Res, $Val extends PoemModel>
           ? _value.originalContent
           : originalContent // ignore: cast_nullable_to_non_nullable
               as PoemContentModel?,
+      title: freezed == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String?,
+      excerpt: freezed == excerpt
+          ? _value.excerpt
+          : excerpt // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 
@@ -268,7 +283,9 @@ abstract class _$$PoemModelImplCopyWith<$Res>
       int likeCount,
       List<TagModel> tags,
       List<PoemContentModel> contents,
-      PoemContentModel? originalContent});
+      PoemContentModel? originalContent,
+      String? title,
+      String? excerpt});
 
   @override
   $PoemContentModelCopyWith<$Res>? get originalContent;
@@ -310,6 +327,8 @@ class __$$PoemModelImplCopyWithImpl<$Res>
     Object? tags = null,
     Object? contents = null,
     Object? originalContent = freezed,
+    Object? title = freezed,
+    Object? excerpt = freezed,
   }) {
     return _then(_$PoemModelImpl(
       publicId: null == publicId
@@ -404,6 +423,14 @@ class __$$PoemModelImplCopyWithImpl<$Res>
           ? _value.originalContent
           : originalContent // ignore: cast_nullable_to_non_nullable
               as PoemContentModel?,
+      title: freezed == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String?,
+      excerpt: freezed == excerpt
+          ? _value.excerpt
+          : excerpt // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -434,7 +461,9 @@ class _$PoemModelImpl implements _PoemModel {
       this.likeCount = 0,
       final List<TagModel> tags = const [],
       final List<PoemContentModel> contents = const [],
-      this.originalContent})
+      this.originalContent,
+      this.title,
+      this.excerpt})
       : _tags = tags,
         _contents = contents;
 
@@ -505,10 +534,15 @@ class _$PoemModelImpl implements _PoemModel {
 
   @override
   final PoemContentModel? originalContent;
+// Simple list API fields (for backward compatibility)
+  @override
+  final String? title;
+  @override
+  final String? excerpt;
 
   @override
   String toString() {
-    return 'PoemModel(publicId: $publicId, poetPublicId: $poetPublicId, poetName: $poetName, categoryPublicId: $categoryPublicId, categoryName: $categoryName, poetryType: $poetryType, poetryTypeUrduName: $poetryTypeUrduName, poetryTypeEnglishName: $poetryTypeEnglishName, contentType: $contentType, requiresStructuredParsing: $requiresStructuredParsing, imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, yearWritten: $yearWritten, source: $source, license: $license, uploadedByUsername: $uploadedByUsername, isPublic: $isPublic, isFeatured: $isFeatured, viewCount: $viewCount, likeCount: $likeCount, tags: $tags, contents: $contents, originalContent: $originalContent)';
+    return 'PoemModel(publicId: $publicId, poetPublicId: $poetPublicId, poetName: $poetName, categoryPublicId: $categoryPublicId, categoryName: $categoryName, poetryType: $poetryType, poetryTypeUrduName: $poetryTypeUrduName, poetryTypeEnglishName: $poetryTypeEnglishName, contentType: $contentType, requiresStructuredParsing: $requiresStructuredParsing, imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, yearWritten: $yearWritten, source: $source, license: $license, uploadedByUsername: $uploadedByUsername, isPublic: $isPublic, isFeatured: $isFeatured, viewCount: $viewCount, likeCount: $likeCount, tags: $tags, contents: $contents, originalContent: $originalContent, title: $title, excerpt: $excerpt)';
   }
 
   @override
@@ -558,7 +592,9 @@ class _$PoemModelImpl implements _PoemModel {
             const DeepCollectionEquality().equals(other._tags, _tags) &&
             const DeepCollectionEquality().equals(other._contents, _contents) &&
             (identical(other.originalContent, originalContent) ||
-                other.originalContent == originalContent));
+                other.originalContent == originalContent) &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.excerpt, excerpt) || other.excerpt == excerpt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -587,7 +623,9 @@ class _$PoemModelImpl implements _PoemModel {
         likeCount,
         const DeepCollectionEquality().hash(_tags),
         const DeepCollectionEquality().hash(_contents),
-        originalContent
+        originalContent,
+        title,
+        excerpt
       ]);
 
   /// Create a copy of PoemModel
@@ -630,7 +668,9 @@ abstract class _PoemModel implements PoemModel {
       final int likeCount,
       final List<TagModel> tags,
       final List<PoemContentModel> contents,
-      final PoemContentModel? originalContent}) = _$PoemModelImpl;
+      final PoemContentModel? originalContent,
+      final String? title,
+      final String? excerpt}) = _$PoemModelImpl;
 
   factory _PoemModel.fromJson(Map<String, dynamic> json) =
       _$PoemModelImpl.fromJson;
@@ -680,7 +720,12 @@ abstract class _PoemModel implements PoemModel {
   @override
   List<PoemContentModel> get contents;
   @override
-  PoemContentModel? get originalContent;
+  PoemContentModel?
+      get originalContent; // Simple list API fields (for backward compatibility)
+  @override
+  String? get title;
+  @override
+  String? get excerpt;
 
   /// Create a copy of PoemModel
   /// with the given fields replaced by the non-null parameter values.

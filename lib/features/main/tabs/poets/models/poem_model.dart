@@ -30,6 +30,9 @@ class PoemModel with _$PoemModel {
     @Default([]) List<TagModel> tags,
     @Default([]) List<PoemContentModel> contents,
     PoemContentModel? originalContent,
+    // Simple list API fields (for backward compatibility)
+    String? title,
+    String? excerpt,
   }) = _PoemModel;
 
   factory PoemModel.fromJson(Map<String, dynamic> json) =>
@@ -107,19 +110,40 @@ extension PoemModelExtensions on PoemModel {
   }
 
   /// Get display title based on language preference
+  /// Handles both list API (title field) and detail API (contents array)
   String getDisplayTitle(String preferredLanguageCode) {
+    // If title field exists (list API), use it
+    if (title != null && title!.isNotEmpty) {
+      return title!;
+    }
+
+    // Otherwise use contents array (detail API)
     final content = getContentForLanguage(preferredLanguageCode);
     return content?.title ?? 'Untitled';
   }
 
   /// Get display text based on language preference
+  /// Handles both list API (excerpt field) and detail API (contents array)
   String getDisplayText(String preferredLanguageCode) {
+    // If excerpt field exists (list API), use it
+    if (excerpt != null && excerpt!.isNotEmpty) {
+      return excerpt!;
+    }
+
+    // Otherwise use contents array (detail API)
     final content = getContentForLanguage(preferredLanguageCode);
     return content?.fullText ?? '';
   }
 
   /// Check if content uses RTL script
+  /// For list API, assume RTL for Urdu language
   bool isRTL(String preferredLanguageCode) {
+    // For list API responses, assume RTL based on language code
+    if (contents.isEmpty && preferredLanguageCode == 'ur') {
+      return true;
+    }
+
+    // For detail API, check script direction
     final content = getContentForLanguage(preferredLanguageCode);
     return content?.scriptDirection?.toLowerCase() == 'rtl';
   }
