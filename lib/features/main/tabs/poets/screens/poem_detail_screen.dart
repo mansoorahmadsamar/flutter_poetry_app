@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
+import 'package:flutter_poetry_app/core/widgets/localized_text.dart';
 import '../models/poem_model.dart';
 import '../providers/poem_providers.dart';
 import '../providers/poet_providers.dart';
@@ -23,16 +24,12 @@ class PoemDetailScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: poemAsync.maybeWhen(
-          data: (poem) => Text(
+          data: (poem) => LocalizedText(
             poem.getDisplayTitle(isUrdu ? 'ur' : 'en'),
-            style: isUrdu
-                ? TextStyle(
-                    fontFamily: 'Jameel Noori Nastaleeq',
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    height: 2.0,
-                  )
-                : null,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           orElse: () => Text('Loading...'),
         ),
@@ -81,16 +78,12 @@ class PoemDetailScreen extends ConsumerWidget {
                     ),
                     SizedBox(width: AppSpacing.md),
                     Expanded(
-                      child: Text(
+                      child: LocalizedText(
                         poem.poetName,
-                        style: isUrdu
-                            ? TextStyle(
-                                fontFamily: 'Jameel Noori Nastaleeq',
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                height: 2.0,
-                              )
-                            : Theme.of(context).textTheme.titleMedium,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                     Icon(Icons.arrow_forward_ios, size: 16),
@@ -101,30 +94,20 @@ class PoemDetailScreen extends ConsumerWidget {
           ),
           SizedBox(height: AppSpacing.lg),
 
-          // Full poem content with Jameel Noori font for Urdu
+          // Full poem content with automatic RTL and font handling
           Container(
             padding: EdgeInsets.all(AppSpacing.xl),
             decoration: BoxDecoration(
               color: isDark ? Colors.grey[800] : AppColors.verseBackground,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
             ),
-            child: Text(
+            child: LocalizedText(
               poem.getDisplayText(isUrdu ? 'ur' : 'en'),
-              style: poem.isRTL(isUrdu ? 'ur' : 'en')
-                  ? TextStyle(
-                      fontFamily: 'Jameel Noori Nastaleeq',
-                      fontSize: 22,
-                      fontWeight: FontWeight.w400,
-                      height: 2.2,
-                    )
-                  : Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontSize: 18,
-                      height: 1.8,
-                    ),
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w400,
+              ),
               textAlign: TextAlign.center,
-              textDirection: poem.isRTL(isUrdu ? 'ur' : 'en')
-                  ? TextDirection.rtl
-                  : TextDirection.ltr,
             ),
           ),
 

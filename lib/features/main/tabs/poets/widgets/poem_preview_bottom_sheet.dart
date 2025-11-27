@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
+import 'package:flutter_poetry_app/core/widgets/localized_text.dart';
 import '../models/poem_model.dart';
 import '../providers/poem_providers.dart';
 import '../providers/poet_providers.dart';
@@ -88,16 +89,12 @@ class PoemPreviewBottomSheet extends ConsumerWidget {
       child: Row(
         children: [
           Expanded(
-            child: Text(
+            child: LocalizedText(
               poem.getDisplayTitle(isUrdu ? 'ur' : 'en'),
-              style: isUrdu
-                  ? TextStyle(
-                      fontFamily: 'Jameel Noori Nastaleeq',
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      height: 2.0,
-                    )
-                  : Theme.of(context).textTheme.titleLarge,
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -161,30 +158,20 @@ class PoemPreviewBottomSheet extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Full poem content with Jameel Noori font for Urdu
+          // Full poem content with automatic RTL and font handling
           Container(
             padding: EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
               color: isDark ? Colors.grey[800] : AppColors.verseBackground,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
             ),
-            child: Text(
+            child: LocalizedText(
               poem.getDisplayText(isUrdu ? 'ur' : 'en'),
-              style: poem.isRTL(isUrdu ? 'ur' : 'en')
-                  ? TextStyle(
-                      fontFamily: 'Jameel Noori Nastaleeq',
-                      fontSize: 20,
-                      fontWeight: FontWeight.w400,
-                      height: 2.2,
-                    )
-                  : Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontSize: 16,
-                      height: 1.8,
-                    ),
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w400,
+              ),
               textAlign: TextAlign.center,
-              textDirection: poem.isRTL(isUrdu ? 'ur' : 'en')
-                  ? TextDirection.rtl
-                  : TextDirection.ltr,
             ),
           ),
 

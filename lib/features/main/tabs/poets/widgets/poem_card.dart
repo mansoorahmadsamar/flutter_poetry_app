@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
+import 'package:flutter_poetry_app/core/widgets/localized_text.dart';
 import '../models/poem_model.dart';
 import '../providers/poet_providers.dart';
 
@@ -26,44 +27,28 @@ class PoemCard extends ConsumerWidget {
         child: Padding(
           padding: EdgeInsets.all(AppSpacing.lg),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: isUrdu ? CrossAxisAlignment.stretch : CrossAxisAlignment.start,
             children: [
-              // Title with Jameel Noori font for Urdu
-              Text(
+              // Title with automatic RTL and font handling
+              LocalizedText(
                 poem.getDisplayTitle(isUrdu ? 'ur' : 'en'),
-                style: isUrdu
-                    ? TextStyle(
-                        fontFamily: 'Jameel Noori Nastaleeq',
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        height: 2.0,
-                      )
-                    : Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               SizedBox(height: AppSpacing.sm),
 
-              // Content preview (first 3 lines) with Jameel Noori font
-              Text(
+              // Content preview with automatic RTL and font handling
+              LocalizedText(
                 poem.getDisplayText(isUrdu ? 'ur' : 'en'),
-                style: poem.isRTL(isUrdu ? 'ur' : 'en')
-                    ? TextStyle(
-                        fontFamily: 'Jameel Noori Nastaleeq',
-                        fontSize: 18,
-                        fontWeight: FontWeight.w400,
-                        height: 2.2,
-                        color: isDark ? Colors.grey[400] : Colors.grey[700],
-                      )
-                    : Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          height: 1.6,
-                          color: isDark ? Colors.grey[400] : Colors.grey[600],
-                        ),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w400,
+                  color: isDark ? Colors.grey[400] : Colors.grey[700],
+                ),
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
-                textDirection: poem.isRTL(isUrdu ? 'ur' : 'en')
-                    ? TextDirection.rtl
-                    : TextDirection.ltr,
               ),
 
               SizedBox(height: AppSpacing.md),

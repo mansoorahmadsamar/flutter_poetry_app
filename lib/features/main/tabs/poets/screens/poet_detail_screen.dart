@@ -11,6 +11,7 @@ import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
+import 'package:flutter_poetry_app/core/widgets/localized_text.dart';
 
 class PoetDetailScreen extends ConsumerStatefulWidget {
   final String publicId;
@@ -156,15 +157,13 @@ class _PoetDetailScreenState extends ConsumerState<PoetDetailScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
+                  LocalizedText(
                     poetProfile.name,
-                    style: (isUrdu
-                        ? AppTypography.urduPoetNameStyle
-                        : Theme.of(context).textTheme.headlineMedium
-                    )?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    style: TextStyle(
+                      fontSize: 28,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   SizedBox(height: AppSpacing.sm),
                   Row(
@@ -238,14 +237,12 @@ class _PoetDetailScreenState extends ConsumerState<PoetDetailScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Bio
-          Text(
+          LocalizedText(
             poetProfile.shortBio,
-            style: (isUrdu
-                ? AppTypography.getUrduTextTheme(context).bodyLarge
-                : Theme.of(context).textTheme.bodyLarge
-            )?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
           ),
           SizedBox(height: AppSpacing.lg),
           // Details Grid
@@ -273,14 +270,11 @@ class _PoetDetailScreenState extends ConsumerState<PoetDetailScreen>
           SizedBox(height: AppSpacing.lg),
           // Bio Text
           if (poetProfile.biography != null)
-            Text(
+            LocalizedText(
               poetProfile.biography!,
-              style: (isUrdu
-                  ? AppTypography.getUrduTextTheme(context).bodyMedium
-                  : Theme.of(context).textTheme.bodyMedium
-              )?.copyWith(
-                    height: isUrdu ? 2.0 : 1.6,
-                  ),
+              style: TextStyle(
+                fontSize: 14,
+              ),
               maxLines: 4,
               overflow: TextOverflow.ellipsis,
             ),
