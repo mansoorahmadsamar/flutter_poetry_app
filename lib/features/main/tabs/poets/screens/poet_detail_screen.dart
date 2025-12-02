@@ -315,7 +315,7 @@ class _PoetDetailScreenState extends ConsumerState<PoetDetailScreen>
     );
   }
 
-  String _getEraLabel(String era) {
+  String _getEraLabel(String? era) {
     switch (era) {
       case 'CLASSICAL':
         return 'Classical';
@@ -326,7 +326,7 @@ class _PoetDetailScreenState extends ConsumerState<PoetDetailScreen>
       case 'EMERGING':
         return 'Emerging';
       default:
-        return era;
+        return era ?? 'Unknown';
     }
   }
 

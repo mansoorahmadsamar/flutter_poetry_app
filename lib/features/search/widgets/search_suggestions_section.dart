@@ -84,14 +84,14 @@ class SearchSuggestionsSection extends ConsumerWidget {
 class _SuggestedPoetCard extends StatelessWidget {
   final String? imageUrl;
   final String name;
-  final String era;
+  final String? era;
   final int poemCount;
   final VoidCallback onTap;
 
   const _SuggestedPoetCard({
     this.imageUrl,
     required this.name,
-    required this.era,
+    this.era,
     required this.poemCount,
     required this.onTap,
   });
@@ -176,7 +176,7 @@ class _SuggestedPoetCard extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
-                    era,
+                    era ?? 'Unknown',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: AppColors.secondary,
                           fontSize: 11,

@@ -293,7 +293,7 @@ class PoetCard extends ConsumerWidget {
     );
   }
 
-  Color _getEraBadgeColor(String era) {
+  Color _getEraBadgeColor(String? era) {
     switch (era) {
       case 'CLASSICAL':
         return const Color(0xFF8B5CF6); // Purple
@@ -308,7 +308,7 @@ class PoetCard extends ConsumerWidget {
     }
   }
 
-  String _getEraLabel(String era) {
+  String _getEraLabel(String? era) {
     switch (era) {
       case 'CLASSICAL':
         return 'CLASSICAL';
@@ -319,7 +319,7 @@ class PoetCard extends ConsumerWidget {
       case 'EMERGING':
         return 'EMERGING';
       default:
-        return era.toUpperCase();
+        return era?.toUpperCase() ?? 'UNKNOWN';
     }
   }
 

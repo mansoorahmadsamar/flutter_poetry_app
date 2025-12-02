@@ -25,8 +25,8 @@ mixin _$PoetProfileModel {
   String? get biography => throw _privateConstructorUsedError;
   @JsonKey(name: 'shortBio')
   String get shortBio => throw _privateConstructorUsedError;
-  String get gender => throw _privateConstructorUsedError;
-  String get era => throw _privateConstructorUsedError;
+  String? get gender => throw _privateConstructorUsedError;
+  String? get era => throw _privateConstructorUsedError;
   int get birthYear => throw _privateConstructorUsedError;
   int? get deathYear => throw _privateConstructorUsedError;
   @JsonKey(name: 'birthDate')
@@ -85,8 +85,8 @@ abstract class $PoetProfileModelCopyWith<$Res> {
       String name,
       String? biography,
       @JsonKey(name: 'shortBio') String shortBio,
-      String gender,
-      String era,
+      String? gender,
+      String? era,
       int birthYear,
       int? deathYear,
       @JsonKey(name: 'birthDate') String? birthDate,
@@ -130,8 +130,8 @@ class _$PoetProfileModelCopyWithImpl<$Res, $Val extends PoetProfileModel>
     Object? name = null,
     Object? biography = freezed,
     Object? shortBio = null,
-    Object? gender = null,
-    Object? era = null,
+    Object? gender = freezed,
+    Object? era = freezed,
     Object? birthYear = null,
     Object? deathYear = freezed,
     Object? birthDate = freezed,
@@ -172,14 +172,14 @@ class _$PoetProfileModelCopyWithImpl<$Res, $Val extends PoetProfileModel>
           ? _value.shortBio
           : shortBio // ignore: cast_nullable_to_non_nullable
               as String,
-      gender: null == gender
+      gender: freezed == gender
           ? _value.gender
           : gender // ignore: cast_nullable_to_non_nullable
-              as String,
-      era: null == era
+              as String?,
+      era: freezed == era
           ? _value.era
           : era // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       birthYear: null == birthYear
           ? _value.birthYear
           : birthYear // ignore: cast_nullable_to_non_nullable
@@ -285,8 +285,8 @@ abstract class _$$PoetProfileModelImplCopyWith<$Res>
       String name,
       String? biography,
       @JsonKey(name: 'shortBio') String shortBio,
-      String gender,
-      String era,
+      String? gender,
+      String? era,
       int birthYear,
       int? deathYear,
       @JsonKey(name: 'birthDate') String? birthDate,
@@ -328,8 +328,8 @@ class __$$PoetProfileModelImplCopyWithImpl<$Res>
     Object? name = null,
     Object? biography = freezed,
     Object? shortBio = null,
-    Object? gender = null,
-    Object? era = null,
+    Object? gender = freezed,
+    Object? era = freezed,
     Object? birthYear = null,
     Object? deathYear = freezed,
     Object? birthDate = freezed,
@@ -370,14 +370,14 @@ class __$$PoetProfileModelImplCopyWithImpl<$Res>
           ? _value.shortBio
           : shortBio // ignore: cast_nullable_to_non_nullable
               as String,
-      gender: null == gender
+      gender: freezed == gender
           ? _value.gender
           : gender // ignore: cast_nullable_to_non_nullable
-              as String,
-      era: null == era
+              as String?,
+      era: freezed == era
           ? _value.era
           : era // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       birthYear: null == birthYear
           ? _value.birthYear
           : birthYear // ignore: cast_nullable_to_non_nullable
@@ -478,8 +478,8 @@ class _$PoetProfileModelImpl implements _PoetProfileModel {
       required this.name,
       this.biography,
       @JsonKey(name: 'shortBio') required this.shortBio,
-      required this.gender,
-      required this.era,
+      this.gender,
+      this.era,
       required this.birthYear,
       this.deathYear,
       @JsonKey(name: 'birthDate') this.birthDate,
@@ -521,9 +521,9 @@ class _$PoetProfileModelImpl implements _PoetProfileModel {
   @JsonKey(name: 'shortBio')
   final String shortBio;
   @override
-  final String gender;
+  final String? gender;
   @override
-  final String era;
+  final String? era;
   @override
   final int birthYear;
   @override
@@ -739,8 +739,8 @@ abstract class _PoetProfileModel implements PoetProfileModel {
       required final String name,
       final String? biography,
       @JsonKey(name: 'shortBio') required final String shortBio,
-      required final String gender,
-      required final String era,
+      final String? gender,
+      final String? era,
       required final int birthYear,
       final int? deathYear,
       @JsonKey(name: 'birthDate') final String? birthDate,
@@ -778,9 +778,9 @@ abstract class _PoetProfileModel implements PoetProfileModel {
   @JsonKey(name: 'shortBio')
   String get shortBio;
   @override
-  String get gender;
+  String? get gender;
   @override
-  String get era;
+  String? get era;
   @override
   int get birthYear;
   @override

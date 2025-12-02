@@ -28,9 +28,9 @@ mixin _$PoetModel {
   int? get deathYear => throw _privateConstructorUsedError;
   @JsonKey(name: 'profileImageUrl')
   String? get profileImageUrl => throw _privateConstructorUsedError;
-  String get gender =>
+  String? get gender =>
       throw _privateConstructorUsedError; // MALE, FEMALE, OTHER
-  String get era =>
+  String? get era =>
       throw _privateConstructorUsedError; // CLASSICAL, MODERN, CONTEMPORARY, EMERGING
   int get poemCount => throw _privateConstructorUsedError;
   int get viewCount => throw _privateConstructorUsedError;
@@ -63,8 +63,8 @@ abstract class $PoetModelCopyWith<$Res> {
       int birthYear,
       int? deathYear,
       @JsonKey(name: 'profileImageUrl') String? profileImageUrl,
-      String gender,
-      String era,
+      String? gender,
+      String? era,
       int poemCount,
       int viewCount,
       @JsonKey(name: 'isFeatured') bool isFeatured,
@@ -93,8 +93,8 @@ class _$PoetModelCopyWithImpl<$Res, $Val extends PoetModel>
     Object? birthYear = null,
     Object? deathYear = freezed,
     Object? profileImageUrl = freezed,
-    Object? gender = null,
-    Object? era = null,
+    Object? gender = freezed,
+    Object? era = freezed,
     Object? poemCount = null,
     Object? viewCount = null,
     Object? isFeatured = null,
@@ -126,14 +126,14 @@ class _$PoetModelCopyWithImpl<$Res, $Val extends PoetModel>
           ? _value.profileImageUrl
           : profileImageUrl // ignore: cast_nullable_to_non_nullable
               as String?,
-      gender: null == gender
+      gender: freezed == gender
           ? _value.gender
           : gender // ignore: cast_nullable_to_non_nullable
-              as String,
-      era: null == era
+              as String?,
+      era: freezed == era
           ? _value.era
           : era // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       poemCount: null == poemCount
           ? _value.poemCount
           : poemCount // ignore: cast_nullable_to_non_nullable
@@ -173,8 +173,8 @@ abstract class _$$PoetModelImplCopyWith<$Res>
       int birthYear,
       int? deathYear,
       @JsonKey(name: 'profileImageUrl') String? profileImageUrl,
-      String gender,
-      String era,
+      String? gender,
+      String? era,
       int poemCount,
       int viewCount,
       @JsonKey(name: 'isFeatured') bool isFeatured,
@@ -201,8 +201,8 @@ class __$$PoetModelImplCopyWithImpl<$Res>
     Object? birthYear = null,
     Object? deathYear = freezed,
     Object? profileImageUrl = freezed,
-    Object? gender = null,
-    Object? era = null,
+    Object? gender = freezed,
+    Object? era = freezed,
     Object? poemCount = null,
     Object? viewCount = null,
     Object? isFeatured = null,
@@ -234,14 +234,14 @@ class __$$PoetModelImplCopyWithImpl<$Res>
           ? _value.profileImageUrl
           : profileImageUrl // ignore: cast_nullable_to_non_nullable
               as String?,
-      gender: null == gender
+      gender: freezed == gender
           ? _value.gender
           : gender // ignore: cast_nullable_to_non_nullable
-              as String,
-      era: null == era
+              as String?,
+      era: freezed == era
           ? _value.era
           : era // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       poemCount: null == poemCount
           ? _value.poemCount
           : poemCount // ignore: cast_nullable_to_non_nullable
@@ -276,8 +276,8 @@ class _$PoetModelImpl implements _PoetModel {
       required this.birthYear,
       this.deathYear,
       @JsonKey(name: 'profileImageUrl') this.profileImageUrl,
-      required this.gender,
-      required this.era,
+      this.gender,
+      this.era,
       required this.poemCount,
       required this.viewCount,
       @JsonKey(name: 'isFeatured') required this.isFeatured,
@@ -303,10 +303,10 @@ class _$PoetModelImpl implements _PoetModel {
   @JsonKey(name: 'profileImageUrl')
   final String? profileImageUrl;
   @override
-  final String gender;
+  final String? gender;
 // MALE, FEMALE, OTHER
   @override
-  final String era;
+  final String? era;
 // CLASSICAL, MODERN, CONTEMPORARY, EMERGING
   @override
   final int poemCount;
@@ -405,8 +405,8 @@ abstract class _PoetModel implements PoetModel {
       required final int birthYear,
       final int? deathYear,
       @JsonKey(name: 'profileImageUrl') final String? profileImageUrl,
-      required final String gender,
-      required final String era,
+      final String? gender,
+      final String? era,
       required final int poemCount,
       required final int viewCount,
       @JsonKey(name: 'isFeatured') required final bool isFeatured,
@@ -431,9 +431,9 @@ abstract class _PoetModel implements PoetModel {
   @JsonKey(name: 'profileImageUrl')
   String? get profileImageUrl;
   @override
-  String get gender; // MALE, FEMALE, OTHER
+  String? get gender; // MALE, FEMALE, OTHER
   @override
-  String get era; // CLASSICAL, MODERN, CONTEMPORARY, EMERGING
+  String? get era; // CLASSICAL, MODERN, CONTEMPORARY, EMERGING
   @override
   int get poemCount;
   @override

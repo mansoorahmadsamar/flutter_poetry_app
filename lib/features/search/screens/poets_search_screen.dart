@@ -133,7 +133,7 @@ class _PoetsSearchScreenState extends ConsumerState<PoetsSearchScreen> {
             _buildErrorState(searchState.error!)
           else if (!searchState.isLoading && searchState.isEmpty && searchState.currentQuery != null)
             // No results found (after search/browse)
-            _buildNoResultsState()
+            ..._buildNoResultsState()
           else if (query.isEmpty)
             // Empty state (no search, no browse)
             ..._buildEmptyState()
@@ -370,41 +370,42 @@ class _PoetsSearchScreenState extends ConsumerState<PoetsSearchScreen> {
     );
   }
 
-  Widget _buildNoResultsState() {
-    return SliverFillRemaining(
-      hasScrollBody: false,
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.xl),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.search_off,
-                size: 64,
-                color: Colors.grey[400],
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Text(
-                'No poets found',
-                style: Theme.of(context).textTheme.titleMedium,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                'Try searching with a different name or clear filters',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.grey[600],
+  List<Widget> _buildNoResultsState() {
+    return [
+      SliverToBoxAdapter(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.search_off,
+                  size: 64,
+                  color: Colors.grey[400],
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              const SearchSuggestionsSection(),
-            ],
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  'No poets found',
+                  style: Theme.of(context).textTheme.titleMedium,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  'Try searching with a different name or clear filters',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.grey[600],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    );
+      const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.lg)),
+      const SearchSuggestionsSection(),
+    ];
   }
 
   void _showFilterBottomSheet(BuildContext context) {
