@@ -15,7 +15,11 @@
       "Bash(mvn clean compile:*)",
       "Bash(dart pub global activate:*)",
       "Bash($HOME/.pub-cache/bin/flutterfire configure:*)",
-      "Bash(xargs basename:*)"
+      "Bash(xargs basename:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfix: make gender and era fields nullable in poet models\n\n- Updated PoetModel and PoetProfileModel to make gender and era nullable\n- Fixed JSON deserialization issues when API returns null for these fields\n- Updated poet_card.dart and poet_detail_screen.dart to handle nullable values\n- Fixed search screen layout error with SliverToBoxAdapter\n- Updated SearchSuggestionsSection to handle nullable era field\n- Regenerated Freezed model files\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

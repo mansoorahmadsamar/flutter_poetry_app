@@ -7,8 +7,10 @@ import 'package:flutter_poetry_app/core/widgets/localized_text.dart';
 import '../models/poem_model.dart';
 import '../providers/poem_providers.dart';
 import '../providers/poet_providers.dart';
+import 'package:flutter_poetry_app/features/engagement/providers/like_providers.dart';
+import 'package:flutter_poetry_app/features/engagement/providers/bookmark_providers.dart';
 
-class PoemDetailScreen extends ConsumerWidget {
+class PoemDetailScreen extends ConsumerStatefulWidget {
   final String publicId;
 
   const PoemDetailScreen({
@@ -17,8 +19,18 @@ class PoemDetailScreen extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final poemAsync = ref.watch(poemDetailProvider(publicId));
+  ConsumerState<PoemDetailScreen> createState() => _PoemDetailScreenState();
+}
+
+class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
+  // Optimistic state for like and bookmark
+  bool? _isLikedOptimistic;
+  bool? _isBookmarkedOptimistic;
+  int? _likeCountOptimistic;
+
+  @override
+  Widget build(BuildContext context) {
+    final poemAsync = ref.watch(poemDetailProvider(widget.publicId));
     final isUrdu = ref.watch(selectedLanguageProvider) == 'ur';
 
     return Scaffold(
@@ -117,25 +129,18 @@ class PoemDetailScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildActionButton(
-                context,
-                icon: Icons.favorite_border,
-                label: 'Like',
-                count: poem.likeCount,
-                onPressed: () {/* TODO */},
-              ),
-              _buildActionButton(
-                context,
-                icon: Icons.bookmark_border,
-                label: 'Save',
-                count: 0,
-                onPressed: () {/* TODO */},
-              ),
+              _buildLikeButton(context, ref, poem),
+              _buildBookmarkButton(context, ref, poem),
               _buildActionButton(
                 context,
                 icon: Icons.share,
                 label: 'Share',
-                onPressed: () {/* TODO */},
+                onPressed: () {
+                  // TODO: Implement share functionality in Phase 2
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Share feature coming soon!')),
+                  );
+                },
               ),
             ],
           ),
@@ -261,6 +266,125 @@ class PoemDetailScreen extends ConsumerWidget {
         ),
         Text(
           count != null ? '$count' : label,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLikeButton(BuildContext context, WidgetRef ref, PoemModel poem) {
+    final isLiked = _isLikedOptimistic ?? poem.isLikedByCurrentUser ?? false;
+    final likeCount = _likeCountOptimistic ?? poem.likeCount;
+
+    return Column(
+      children: [
+        IconButton(
+          icon: Icon(
+            isLiked ? Icons.favorite : Icons.favorite_border,
+            size: 28,
+            color: isLiked ? Colors.red : null,
+          ),
+          onPressed: () async {
+            // Optimistic update
+            setState(() {
+              _isLikedOptimistic = !isLiked;
+              _likeCountOptimistic = isLiked ? likeCount - 1 : likeCount + 1;
+            });
+
+            try {
+              final notifier = ref.read(likeActionProvider.notifier);
+              await notifier.toggleLike(widget.publicId, isLiked);
+
+              // Invalidate poem detail to get updated data from server
+              ref.invalidate(poemDetailProvider(widget.publicId));
+
+              // Clear optimistic state
+              setState(() {
+                _isLikedOptimistic = null;
+                _likeCountOptimistic = null;
+              });
+            } catch (e) {
+              // Revert optimistic update on error
+              setState(() {
+                _isLikedOptimistic = null;
+                _likeCountOptimistic = null;
+              });
+
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Failed to ${isLiked ? 'unlike' : 'like'} poem'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            }
+          },
+        ),
+        Text(
+          '$likeCount',
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBookmarkButton(BuildContext context, WidgetRef ref, PoemModel poem) {
+    final isBookmarked = _isBookmarkedOptimistic ?? poem.isBookmarkedByCurrentUser ?? false;
+
+    return Column(
+      children: [
+        IconButton(
+          icon: Icon(
+            isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+            size: 28,
+            color: isBookmarked ? AppColors.primary : null,
+          ),
+          onPressed: () async {
+            // Optimistic update
+            setState(() {
+              _isBookmarkedOptimistic = !isBookmarked;
+            });
+
+            try {
+              final notifier = ref.read(bookmarkActionProvider.notifier);
+              await notifier.toggleBookmark(widget.publicId, isBookmarked);
+
+              // Invalidate poem detail to get updated data from server
+              ref.invalidate(poemDetailProvider(widget.publicId));
+
+              // Clear optimistic state
+              setState(() {
+                _isBookmarkedOptimistic = null;
+              });
+
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(isBookmarked ? 'Removed from bookmarks' : 'Added to bookmarks'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              }
+            } catch (e) {
+              // Revert optimistic update on error
+              setState(() {
+                _isBookmarkedOptimistic = null;
+              });
+
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Failed to ${isBookmarked ? 'remove' : 'add'} bookmark'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            }
+          },
+        ),
+        Text(
+          'Save',
           style: Theme.of(context).textTheme.bodySmall,
         ),
       ],

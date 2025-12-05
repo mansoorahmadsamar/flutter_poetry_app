@@ -42,6 +42,9 @@ mixin _$PoemModel {
   bool get isFeatured => throw _privateConstructorUsedError;
   int get viewCount => throw _privateConstructorUsedError;
   int get likeCount => throw _privateConstructorUsedError;
+  bool? get isLikedByCurrentUser => throw _privateConstructorUsedError;
+  bool? get isBookmarkedByCurrentUser => throw _privateConstructorUsedError;
+  int? get commentCount => throw _privateConstructorUsedError;
   List<TagModel> get tags => throw _privateConstructorUsedError;
   List<PoemContentModel> get contents => throw _privateConstructorUsedError;
   PoemContentModel? get originalContent =>
@@ -86,6 +89,9 @@ abstract class $PoemModelCopyWith<$Res> {
       bool isFeatured,
       int viewCount,
       int likeCount,
+      bool? isLikedByCurrentUser,
+      bool? isBookmarkedByCurrentUser,
+      int? commentCount,
       List<TagModel> tags,
       List<PoemContentModel> contents,
       PoemContentModel? originalContent,
@@ -131,6 +137,9 @@ class _$PoemModelCopyWithImpl<$Res, $Val extends PoemModel>
     Object? isFeatured = null,
     Object? viewCount = null,
     Object? likeCount = null,
+    Object? isLikedByCurrentUser = freezed,
+    Object? isBookmarkedByCurrentUser = freezed,
+    Object? commentCount = freezed,
     Object? tags = null,
     Object? contents = null,
     Object? originalContent = freezed,
@@ -222,6 +231,18 @@ class _$PoemModelCopyWithImpl<$Res, $Val extends PoemModel>
           ? _value.likeCount
           : likeCount // ignore: cast_nullable_to_non_nullable
               as int,
+      isLikedByCurrentUser: freezed == isLikedByCurrentUser
+          ? _value.isLikedByCurrentUser
+          : isLikedByCurrentUser // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      isBookmarkedByCurrentUser: freezed == isBookmarkedByCurrentUser
+          ? _value.isBookmarkedByCurrentUser
+          : isBookmarkedByCurrentUser // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      commentCount: freezed == commentCount
+          ? _value.commentCount
+          : commentCount // ignore: cast_nullable_to_non_nullable
+              as int?,
       tags: null == tags
           ? _value.tags
           : tags // ignore: cast_nullable_to_non_nullable
@@ -290,6 +311,9 @@ abstract class _$$PoemModelImplCopyWith<$Res>
       bool isFeatured,
       int viewCount,
       int likeCount,
+      bool? isLikedByCurrentUser,
+      bool? isBookmarkedByCurrentUser,
+      int? commentCount,
       List<TagModel> tags,
       List<PoemContentModel> contents,
       PoemContentModel? originalContent,
@@ -334,6 +358,9 @@ class __$$PoemModelImplCopyWithImpl<$Res>
     Object? isFeatured = null,
     Object? viewCount = null,
     Object? likeCount = null,
+    Object? isLikedByCurrentUser = freezed,
+    Object? isBookmarkedByCurrentUser = freezed,
+    Object? commentCount = freezed,
     Object? tags = null,
     Object? contents = null,
     Object? originalContent = freezed,
@@ -425,6 +452,18 @@ class __$$PoemModelImplCopyWithImpl<$Res>
           ? _value.likeCount
           : likeCount // ignore: cast_nullable_to_non_nullable
               as int,
+      isLikedByCurrentUser: freezed == isLikedByCurrentUser
+          ? _value.isLikedByCurrentUser
+          : isLikedByCurrentUser // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      isBookmarkedByCurrentUser: freezed == isBookmarkedByCurrentUser
+          ? _value.isBookmarkedByCurrentUser
+          : isBookmarkedByCurrentUser // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      commentCount: freezed == commentCount
+          ? _value.commentCount
+          : commentCount // ignore: cast_nullable_to_non_nullable
+              as int?,
       tags: null == tags
           ? _value._tags
           : tags // ignore: cast_nullable_to_non_nullable
@@ -474,6 +513,9 @@ class _$PoemModelImpl implements _PoemModel {
       this.isFeatured = false,
       this.viewCount = 0,
       this.likeCount = 0,
+      this.isLikedByCurrentUser,
+      this.isBookmarkedByCurrentUser,
+      this.commentCount,
       final List<TagModel> tags = const [],
       final List<PoemContentModel> contents = const [],
       this.originalContent,
@@ -532,6 +574,12 @@ class _$PoemModelImpl implements _PoemModel {
   @override
   @JsonKey()
   final int likeCount;
+  @override
+  final bool? isLikedByCurrentUser;
+  @override
+  final bool? isBookmarkedByCurrentUser;
+  @override
+  final int? commentCount;
   final List<TagModel> _tags;
   @override
   @JsonKey()
@@ -560,7 +608,7 @@ class _$PoemModelImpl implements _PoemModel {
 
   @override
   String toString() {
-    return 'PoemModel(publicId: $publicId, poetPublicId: $poetPublicId, poetName: $poetName, categoryPublicId: $categoryPublicId, categoryName: $categoryName, poetryType: $poetryType, poetryTypeName: $poetryTypeName, poetryTypeUrduName: $poetryTypeUrduName, poetryTypeEnglishName: $poetryTypeEnglishName, contentType: $contentType, requiresStructuredParsing: $requiresStructuredParsing, imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, yearWritten: $yearWritten, source: $source, license: $license, uploadedByUsername: $uploadedByUsername, isPublic: $isPublic, isFeatured: $isFeatured, viewCount: $viewCount, likeCount: $likeCount, tags: $tags, contents: $contents, originalContent: $originalContent, title: $title, excerpt: $excerpt)';
+    return 'PoemModel(publicId: $publicId, poetPublicId: $poetPublicId, poetName: $poetName, categoryPublicId: $categoryPublicId, categoryName: $categoryName, poetryType: $poetryType, poetryTypeName: $poetryTypeName, poetryTypeUrduName: $poetryTypeUrduName, poetryTypeEnglishName: $poetryTypeEnglishName, contentType: $contentType, requiresStructuredParsing: $requiresStructuredParsing, imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, yearWritten: $yearWritten, source: $source, license: $license, uploadedByUsername: $uploadedByUsername, isPublic: $isPublic, isFeatured: $isFeatured, viewCount: $viewCount, likeCount: $likeCount, isLikedByCurrentUser: $isLikedByCurrentUser, isBookmarkedByCurrentUser: $isBookmarkedByCurrentUser, commentCount: $commentCount, tags: $tags, contents: $contents, originalContent: $originalContent, title: $title, excerpt: $excerpt)';
   }
 
   @override
@@ -609,6 +657,13 @@ class _$PoemModelImpl implements _PoemModel {
                 other.viewCount == viewCount) &&
             (identical(other.likeCount, likeCount) ||
                 other.likeCount == likeCount) &&
+            (identical(other.isLikedByCurrentUser, isLikedByCurrentUser) ||
+                other.isLikedByCurrentUser == isLikedByCurrentUser) &&
+            (identical(other.isBookmarkedByCurrentUser,
+                    isBookmarkedByCurrentUser) ||
+                other.isBookmarkedByCurrentUser == isBookmarkedByCurrentUser) &&
+            (identical(other.commentCount, commentCount) ||
+                other.commentCount == commentCount) &&
             const DeepCollectionEquality().equals(other._tags, _tags) &&
             const DeepCollectionEquality().equals(other._contents, _contents) &&
             (identical(other.originalContent, originalContent) ||
@@ -642,6 +697,9 @@ class _$PoemModelImpl implements _PoemModel {
         isFeatured,
         viewCount,
         likeCount,
+        isLikedByCurrentUser,
+        isBookmarkedByCurrentUser,
+        commentCount,
         const DeepCollectionEquality().hash(_tags),
         const DeepCollectionEquality().hash(_contents),
         originalContent,
@@ -688,6 +746,9 @@ abstract class _PoemModel implements PoemModel {
       final bool isFeatured,
       final int viewCount,
       final int likeCount,
+      final bool? isLikedByCurrentUser,
+      final bool? isBookmarkedByCurrentUser,
+      final int? commentCount,
       final List<TagModel> tags,
       final List<PoemContentModel> contents,
       final PoemContentModel? originalContent,
@@ -740,6 +801,12 @@ abstract class _PoemModel implements PoemModel {
   int get viewCount;
   @override
   int get likeCount;
+  @override
+  bool? get isLikedByCurrentUser;
+  @override
+  bool? get isBookmarkedByCurrentUser;
+  @override
+  int? get commentCount;
   @override
   List<TagModel> get tags;
   @override

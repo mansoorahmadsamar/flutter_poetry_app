@@ -29,6 +29,9 @@ _$PoemModelImpl _$$PoemModelImplFromJson(Map<String, dynamic> json) =>
       isFeatured: json['isFeatured'] as bool? ?? false,
       viewCount: (json['viewCount'] as num?)?.toInt() ?? 0,
       likeCount: (json['likeCount'] as num?)?.toInt() ?? 0,
+      isLikedByCurrentUser: json['isLikedByCurrentUser'] as bool?,
+      isBookmarkedByCurrentUser: json['isBookmarkedByCurrentUser'] as bool?,
+      commentCount: (json['commentCount'] as num?)?.toInt(),
       tags: (json['tags'] as List<dynamic>?)
               ?.map((e) => TagModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
@@ -68,6 +71,9 @@ Map<String, dynamic> _$$PoemModelImplToJson(_$PoemModelImpl instance) =>
       'isFeatured': instance.isFeatured,
       'viewCount': instance.viewCount,
       'likeCount': instance.likeCount,
+      'isLikedByCurrentUser': instance.isLikedByCurrentUser,
+      'isBookmarkedByCurrentUser': instance.isBookmarkedByCurrentUser,
+      'commentCount': instance.commentCount,
       'tags': instance.tags,
       'contents': instance.contents,
       'originalContent': instance.originalContent,

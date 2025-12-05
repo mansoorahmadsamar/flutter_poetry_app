@@ -79,6 +79,9 @@ dependencies:
   # HTTP client for Firebase token verification
   http: ^1.2.0
 
+  # Sharing
+  share_plus: ^7.0.0  # For sharing poems and poets
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
