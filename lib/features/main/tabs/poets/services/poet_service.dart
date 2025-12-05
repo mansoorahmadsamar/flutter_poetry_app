@@ -470,11 +470,13 @@ class PoetService {
     String? poetryType,
     int page = 0,
     int size = 20,
+    String lang = 'ur',
   }) async {
     try {
       final queryParams = <String, dynamic>{
         'page': page,
         'size': size,
+        'lang': lang,
       };
       if (poetryType != null) {
         queryParams['poetryType'] = poetryType;
@@ -506,9 +508,12 @@ class PoetService {
   }
 
   /// Get single poem detail
-  Future<PoemModel> getPoemById(String publicId) async {
+  Future<PoemModel> getPoemById(String publicId, {String lang = 'ur'}) async {
     try {
-      final response = await _dio.get('/api/poems/$publicId');
+      final response = await _dio.get(
+        '/api/poems/$publicId',
+        queryParameters: {'lang': lang},
+      );
 
       final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
         response.data,

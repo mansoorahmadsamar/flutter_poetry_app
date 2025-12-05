@@ -194,7 +194,7 @@ class PoemPreviewBottomSheet extends ConsumerWidget {
             _buildMetaRow(
               context,
               Icons.category,
-              poem.poetryTypeUrduName ?? poem.poetryType,
+              poem.poetryTypeName ?? poem.poetryTypeUrduName ?? poem.poetryType,
             ),
             _buildMetaRow(
               context,

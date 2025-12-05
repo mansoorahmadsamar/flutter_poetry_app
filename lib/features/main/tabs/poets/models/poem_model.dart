@@ -13,6 +13,7 @@ class PoemModel with _$PoemModel {
     String? categoryPublicId,
     String? categoryName,
     required String poetryType,
+    @JsonKey(name: 'poetryTypeName') String? poetryTypeName,
     String? poetryTypeUrduName,
     String? poetryTypeEnglishName,
     required String contentType,

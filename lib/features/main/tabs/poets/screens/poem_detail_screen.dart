@@ -163,7 +163,7 @@ class PoemDetailScreen extends ConsumerWidget {
                   _buildDetailRow(
                     context,
                     'Poetry Type',
-                    poem.poetryTypeUrduName ?? poem.poetryType,
+                    poem.poetryTypeName ?? poem.poetryTypeUrduName ?? poem.poetryType,
                   ),
                   _buildDetailRow(
                     context,

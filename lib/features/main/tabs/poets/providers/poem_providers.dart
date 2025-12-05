@@ -26,6 +26,7 @@ final poetPoemsProvider = FutureProvider.autoDispose.family<
     ({String poetPublicId, String? poetryType, int page})>(
   (ref, params) async {
     final service = ref.watch(poetServiceProvider);
+    final language = ref.watch(selectedLanguageProvider);
 
     try {
       final result = await service.getPoemsByPoet(
@@ -33,8 +34,9 @@ final poetPoemsProvider = FutureProvider.autoDispose.family<
         poetryType: params.poetryType,
         page: params.page,
         size: 20,
+        lang: language,
       );
-      _logger.i('✅ Poems loaded - Page: ${params.page}, Type: ${params.poetryType}');
+      _logger.i('✅ Poems loaded - Page: ${params.page}, Type: ${params.poetryType}, Lang: $language');
       return result;
     } catch (e) {
       _logger.e('❌ Error loading poems: $e');
@@ -49,10 +51,11 @@ final poemDetailProvider = FutureProvider.autoDispose.family<
     String>(
   (ref, publicId) async {
     final service = ref.watch(poetServiceProvider);
+    final language = ref.watch(selectedLanguageProvider);
 
     try {
-      final result = await service.getPoemById(publicId);
-      _logger.i('✅ Poem detail loaded: $publicId');
+      final result = await service.getPoemById(publicId, lang: language);
+      _logger.i('✅ Poem detail loaded: $publicId, Lang: $language');
       return result;
     } catch (e) {
       _logger.e('❌ Error loading poem detail: $e');

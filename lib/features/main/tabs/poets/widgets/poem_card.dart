@@ -68,7 +68,7 @@ class PoemCard extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                     ),
                     child: Text(
-                      poem.poetryTypeUrduName ?? _getPoetryTypeLabel(poem.poetryType),
+                      poem.poetryTypeName ?? poem.poetryTypeUrduName ?? _getPoetryTypeLabel(poem.poetryType),
                       style: TextStyle(
                         fontSize: 11,
                         color: Colors.white,

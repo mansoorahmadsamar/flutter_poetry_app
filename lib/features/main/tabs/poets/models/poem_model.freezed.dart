@@ -26,6 +26,8 @@ mixin _$PoemModel {
   String? get categoryPublicId => throw _privateConstructorUsedError;
   String? get categoryName => throw _privateConstructorUsedError;
   String get poetryType => throw _privateConstructorUsedError;
+  @JsonKey(name: 'poetryTypeName')
+  String? get poetryTypeName => throw _privateConstructorUsedError;
   String? get poetryTypeUrduName => throw _privateConstructorUsedError;
   String? get poetryTypeEnglishName => throw _privateConstructorUsedError;
   String get contentType => throw _privateConstructorUsedError;
@@ -69,6 +71,7 @@ abstract class $PoemModelCopyWith<$Res> {
       String? categoryPublicId,
       String? categoryName,
       String poetryType,
+      @JsonKey(name: 'poetryTypeName') String? poetryTypeName,
       String? poetryTypeUrduName,
       String? poetryTypeEnglishName,
       String contentType,
@@ -113,6 +116,7 @@ class _$PoemModelCopyWithImpl<$Res, $Val extends PoemModel>
     Object? categoryPublicId = freezed,
     Object? categoryName = freezed,
     Object? poetryType = null,
+    Object? poetryTypeName = freezed,
     Object? poetryTypeUrduName = freezed,
     Object? poetryTypeEnglishName = freezed,
     Object? contentType = null,
@@ -158,6 +162,10 @@ class _$PoemModelCopyWithImpl<$Res, $Val extends PoemModel>
           ? _value.poetryType
           : poetryType // ignore: cast_nullable_to_non_nullable
               as String,
+      poetryTypeName: freezed == poetryTypeName
+          ? _value.poetryTypeName
+          : poetryTypeName // ignore: cast_nullable_to_non_nullable
+              as String?,
       poetryTypeUrduName: freezed == poetryTypeUrduName
           ? _value.poetryTypeUrduName
           : poetryTypeUrduName // ignore: cast_nullable_to_non_nullable
@@ -267,6 +275,7 @@ abstract class _$$PoemModelImplCopyWith<$Res>
       String? categoryPublicId,
       String? categoryName,
       String poetryType,
+      @JsonKey(name: 'poetryTypeName') String? poetryTypeName,
       String? poetryTypeUrduName,
       String? poetryTypeEnglishName,
       String contentType,
@@ -310,6 +319,7 @@ class __$$PoemModelImplCopyWithImpl<$Res>
     Object? categoryPublicId = freezed,
     Object? categoryName = freezed,
     Object? poetryType = null,
+    Object? poetryTypeName = freezed,
     Object? poetryTypeUrduName = freezed,
     Object? poetryTypeEnglishName = freezed,
     Object? contentType = null,
@@ -355,6 +365,10 @@ class __$$PoemModelImplCopyWithImpl<$Res>
           ? _value.poetryType
           : poetryType // ignore: cast_nullable_to_non_nullable
               as String,
+      poetryTypeName: freezed == poetryTypeName
+          ? _value.poetryTypeName
+          : poetryTypeName // ignore: cast_nullable_to_non_nullable
+              as String?,
       poetryTypeUrduName: freezed == poetryTypeUrduName
           ? _value.poetryTypeUrduName
           : poetryTypeUrduName // ignore: cast_nullable_to_non_nullable
@@ -445,6 +459,7 @@ class _$PoemModelImpl implements _PoemModel {
       this.categoryPublicId,
       this.categoryName,
       required this.poetryType,
+      @JsonKey(name: 'poetryTypeName') this.poetryTypeName,
       this.poetryTypeUrduName,
       this.poetryTypeEnglishName,
       required this.contentType,
@@ -482,6 +497,9 @@ class _$PoemModelImpl implements _PoemModel {
   final String? categoryName;
   @override
   final String poetryType;
+  @override
+  @JsonKey(name: 'poetryTypeName')
+  final String? poetryTypeName;
   @override
   final String? poetryTypeUrduName;
   @override
@@ -542,7 +560,7 @@ class _$PoemModelImpl implements _PoemModel {
 
   @override
   String toString() {
-    return 'PoemModel(publicId: $publicId, poetPublicId: $poetPublicId, poetName: $poetName, categoryPublicId: $categoryPublicId, categoryName: $categoryName, poetryType: $poetryType, poetryTypeUrduName: $poetryTypeUrduName, poetryTypeEnglishName: $poetryTypeEnglishName, contentType: $contentType, requiresStructuredParsing: $requiresStructuredParsing, imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, yearWritten: $yearWritten, source: $source, license: $license, uploadedByUsername: $uploadedByUsername, isPublic: $isPublic, isFeatured: $isFeatured, viewCount: $viewCount, likeCount: $likeCount, tags: $tags, contents: $contents, originalContent: $originalContent, title: $title, excerpt: $excerpt)';
+    return 'PoemModel(publicId: $publicId, poetPublicId: $poetPublicId, poetName: $poetName, categoryPublicId: $categoryPublicId, categoryName: $categoryName, poetryType: $poetryType, poetryTypeName: $poetryTypeName, poetryTypeUrduName: $poetryTypeUrduName, poetryTypeEnglishName: $poetryTypeEnglishName, contentType: $contentType, requiresStructuredParsing: $requiresStructuredParsing, imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, yearWritten: $yearWritten, source: $source, license: $license, uploadedByUsername: $uploadedByUsername, isPublic: $isPublic, isFeatured: $isFeatured, viewCount: $viewCount, likeCount: $likeCount, tags: $tags, contents: $contents, originalContent: $originalContent, title: $title, excerpt: $excerpt)';
   }
 
   @override
@@ -562,6 +580,8 @@ class _$PoemModelImpl implements _PoemModel {
                 other.categoryName == categoryName) &&
             (identical(other.poetryType, poetryType) ||
                 other.poetryType == poetryType) &&
+            (identical(other.poetryTypeName, poetryTypeName) ||
+                other.poetryTypeName == poetryTypeName) &&
             (identical(other.poetryTypeUrduName, poetryTypeUrduName) ||
                 other.poetryTypeUrduName == poetryTypeUrduName) &&
             (identical(other.poetryTypeEnglishName, poetryTypeEnglishName) ||
@@ -607,6 +627,7 @@ class _$PoemModelImpl implements _PoemModel {
         categoryPublicId,
         categoryName,
         poetryType,
+        poetryTypeName,
         poetryTypeUrduName,
         poetryTypeEnglishName,
         contentType,
@@ -652,6 +673,7 @@ abstract class _PoemModel implements PoemModel {
       final String? categoryPublicId,
       final String? categoryName,
       required final String poetryType,
+      @JsonKey(name: 'poetryTypeName') final String? poetryTypeName,
       final String? poetryTypeUrduName,
       final String? poetryTypeEnglishName,
       required final String contentType,
@@ -687,6 +709,9 @@ abstract class _PoemModel implements PoemModel {
   String? get categoryName;
   @override
   String get poetryType;
+  @override
+  @JsonKey(name: 'poetryTypeName')
+  String? get poetryTypeName;
   @override
   String? get poetryTypeUrduName;
   @override
