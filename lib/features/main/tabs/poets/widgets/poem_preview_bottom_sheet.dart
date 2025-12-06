@@ -160,14 +160,11 @@ class _PoemPreviewBottomSheetState extends ConsumerState<PoemPreviewBottomSheet>
       final notifier = ref.read(likeActionProvider.notifier);
       final newIsLiked = await notifier.toggleLike(widget.poemPublicId);
 
-      // Update optimistic state with server response and keep it
+      // Update optimistic state with server response and keep it permanently
       if (mounted) {
         setState(() {
           _isLikedOptimistic = newIsLiked;
         });
-
-        // Invalidate to refresh provider in background, but keep optimistic state
-        ref.invalidate(poemDetailProvider(widget.poemPublicId));
       }
     } catch (e) {
       // Revert optimistic update on error
@@ -198,7 +195,7 @@ class _PoemPreviewBottomSheetState extends ConsumerState<PoemPreviewBottomSheet>
       final notifier = ref.read(bookmarkActionProvider.notifier);
       final newIsBookmarked = await notifier.toggleBookmark(widget.poemPublicId);
 
-      // Update optimistic state with server response and keep it
+      // Update optimistic state with server response and keep it permanently
       if (mounted) {
         setState(() {
           _isBookmarkedOptimistic = newIsBookmarked;
@@ -212,9 +209,6 @@ class _PoemPreviewBottomSheetState extends ConsumerState<PoemPreviewBottomSheet>
             duration: const Duration(seconds: 2),
           ),
         );
-
-        // Invalidate to refresh provider in background, but keep optimistic state
-        ref.invalidate(poemDetailProvider(widget.poemPublicId));
       }
     } catch (e) {
       // Revert optimistic update on error

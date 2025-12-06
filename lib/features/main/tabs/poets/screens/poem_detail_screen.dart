@@ -295,15 +295,13 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
               final notifier = ref.read(likeActionProvider.notifier);
               final newIsLiked = await notifier.toggleLike(widget.publicId);
 
-              // Update optimistic state with server response and keep it
+              // Update optimistic state with server response and keep it permanently
               if (mounted) {
                 setState(() {
                   _isLikedOptimistic = newIsLiked;
-                  _likeCountOptimistic = newIsLiked ? (poem.likeCount + 1) : (poem.likeCount);
+                  // Keep the optimistic count - don't recalculate from poem.likeCount
+                  // The count is already correct from the initial optimistic update
                 });
-
-                // Invalidate to refresh provider in background, but keep optimistic state
-                ref.invalidate(poemDetailProvider(widget.publicId));
               }
             } catch (e) {
               // Revert optimistic update on error
@@ -352,7 +350,7 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
               final notifier = ref.read(bookmarkActionProvider.notifier);
               final newIsBookmarked = await notifier.toggleBookmark(widget.publicId);
 
-              // Update optimistic state with server response and keep it
+              // Update optimistic state with server response and keep it permanently
               if (mounted) {
                 setState(() {
                   _isBookmarkedOptimistic = newIsBookmarked;
@@ -366,9 +364,6 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
                     duration: const Duration(seconds: 2),
                   ),
                 );
-
-                // Invalidate to refresh provider in background, but keep optimistic state
-                ref.invalidate(poemDetailProvider(widget.publicId));
               }
             } catch (e) {
               // Revert optimistic update on error
