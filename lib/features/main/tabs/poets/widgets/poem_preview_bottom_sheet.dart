@@ -7,8 +7,10 @@ import 'package:flutter_poetry_app/core/widgets/localized_text.dart';
 import '../models/poem_model.dart';
 import '../providers/poem_providers.dart';
 import '../providers/poet_providers.dart';
+import 'package:flutter_poetry_app/features/engagement/providers/like_providers.dart';
+import 'package:flutter_poetry_app/features/engagement/providers/bookmark_providers.dart';
 
-class PoemPreviewBottomSheet extends ConsumerWidget {
+class PoemPreviewBottomSheet extends ConsumerStatefulWidget {
   final String poemPublicId;
 
   const PoemPreviewBottomSheet({
@@ -17,8 +19,17 @@ class PoemPreviewBottomSheet extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final poemAsync = ref.watch(poemDetailProvider(poemPublicId));
+  ConsumerState<PoemPreviewBottomSheet> createState() => _PoemPreviewBottomSheetState();
+}
+
+class _PoemPreviewBottomSheetState extends ConsumerState<PoemPreviewBottomSheet> {
+  // Optimistic state for like and bookmark
+  bool? _isLikedOptimistic;
+  bool? _isBookmarkedOptimistic;
+
+  @override
+  Widget build(BuildContext context) {
+    final poemAsync = ref.watch(poemDetailProvider(widget.poemPublicId));
     final isUrdu = ref.watch(selectedLanguageProvider) == 'ur';
 
     return DraggableScrollableSheet(
@@ -81,6 +92,9 @@ class PoemPreviewBottomSheet extends ConsumerWidget {
     PoemModel poem,
     bool isUrdu,
   ) {
+    final isLiked = _isLikedOptimistic ?? poem.isLikedByCurrentUser ?? false;
+    final isBookmarked = _isBookmarkedOptimistic ?? poem.isBookmarkedByCurrentUser ?? false;
+
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: AppSpacing.lg,
@@ -102,14 +116,23 @@ class PoemPreviewBottomSheet extends ConsumerWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Like button
               IconButton(
-                icon: Icon(Icons.favorite_border),
-                onPressed: () {/* TODO: Like */},
+                icon: Icon(
+                  isLiked ? Icons.favorite : Icons.favorite_border,
+                  color: isLiked ? Colors.red : null,
+                ),
+                onPressed: () => _handleLikeToggle(poem),
               ),
+              // Bookmark button
               IconButton(
-                icon: Icon(Icons.bookmark_border),
-                onPressed: () {/* TODO: Bookmark */},
+                icon: Icon(
+                  isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+                  color: isBookmarked ? AppColors.primary : null,
+                ),
+                onPressed: () => _handleBookmarkToggle(poem),
               ),
+              // Full screen button
               IconButton(
                 icon: Icon(Icons.fullscreen),
                 tooltip: 'Open Full Screen',
@@ -123,6 +146,91 @@ class PoemPreviewBottomSheet extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _handleLikeToggle(PoemModel poem) async {
+    final isLiked = _isLikedOptimistic ?? poem.isLikedByCurrentUser ?? false;
+
+    // Optimistic update
+    setState(() {
+      _isLikedOptimistic = !isLiked;
+    });
+
+    try {
+      final notifier = ref.read(likeActionProvider.notifier);
+      final newIsLiked = await notifier.toggleLike(widget.poemPublicId);
+
+      // Update optimistic state with server response and keep it
+      if (mounted) {
+        setState(() {
+          _isLikedOptimistic = newIsLiked;
+        });
+
+        // Invalidate to refresh provider in background, but keep optimistic state
+        ref.invalidate(poemDetailProvider(widget.poemPublicId));
+      }
+    } catch (e) {
+      // Revert optimistic update on error
+      if (mounted) {
+        setState(() {
+          _isLikedOptimistic = null;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to ${isLiked ? 'unlike' : 'like'} poem'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _handleBookmarkToggle(PoemModel poem) async {
+    final isBookmarked = _isBookmarkedOptimistic ?? poem.isBookmarkedByCurrentUser ?? false;
+
+    // Optimistic update
+    setState(() {
+      _isBookmarkedOptimistic = !isBookmarked;
+    });
+
+    try {
+      final notifier = ref.read(bookmarkActionProvider.notifier);
+      final newIsBookmarked = await notifier.toggleBookmark(widget.poemPublicId);
+
+      // Update optimistic state with server response and keep it
+      if (mounted) {
+        setState(() {
+          _isBookmarkedOptimistic = newIsBookmarked;
+        });
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(newIsBookmarked ? 'Added to bookmarks' : 'Removed from bookmarks'),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+
+        // Invalidate to refresh provider in background, but keep optimistic state
+        ref.invalidate(poemDetailProvider(widget.poemPublicId));
+      }
+    } catch (e) {
+      // Revert optimistic update on error
+      if (mounted) {
+        setState(() {
+          _isBookmarkedOptimistic = null;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to ${isBookmarked ? 'remove' : 'add'} bookmark'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   Widget _buildLoadingHeader() {

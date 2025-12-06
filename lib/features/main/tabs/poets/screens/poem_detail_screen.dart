@@ -293,24 +293,26 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
 
             try {
               final notifier = ref.read(likeActionProvider.notifier);
-              await notifier.toggleLike(widget.publicId);
+              final newIsLiked = await notifier.toggleLike(widget.publicId);
 
-              // Invalidate poem detail to get updated data from server
-              ref.invalidate(poemDetailProvider(widget.publicId));
+              // Update optimistic state with server response and keep it
+              if (mounted) {
+                setState(() {
+                  _isLikedOptimistic = newIsLiked;
+                  _likeCountOptimistic = newIsLiked ? (poem.likeCount + 1) : (poem.likeCount);
+                });
 
-              // Clear optimistic state
-              setState(() {
-                _isLikedOptimistic = null;
-                _likeCountOptimistic = null;
-              });
+                // Invalidate to refresh provider in background, but keep optimistic state
+                ref.invalidate(poemDetailProvider(widget.publicId));
+              }
             } catch (e) {
               // Revert optimistic update on error
-              setState(() {
-                _isLikedOptimistic = null;
-                _likeCountOptimistic = null;
-              });
-
               if (mounted) {
+                setState(() {
+                  _isLikedOptimistic = null;
+                  _likeCountOptimistic = null;
+                });
+
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Failed to ${isLiked ? 'unlike' : 'like'} poem'),
@@ -348,31 +350,33 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
 
             try {
               final notifier = ref.read(bookmarkActionProvider.notifier);
-              await notifier.toggleBookmark(widget.publicId);
+              final newIsBookmarked = await notifier.toggleBookmark(widget.publicId);
 
-              // Invalidate poem detail to get updated data from server
-              ref.invalidate(poemDetailProvider(widget.publicId));
-
-              // Clear optimistic state
-              setState(() {
-                _isBookmarkedOptimistic = null;
-              });
-
+              // Update optimistic state with server response and keep it
               if (mounted) {
+                setState(() {
+                  _isBookmarkedOptimistic = newIsBookmarked;
+                });
+
+                // Show success message
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(isBookmarked ? 'Removed from bookmarks' : 'Added to bookmarks'),
+                    content: Text(newIsBookmarked ? 'Added to bookmarks' : 'Removed from bookmarks'),
                     backgroundColor: Colors.green,
+                    duration: const Duration(seconds: 2),
                   ),
                 );
+
+                // Invalidate to refresh provider in background, but keep optimistic state
+                ref.invalidate(poemDetailProvider(widget.publicId));
               }
             } catch (e) {
               // Revert optimistic update on error
-              setState(() {
-                _isBookmarkedOptimistic = null;
-              });
-
               if (mounted) {
+                setState(() {
+                  _isBookmarkedOptimistic = null;
+                });
+
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Failed to ${isBookmarked ? 'remove' : 'add'} bookmark'),
