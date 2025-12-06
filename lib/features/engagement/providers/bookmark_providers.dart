@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:flutter_poetry_app/core/network/dio_client.dart';
 import 'package:flutter_poetry_app/core/network/dto/api_response.dart';
-import '../models/bookmark_model.dart';
+import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.dart';
 import '../services/bookmark_service.dart';
 
 final Logger _logger = Logger();
@@ -47,7 +47,7 @@ class BookmarksParams {
 
 /// Get user's bookmarks with pagination and filters
 final bookmarksProvider = FutureProvider.autoDispose
-    .family<PaginatedResponse<BookmarkModel>, BookmarksParams>(
+    .family<PaginatedResponse<PoemModel>, BookmarksParams>(
   (ref, params) async {
     final service = ref.watch(bookmarkServiceProvider);
 
@@ -81,50 +81,26 @@ class BookmarkActionNotifier extends StateNotifier<AsyncValue<void>> {
 
   BookmarkActionNotifier(this.ref) : super(const AsyncValue.data(null));
 
-  /// Add a bookmark for a poem
-  Future<void> bookmarkPoem(String poemPublicId) async {
-    state = const AsyncValue.loading();
-
-    try {
-      final service = ref.read(bookmarkServiceProvider);
-      await service.bookmarkPoem(poemPublicId);
-
-      state = const AsyncValue.data(null);
-      _logger.i('✅ Poem bookmarked: $poemPublicId');
-
-      // Invalidate bookmarks list to refresh
-      ref.invalidate(bookmarksProvider);
-    } catch (e, stack) {
-      _logger.e('❌ Error bookmarking poem: $e');
-      state = AsyncValue.error(e, stack);
-    }
-  }
-
-  /// Remove a bookmark
-  Future<void> removeBookmark(String poemPublicId) async {
-    state = const AsyncValue.loading();
-
-    try {
-      final service = ref.read(bookmarkServiceProvider);
-      await service.removeBookmark(poemPublicId);
-
-      state = const AsyncValue.data(null);
-      _logger.i('✅ Bookmark removed: $poemPublicId');
-
-      // Invalidate bookmarks list to refresh
-      ref.invalidate(bookmarksProvider);
-    } catch (e, stack) {
-      _logger.e('❌ Error removing bookmark: $e');
-      state = AsyncValue.error(e, stack);
-    }
-  }
-
   /// Toggle bookmark (add if not bookmarked, remove if bookmarked)
-  Future<void> toggleBookmark(String poemPublicId, bool isCurrentlyBookmarked) async {
-    if (isCurrentlyBookmarked) {
-      await removeBookmark(poemPublicId);
-    } else {
-      await bookmarkPoem(poemPublicId);
+  /// Returns true if bookmarked, false if removed
+  Future<bool> toggleBookmark(String poemPublicId) async {
+    state = const AsyncValue.loading();
+
+    try {
+      final service = ref.read(bookmarkServiceProvider);
+      final isBookmarked = await service.toggleBookmark(poemPublicId);
+
+      state = const AsyncValue.data(null);
+      _logger.i('✅ Bookmark toggled: $poemPublicId - isBookmarked: $isBookmarked');
+
+      // Invalidate bookmarks list to refresh
+      ref.invalidate(bookmarksProvider);
+
+      return isBookmarked;
+    } catch (e, stack) {
+      _logger.e('❌ Error toggling bookmark: $e');
+      state = AsyncValue.error(e, stack);
+      rethrow;
     }
   }
 }

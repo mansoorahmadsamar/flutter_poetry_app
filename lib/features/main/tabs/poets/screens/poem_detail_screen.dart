@@ -293,7 +293,7 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
 
             try {
               final notifier = ref.read(likeActionProvider.notifier);
-              await notifier.toggleLike(widget.publicId, isLiked);
+              await notifier.toggleLike(widget.publicId);
 
               // Invalidate poem detail to get updated data from server
               ref.invalidate(poemDetailProvider(widget.publicId));
@@ -348,7 +348,7 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
 
             try {
               final notifier = ref.read(bookmarkActionProvider.notifier);
-              await notifier.toggleBookmark(widget.publicId, isBookmarked);
+              await notifier.toggleBookmark(widget.publicId);
 
               // Invalidate poem detail to get updated data from server
               ref.invalidate(poemDetailProvider(widget.publicId));

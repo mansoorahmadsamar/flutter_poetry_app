@@ -670,7 +670,177 @@ GET /api/users/me/following?query=ghalib&page=0&size=20
 
 ## Enhanced Bookmarks & Likes
 
-### 1. Get User's Bookmarks (Enhanced)
+### 1. Toggle Bookmark
+
+**Endpoint:** `POST /api/poems/{poemPublicId}/bookmark`
+
+**Description:** Add or remove a bookmark for a poem. This endpoint acts as a toggle - if the poem is already bookmarked, it will remove the bookmark; if not, it will add one.
+
+**Authentication:** Required
+
+**Path Parameters:**
+- `poemPublicId` (string) - The public ID of the poem
+
+**Request Body:** None required
+
+**Example Request:**
+
+```http
+POST /api/poems/abc123/bookmark
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+**Success Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "message": "Poem bookmarked successfully",
+  "data": {
+    "bookmarked": true
+  },
+  "timestamp": "2025-12-06T11:30:00"
+}
+```
+
+**When removing bookmark:**
+
+```json
+{
+  "success": true,
+  "message": "Bookmark removed successfully",
+  "data": {
+    "bookmarked": false
+  },
+  "timestamp": "2025-12-06T11:30:00"
+}
+```
+
+**Flutter Implementation:**
+
+```dart
+Future<bool> toggleBookmark(String poemPublicId) async {
+  final response = await http.post(
+    Uri.parse('$baseUrl/api/poems/$poemPublicId/bookmark'),
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+    return data['data']['bookmarked'] as bool;
+  }
+  throw Exception('Failed to toggle bookmark');
+}
+```
+
+---
+
+### 2. Toggle Like
+
+**Endpoint:** `POST /api/poems/{poemPublicId}/like`
+
+**Description:** Add or remove a like for a poem. This endpoint acts as a toggle - if the poem is already liked, it will remove the like; if not, it will add one.
+
+**Authentication:** Required
+
+**Path Parameters:**
+- `poemPublicId` (string) - The public ID of the poem
+
+**Request Body:** None required
+
+**Example Request:**
+
+```http
+POST /api/poems/abc123/like
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+**Success Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "message": "Poem liked successfully",
+  "data": {
+    "liked": true
+  },
+  "timestamp": "2025-12-06T11:30:00"
+}
+```
+
+**When removing like:**
+
+```json
+{
+  "success": true,
+  "message": "Like removed successfully",
+  "data": {
+    "liked": false
+  },
+  "timestamp": "2025-12-06T11:30:00"
+}
+```
+
+**Flutter Implementation:**
+
+```dart
+Future<bool> toggleLike(String poemPublicId) async {
+  final response = await http.post(
+    Uri.parse('$baseUrl/api/poems/$poemPublicId/like'),
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+    return data['data']['liked'] as bool;
+  }
+  throw Exception('Failed to toggle like');
+}
+```
+
+---
+
+### 3. Check Bookmark/Like Status
+
+**Endpoint:** `GET /api/poems/{poemPublicId}/status`
+
+**Description:** Check if the current user has bookmarked or liked a specific poem.
+
+**Authentication:** Required
+
+**Path Parameters:**
+- `poemPublicId` (string) - The public ID of the poem
+
+**Example Request:**
+
+```http
+GET /api/poems/abc123/status
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+**Success Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "message": "Status retrieved successfully",
+  "data": {
+    "bookmarked": true,
+    "liked": false
+  },
+  "timestamp": "2025-12-06T11:30:00"
+}
+```
+
+---
+
+### 4. Get User's Bookmarks (Enhanced)
 
 **Endpoint:** `GET /api/users/me/bookmarks`
 

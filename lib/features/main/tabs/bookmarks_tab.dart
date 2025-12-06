@@ -148,14 +148,12 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
-                    final bookmark = bookmarks[index];
-                    // Convert bookmark to a simple map for PoemCard
-                    // We'll need to fetch the full poem or create a simplified card
+                    final poem = bookmarks[index];
                     return Card(
                       clipBehavior: Clip.antiAlias,
                       child: InkWell(
                         onTap: () {
-                          context.push('/main/poems/${bookmark.contentId}');
+                          context.push('/main/poems/${poem.publicId}');
                         },
                         child: Padding(
                           padding: EdgeInsets.all(AppSpacing.md),
@@ -172,9 +170,9 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
                               ),
                               SizedBox(height: AppSpacing.sm),
                               // Title
-                              if (bookmark.contentTitle != null)
+                              if (poem.title != null)
                                 LocalizedText(
-                                  bookmark.contentTitle!,
+                                  poem.title!,
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -184,10 +182,10 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
                                 ),
                               SizedBox(height: AppSpacing.sm),
                               // Excerpt
-                              if (bookmark.contentExcerpt != null)
+                              if (poem.excerpt != null)
                                 Expanded(
                                   child: LocalizedText(
-                                    bookmark.contentExcerpt!,
+                                    poem.excerpt!,
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey[700],
@@ -197,11 +195,20 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
                                   ),
                                 ),
                               SizedBox(height: AppSpacing.sm),
-                              // Date
+                              // Poet name and poetry type
                               Text(
-                                _formatDate(bookmark.createdAt),
+                                poem.poetName,
                                 style: TextStyle(
                                   fontSize: 12,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              SizedBox(height: AppSpacing.xs),
+                              Text(
+                                poem.poetryType,
+                                style: TextStyle(
+                                  fontSize: 11,
                                   color: Colors.grey[500],
                                 ),
                               ),
@@ -386,25 +393,6 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
         return 'Oldest First';
       default:
         return sortBy;
-    }
-  }
-
-  String _formatDate(DateTime date) {
-    final now = DateTime.now();
-    final difference = now.difference(date);
-
-    if (difference.inDays == 0) {
-      return 'Today';
-    } else if (difference.inDays == 1) {
-      return 'Yesterday';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays} days ago';
-    } else if (difference.inDays < 30) {
-      return '${(difference.inDays / 7).floor()} weeks ago';
-    } else if (difference.inDays < 365) {
-      return '${(difference.inDays / 30).floor()} months ago';
-    } else {
-      return '${(difference.inDays / 365).floor()} years ago';
     }
   }
 }

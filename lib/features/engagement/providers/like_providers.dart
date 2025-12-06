@@ -25,44 +25,23 @@ class LikeActionNotifier extends StateNotifier<AsyncValue<void>> {
 
   LikeActionNotifier(this.ref) : super(const AsyncValue.data(null));
 
-  /// Like a poem
-  Future<void> likePoem(String poemPublicId) async {
-    state = const AsyncValue.loading();
-
-    try {
-      final service = ref.read(likeServiceProvider);
-      await service.likePoem(poemPublicId);
-
-      state = const AsyncValue.data(null);
-      _logger.i('✅ Poem liked: $poemPublicId');
-    } catch (e, stack) {
-      _logger.e('❌ Error liking poem: $e');
-      state = AsyncValue.error(e, stack);
-    }
-  }
-
-  /// Unlike a poem
-  Future<void> unlikePoem(String poemPublicId) async {
-    state = const AsyncValue.loading();
-
-    try {
-      final service = ref.read(likeServiceProvider);
-      await service.unlikePoem(poemPublicId);
-
-      state = const AsyncValue.data(null);
-      _logger.i('✅ Poem unliked: $poemPublicId');
-    } catch (e, stack) {
-      _logger.e('❌ Error unliking poem: $e');
-      state = AsyncValue.error(e, stack);
-    }
-  }
-
   /// Toggle like (add if not liked, remove if liked)
-  Future<void> toggleLike(String poemPublicId, bool isCurrentlyLiked) async {
-    if (isCurrentlyLiked) {
-      await unlikePoem(poemPublicId);
-    } else {
-      await likePoem(poemPublicId);
+  /// Returns true if liked, false if removed
+  Future<bool> toggleLike(String poemPublicId) async {
+    state = const AsyncValue.loading();
+
+    try {
+      final service = ref.read(likeServiceProvider);
+      final isLiked = await service.toggleLike(poemPublicId);
+
+      state = const AsyncValue.data(null);
+      _logger.i('✅ Like toggled: $poemPublicId - isLiked: $isLiked');
+
+      return isLiked;
+    } catch (e, stack) {
+      _logger.e('❌ Error toggling like: $e');
+      state = AsyncValue.error(e, stack);
+      rethrow;
     }
   }
 }
