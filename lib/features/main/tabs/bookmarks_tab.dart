@@ -16,21 +16,106 @@ class BookmarksTab extends ConsumerStatefulWidget {
 
 class _BookmarksTabState extends ConsumerState<BookmarksTab> {
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   String _searchQuery = '';
   String? _selectedPoetryType;
   String _sortBy = 'NEWEST';
   int _currentPage = 0;
+  bool _isLoadingMore = false;
+  bool _hasMorePages = true;
+  List<dynamic> _allBookmarks = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent * 0.9) {
+      _loadMoreBookmarks();
+    }
+  }
+
+  Future<void> _loadMoreBookmarks() async {
+    if (_isLoadingMore || !_hasMorePages) return;
+
+    setState(() {
+      _isLoadingMore = true;
+    });
+
+    final nextPage = _currentPage + 1;
+    final params = BookmarksParams(
+      page: nextPage,
+      search: _searchQuery.isEmpty ? null : _searchQuery,
+      poetryType: _selectedPoetryType,
+      sortBy: _sortBy,
+    );
+
+    try {
+      final result = await ref.read(bookmarksProvider(params).future);
+
+      if (mounted) {
+        setState(() {
+          _currentPage = nextPage;
+          _allBookmarks.addAll(result.content);
+          _hasMorePages = nextPage < result.totalPages - 1;
+          _isLoadingMore = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingMore = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _handleRefresh() async {
+    setState(() {
+      _currentPage = 0;
+      _allBookmarks.clear();
+      _hasMorePages = true;
+    });
+
+    // Invalidate and wait for the provider to refresh
+    ref.invalidate(bookmarksProvider);
+
+    // Wait for the new data to be fetched
+    final params = BookmarksParams(
+      page: 0,
+      search: _searchQuery.isEmpty ? null : _searchQuery,
+      poetryType: _selectedPoetryType,
+      sortBy: _sortBy,
+    );
+
+    try {
+      await ref.read(bookmarksProvider(params).future);
+    } catch (e) {
+      // Error will be handled by the AsyncValue in the UI
+    }
+  }
+
+  void _resetPagination() {
+    setState(() {
+      _currentPage = 0;
+      _allBookmarks.clear();
+      _hasMorePages = true;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final params = BookmarksParams(
-      page: _currentPage,
+      page: 0, // Always start with page 0
       search: _searchQuery.isEmpty ? null : _searchQuery,
       poetryType: _selectedPoetryType,
       sortBy: _sortBy,
@@ -38,8 +123,12 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
 
     final bookmarksAsync = ref.watch(bookmarksProvider(params));
 
-    return CustomScrollView(
-      slivers: [
+    return RefreshIndicator(
+      onRefresh: _handleRefresh,
+      child: CustomScrollView(
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
         // App bar
         SliverAppBar(
           floating: true,
@@ -74,8 +163,8 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
                           _searchController.clear();
                           setState(() {
                             _searchQuery = '';
-                            _currentPage = 0;
                           });
+                          _resetPagination();
                         },
                       )
                     : null,
@@ -86,8 +175,8 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
               onSubmitted: (value) {
                 setState(() {
                   _searchQuery = value.trim();
-                  _currentPage = 0;
                 });
+                _resetPagination();
               },
             ),
           ),
@@ -107,8 +196,8 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
                       onDeleted: () {
                         setState(() {
                           _selectedPoetryType = null;
-                          _currentPage = 0;
                         });
+                        _resetPagination();
                       },
                     ),
                   if (_sortBy != 'NEWEST')
@@ -117,8 +206,8 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
                       onDeleted: () {
                         setState(() {
                           _sortBy = 'NEWEST';
-                          _currentPage = 0;
                         });
+                        _resetPagination();
                       },
                     ),
                 ],
@@ -129,98 +218,136 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
         // Bookmarks list or empty state
         bookmarksAsync.when(
           data: (paginatedResponse) {
-            final bookmarks = paginatedResponse.content;
+            // Update cached bookmarks with first page data
+            if (_currentPage == 0 && _allBookmarks.isEmpty) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                  setState(() {
+                    _allBookmarks = List.from(paginatedResponse.content);
+                    _hasMorePages = paginatedResponse.totalPages > 1;
+                  });
+                }
+              });
+            }
 
-            if (bookmarks.isEmpty) {
+            // Combine first page with cached bookmarks for subsequent pages
+            final allBookmarks = _currentPage == 0
+                ? paginatedResponse.content
+                : _allBookmarks;
+
+            if (allBookmarks.isEmpty) {
               return SliverFillRemaining(
                 child: _buildEmptyState(context),
               );
             }
 
-            return SliverPadding(
-              padding: EdgeInsets.all(AppSpacing.md),
-              sliver: SliverGrid(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.65,
-                  crossAxisSpacing: AppSpacing.md,
-                  mainAxisSpacing: AppSpacing.md,
-                ),
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final poem = bookmarks[index];
-                    return Card(
-                      clipBehavior: Clip.antiAlias,
-                      child: InkWell(
-                        onTap: () {
-                          context.push('/main/poems/${poem.publicId}');
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.all(AppSpacing.md),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Bookmark icon
-                              const Align(
-                                alignment: Alignment.topRight,
-                                child: Icon(
-                                  Icons.bookmark,
-                                  color: AppColors.primary,
-                                ),
-                              ),
-                              SizedBox(height: AppSpacing.sm),
-                              // Title
-                              if (poem.title != null)
-                                LocalizedText(
-                                  poem.title!,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+            return SliverList(
+              delegate: SliverChildListDelegate([
+                Padding(
+                  padding: EdgeInsets.all(AppSpacing.md),
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.65,
+                      crossAxisSpacing: AppSpacing.md,
+                      mainAxisSpacing: AppSpacing.md,
+                    ),
+                    itemCount: allBookmarks.length,
+                    itemBuilder: (context, index) {
+                      final poem = allBookmarks[index];
+                      return Card(
+                        clipBehavior: Clip.antiAlias,
+                        child: InkWell(
+                          onTap: () {
+                            context.push('/main/poems/${poem.publicId}');
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.all(AppSpacing.md),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Bookmark icon
+                                const Align(
+                                  alignment: Alignment.topRight,
+                                  child: Icon(
+                                    Icons.bookmark,
+                                    color: AppColors.primary,
                                   ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              SizedBox(height: AppSpacing.sm),
-                              // Excerpt
-                              if (poem.excerpt != null)
-                                Expanded(
-                                  child: LocalizedText(
-                                    poem.excerpt!,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[700],
+                                SizedBox(height: AppSpacing.sm),
+                                // Title
+                                if (poem.title != null)
+                                  LocalizedText(
+                                    poem.title!,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    maxLines: 4,
+                                    maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                   ),
+                                SizedBox(height: AppSpacing.sm),
+                                // Excerpt
+                                if (poem.excerpt != null)
+                                  Expanded(
+                                    child: LocalizedText(
+                                      poem.excerpt!,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey[700],
+                                      ),
+                                      maxLines: 4,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                SizedBox(height: AppSpacing.sm),
+                                // Poet name and poetry type
+                                Text(
+                                  poem.poetName,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
-                              SizedBox(height: AppSpacing.sm),
-                              // Poet name and poetry type
-                              Text(
-                                poem.poetName,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey[600],
-                                  fontWeight: FontWeight.w500,
+                                SizedBox(height: AppSpacing.xs),
+                                Text(
+                                  poem.poetryType,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.grey[500],
+                                  ),
                                 ),
-                              ),
-                              SizedBox(height: AppSpacing.xs),
-                              Text(
-                                poem.poetryType,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Colors.grey[500],
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  },
-                  childCount: bookmarks.length,
+                      );
+                    },
+                  ),
                 ),
-              ),
+                // Loading indicator for pagination
+                if (_isLoadingMore)
+                  const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+                // End of list indicator
+                if (!_hasMorePages && allBookmarks.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Center(
+                      child: Text(
+                        'No more bookmarks',
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
+                    ),
+                  ),
+              ]),
             );
           },
           loading: () => const SliverFillRemaining(
@@ -231,6 +358,7 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
           ),
         ),
       ],
+      ),
     );
   }
 
@@ -302,11 +430,7 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
-              onPressed: () {
-                setState(() {
-                  _currentPage = 0;
-                });
-              },
+              onPressed: _resetPagination,
               icon: const Icon(Icons.refresh),
               label: const Text('Retry'),
             ),
@@ -368,9 +492,7 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        setState(() {
-                          _currentPage = 0;
-                        });
+                        _resetPagination();
                         Navigator.pop(context);
                       },
                       child: const Text('Apply Filters'),

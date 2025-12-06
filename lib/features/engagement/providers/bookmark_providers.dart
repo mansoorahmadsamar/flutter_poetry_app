@@ -45,6 +45,29 @@ class BookmarksParams {
       page.hashCode ^ search.hashCode ^ poetryType.hashCode ^ sortBy.hashCode;
 }
 
+/// Convert UI sort option to backend field name and direction
+String _mapSortByToField(String sortBy) {
+  switch (sortBy) {
+    case 'NEWEST':
+      return 'createdAt';
+    case 'OLDEST':
+      return 'createdAt';
+    default:
+      return 'createdAt';
+  }
+}
+
+String _mapSortByToDirection(String sortBy) {
+  switch (sortBy) {
+    case 'NEWEST':
+      return 'desc';
+    case 'OLDEST':
+      return 'asc';
+    default:
+      return 'desc';
+  }
+}
+
 /// Get user's bookmarks with pagination and filters
 final bookmarksProvider = FutureProvider.autoDispose
     .family<PaginatedResponse<PoemModel>, BookmarksParams>(
@@ -57,7 +80,8 @@ final bookmarksProvider = FutureProvider.autoDispose
         size: 20,
         search: params.search,
         poetryType: params.poetryType,
-        sortBy: params.sortBy,
+        sortBy: _mapSortByToField(params.sortBy),
+        sortDir: _mapSortByToDirection(params.sortBy),
       );
       _logger.i('✅ Bookmarks loaded - Page: ${params.page}');
       return result;

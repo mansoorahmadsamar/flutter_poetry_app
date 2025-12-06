@@ -80,6 +80,28 @@ Content-Type: application/json
 
 The backend automatically extracts user information from the JWT token. You don't need to send user IDs in request bodies for protected endpoints.
 
+### Understanding `/me` Endpoints
+
+This API uses the `/me` pattern for accessing the current authenticated user's private data. This is a **security best practice** used by major APIs (GitHub, Twitter, Spotify, Google).
+
+**Why `/me` instead of `/{userId}`?**
+
+1. **Security** - Users can ONLY access their own data. No risk of accessing others' private information.
+2. **Privacy** - Private data (bookmarks, likes, notifications) is private by default.
+3. **Simplicity** - Client apps don't need to track or pass user IDs.
+4. **Industry Standard** - Follows RESTful best practices.
+
+**Examples:**
+- `/api/users/me` - Get current user's profile
+- `/api/users/me/bookmarks` - Get current user's bookmarks (private)
+- `/api/users/me/likes` - Get current user's likes (private)
+- `/api/users/me/following` - Get poets the current user follows
+
+**Public vs Private Endpoints:**
+- `/api/users/me/*` - Private data, requires authentication
+- `/api/users/{publicUserId}` - Public profile data, anyone can view
+- `/api/users/{publicUserId}/poems` - User's public poems
+
 ---
 
 ## Comments System

@@ -11,6 +11,7 @@ _$PoemModelImpl _$$PoemModelImplFromJson(Map<String, dynamic> json) =>
       publicId: json['publicId'] as String,
       poetPublicId: json['poetPublicId'] as String,
       poetName: json['poetName'] as String,
+      poetProfileImageUrl: json['poetProfileImageUrl'] as String?,
       categoryPublicId: json['categoryPublicId'] as String?,
       categoryName: json['categoryName'] as String?,
       poetryType: json['poetryType'] as String,
@@ -29,9 +30,22 @@ _$PoemModelImpl _$$PoemModelImplFromJson(Map<String, dynamic> json) =>
       isFeatured: json['isFeatured'] as bool? ?? false,
       viewCount: (json['viewCount'] as num?)?.toInt() ?? 0,
       likeCount: (json['likeCount'] as num?)?.toInt() ?? 0,
+      shareCount: (json['shareCount'] as num?)?.toInt() ?? 0,
       isLikedByCurrentUser: json['isLikedByCurrentUser'] as bool?,
       isBookmarkedByCurrentUser: json['isBookmarkedByCurrentUser'] as bool?,
       commentCount: (json['commentCount'] as num?)?.toInt(),
+      createdAt: json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
+      updatedAt: json['updatedAt'] == null
+          ? null
+          : DateTime.parse(json['updatedAt'] as String),
+      bookmarkedAt: json['bookmarkedAt'] == null
+          ? null
+          : DateTime.parse(json['bookmarkedAt'] as String),
+      likedAt: json['likedAt'] == null
+          ? null
+          : DateTime.parse(json['likedAt'] as String),
       tags: (json['tags'] as List<dynamic>?)
               ?.map((e) => TagModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
@@ -53,6 +67,7 @@ Map<String, dynamic> _$$PoemModelImplToJson(_$PoemModelImpl instance) =>
       'publicId': instance.publicId,
       'poetPublicId': instance.poetPublicId,
       'poetName': instance.poetName,
+      'poetProfileImageUrl': instance.poetProfileImageUrl,
       'categoryPublicId': instance.categoryPublicId,
       'categoryName': instance.categoryName,
       'poetryType': instance.poetryType,
@@ -71,9 +86,14 @@ Map<String, dynamic> _$$PoemModelImplToJson(_$PoemModelImpl instance) =>
       'isFeatured': instance.isFeatured,
       'viewCount': instance.viewCount,
       'likeCount': instance.likeCount,
+      'shareCount': instance.shareCount,
       'isLikedByCurrentUser': instance.isLikedByCurrentUser,
       'isBookmarkedByCurrentUser': instance.isBookmarkedByCurrentUser,
       'commentCount': instance.commentCount,
+      'createdAt': instance.createdAt?.toIso8601String(),
+      'updatedAt': instance.updatedAt?.toIso8601String(),
+      'bookmarkedAt': instance.bookmarkedAt?.toIso8601String(),
+      'likedAt': instance.likedAt?.toIso8601String(),
       'tags': instance.tags,
       'contents': instance.contents,
       'originalContent': instance.originalContent,

@@ -23,6 +23,7 @@ mixin _$PoemModel {
   String get publicId => throw _privateConstructorUsedError;
   String get poetPublicId => throw _privateConstructorUsedError;
   String get poetName => throw _privateConstructorUsedError;
+  String? get poetProfileImageUrl => throw _privateConstructorUsedError;
   String? get categoryPublicId => throw _privateConstructorUsedError;
   String? get categoryName => throw _privateConstructorUsedError;
   String get poetryType => throw _privateConstructorUsedError;
@@ -42,9 +43,14 @@ mixin _$PoemModel {
   bool get isFeatured => throw _privateConstructorUsedError;
   int get viewCount => throw _privateConstructorUsedError;
   int get likeCount => throw _privateConstructorUsedError;
+  int get shareCount => throw _privateConstructorUsedError;
   bool? get isLikedByCurrentUser => throw _privateConstructorUsedError;
   bool? get isBookmarkedByCurrentUser => throw _privateConstructorUsedError;
   int? get commentCount => throw _privateConstructorUsedError;
+  DateTime? get createdAt => throw _privateConstructorUsedError;
+  DateTime? get updatedAt => throw _privateConstructorUsedError;
+  DateTime? get bookmarkedAt => throw _privateConstructorUsedError;
+  DateTime? get likedAt => throw _privateConstructorUsedError;
   List<TagModel> get tags => throw _privateConstructorUsedError;
   List<PoemContentModel> get contents => throw _privateConstructorUsedError;
   PoemContentModel? get originalContent =>
@@ -71,6 +77,7 @@ abstract class $PoemModelCopyWith<$Res> {
       {String publicId,
       String poetPublicId,
       String poetName,
+      String? poetProfileImageUrl,
       String? categoryPublicId,
       String? categoryName,
       String poetryType,
@@ -89,9 +96,14 @@ abstract class $PoemModelCopyWith<$Res> {
       bool isFeatured,
       int viewCount,
       int likeCount,
+      int shareCount,
       bool? isLikedByCurrentUser,
       bool? isBookmarkedByCurrentUser,
       int? commentCount,
+      DateTime? createdAt,
+      DateTime? updatedAt,
+      DateTime? bookmarkedAt,
+      DateTime? likedAt,
       List<TagModel> tags,
       List<PoemContentModel> contents,
       PoemContentModel? originalContent,
@@ -119,6 +131,7 @@ class _$PoemModelCopyWithImpl<$Res, $Val extends PoemModel>
     Object? publicId = null,
     Object? poetPublicId = null,
     Object? poetName = null,
+    Object? poetProfileImageUrl = freezed,
     Object? categoryPublicId = freezed,
     Object? categoryName = freezed,
     Object? poetryType = null,
@@ -137,9 +150,14 @@ class _$PoemModelCopyWithImpl<$Res, $Val extends PoemModel>
     Object? isFeatured = null,
     Object? viewCount = null,
     Object? likeCount = null,
+    Object? shareCount = null,
     Object? isLikedByCurrentUser = freezed,
     Object? isBookmarkedByCurrentUser = freezed,
     Object? commentCount = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
+    Object? bookmarkedAt = freezed,
+    Object? likedAt = freezed,
     Object? tags = null,
     Object? contents = null,
     Object? originalContent = freezed,
@@ -159,6 +177,10 @@ class _$PoemModelCopyWithImpl<$Res, $Val extends PoemModel>
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
               as String,
+      poetProfileImageUrl: freezed == poetProfileImageUrl
+          ? _value.poetProfileImageUrl
+          : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
       categoryPublicId: freezed == categoryPublicId
           ? _value.categoryPublicId
           : categoryPublicId // ignore: cast_nullable_to_non_nullable
@@ -231,6 +253,10 @@ class _$PoemModelCopyWithImpl<$Res, $Val extends PoemModel>
           ? _value.likeCount
           : likeCount // ignore: cast_nullable_to_non_nullable
               as int,
+      shareCount: null == shareCount
+          ? _value.shareCount
+          : shareCount // ignore: cast_nullable_to_non_nullable
+              as int,
       isLikedByCurrentUser: freezed == isLikedByCurrentUser
           ? _value.isLikedByCurrentUser
           : isLikedByCurrentUser // ignore: cast_nullable_to_non_nullable
@@ -243,6 +269,22 @@ class _$PoemModelCopyWithImpl<$Res, $Val extends PoemModel>
           ? _value.commentCount
           : commentCount // ignore: cast_nullable_to_non_nullable
               as int?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      bookmarkedAt: freezed == bookmarkedAt
+          ? _value.bookmarkedAt
+          : bookmarkedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      likedAt: freezed == likedAt
+          ? _value.likedAt
+          : likedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
       tags: null == tags
           ? _value.tags
           : tags // ignore: cast_nullable_to_non_nullable
@@ -293,6 +335,7 @@ abstract class _$$PoemModelImplCopyWith<$Res>
       {String publicId,
       String poetPublicId,
       String poetName,
+      String? poetProfileImageUrl,
       String? categoryPublicId,
       String? categoryName,
       String poetryType,
@@ -311,9 +354,14 @@ abstract class _$$PoemModelImplCopyWith<$Res>
       bool isFeatured,
       int viewCount,
       int likeCount,
+      int shareCount,
       bool? isLikedByCurrentUser,
       bool? isBookmarkedByCurrentUser,
       int? commentCount,
+      DateTime? createdAt,
+      DateTime? updatedAt,
+      DateTime? bookmarkedAt,
+      DateTime? likedAt,
       List<TagModel> tags,
       List<PoemContentModel> contents,
       PoemContentModel? originalContent,
@@ -340,6 +388,7 @@ class __$$PoemModelImplCopyWithImpl<$Res>
     Object? publicId = null,
     Object? poetPublicId = null,
     Object? poetName = null,
+    Object? poetProfileImageUrl = freezed,
     Object? categoryPublicId = freezed,
     Object? categoryName = freezed,
     Object? poetryType = null,
@@ -358,9 +407,14 @@ class __$$PoemModelImplCopyWithImpl<$Res>
     Object? isFeatured = null,
     Object? viewCount = null,
     Object? likeCount = null,
+    Object? shareCount = null,
     Object? isLikedByCurrentUser = freezed,
     Object? isBookmarkedByCurrentUser = freezed,
     Object? commentCount = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
+    Object? bookmarkedAt = freezed,
+    Object? likedAt = freezed,
     Object? tags = null,
     Object? contents = null,
     Object? originalContent = freezed,
@@ -380,6 +434,10 @@ class __$$PoemModelImplCopyWithImpl<$Res>
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
               as String,
+      poetProfileImageUrl: freezed == poetProfileImageUrl
+          ? _value.poetProfileImageUrl
+          : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
       categoryPublicId: freezed == categoryPublicId
           ? _value.categoryPublicId
           : categoryPublicId // ignore: cast_nullable_to_non_nullable
@@ -452,6 +510,10 @@ class __$$PoemModelImplCopyWithImpl<$Res>
           ? _value.likeCount
           : likeCount // ignore: cast_nullable_to_non_nullable
               as int,
+      shareCount: null == shareCount
+          ? _value.shareCount
+          : shareCount // ignore: cast_nullable_to_non_nullable
+              as int,
       isLikedByCurrentUser: freezed == isLikedByCurrentUser
           ? _value.isLikedByCurrentUser
           : isLikedByCurrentUser // ignore: cast_nullable_to_non_nullable
@@ -464,6 +526,22 @@ class __$$PoemModelImplCopyWithImpl<$Res>
           ? _value.commentCount
           : commentCount // ignore: cast_nullable_to_non_nullable
               as int?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      bookmarkedAt: freezed == bookmarkedAt
+          ? _value.bookmarkedAt
+          : bookmarkedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      likedAt: freezed == likedAt
+          ? _value.likedAt
+          : likedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
       tags: null == tags
           ? _value._tags
           : tags // ignore: cast_nullable_to_non_nullable
@@ -495,6 +573,7 @@ class _$PoemModelImpl implements _PoemModel {
       {required this.publicId,
       required this.poetPublicId,
       required this.poetName,
+      this.poetProfileImageUrl,
       this.categoryPublicId,
       this.categoryName,
       required this.poetryType,
@@ -513,9 +592,14 @@ class _$PoemModelImpl implements _PoemModel {
       this.isFeatured = false,
       this.viewCount = 0,
       this.likeCount = 0,
+      this.shareCount = 0,
       this.isLikedByCurrentUser,
       this.isBookmarkedByCurrentUser,
       this.commentCount,
+      this.createdAt,
+      this.updatedAt,
+      this.bookmarkedAt,
+      this.likedAt,
       final List<TagModel> tags = const [],
       final List<PoemContentModel> contents = const [],
       this.originalContent,
@@ -533,6 +617,8 @@ class _$PoemModelImpl implements _PoemModel {
   final String poetPublicId;
   @override
   final String poetName;
+  @override
+  final String? poetProfileImageUrl;
   @override
   final String? categoryPublicId;
   @override
@@ -575,11 +661,22 @@ class _$PoemModelImpl implements _PoemModel {
   @JsonKey()
   final int likeCount;
   @override
+  @JsonKey()
+  final int shareCount;
+  @override
   final bool? isLikedByCurrentUser;
   @override
   final bool? isBookmarkedByCurrentUser;
   @override
   final int? commentCount;
+  @override
+  final DateTime? createdAt;
+  @override
+  final DateTime? updatedAt;
+  @override
+  final DateTime? bookmarkedAt;
+  @override
+  final DateTime? likedAt;
   final List<TagModel> _tags;
   @override
   @JsonKey()
@@ -608,7 +705,7 @@ class _$PoemModelImpl implements _PoemModel {
 
   @override
   String toString() {
-    return 'PoemModel(publicId: $publicId, poetPublicId: $poetPublicId, poetName: $poetName, categoryPublicId: $categoryPublicId, categoryName: $categoryName, poetryType: $poetryType, poetryTypeName: $poetryTypeName, poetryTypeUrduName: $poetryTypeUrduName, poetryTypeEnglishName: $poetryTypeEnglishName, contentType: $contentType, requiresStructuredParsing: $requiresStructuredParsing, imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, yearWritten: $yearWritten, source: $source, license: $license, uploadedByUsername: $uploadedByUsername, isPublic: $isPublic, isFeatured: $isFeatured, viewCount: $viewCount, likeCount: $likeCount, isLikedByCurrentUser: $isLikedByCurrentUser, isBookmarkedByCurrentUser: $isBookmarkedByCurrentUser, commentCount: $commentCount, tags: $tags, contents: $contents, originalContent: $originalContent, title: $title, excerpt: $excerpt)';
+    return 'PoemModel(publicId: $publicId, poetPublicId: $poetPublicId, poetName: $poetName, poetProfileImageUrl: $poetProfileImageUrl, categoryPublicId: $categoryPublicId, categoryName: $categoryName, poetryType: $poetryType, poetryTypeName: $poetryTypeName, poetryTypeUrduName: $poetryTypeUrduName, poetryTypeEnglishName: $poetryTypeEnglishName, contentType: $contentType, requiresStructuredParsing: $requiresStructuredParsing, imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, yearWritten: $yearWritten, source: $source, license: $license, uploadedByUsername: $uploadedByUsername, isPublic: $isPublic, isFeatured: $isFeatured, viewCount: $viewCount, likeCount: $likeCount, shareCount: $shareCount, isLikedByCurrentUser: $isLikedByCurrentUser, isBookmarkedByCurrentUser: $isBookmarkedByCurrentUser, commentCount: $commentCount, createdAt: $createdAt, updatedAt: $updatedAt, bookmarkedAt: $bookmarkedAt, likedAt: $likedAt, tags: $tags, contents: $contents, originalContent: $originalContent, title: $title, excerpt: $excerpt)';
   }
 
   @override
@@ -622,6 +719,8 @@ class _$PoemModelImpl implements _PoemModel {
                 other.poetPublicId == poetPublicId) &&
             (identical(other.poetName, poetName) ||
                 other.poetName == poetName) &&
+            (identical(other.poetProfileImageUrl, poetProfileImageUrl) ||
+                other.poetProfileImageUrl == poetProfileImageUrl) &&
             (identical(other.categoryPublicId, categoryPublicId) ||
                 other.categoryPublicId == categoryPublicId) &&
             (identical(other.categoryName, categoryName) ||
@@ -657,6 +756,8 @@ class _$PoemModelImpl implements _PoemModel {
                 other.viewCount == viewCount) &&
             (identical(other.likeCount, likeCount) ||
                 other.likeCount == likeCount) &&
+            (identical(other.shareCount, shareCount) ||
+                other.shareCount == shareCount) &&
             (identical(other.isLikedByCurrentUser, isLikedByCurrentUser) ||
                 other.isLikedByCurrentUser == isLikedByCurrentUser) &&
             (identical(other.isBookmarkedByCurrentUser,
@@ -664,6 +765,13 @@ class _$PoemModelImpl implements _PoemModel {
                 other.isBookmarkedByCurrentUser == isBookmarkedByCurrentUser) &&
             (identical(other.commentCount, commentCount) ||
                 other.commentCount == commentCount) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt) &&
+            (identical(other.bookmarkedAt, bookmarkedAt) ||
+                other.bookmarkedAt == bookmarkedAt) &&
+            (identical(other.likedAt, likedAt) || other.likedAt == likedAt) &&
             const DeepCollectionEquality().equals(other._tags, _tags) &&
             const DeepCollectionEquality().equals(other._contents, _contents) &&
             (identical(other.originalContent, originalContent) ||
@@ -679,6 +787,7 @@ class _$PoemModelImpl implements _PoemModel {
         publicId,
         poetPublicId,
         poetName,
+        poetProfileImageUrl,
         categoryPublicId,
         categoryName,
         poetryType,
@@ -697,9 +806,14 @@ class _$PoemModelImpl implements _PoemModel {
         isFeatured,
         viewCount,
         likeCount,
+        shareCount,
         isLikedByCurrentUser,
         isBookmarkedByCurrentUser,
         commentCount,
+        createdAt,
+        updatedAt,
+        bookmarkedAt,
+        likedAt,
         const DeepCollectionEquality().hash(_tags),
         const DeepCollectionEquality().hash(_contents),
         originalContent,
@@ -728,6 +842,7 @@ abstract class _PoemModel implements PoemModel {
       {required final String publicId,
       required final String poetPublicId,
       required final String poetName,
+      final String? poetProfileImageUrl,
       final String? categoryPublicId,
       final String? categoryName,
       required final String poetryType,
@@ -746,9 +861,14 @@ abstract class _PoemModel implements PoemModel {
       final bool isFeatured,
       final int viewCount,
       final int likeCount,
+      final int shareCount,
       final bool? isLikedByCurrentUser,
       final bool? isBookmarkedByCurrentUser,
       final int? commentCount,
+      final DateTime? createdAt,
+      final DateTime? updatedAt,
+      final DateTime? bookmarkedAt,
+      final DateTime? likedAt,
       final List<TagModel> tags,
       final List<PoemContentModel> contents,
       final PoemContentModel? originalContent,
@@ -764,6 +884,8 @@ abstract class _PoemModel implements PoemModel {
   String get poetPublicId;
   @override
   String get poetName;
+  @override
+  String? get poetProfileImageUrl;
   @override
   String? get categoryPublicId;
   @override
@@ -802,11 +924,21 @@ abstract class _PoemModel implements PoemModel {
   @override
   int get likeCount;
   @override
+  int get shareCount;
+  @override
   bool? get isLikedByCurrentUser;
   @override
   bool? get isBookmarkedByCurrentUser;
   @override
   int? get commentCount;
+  @override
+  DateTime? get createdAt;
+  @override
+  DateTime? get updatedAt;
+  @override
+  DateTime? get bookmarkedAt;
+  @override
+  DateTime? get likedAt;
   @override
   List<TagModel> get tags;
   @override

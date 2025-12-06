@@ -9,6 +9,26 @@
 
 The bookmark and like endpoints are **already implemented** in the backend. The Flutter team was calling the wrong endpoint URLs.
 
+### Why We Use `/me` Endpoints
+
+The API uses `/api/users/me/*` for private user data instead of `/api/users/{userId}/*`. This is a **security best practice**:
+
+**Benefits:**
+1. ✅ **More Secure** - Users can ONLY access their own data, no risk of data leakage
+2. ✅ **Privacy First** - Bookmarks and likes are private by default
+3. ✅ **Simpler Code** - No need to track user IDs on the client
+4. ✅ **Industry Standard** - Used by GitHub, Twitter, Spotify, Google
+
+**How it works:**
+- The JWT token identifies the user automatically
+- No user ID needed in the URL
+- Impossible to access other users' private data
+
+**Examples:**
+- `/api/users/me/bookmarks` - Your bookmarks (private) ✅
+- `/api/users/me/likes` - Your likes (private) ✅
+- `/api/users/{publicUserId}` - Someone's public profile ✅
+
 ### ❌ Wrong Endpoints (Don't Use These)
 
 ```
