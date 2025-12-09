@@ -23,10 +23,6 @@ class PoemPreviewBottomSheet extends ConsumerStatefulWidget {
 }
 
 class _PoemPreviewBottomSheetState extends ConsumerState<PoemPreviewBottomSheet> {
-  // Optimistic state for like and bookmark
-  bool? _isLikedOptimistic;
-  bool? _isBookmarkedOptimistic;
-
   @override
   Widget build(BuildContext context) {
     final poemAsync = ref.watch(poemDetailProvider(widget.poemPublicId));
@@ -92,8 +88,8 @@ class _PoemPreviewBottomSheetState extends ConsumerState<PoemPreviewBottomSheet>
     PoemModel poem,
     bool isUrdu,
   ) {
-    final isLiked = _isLikedOptimistic ?? poem.isLikedByCurrentUser ?? false;
-    final isBookmarked = _isBookmarkedOptimistic ?? poem.isBookmarkedByCurrentUser ?? false;
+    final isLiked = poem.isLikedByCurrentUser ?? false;
+    final isBookmarked = poem.isBookmarkedByCurrentUser ?? false;
 
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -149,30 +145,12 @@ class _PoemPreviewBottomSheetState extends ConsumerState<PoemPreviewBottomSheet>
   }
 
   Future<void> _handleLikeToggle(PoemModel poem) async {
-    final isLiked = _isLikedOptimistic ?? poem.isLikedByCurrentUser ?? false;
-
-    // Optimistic update
-    setState(() {
-      _isLikedOptimistic = !isLiked;
-    });
+    final isLiked = poem.isLikedByCurrentUser ?? false;
 
     try {
-      final notifier = ref.read(likeActionProvider.notifier);
-      final newIsLiked = await notifier.toggleLike(widget.poemPublicId);
-
-      // Update optimistic state with server response and keep it permanently
-      if (mounted) {
-        setState(() {
-          _isLikedOptimistic = newIsLiked;
-        });
-      }
+      await ref.read(likeActionProvider.notifier).toggleLike(widget.poemPublicId);
     } catch (e) {
-      // Revert optimistic update on error
       if (mounted) {
-        setState(() {
-          _isLikedOptimistic = null;
-        });
-
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to ${isLiked ? 'unlike' : 'like'} poem'),
@@ -184,39 +162,22 @@ class _PoemPreviewBottomSheetState extends ConsumerState<PoemPreviewBottomSheet>
   }
 
   Future<void> _handleBookmarkToggle(PoemModel poem) async {
-    final isBookmarked = _isBookmarkedOptimistic ?? poem.isBookmarkedByCurrentUser ?? false;
-
-    // Optimistic update
-    setState(() {
-      _isBookmarkedOptimistic = !isBookmarked;
-    });
+    final isBookmarked = poem.isBookmarkedByCurrentUser ?? false;
 
     try {
-      final notifier = ref.read(bookmarkActionProvider.notifier);
-      final newIsBookmarked = await notifier.toggleBookmark(widget.poemPublicId);
+      final enrichedPoem = await ref.read(bookmarkActionProvider.notifier).toggleBookmark(widget.poemPublicId);
 
-      // Update optimistic state with server response and keep it permanently
       if (mounted) {
-        setState(() {
-          _isBookmarkedOptimistic = newIsBookmarked;
-        });
-
-        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(newIsBookmarked ? 'Added to bookmarks' : 'Removed from bookmarks'),
+            content: Text((enrichedPoem.isBookmarkedByCurrentUser ?? false) ? 'Added to bookmarks' : 'Removed from bookmarks'),
             backgroundColor: Colors.green,
             duration: const Duration(seconds: 2),
           ),
         );
       }
     } catch (e) {
-      // Revert optimistic update on error
       if (mounted) {
-        setState(() {
-          _isBookmarkedOptimistic = null;
-        });
-
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to ${isBookmarked ? 'remove' : 'add'} bookmark'),

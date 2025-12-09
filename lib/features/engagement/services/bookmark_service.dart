@@ -8,8 +8,8 @@ class BookmarkService {
   BookmarkService(this._dio);
 
   /// Toggle bookmark for a poem (add if not bookmarked, remove if bookmarked)
-  /// Returns true if bookmarked, false if removed
-  Future<bool> toggleBookmark(String poemPublicId) async {
+  /// Returns the enriched poem model with updated engagement data
+  Future<PoemModel> toggleBookmark(String poemPublicId) async {
     final response = await _dio.post('/api/poems/$poemPublicId/bookmark');
 
     final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
@@ -21,7 +21,7 @@ class BookmarkService {
       throw Exception(apiResponse.message ?? 'Failed to toggle bookmark');
     }
 
-    return apiResponse.data!['bookmarked'] as bool;
+    return PoemModel.fromJson(apiResponse.data!);
   }
 
   /// Get user's bookmarks with pagination and filters

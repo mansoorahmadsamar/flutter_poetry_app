@@ -8,8 +8,8 @@ class LikeService {
   LikeService(this._dio);
 
   /// Toggle like for a poem (add if not liked, remove if liked)
-  /// Returns true if liked, false if removed
-  Future<bool> toggleLike(String poemPublicId) async {
+  /// Returns the enriched poem model with updated engagement data
+  Future<PoemModel> toggleLike(String poemPublicId) async {
     final response = await _dio.post('/api/poems/$poemPublicId/like');
 
     final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
@@ -21,7 +21,7 @@ class LikeService {
       throw Exception(apiResponse.message);
     }
 
-    return apiResponse.data!['liked'] as bool;
+    return PoemModel.fromJson(apiResponse.data!);
   }
 
   /// Get user's likes with pagination and filters

@@ -77,16 +77,42 @@ class PoemCard extends ConsumerWidget {
                     ),
                   ),
 
-                  // Stats
+                  // Stats - show engagement metrics
                   Row(
                     children: [
-                      Icon(Icons.favorite_border, size: 16, color: Colors.grey),
+                      // Like indicator with user state
+                      Icon(
+                        poem.isLikedByCurrentUser ?? false
+                            ? Icons.favorite
+                            : Icons.favorite_border,
+                        size: 16,
+                        color: poem.isLikedByCurrentUser ?? false
+                            ? Colors.red
+                            : Colors.grey,
+                      ),
                       SizedBox(width: 4),
                       Text(
                         '${poem.likeCount}',
-                        style: Theme.of(context).textTheme.bodySmall,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: poem.isLikedByCurrentUser ?? false
+                                  ? Colors.red
+                                  : null,
+                            ),
                       ),
                       SizedBox(width: AppSpacing.md),
+
+                      // Comment count (if available)
+                      if ((poem.commentCount ?? 0) > 0) ...[
+                        Icon(Icons.comment, size: 16, color: Colors.grey),
+                        SizedBox(width: 4),
+                        Text(
+                          '${poem.commentCount}',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                        SizedBox(width: AppSpacing.md),
+                      ],
+
+                      // View count
                       Icon(Icons.visibility, size: 16, color: Colors.grey),
                       SizedBox(width: 4),
                       Text(
