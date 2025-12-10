@@ -41,7 +41,12 @@ class BookmarkService {
       'sortDir': sortDir,
     };
 
-    if (search != null && search.isNotEmpty) {
+    // Determine endpoint based on whether there's a search query
+    String endpoint = '/api/users/me/bookmarks';
+
+    if (search != null && search.isNotEmpty && search.length >= 3) {
+      // Use search endpoint when query has 3+ characters
+      endpoint = '/api/users/me/bookmarks/search';
       queryParams['query'] = search;
     }
 
@@ -54,7 +59,7 @@ class BookmarkService {
     }
 
     final response = await _dio.get(
-      '/api/users/me/bookmarks',
+      endpoint,
       queryParameters: queryParams,
     );
 

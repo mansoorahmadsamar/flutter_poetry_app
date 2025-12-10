@@ -15,9 +15,7 @@ class BookmarksTab extends ConsumerStatefulWidget {
 }
 
 class _BookmarksTabState extends ConsumerState<BookmarksTab> {
-  final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  String _searchQuery = '';
   String? _selectedPoetryType;
   String _sortBy = 'NEWEST';
   int _currentPage = 0;
@@ -33,7 +31,6 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
 
   @override
   void dispose() {
-    _searchController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -54,7 +51,7 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
     final nextPage = _currentPage + 1;
     final params = BookmarksParams(
       page: nextPage,
-      search: _searchQuery.isEmpty ? null : _searchQuery,
+      search: null,
       poetryType: _selectedPoetryType,
       sortBy: _sortBy,
     );
@@ -92,7 +89,7 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
     // Wait for the new data to be fetched
     final params = BookmarksParams(
       page: 0,
-      search: _searchQuery.isEmpty ? null : _searchQuery,
+      search: null,
       poetryType: _selectedPoetryType,
       sortBy: _sortBy,
     );
@@ -116,7 +113,7 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
   Widget build(BuildContext context) {
     final params = BookmarksParams(
       page: 0, // Always start with page 0
-      search: _searchQuery.isEmpty ? null : _searchQuery,
+      search: null,
       poetryType: _selectedPoetryType,
       sortBy: _sortBy,
     );
@@ -141,45 +138,17 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.filter_list),
+              icon: const Icon(Icons.search, color: Colors.white),
+              tooltip: 'Search Bookmarks',
+              onPressed: () {
+                context.push('/bookmarks/search');
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.filter_list, color: Colors.white),
               onPressed: () => _showFilterDialog(context),
             ),
           ],
-        ),
-
-        // Search bar
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: EdgeInsets.all(AppSpacing.md),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search bookmarks...',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          _searchController.clear();
-                          setState(() {
-                            _searchQuery = '';
-                          });
-                          _resetPagination();
-                        },
-                      )
-                    : null,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                ),
-              ),
-              onSubmitted: (value) {
-                setState(() {
-                  _searchQuery = value.trim();
-                });
-                _resetPagination();
-              },
-            ),
-          ),
         ),
 
         // Filter chips
@@ -376,7 +345,7 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
             ),
             const SizedBox(height: 24),
             Text(
-              _searchQuery.isNotEmpty || _selectedPoetryType != null
+              _selectedPoetryType != null
                   ? 'No Bookmarks Found'
                   : 'No Bookmarks Yet',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -386,8 +355,8 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
             ),
             const SizedBox(height: 12),
             Text(
-              _searchQuery.isNotEmpty || _selectedPoetryType != null
-                  ? 'Try adjusting your search or filters'
+              _selectedPoetryType != null
+                  ? 'Try adjusting your filters'
                   : 'Start bookmarking your favorite poems to see them here',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
