@@ -23,11 +23,6 @@ class PoemDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
-  // Optimistic state for like and bookmark
-  bool? _isLikedOptimistic;
-  bool? _isBookmarkedOptimistic;
-  int? _likeCountOptimistic;
-
   @override
   Widget build(BuildContext context) {
     final poemAsync = ref.watch(poemDetailProvider(widget.publicId));
@@ -144,6 +139,11 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
               ),
             ],
           ),
+
+          SizedBox(height: AppSpacing.md),
+
+          // Engagement statistics
+          _buildEngagementStats(context, poem),
 
           SizedBox(height: AppSpacing.lg),
 
@@ -273,8 +273,7 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
   }
 
   Widget _buildLikeButton(BuildContext context, WidgetRef ref, PoemModel poem) {
-    final isLiked = _isLikedOptimistic ?? poem.isLikedByCurrentUser ?? false;
-    final likeCount = _likeCountOptimistic ?? poem.likeCount;
+    final isLiked = poem.isLikedByCurrentUser ?? false;
 
     return Column(
       children: [
@@ -285,32 +284,10 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
             color: isLiked ? Colors.red : null,
           ),
           onPressed: () async {
-            // Optimistic update
-            setState(() {
-              _isLikedOptimistic = !isLiked;
-              _likeCountOptimistic = isLiked ? likeCount - 1 : likeCount + 1;
-            });
-
             try {
-              final notifier = ref.read(likeActionProvider.notifier);
-              final newIsLiked = await notifier.toggleLike(widget.publicId);
-
-              // Update optimistic state with server response and keep it permanently
-              if (mounted) {
-                setState(() {
-                  _isLikedOptimistic = newIsLiked;
-                  // Keep the optimistic count - don't recalculate from poem.likeCount
-                  // The count is already correct from the initial optimistic update
-                });
-              }
+              await ref.read(likeActionProvider.notifier).toggleLike(widget.publicId);
             } catch (e) {
-              // Revert optimistic update on error
               if (mounted) {
-                setState(() {
-                  _isLikedOptimistic = null;
-                  _likeCountOptimistic = null;
-                });
-
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Failed to ${isLiked ? 'unlike' : 'like'} poem'),
@@ -322,7 +299,7 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
           },
         ),
         Text(
-          '$likeCount',
+          '${poem.likeCount}',
           style: Theme.of(context).textTheme.bodySmall,
         ),
       ],
@@ -330,7 +307,7 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
   }
 
   Widget _buildBookmarkButton(BuildContext context, WidgetRef ref, PoemModel poem) {
-    final isBookmarked = _isBookmarkedOptimistic ?? poem.isBookmarkedByCurrentUser ?? false;
+    final isBookmarked = poem.isBookmarkedByCurrentUser ?? false;
 
     return Column(
       children: [
@@ -341,37 +318,20 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
             color: isBookmarked ? AppColors.primary : null,
           ),
           onPressed: () async {
-            // Optimistic update
-            setState(() {
-              _isBookmarkedOptimistic = !isBookmarked;
-            });
-
             try {
-              final notifier = ref.read(bookmarkActionProvider.notifier);
-              final newIsBookmarked = await notifier.toggleBookmark(widget.publicId);
+              final enrichedPoem = await ref.read(bookmarkActionProvider.notifier).toggleBookmark(widget.publicId);
 
-              // Update optimistic state with server response and keep it permanently
               if (mounted) {
-                setState(() {
-                  _isBookmarkedOptimistic = newIsBookmarked;
-                });
-
-                // Show success message
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(newIsBookmarked ? 'Added to bookmarks' : 'Removed from bookmarks'),
+                    content: Text((enrichedPoem.isBookmarkedByCurrentUser ?? false) ? 'Added to bookmarks' : 'Removed from bookmarks'),
                     backgroundColor: Colors.green,
                     duration: const Duration(seconds: 2),
                   ),
                 );
               }
             } catch (e) {
-              // Revert optimistic update on error
               if (mounted) {
-                setState(() {
-                  _isBookmarkedOptimistic = null;
-                });
-
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Failed to ${isBookmarked ? 'remove' : 'add'} bookmark'),
@@ -388,6 +348,89 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
         ),
       ],
     );
+  }
+
+  Widget _buildEngagementStats(BuildContext context, PoemModel poem) {
+    return Card(
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.md,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildStatItem(
+              context,
+              icon: Icons.visibility,
+              label: 'Views',
+              count: poem.viewCount,
+            ),
+            _buildStatItem(
+              context,
+              icon: Icons.favorite,
+              label: 'Likes',
+              count: poem.likeCount,
+              isActive: poem.isLikedByCurrentUser ?? false,
+            ),
+            _buildStatItem(
+              context,
+              icon: Icons.comment,
+              label: 'Comments',
+              count: poem.commentCount ?? 0,
+            ),
+            _buildStatItem(
+              context,
+              icon: Icons.share,
+              label: 'Shares',
+              count: poem.shareCount,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatItem(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required int count,
+    bool isActive = false,
+  }) {
+    final color = isActive ? Colors.red : Colors.grey;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 24, color: color),
+        SizedBox(height: 4),
+        Text(
+          _formatCount(count),
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey,
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatCount(int count) {
+    if (count >= 1000000) {
+      return '${(count / 1000000).toStringAsFixed(1)}M';
+    } else if (count >= 1000) {
+      return '${(count / 1000).toStringAsFixed(1)}K';
+    }
+    return count.toString();
   }
 
   Widget _buildDetailRow(BuildContext context, String label, String value) {

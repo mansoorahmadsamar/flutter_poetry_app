@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:flutter_poetry_app/core/network/dio_client.dart';
+import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.dart';
+import 'package:flutter_poetry_app/features/main/tabs/poets/providers/poem_providers.dart';
 import '../services/like_service.dart';
 
 final Logger _logger = Logger();
@@ -26,18 +28,21 @@ class LikeActionNotifier extends StateNotifier<AsyncValue<void>> {
   LikeActionNotifier(this.ref) : super(const AsyncValue.data(null));
 
   /// Toggle like (add if not liked, remove if liked)
-  /// Returns true if liked, false if removed
-  Future<bool> toggleLike(String poemPublicId) async {
+  /// Returns the enriched poem model with updated engagement data
+  Future<PoemModel> toggleLike(String poemPublicId) async {
     state = const AsyncValue.loading();
 
     try {
       final service = ref.read(likeServiceProvider);
-      final isLiked = await service.toggleLike(poemPublicId);
+      final enrichedPoem = await service.toggleLike(poemPublicId);
 
       state = const AsyncValue.data(null);
-      _logger.i('✅ Like toggled: $poemPublicId - isLiked: $isLiked');
+      _logger.i('✅ Like toggled: $poemPublicId - isLiked: ${enrichedPoem.isLikedByCurrentUser}, count: ${enrichedPoem.likeCount}');
 
-      return isLiked;
+      // Invalidate poem detail provider to refresh UI
+      ref.invalidate(poemDetailProvider(poemPublicId));
+
+      return enrichedPoem;
     } catch (e, stack) {
       _logger.e('❌ Error toggling like: $e');
       state = AsyncValue.error(e, stack);

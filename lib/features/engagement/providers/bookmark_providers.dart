@@ -3,6 +3,7 @@ import 'package:logger/logger.dart';
 import 'package:flutter_poetry_app/core/network/dio_client.dart';
 import 'package:flutter_poetry_app/core/network/dto/api_response.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.dart';
+import 'package:flutter_poetry_app/features/main/tabs/poets/providers/poem_providers.dart';
 import '../services/bookmark_service.dart';
 
 final Logger _logger = Logger();
@@ -106,21 +107,24 @@ class BookmarkActionNotifier extends StateNotifier<AsyncValue<void>> {
   BookmarkActionNotifier(this.ref) : super(const AsyncValue.data(null));
 
   /// Toggle bookmark (add if not bookmarked, remove if bookmarked)
-  /// Returns true if bookmarked, false if removed
-  Future<bool> toggleBookmark(String poemPublicId) async {
+  /// Returns the enriched poem model with updated engagement data
+  Future<PoemModel> toggleBookmark(String poemPublicId) async {
     state = const AsyncValue.loading();
 
     try {
       final service = ref.read(bookmarkServiceProvider);
-      final isBookmarked = await service.toggleBookmark(poemPublicId);
+      final enrichedPoem = await service.toggleBookmark(poemPublicId);
 
       state = const AsyncValue.data(null);
-      _logger.i('✅ Bookmark toggled: $poemPublicId - isBookmarked: $isBookmarked');
+      _logger.i('✅ Bookmark toggled: $poemPublicId - isBookmarked: ${enrichedPoem.isBookmarkedByCurrentUser}');
 
       // Invalidate bookmarks list to refresh
       ref.invalidate(bookmarksProvider);
 
-      return isBookmarked;
+      // Invalidate poem detail provider to refresh with server data
+      ref.invalidate(poemDetailProvider(poemPublicId));
+
+      return enrichedPoem;
     } catch (e, stack) {
       _logger.e('❌ Error toggling bookmark: $e');
       state = AsyncValue.error(e, stack);
