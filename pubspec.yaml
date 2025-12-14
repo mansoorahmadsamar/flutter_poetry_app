@@ -82,6 +82,9 @@ dependencies:
   # Sharing
   share_plus: ^7.0.0  # For sharing poems and poets
 
+  # Image Poetry Generation
+  path_provider: ^2.1.2  # For file storage paths
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

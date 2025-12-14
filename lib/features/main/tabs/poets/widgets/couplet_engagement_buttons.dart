@@ -4,6 +4,7 @@ import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/couplet_model.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/couplet_providers.dart';
+import 'package:flutter_poetry_app/features/image_poetry/widgets/share_options_sheet.dart';
 
 class CoupletEngagementButtons extends ConsumerWidget {
   final CoupletModel couplet;
@@ -115,9 +116,11 @@ class CoupletEngagementButtons extends ConsumerWidget {
   }
 
   void _handleShare(BuildContext context) {
-    // TODO: Implement share functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Share feature coming soon')),
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ShareOptionsSheet(coupletId: couplet.publicId),
     );
   }
 }
