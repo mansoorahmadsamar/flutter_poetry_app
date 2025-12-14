@@ -7,6 +7,7 @@ import '../../features/main/tabs/poets/screens/poet_detail_screen.dart';
 import '../../features/main/tabs/poets/screens/poem_detail_screen.dart';
 import '../../features/search/screens/poets_search_screen.dart';
 import '../../features/engagement/screens/bookmark_search_screen.dart';
+import '../../features/engagement/screens/bookmarked_couplets_screen.dart';
 import '../auth/auth_provider.dart';
 
 /// App routes
@@ -86,6 +87,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/bookmarks/search',
         name: 'bookmark-search',
         builder: (context, state) => const BookmarkSearchScreen(),
+      ),
+      GoRoute(
+        path: '/bookmarks/couplets',
+        name: 'bookmarked-couplets',
+        builder: (context, state) => const BookmarkedCoupletsScreen(),
       ),
     ],
   );

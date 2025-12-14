@@ -7,8 +7,10 @@ import 'package:flutter_poetry_app/core/widgets/localized_text.dart';
 import '../models/poem_model.dart';
 import '../providers/poem_providers.dart';
 import '../providers/poet_providers.dart';
+import '../widgets/couplet_card.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/like_providers.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/bookmark_providers.dart';
+import 'package:flutter_poetry_app/features/engagement/providers/couplet_providers.dart';
 
 class PoemDetailScreen extends ConsumerStatefulWidget {
   final String publicId;
@@ -66,6 +68,7 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
     bool isUrdu,
   ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final coupletsAsync = ref.watch(coupletsProvider(poem.publicId));
 
     return SingleChildScrollView(
       padding: EdgeInsets.all(AppSpacing.lg),
@@ -101,21 +104,60 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
           ),
           SizedBox(height: AppSpacing.lg),
 
-          // Full poem content with automatic RTL and font handling
-          Container(
-            padding: EdgeInsets.all(AppSpacing.xl),
-            decoration: BoxDecoration(
-              color: isDark ? Colors.grey[800] : AppColors.verseBackground,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+          // Poem content - display as couplets or fallback to full text
+          coupletsAsync.when(
+            data: (couplets) {
+              if (couplets.isEmpty) {
+                // Fallback to full text if no couplets available
+                return Container(
+                  padding: EdgeInsets.all(AppSpacing.xl),
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.grey[800] : AppColors.verseBackground,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                  ),
+                  child: LocalizedText(
+                    poem.getDisplayText(isUrdu ? 'ur' : 'en'),
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                );
+              }
+
+              // Display couplets
+              return Column(
+                children: [
+                  ...couplets.map((couplet) => CoupletCard(
+                        couplet: couplet,
+                      )),
+                  SizedBox(height: AppSpacing.lg),
+                ],
+              );
+            },
+            loading: () => Container(
+              padding: EdgeInsets.all(AppSpacing.xl),
+              child: const Center(child: CircularProgressIndicator()),
             ),
-            child: LocalizedText(
-              poem.getDisplayText(isUrdu ? 'ur' : 'en'),
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w400,
-              ),
-              textAlign: TextAlign.center,
-            ),
+            error: (error, stack) {
+              // Fallback to full text on error
+              return Container(
+                padding: EdgeInsets.all(AppSpacing.xl),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey[800] : AppColors.verseBackground,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                ),
+                child: LocalizedText(
+                  poem.getDisplayText(isUrdu ? 'ur' : 'en'),
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              );
+            },
           ),
 
           SizedBox(height: AppSpacing.lg),

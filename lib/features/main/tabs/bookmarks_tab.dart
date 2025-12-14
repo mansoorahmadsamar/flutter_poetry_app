@@ -138,6 +138,13 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
           ),
           actions: [
             IconButton(
+              icon: const Icon(Icons.format_quote, color: Colors.white),
+              tooltip: 'Bookmarked Couplets',
+              onPressed: () {
+                context.push('/bookmarks/couplets');
+              },
+            ),
+            IconButton(
               icon: const Icon(Icons.search, color: Colors.white),
               tooltip: 'Search Bookmarks',
               onPressed: () {
