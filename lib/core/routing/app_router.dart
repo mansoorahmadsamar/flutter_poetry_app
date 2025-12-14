@@ -10,6 +10,7 @@ import '../../features/engagement/screens/bookmark_search_screen.dart';
 import '../../features/engagement/screens/bookmarked_couplets_screen.dart';
 import '../../features/image_poetry/screens/template_selection_screen.dart';
 import '../../features/image_poetry/screens/image_generation_screen.dart';
+import '../../features/image_poetry/screens/generated_image_gallery_screen.dart';
 import '../auth/auth_provider.dart';
 
 /// App routes
@@ -115,6 +116,13 @@ final routerProvider = Provider<GoRouter>((ref) {
             templateId: extra?['templateId'] as String?,
           );
         },
+      ),
+      GoRoute(
+        path: '/image-poetry/couplet/:coupletId/gallery',
+        name: 'couplet-image-gallery',
+        builder: (context, state) => GeneratedImageGalleryScreen(
+          coupletId: state.pathParameters['coupletId']!,
+        ),
       ),
     ],
   );
