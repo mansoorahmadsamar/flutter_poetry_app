@@ -11,6 +11,8 @@ import '../../features/engagement/screens/bookmarked_couplets_screen.dart';
 import '../../features/image_poetry/screens/template_selection_screen.dart';
 import '../../features/image_poetry/screens/image_generation_screen.dart';
 import '../../features/image_poetry/screens/generated_image_gallery_screen.dart';
+import '../../features/image_poetry/screens/saved_images_screen.dart';
+import '../../features/image_poetry/screens/image_detail_screen.dart';
 import '../auth/auth_provider.dart';
 
 /// App routes
@@ -122,6 +124,18 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'couplet-image-gallery',
         builder: (context, state) => GeneratedImageGalleryScreen(
           coupletId: state.pathParameters['coupletId']!,
+        ),
+      ),
+      GoRoute(
+        path: '/image-poetry/saved',
+        name: 'saved-images',
+        builder: (context, state) => const SavedImagesScreen(),
+      ),
+      GoRoute(
+        path: '/image-poetry/image/:imageId',
+        name: 'image-detail',
+        builder: (context, state) => ImageDetailScreen(
+          imageId: state.pathParameters['imageId']!,
         ),
       ),
     ],
