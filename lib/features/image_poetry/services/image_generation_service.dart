@@ -15,6 +15,9 @@ class ImageGenerationService {
     final response = await _dio.post(
       '/api/couplets/$coupletId/generate-image',
       data: request.toJson(),
+      options: Options(
+        receiveTimeout: const Duration(minutes: 2), // 120 seconds for image generation
+      ),
     );
 
     final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
@@ -60,6 +63,9 @@ class ImageGenerationService {
     final response = await _dio.post(
       '/api/users/me/upload-background',
       data: formData,
+      options: Options(
+        receiveTimeout: const Duration(minutes: 2), // 120 seconds for file upload
+      ),
     );
 
     final apiResponse = ApiResponse<String>.fromJson(
