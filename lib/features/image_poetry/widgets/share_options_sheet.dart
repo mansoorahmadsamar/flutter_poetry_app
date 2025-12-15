@@ -59,14 +59,14 @@ class ShareOptionsSheet extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.image),
               title: const Text('Share as Image'),
-              subtitle: const Text('Create beautiful image with template'),
+              subtitle: const Text('Use templates or custom background'),
               trailing: Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: AppSpacing.sm,
                   vertical: AppSpacing.xs,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
+                  color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                 ),
                 child: const Text(
@@ -81,8 +81,7 @@ class ShareOptionsSheet extends StatelessWidget {
               onTap: () {
                 Navigator.pop(context);
                 context.push(
-                  '/image-poetry/templates',
-                  extra: {'coupletId': coupletId},
+                  '/image-poetry/generate/$coupletId',
                 );
               },
             ),

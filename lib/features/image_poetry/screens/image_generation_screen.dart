@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
@@ -39,7 +40,7 @@ class _ImageGenerationScreenState extends ConsumerState<ImageGenerationScreen>
     _tabController = TabController(
       length: 2,
       vsync: this,
-      initialIndex: widget.templateId != null ? 0 : 1,
+      initialIndex: 0, // Always start on Templates tab
     );
   }
 
@@ -277,7 +278,7 @@ class _ImageGenerationScreenState extends ConsumerState<ImageGenerationScreen>
           ),
           SizedBox(height: AppSpacing.md),
           Text(
-            'No Template Selected',
+            'Choose a Template',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
@@ -286,10 +287,25 @@ class _ImageGenerationScreenState extends ConsumerState<ImageGenerationScreen>
           ),
           SizedBox(height: AppSpacing.sm),
           Text(
-            'Please select a template first',
+            'Browse beautiful templates to get started',
             style: TextStyle(
               fontSize: 14,
               color: Colors.grey[500],
+            ),
+          ),
+          SizedBox(height: AppSpacing.lg),
+          ElevatedButton.icon(
+            onPressed: () {
+              context.push(
+                '/image-poetry/templates',
+                extra: {'coupletId': widget.coupletId},
+              );
+            },
+            icon: const Icon(Icons.collections),
+            label: const Text('Browse Templates'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
             ),
           ),
         ],

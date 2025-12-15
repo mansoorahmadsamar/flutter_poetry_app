@@ -151,7 +151,7 @@ class _TemplateSelectionScreenState
   }
 
   Widget _buildCategoryFilters() {
-    const categories = ['NATURE', 'MINIMAL', 'ARTISTIC', 'TRADITIONAL'];
+    const categories = ['CLASSIC', 'MODERN', 'FLORAL', 'GEOMETRIC', 'MINIMAL', 'NATURE'];
 
     return Container(
       padding: EdgeInsets.symmetric(
