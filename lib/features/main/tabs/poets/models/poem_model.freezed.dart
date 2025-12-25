@@ -1715,6 +1715,7 @@ VerseModel _$VerseModelFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$VerseModel {
   String get publicId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'verseText')
   String get text => throw _privateConstructorUsedError;
   String? get verseType => throw _privateConstructorUsedError;
   int? get verseNumber => throw _privateConstructorUsedError;
@@ -1736,7 +1737,10 @@ abstract class $VerseModelCopyWith<$Res> {
       _$VerseModelCopyWithImpl<$Res, VerseModel>;
   @useResult
   $Res call(
-      {String publicId, String text, String? verseType, int? verseNumber});
+      {String publicId,
+      @JsonKey(name: 'verseText') String text,
+      String? verseType,
+      int? verseNumber});
 }
 
 /// @nodoc
@@ -1789,7 +1793,10 @@ abstract class _$$VerseModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String publicId, String text, String? verseType, int? verseNumber});
+      {String publicId,
+      @JsonKey(name: 'verseText') String text,
+      String? verseType,
+      int? verseNumber});
 }
 
 /// @nodoc
@@ -1836,7 +1843,7 @@ class __$$VerseModelImplCopyWithImpl<$Res>
 class _$VerseModelImpl implements _VerseModel {
   const _$VerseModelImpl(
       {required this.publicId,
-      required this.text,
+      @JsonKey(name: 'verseText') required this.text,
       this.verseType,
       this.verseNumber});
 
@@ -1846,6 +1853,7 @@ class _$VerseModelImpl implements _VerseModel {
   @override
   final String publicId;
   @override
+  @JsonKey(name: 'verseText')
   final String text;
   @override
   final String? verseType;
@@ -1895,7 +1903,7 @@ class _$VerseModelImpl implements _VerseModel {
 abstract class _VerseModel implements VerseModel {
   const factory _VerseModel(
       {required final String publicId,
-      required final String text,
+      @JsonKey(name: 'verseText') required final String text,
       final String? verseType,
       final int? verseNumber}) = _$VerseModelImpl;
 
@@ -1905,6 +1913,7 @@ abstract class _VerseModel implements VerseModel {
   @override
   String get publicId;
   @override
+  @JsonKey(name: 'verseText')
   String get text;
   @override
   String? get verseType;
