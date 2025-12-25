@@ -47,11 +47,31 @@ class PoetGalleryTab extends ConsumerWidget {
                       fit: BoxFit.cover,
                       placeholder: (context, url) => Container(
                         color: isDark ? Colors.grey[800] : Colors.grey[300],
+                        child: Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
                       ),
-                      errorWidget: (context, url, error) => Container(
-                        color: isDark ? Colors.grey[800] : Colors.grey[300],
-                        child: Icon(Icons.broken_image),
-                      ),
+                      errorWidget: (context, url, error) {
+                        debugPrint('Image load error: $error');
+                        return Container(
+                          color: isDark ? Colors.grey[800] : Colors.grey[300],
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.broken_image, size: 32),
+                              SizedBox(height: 4),
+                              Text(
+                                'Failed to load',
+                                style: TextStyle(fontSize: 10),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      // Add memory cache configuration
+                      memCacheHeight: 400,
+                      memCacheWidth: 400,
                     ),
                     if (image.isProfileImage)
                       Positioned(

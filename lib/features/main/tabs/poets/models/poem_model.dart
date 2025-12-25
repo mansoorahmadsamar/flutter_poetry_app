@@ -93,7 +93,7 @@ class TagModel with _$TagModel {
 class VerseModel with _$VerseModel {
   const factory VerseModel({
     required String publicId,
-    required String text,
+    @JsonKey(name: 'verseText') required String text,
     String? verseType,
     int? verseNumber,
   }) = _VerseModel;

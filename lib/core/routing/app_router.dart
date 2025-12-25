@@ -7,6 +7,12 @@ import '../../features/main/tabs/poets/screens/poet_detail_screen.dart';
 import '../../features/main/tabs/poets/screens/poem_detail_screen.dart';
 import '../../features/search/screens/poets_search_screen.dart';
 import '../../features/engagement/screens/bookmark_search_screen.dart';
+import '../../features/engagement/screens/bookmarked_couplets_screen.dart';
+import '../../features/image_poetry/screens/template_selection_screen.dart';
+import '../../features/image_poetry/screens/image_generation_screen.dart';
+import '../../features/image_poetry/screens/generated_image_gallery_screen.dart';
+import '../../features/image_poetry/screens/saved_images_screen.dart';
+import '../../features/image_poetry/screens/image_detail_screen.dart';
 import '../auth/auth_provider.dart';
 
 /// App routes
@@ -86,6 +92,51 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/bookmarks/search',
         name: 'bookmark-search',
         builder: (context, state) => const BookmarkSearchScreen(),
+      ),
+      GoRoute(
+        path: '/bookmarks/couplets',
+        name: 'bookmarked-couplets',
+        builder: (context, state) => const BookmarkedCoupletsScreen(),
+      ),
+      // Image poetry routes
+      GoRoute(
+        path: '/image-poetry/templates',
+        name: 'template-selection',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final coupletId = extra?['coupletId'] as String? ?? '';
+          return TemplateSelectionScreen(coupletId: coupletId);
+        },
+      ),
+      GoRoute(
+        path: '/image-poetry/generate/:coupletId',
+        name: 'image-generation',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return ImageGenerationScreen(
+            coupletId: state.pathParameters['coupletId']!,
+            templateId: extra?['templateId'] as String?,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/image-poetry/couplet/:coupletId/gallery',
+        name: 'couplet-image-gallery',
+        builder: (context, state) => GeneratedImageGalleryScreen(
+          coupletId: state.pathParameters['coupletId']!,
+        ),
+      ),
+      GoRoute(
+        path: '/image-poetry/saved',
+        name: 'saved-images',
+        builder: (context, state) => const SavedImagesScreen(),
+      ),
+      GoRoute(
+        path: '/image-poetry/image/:imageId',
+        name: 'image-detail',
+        builder: (context, state) => ImageDetailScreen(
+          imageId: state.pathParameters['imageId']!,
+        ),
       ),
     ],
   );
