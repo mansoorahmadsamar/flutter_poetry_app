@@ -44,25 +44,20 @@ class LoginScreen extends ConsumerWidget {
             children: [
               const Spacer(),
 
-              // App icon
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Icon(
-                  Icons.auto_stories,
-                  size: 60,
-                  color: Colors.white,
+              // App logo
+              Center(
+                child: Image.asset(
+                  'assets/images/logo_image.png',
+                  width: 150,
+                  height: 150,
+                  fit: BoxFit.contain,
                 ),
               ),
               const SizedBox(height: 32),
 
               // Welcome text
               Text(
-                'Welcome to Poetry App',
+                'Welcome to Sukhan',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,

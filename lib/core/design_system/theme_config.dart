@@ -9,8 +9,8 @@ class ThemeConfig {
   /// Get colors based on the current theme type
   static AppColors getColors(AppThemeType themeType) {
     switch (themeType) {
-      case AppThemeType.deepSerenity:
-        return DeepSerenityColors();
+      case AppThemeType.poeticGreen:
+        return PoeticGreenColors();
       // case AppThemeType.passionEarth:
       //   return PassionEarthColors();
       // case AppThemeType.turquoiseSilver:
@@ -32,14 +32,14 @@ ${_getThemeDetails(themeType)}
   /// Get detailed color information for a theme
   static String _getThemeDetails(AppThemeType themeType) {
     switch (themeType) {
-      case AppThemeType.deepSerenity:
+      case AppThemeType.poeticGreen:
         return '''
-Primary Color: Deep Violet (#4A148C)
-Secondary Color: Pure Gold (#FFD700)
-Background: Off-White (#F5F5F5)
-Surface: Deep Slate (#212121)
+Primary Color: Deep Poetic Green (#1B4D3E)
+Secondary Color: Accent Gold (#C5A059)
+Background: Soft Cream (#F5F5DC)
+Surface: Text Charcoal (#2C2C2C)
 
-Perfect for: Poetry apps, elegant & serene interfaces
+Perfect for: Poetry apps, natural & literary interfaces
         ''';
       // Add other themes here
     }
@@ -54,9 +54,9 @@ Perfect for: Poetry apps, elegant & serene interfaces
   static List<ThemeMetadata> getAvailableThemes() {
     return [
       ThemeMetadata(
-        type: AppThemeType.deepSerenity,
-        name: 'Deep Serenity',
-        description: 'Deep Violet & Pure Gold - Elegant and serene',
+        type: AppThemeType.poeticGreen,
+        name: 'Poetic Green',
+        description: 'Deep Green & Accent Gold - Natural and poetic',
         primaryColor: AppColors.primary,
         secondaryColor: AppColors.secondary,
         isAvailable: true,
