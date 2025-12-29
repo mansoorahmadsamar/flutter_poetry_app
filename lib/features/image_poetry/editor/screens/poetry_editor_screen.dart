@@ -1,8 +1,14 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/features/image_poetry/editor/providers/poetry_canvas_provider.dart';
+import 'package:flutter_poetry_app/features/image_poetry/editor/widgets/interactive_poetry_canvas.dart';
+import 'package:flutter_poetry_app/features/image_poetry/editor/widgets/text_styling_toolbar.dart';
+import 'package:flutter_poetry_app/features/image_poetry/editor/services/image_export_service.dart';
 
 class PoetryEditorScreen extends ConsumerStatefulWidget {
   final String? coupletId;
@@ -44,8 +50,6 @@ class _PoetryEditorScreenState extends ConsumerState<PoetryEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final canvasState = ref.watch(poetryCanvasProvider);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Poetry Image Editor'),
@@ -62,27 +66,9 @@ class _PoetryEditorScreenState extends ConsumerState<PoetryEditorScreen> {
       ),
       body: Column(
         children: [
-          // Canvas Area (placeholder for now)
+          // Interactive Canvas Area
           Expanded(
-            child: Container(
-              color: Colors.grey[100],
-              child: Center(
-                child: RepaintBoundary(
-                  key: _canvasKey,
-                  child: Container(
-                    width: 360,
-                    height: 640,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: Colors.grey[300]!),
-                    ),
-                    child: canvasState.textLayers.isEmpty
-                        ? _buildEmptyState()
-                        : _buildCanvasPreview(canvasState),
-                  ),
-                ),
-              ),
-            ),
+            child: InteractivePoetryCanvas(canvasKey: _canvasKey),
           ),
 
           // Action Buttons
@@ -112,6 +98,11 @@ class _PoetryEditorScreenState extends ConsumerState<PoetryEditorScreen> {
                   onPressed: _showBackgroundOptions,
                 ),
                 _ActionButton(
+                  icon: Icons.palette,
+                  label: 'Style',
+                  onPressed: _showStylingToolbar,
+                ),
+                _ActionButton(
                   icon: Icons.layers_outlined,
                   label: 'Layers',
                   onPressed: _showLayersPanel,
@@ -121,83 +112,6 @@ class _PoetryEditorScreenState extends ConsumerState<PoetryEditorScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.palette_outlined,
-            size: 64,
-            color: Colors.grey[400],
-          ),
-          SizedBox(height: AppSpacing.md),
-          Text(
-            'Tap "Add Text" to start creating',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCanvasPreview(canvasState) {
-    return Stack(
-      children: [
-        // Background image (if any)
-        if (canvasState.backgroundImagePath != null)
-          Positioned.fill(
-            child: Image.network(
-              canvasState.backgroundImagePath!,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stack) {
-                return Container(
-                  color: Colors.grey[200],
-                  child: const Icon(Icons.broken_image),
-                );
-              },
-            ),
-          ),
-
-        // Text layers preview (simple version)
-        ...canvasState.textLayers.map((layer) {
-          return Positioned(
-            left: layer.position.dx,
-            top: layer.position.dy,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: layer.backgroundColor ?? Colors.transparent,
-                borderRadius: BorderRadius.circular(4),
-                border: layer.isSelected
-                    ? Border.all(color: AppColors.primary, width: 2)
-                    : null,
-              ),
-              child: Text(
-                layer.text,
-                style: TextStyle(
-                  fontFamily: layer.languageCode == 'ur'
-                      ? 'Jameel Noori Nastaleeq'
-                      : null,
-                  fontSize: layer.fontSize,
-                  color: layer.textColor,
-                  height: layer.lineHeight,
-                ),
-                textDirection: layer.languageCode == 'ur'
-                    ? TextDirection.rtl
-                    : TextDirection.ltr,
-                textAlign: layer.textAlign,
-              ),
-            ),
-          );
-        }),
-      ],
     );
   }
 
@@ -293,7 +207,7 @@ class _PoetryEditorScreenState extends ConsumerState<PoetryEditorScreen> {
                 title: const Text('Solid Color'),
                 onTap: () {
                   Navigator.pop(context);
-                  // TODO: Show color picker
+                  _showColorPicker();
                 },
               ),
               ListTile(
@@ -301,7 +215,7 @@ class _PoetryEditorScreenState extends ConsumerState<PoetryEditorScreen> {
                 title: const Text('Choose Template'),
                 onTap: () {
                   Navigator.pop(context);
-                  // TODO: Navigate to template selection
+                  _navigateToTemplateSelection();
                 },
               ),
               ListTile(
@@ -309,12 +223,90 @@ class _PoetryEditorScreenState extends ConsumerState<PoetryEditorScreen> {
                 title: const Text('Upload Custom Image'),
                 onTap: () {
                   Navigator.pop(context);
-                  // TODO: Image picker
+                  _pickCustomImage();
                 },
               ),
             ],
           ),
         );
+      },
+    );
+  }
+
+  void _showColorPicker() {
+    // TODO: Implement solid color background
+    // For now, just show a simple color picker or predefined colors
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Solid color background coming soon!'),
+      ),
+    );
+  }
+
+  Future<void> _navigateToTemplateSelection() async {
+    // Navigate to template selection screen
+    final result = await context.push('/template-selection');
+
+    if (result != null && result is Map<String, dynamic>) {
+      final templateUrl = result['templateUrl'] as String?;
+      if (templateUrl != null) {
+        ref.read(poetryCanvasProvider.notifier).setBackgroundFromUrl(templateUrl);
+      }
+    }
+  }
+
+  Future<void> _pickCustomImage() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1920,
+        maxHeight: 1920,
+      );
+
+      if (image != null) {
+        final file = File(image.path);
+        ref.read(poetryCanvasProvider.notifier).setBackgroundFromFile(file);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Background image loaded!'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to load image: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  void _showStylingToolbar() {
+    final canvasState = ref.read(poetryCanvasProvider);
+
+    if (canvasState.selectedLayerId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a text layer first'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return TextStylingToolbar(layerId: canvasState.selectedLayerId!);
       },
     );
   }
@@ -373,12 +365,111 @@ class _PoetryEditorScreenState extends ConsumerState<PoetryEditorScreen> {
   }
 
   Future<void> _handleExport() async {
-    // TODO: Implement export with ImageExportService
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Export functionality coming soon!'),
-      ),
-    );
+    try {
+      // Show loading indicator
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              ),
+              SizedBox(width: 16),
+              Text('Exporting image...'),
+            ],
+          ),
+          duration: Duration(seconds: 30),
+        ),
+      );
+
+      // Export to file
+      final exportService = ImageExportService();
+      final file = await exportService.exportToFile(
+        canvasKey: _canvasKey,
+        targetSize: const Size(1080, 1920),
+        format: ImageFormat.png,
+      );
+
+      // Save to gallery
+      final saved = await exportService.saveToGallery(file);
+
+      if (!mounted) return;
+
+      // Hide loading snackbar
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+      if (saved) {
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.check_circle, color: Colors.white),
+                SizedBox(width: 16),
+                Expanded(
+                  child: Text('Image saved to gallery successfully!'),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      } else {
+        // Permission denied or save failed
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.warning, color: Colors.white),
+                SizedBox(width: 16),
+                Expanded(
+                  child: Text('Could not save to gallery. Please check permissions.'),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.orange,
+            action: SnackBarAction(
+              label: 'Settings',
+              textColor: Colors.white,
+              onPressed: () {
+                // Open app settings
+                // Note: This requires adding openAppSettings() from permission_handler
+              },
+            ),
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+
+      // Hide loading snackbar
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.error, color: Colors.white),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text('Export failed: ${e.toString()}'),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+    }
   }
 }
 
