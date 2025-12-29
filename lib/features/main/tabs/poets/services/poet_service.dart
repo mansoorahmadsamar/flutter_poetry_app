@@ -382,9 +382,17 @@ class PoetService {
   }
 
   /// Get poet gallery images
-  Future<List<PoetImageModel>> getPoetGallery(String publicId) async {
+  Future<List<PoetImageModel>> getPoetGallery({
+    required String publicId,
+    String lang = 'ur',
+  }) async {
     try {
-      final response = await _dio.get('$_baseEndpoint/$publicId/gallery');
+      final response = await _dio.get(
+        '$_baseEndpoint/$publicId/gallery',
+        queryParameters: {
+          'lang': lang,
+        },
+      );
 
       final apiResponse = ApiResponse<dynamic>.fromJson(
         response.data,
@@ -440,9 +448,21 @@ class PoetService {
   }
 
   /// Get poet videos
-  Future<List<PoetVideoModel>> getPoetVideos(String publicId) async {
+  /// videoType options: MUSHAIRA, INTERVIEW, DOCUMENTARY, RECITATION, BIOGRAPHY, OTHER
+  Future<List<PoetVideoModel>> getPoetVideos({
+    required String publicId,
+    String? videoType,
+  }) async {
     try {
-      final response = await _dio.get('$_baseEndpoint/$publicId/videos');
+      final queryParams = <String, dynamic>{};
+      if (videoType != null) {
+        queryParams['type'] = videoType;
+      }
+
+      final response = await _dio.get(
+        '$_baseEndpoint/$publicId/videos',
+        queryParameters: queryParams.isNotEmpty ? queryParams : null,
+      );
 
       final apiResponse = ApiResponse<dynamic>.fromJson(
         response.data,
@@ -451,7 +471,7 @@ class PoetService {
 
       if (apiResponse.success && apiResponse.data != null) {
         final List<dynamic> data = apiResponse.data as List<dynamic>;
-        _logger.i('✅ Poet videos fetched successfully - ID: $publicId');
+        _logger.i('✅ Poet videos fetched successfully - ID: $publicId, Type: $videoType');
         return data
             .map((item) => PoetVideoModel.fromJson(item as Map<String, dynamic>))
             .toList();
@@ -460,6 +480,37 @@ class PoetService {
       }
     } on DioException catch (e) {
       _logger.e('❌ Error fetching poet videos: ${e.message}');
+      rethrow;
+    }
+  }
+
+  /// Get poet facts
+  Future<List<String>> getPoetFacts({
+    required String publicId,
+    String lang = 'ur',
+  }) async {
+    try {
+      final response = await _dio.get(
+        '$_baseEndpoint/$publicId/facts',
+        queryParameters: {
+          'lang': lang,
+        },
+      );
+
+      final apiResponse = ApiResponse<dynamic>.fromJson(
+        response.data,
+        (json) => json,
+      );
+
+      if (apiResponse.success && apiResponse.data != null) {
+        final List<dynamic> data = apiResponse.data as List<dynamic>;
+        _logger.i('✅ Poet facts fetched successfully - ID: $publicId');
+        return data.map((item) => item.toString()).toList();
+      } else {
+        throw Exception(apiResponse.message);
+      }
+    } on DioException catch (e) {
+      _logger.e('❌ Error fetching poet facts: ${e.message}');
       rethrow;
     }
   }

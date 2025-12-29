@@ -4,15 +4,19 @@ import 'package:flutter/foundation.dart';
 class PlatformUtils {
   /// Get the correct localhost URL based on platform
   static String getLocalhostUrl(int port) {
-    if (kIsWeb) {
-      return 'http://localhost:$port';
-    } else if (Platform.isAndroid) {
-      // Android emulator uses 10.0.2.2 to access host machine's localhost
-      return 'http://10.0.2.2:$port';
-    } else {
-      // iOS simulator and real devices can use localhost
-      return 'http://localhost:$port';
-    }
+    // Use remote server for testing
+    return 'http://192.168.10.7:$port';
+
+    // Original localhost logic (commented out for remote testing)
+    // if (kIsWeb) {
+    //   return 'http://localhost:$port';
+    // } else if (Platform.isAndroid) {
+    //   // Android emulator uses 10.0.2.2 to access host machine's localhost
+    //   return 'http://10.0.2.2:$port';
+    // } else {
+    //   // iOS simulator and real devices can use localhost
+    //   return 'http://localhost:$port';
+    // }
   }
 
   /// Check if running on Android emulator

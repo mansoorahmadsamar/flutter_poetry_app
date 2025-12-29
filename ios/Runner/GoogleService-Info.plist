@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>381838704656-tcmne96cdg0ko2cgd4bnr84ui7h5f34k.apps.googleusercontent.com</string>
+	<string>381838704656-p6eop70fhpv51ibck93ga9dd4mlt7k33.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.381838704656-tcmne96cdg0ko2cgd4bnr84ui7h5f34k</string>
+	<string>com.googleusercontent.apps.381838704656-p6eop70fhpv51ibck93ga9dd4mlt7k33</string>
 	<key>ANDROID_CLIENT_ID</key>
 	<string>381838704656-4mhqe5ej6tjhtj9p16l4uvoc9bij95dq.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
@@ -15,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.techhikes.poetry</string>
+	<string>com.techhikes.poetryapp</string>
 	<key>PROJECT_ID</key>
 	<string>poetry-world-eaf6c</string>
 	<key>STORAGE_BUCKET</key>
@@ -31,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:381838704656:ios:27aa8db55cb38aa0e88a95</string>
+	<string>1:381838704656:ios:9a91e1b5e1f2985de88a95</string>
 </dict>
 </plist>

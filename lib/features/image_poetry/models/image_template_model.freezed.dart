@@ -255,10 +255,10 @@ class _$ImageTemplateModelImpl implements _ImageTemplateModel {
       {required this.publicId,
       required this.name,
       this.description,
-      required this.category,
-      required this.backgroundImageUrl,
+      this.category = '',
+      this.backgroundImageUrl = '',
       this.thumbnailUrl,
-      required final Map<String, dynamic> layoutConfig,
+      final Map<String, dynamic> layoutConfig = const {},
       this.isPremium = false,
       this.isActive = true,
       this.displayOrder = 0,
@@ -276,14 +276,17 @@ class _$ImageTemplateModelImpl implements _ImageTemplateModel {
   @override
   final String? description;
   @override
+  @JsonKey()
   final String category;
 // NATURE, MINIMAL, ARTISTIC, TRADITIONAL
   @override
+  @JsonKey()
   final String backgroundImageUrl;
   @override
   final String? thumbnailUrl;
   final Map<String, dynamic> _layoutConfig;
   @override
+  @JsonKey()
   Map<String, dynamic> get layoutConfig {
     if (_layoutConfig is EqualUnmodifiableMapView) return _layoutConfig;
     // ignore: implicit_dynamic_type
@@ -379,10 +382,10 @@ abstract class _ImageTemplateModel implements ImageTemplateModel {
       {required final String publicId,
       required final String name,
       final String? description,
-      required final String category,
-      required final String backgroundImageUrl,
+      final String category,
+      final String backgroundImageUrl,
       final String? thumbnailUrl,
-      required final Map<String, dynamic> layoutConfig,
+      final Map<String, dynamic> layoutConfig,
       final bool isPremium,
       final bool isActive,
       final int displayOrder,

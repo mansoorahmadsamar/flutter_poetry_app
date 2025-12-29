@@ -23,7 +23,7 @@
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>GIDClientID</key>
-	<string>381838704656-tcmne96cdg0ko2cgd4bnr84ui7h5f34k.apps.googleusercontent.com</string>
+	<string>381838704656-p6eop70fhpv51ibck93ga9dd4mlt7k33.apps.googleusercontent.com</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
@@ -65,7 +65,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.381838704656-tcmne96cdg0ko2cgd4bnr84ui7h5f34k</string>
+				<string>com.googleusercontent.apps.381838704656-p6eop70fhpv51ibck93ga9dd4mlt7k33</string>
 			</array>
 		</dict>
 	</array>
@@ -75,5 +75,10 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<!-- Photo Library permissions for saving images -->
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>We need access to save your created poetry images to your photo library.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need access to your photo library to select background images for your poetry creations.</string>
 </dict>
 </plist>

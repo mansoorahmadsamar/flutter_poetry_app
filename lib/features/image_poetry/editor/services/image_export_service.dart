@@ -3,8 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:gal/gal.dart';
 import 'package:logger/logger.dart';
 
 enum ImageFormat { png, jpeg }
@@ -61,80 +60,32 @@ class ImageExportService {
     }
   }
 
-  /// Save image to device gallery
+  /// Save image to device gallery using Gal package
+  /// Gal handles permissions automatically
   Future<bool> saveToGallery(File imageFile) async {
     try {
-      _logger.i('Requesting storage permission...');
-
-      // Request storage permission
-      final hasPermission = await _requestStoragePermission();
-
-      if (!hasPermission) {
-        _logger.w('Storage permission denied');
-        return false;
-      }
-
       _logger.i('Saving to gallery: ${imageFile.path}');
 
-      // Save to gallery
-      final result = await ImageGallerySaver.saveFile(
-        imageFile.path,
-        name: 'Poetry_${DateTime.now().millisecondsSinceEpoch}',
-      );
+      // Save to gallery using Gal (handles permissions automatically)
+      await Gal.putImage(imageFile.path);
 
-      final success = result != null && (result['isSuccess'] == true || result['filePath'] != null);
+      _logger.i('✅ Image saved to gallery successfully');
+      return true;
+    } on GalException catch (e) {
+      _logger.e('❌ Gal error saving to gallery: ${e.type}');
 
-      if (success) {
-        _logger.i('✅ Image saved to gallery successfully');
-      } else {
-        _logger.e('❌ Failed to save image to gallery: $result');
+      // Handle specific error types
+      if (e.type == GalExceptionType.accessDenied) {
+        _logger.w('Gallery access denied by user');
+      } else if (e.type == GalExceptionType.notEnoughSpace) {
+        _logger.w('Not enough storage space');
       }
 
-      return success;
+      return false;
     } catch (e) {
-      _logger.e('❌ Error saving to gallery: $e');
+      _logger.e('❌ Unexpected error saving to gallery: $e');
       return false;
     }
-  }
-
-  /// Request storage permission based on platform
-  Future<bool> _requestStoragePermission() async {
-    if (Platform.isAndroid) {
-      // For Android 13+ (API 33+), use photos permission
-      // For Android < 13, use storage permission
-      final androidInfo = await _getAndroidVersion();
-
-      if (androidInfo >= 33) {
-        // Android 13+: Request photos permission
-        final status = await Permission.photos.request();
-        return status.isGranted;
-      } else {
-        // Android < 13: Request storage permission
-        final status = await Permission.storage.request();
-        return status.isGranted;
-      }
-    } else if (Platform.isIOS) {
-      // iOS: Request photos permission
-      final status = await Permission.photos.request();
-      return status.isGranted;
-    }
-
-    // For other platforms, assume permission granted
-    return true;
-  }
-
-  /// Get Android SDK version
-  Future<int> _getAndroidVersion() async {
-    if (Platform.isAndroid) {
-      try {
-        // This is a simplified version - you might need platform channels for exact version
-        return 33; // Assume Android 13+ for now (safer approach)
-      } catch (e) {
-        _logger.w('Could not determine Android version: $e');
-        return 33;
-      }
-    }
-    return 0;
   }
 
   /// Export and save in one step

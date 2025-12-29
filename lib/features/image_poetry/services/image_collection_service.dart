@@ -34,7 +34,7 @@ class ImageCollectionService {
   Future<PaginatedResponse<GeneratedImageModel>> getSavedImages({
     String? collectionName,
     bool? favoritesOnly,
-    int page = 1,
+    int page = 0,
     int size = 20,
   }) async {
     final queryParams = <String, dynamic>{
