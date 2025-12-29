@@ -88,6 +88,10 @@ dependencies:
   photo_view: ^0.14.0  # Zoomable image viewer
   flutter_colorpicker: ^1.0.3  # Color picker for customization
 
+  # Poetry Image Editor (Canvas-based)
+  image_gallery_saver: ^2.0.3  # Save images to gallery
+  permission_handler: ^11.3.0  # Handle gallery permissions
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -13,6 +13,7 @@ import '../../features/image_poetry/screens/image_generation_screen.dart';
 import '../../features/image_poetry/screens/generated_image_gallery_screen.dart';
 import '../../features/image_poetry/screens/saved_images_screen.dart';
 import '../../features/image_poetry/screens/image_detail_screen.dart';
+import '../../features/image_poetry/editor/screens/poetry_editor_screen.dart';
 import '../auth/auth_provider.dart';
 
 /// App routes
@@ -137,6 +138,18 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => ImageDetailScreen(
           imageId: state.pathParameters['imageId']!,
         ),
+      ),
+      // Poetry Editor (NEW - Canvas-based editor)
+      GoRoute(
+        path: '/poetry-editor',
+        name: 'poetry-editor',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return PoetryEditorScreen(
+            coupletId: extra?['coupletId'] as String?,
+            initialVerses: extra?['verses'] as List<String>?,
+          );
+        },
       ),
     ],
   );
