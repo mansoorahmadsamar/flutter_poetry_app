@@ -245,7 +245,7 @@ class _PoetryEditorScreenState extends ConsumerState<PoetryEditorScreen> {
 
   Future<void> _navigateToTemplateSelection() async {
     // Navigate to template selection screen
-    final result = await context.push('/template-selection');
+    final result = await context.push('/image-poetry/templates');
 
     if (result != null && result is Map<String, dynamic>) {
       final templateUrl = result['templateUrl'] as String?;

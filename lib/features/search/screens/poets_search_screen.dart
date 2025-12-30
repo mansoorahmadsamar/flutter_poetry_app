@@ -26,8 +26,9 @@ class _PoetsSearchScreenState extends ConsumerState<PoetsSearchScreen> {
   @override
   void initState() {
     super.initState();
-    // Autofocus the search field
+    // Clear any previous search results and reset to empty state
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(searchPaginationProvider.notifier).reset();
       _focusNode.requestFocus();
     });
   }

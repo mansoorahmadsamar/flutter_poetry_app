@@ -329,9 +329,35 @@ class _TemplateSelectionScreenState
   }
 
   void _selectTemplate(String templateId) {
-    context.push(
-      '/image-poetry/generate/${widget.coupletId}',
-      extra: {'templateId': templateId},
-    );
+    // If coupletId is empty, we're being called from the canvas editor
+    // Return the template data instead of navigating
+    if (widget.coupletId.isEmpty) {
+      // Get the template details
+      final templatesAsync = ref.read(templatesProvider(
+        TemplateParams(
+          category: _selectedCategory,
+          isPremium: _premiumFilter,
+        ),
+      ));
+
+      templatesAsync.whenData((paginatedResponse) {
+        final template = paginatedResponse.content.firstWhere(
+          (t) => t.publicId == templateId,
+          orElse: () => paginatedResponse.content.first,
+        );
+
+        // Return template URL to editor
+        context.pop({
+          'templateUrl': template.backgroundImageUrl,
+          'templateId': templateId,
+        });
+      });
+    } else {
+      // Original flow: navigate to server-side generation
+      context.push(
+        '/image-poetry/generate/${widget.coupletId}',
+        extra: {'templateId': templateId},
+      );
+    }
   }
 }
