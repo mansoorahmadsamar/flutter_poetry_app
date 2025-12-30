@@ -20,6 +20,10 @@ _$PoetModelImpl _$$PoetModelImplFromJson(Map<String, dynamic> json) =>
       viewCount: (json['viewCount'] as num).toInt(),
       isFeatured: json['isFeatured'] as bool,
       isTrending: json['isTrending'] as bool,
+      birthPlace: json['birthPlace'] as String?,
+      country: json['country'] as String?,
+      countryFlag: json['countryFlag'] as String?,
+      countryFlagUrl: json['countryFlagUrl'] as String?,
       topTags:
           (json['topTags'] as List<dynamic>?)?.map((e) => e as String).toList(),
     );
@@ -38,5 +42,9 @@ Map<String, dynamic> _$$PoetModelImplToJson(_$PoetModelImpl instance) =>
       'viewCount': instance.viewCount,
       'isFeatured': instance.isFeatured,
       'isTrending': instance.isTrending,
+      'birthPlace': instance.birthPlace,
+      'country': instance.country,
+      'countryFlag': instance.countryFlag,
+      'countryFlagUrl': instance.countryFlagUrl,
       'topTags': instance.topTags,
     };

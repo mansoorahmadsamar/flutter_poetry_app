@@ -40,9 +40,6 @@ class _InteractivePoetryCanvasState
 
     return GestureDetector(
       onTapDown: (details) => _handleTapDown(details, canvasState),
-      onPanStart: _handlePanStart,
-      onPanUpdate: (details) => _handlePanUpdate(details, canvasState),
-      onPanEnd: _handlePanEnd,
       onScaleStart: (details) => _handleScaleStart(details, canvasState),
       onScaleUpdate: (details) => _handleScaleUpdate(details, canvasState),
       onScaleEnd: _handleScaleEnd,
@@ -118,29 +115,11 @@ class _InteractivePoetryCanvasState
     }
   }
 
-  void _handlePanStart(DragStartDetails details) {
-    _lastFocalPoint = details.localPosition;
-  }
-
-  void _handlePanUpdate(DragUpdateDetails details, CanvasStateModel canvasState) {
-    if (canvasState.selectedLayerId == null) return;
-
-    final delta = details.localPosition - (_lastFocalPoint ?? details.localPosition);
-    _lastFocalPoint = details.localPosition;
-
-    // Move the selected layer
-    ref.read(poetryCanvasProvider.notifier).moveLayer(
-          canvasState.selectedLayerId!,
-          delta,
-        );
-  }
-
-  void _handlePanEnd(DragEndDetails details) {
-    _lastFocalPoint = null;
-  }
-
   void _handleScaleStart(ScaleStartDetails details, CanvasStateModel canvasState) {
     if (canvasState.selectedLayerId == null) return;
+
+    // Store initial focal point for dragging
+    _lastFocalPoint = details.focalPoint;
 
     final selectedLayer = canvasState.textLayers.firstWhere(
       (l) => l.id == canvasState.selectedLayerId,
@@ -153,8 +132,17 @@ class _InteractivePoetryCanvasState
   void _handleScaleUpdate(ScaleUpdateDetails details, CanvasStateModel canvasState) {
     if (canvasState.selectedLayerId == null) return;
 
-    // Two-finger gesture: scale and rotate
-    if (details.pointerCount == 2) {
+    if (details.pointerCount == 1) {
+      // Single-finger gesture: drag/move
+      final delta = details.focalPoint - (_lastFocalPoint ?? details.focalPoint);
+      _lastFocalPoint = details.focalPoint;
+
+      ref.read(poetryCanvasProvider.notifier).moveLayer(
+            canvasState.selectedLayerId!,
+            delta,
+          );
+    } else if (details.pointerCount == 2) {
+      // Two-finger gesture: scale and rotate
       // Scale
       final newScale = _initialScale * details.scale;
       ref.read(poetryCanvasProvider.notifier).scaleLayer(
@@ -173,6 +161,7 @@ class _InteractivePoetryCanvasState
 
   void _handleScaleEnd(ScaleEndDetails details) {
     // Reset initial values
+    _lastFocalPoint = null;
     _initialScale = 1.0;
     _initialRotation = 0.0;
   }

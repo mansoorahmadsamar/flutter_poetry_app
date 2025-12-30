@@ -18,6 +18,10 @@ class PoetModel with _$PoetModel {
     required int viewCount,
     @JsonKey(name: 'isFeatured') required bool isFeatured,
     @JsonKey(name: 'isTrending') required bool isTrending,
+    @JsonKey(name: 'birthPlace') String? birthPlace,
+    String? country,
+    @JsonKey(name: 'countryFlag') String? countryFlag,
+    @JsonKey(name: 'countryFlagUrl') String? countryFlagUrl,
     @JsonKey(name: 'topTags') List<String>? topTags,
   }) = _PoetModel;
 

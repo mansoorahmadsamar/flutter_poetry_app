@@ -38,6 +38,13 @@ mixin _$PoetModel {
   bool get isFeatured => throw _privateConstructorUsedError;
   @JsonKey(name: 'isTrending')
   bool get isTrending => throw _privateConstructorUsedError;
+  @JsonKey(name: 'birthPlace')
+  String? get birthPlace => throw _privateConstructorUsedError;
+  String? get country => throw _privateConstructorUsedError;
+  @JsonKey(name: 'countryFlag')
+  String? get countryFlag => throw _privateConstructorUsedError;
+  @JsonKey(name: 'countryFlagUrl')
+  String? get countryFlagUrl => throw _privateConstructorUsedError;
   @JsonKey(name: 'topTags')
   List<String>? get topTags => throw _privateConstructorUsedError;
 
@@ -69,6 +76,10 @@ abstract class $PoetModelCopyWith<$Res> {
       int viewCount,
       @JsonKey(name: 'isFeatured') bool isFeatured,
       @JsonKey(name: 'isTrending') bool isTrending,
+      @JsonKey(name: 'birthPlace') String? birthPlace,
+      String? country,
+      @JsonKey(name: 'countryFlag') String? countryFlag,
+      @JsonKey(name: 'countryFlagUrl') String? countryFlagUrl,
       @JsonKey(name: 'topTags') List<String>? topTags});
 }
 
@@ -99,6 +110,10 @@ class _$PoetModelCopyWithImpl<$Res, $Val extends PoetModel>
     Object? viewCount = null,
     Object? isFeatured = null,
     Object? isTrending = null,
+    Object? birthPlace = freezed,
+    Object? country = freezed,
+    Object? countryFlag = freezed,
+    Object? countryFlagUrl = freezed,
     Object? topTags = freezed,
   }) {
     return _then(_value.copyWith(
@@ -150,6 +165,22 @@ class _$PoetModelCopyWithImpl<$Res, $Val extends PoetModel>
           ? _value.isTrending
           : isTrending // ignore: cast_nullable_to_non_nullable
               as bool,
+      birthPlace: freezed == birthPlace
+          ? _value.birthPlace
+          : birthPlace // ignore: cast_nullable_to_non_nullable
+              as String?,
+      country: freezed == country
+          ? _value.country
+          : country // ignore: cast_nullable_to_non_nullable
+              as String?,
+      countryFlag: freezed == countryFlag
+          ? _value.countryFlag
+          : countryFlag // ignore: cast_nullable_to_non_nullable
+              as String?,
+      countryFlagUrl: freezed == countryFlagUrl
+          ? _value.countryFlagUrl
+          : countryFlagUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
       topTags: freezed == topTags
           ? _value.topTags
           : topTags // ignore: cast_nullable_to_non_nullable
@@ -179,6 +210,10 @@ abstract class _$$PoetModelImplCopyWith<$Res>
       int viewCount,
       @JsonKey(name: 'isFeatured') bool isFeatured,
       @JsonKey(name: 'isTrending') bool isTrending,
+      @JsonKey(name: 'birthPlace') String? birthPlace,
+      String? country,
+      @JsonKey(name: 'countryFlag') String? countryFlag,
+      @JsonKey(name: 'countryFlagUrl') String? countryFlagUrl,
       @JsonKey(name: 'topTags') List<String>? topTags});
 }
 
@@ -207,6 +242,10 @@ class __$$PoetModelImplCopyWithImpl<$Res>
     Object? viewCount = null,
     Object? isFeatured = null,
     Object? isTrending = null,
+    Object? birthPlace = freezed,
+    Object? country = freezed,
+    Object? countryFlag = freezed,
+    Object? countryFlagUrl = freezed,
     Object? topTags = freezed,
   }) {
     return _then(_$PoetModelImpl(
@@ -258,6 +297,22 @@ class __$$PoetModelImplCopyWithImpl<$Res>
           ? _value.isTrending
           : isTrending // ignore: cast_nullable_to_non_nullable
               as bool,
+      birthPlace: freezed == birthPlace
+          ? _value.birthPlace
+          : birthPlace // ignore: cast_nullable_to_non_nullable
+              as String?,
+      country: freezed == country
+          ? _value.country
+          : country // ignore: cast_nullable_to_non_nullable
+              as String?,
+      countryFlag: freezed == countryFlag
+          ? _value.countryFlag
+          : countryFlag // ignore: cast_nullable_to_non_nullable
+              as String?,
+      countryFlagUrl: freezed == countryFlagUrl
+          ? _value.countryFlagUrl
+          : countryFlagUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
       topTags: freezed == topTags
           ? _value._topTags
           : topTags // ignore: cast_nullable_to_non_nullable
@@ -282,6 +337,10 @@ class _$PoetModelImpl implements _PoetModel {
       required this.viewCount,
       @JsonKey(name: 'isFeatured') required this.isFeatured,
       @JsonKey(name: 'isTrending') required this.isTrending,
+      @JsonKey(name: 'birthPlace') this.birthPlace,
+      this.country,
+      @JsonKey(name: 'countryFlag') this.countryFlag,
+      @JsonKey(name: 'countryFlagUrl') this.countryFlagUrl,
       @JsonKey(name: 'topTags') final List<String>? topTags})
       : _topTags = topTags;
 
@@ -318,6 +377,17 @@ class _$PoetModelImpl implements _PoetModel {
   @override
   @JsonKey(name: 'isTrending')
   final bool isTrending;
+  @override
+  @JsonKey(name: 'birthPlace')
+  final String? birthPlace;
+  @override
+  final String? country;
+  @override
+  @JsonKey(name: 'countryFlag')
+  final String? countryFlag;
+  @override
+  @JsonKey(name: 'countryFlagUrl')
+  final String? countryFlagUrl;
   final List<String>? _topTags;
   @override
   @JsonKey(name: 'topTags')
@@ -331,7 +401,7 @@ class _$PoetModelImpl implements _PoetModel {
 
   @override
   String toString() {
-    return 'PoetModel(publicId: $publicId, name: $name, shortBio: $shortBio, birthYear: $birthYear, deathYear: $deathYear, profileImageUrl: $profileImageUrl, gender: $gender, era: $era, poemCount: $poemCount, viewCount: $viewCount, isFeatured: $isFeatured, isTrending: $isTrending, topTags: $topTags)';
+    return 'PoetModel(publicId: $publicId, name: $name, shortBio: $shortBio, birthYear: $birthYear, deathYear: $deathYear, profileImageUrl: $profileImageUrl, gender: $gender, era: $era, poemCount: $poemCount, viewCount: $viewCount, isFeatured: $isFeatured, isTrending: $isTrending, birthPlace: $birthPlace, country: $country, countryFlag: $countryFlag, countryFlagUrl: $countryFlagUrl, topTags: $topTags)';
   }
 
   @override
@@ -360,6 +430,13 @@ class _$PoetModelImpl implements _PoetModel {
                 other.isFeatured == isFeatured) &&
             (identical(other.isTrending, isTrending) ||
                 other.isTrending == isTrending) &&
+            (identical(other.birthPlace, birthPlace) ||
+                other.birthPlace == birthPlace) &&
+            (identical(other.country, country) || other.country == country) &&
+            (identical(other.countryFlag, countryFlag) ||
+                other.countryFlag == countryFlag) &&
+            (identical(other.countryFlagUrl, countryFlagUrl) ||
+                other.countryFlagUrl == countryFlagUrl) &&
             const DeepCollectionEquality().equals(other._topTags, _topTags));
   }
 
@@ -379,6 +456,10 @@ class _$PoetModelImpl implements _PoetModel {
       viewCount,
       isFeatured,
       isTrending,
+      birthPlace,
+      country,
+      countryFlag,
+      countryFlagUrl,
       const DeepCollectionEquality().hash(_topTags));
 
   /// Create a copy of PoetModel
@@ -411,6 +492,10 @@ abstract class _PoetModel implements PoetModel {
       required final int viewCount,
       @JsonKey(name: 'isFeatured') required final bool isFeatured,
       @JsonKey(name: 'isTrending') required final bool isTrending,
+      @JsonKey(name: 'birthPlace') final String? birthPlace,
+      final String? country,
+      @JsonKey(name: 'countryFlag') final String? countryFlag,
+      @JsonKey(name: 'countryFlagUrl') final String? countryFlagUrl,
       @JsonKey(name: 'topTags') final List<String>? topTags}) = _$PoetModelImpl;
 
   factory _PoetModel.fromJson(Map<String, dynamic> json) =
@@ -444,6 +529,17 @@ abstract class _PoetModel implements PoetModel {
   @override
   @JsonKey(name: 'isTrending')
   bool get isTrending;
+  @override
+  @JsonKey(name: 'birthPlace')
+  String? get birthPlace;
+  @override
+  String? get country;
+  @override
+  @JsonKey(name: 'countryFlag')
+  String? get countryFlag;
+  @override
+  @JsonKey(name: 'countryFlagUrl')
+  String? get countryFlagUrl;
   @override
   @JsonKey(name: 'topTags')
   List<String>? get topTags;

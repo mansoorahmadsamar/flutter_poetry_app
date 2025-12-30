@@ -229,10 +229,10 @@ class _PoetsListScreenState extends ConsumerState<PoetsListScreen> {
           childCount: paginationState.poets.length,
         ),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.65,
-          crossAxisSpacing: AppSpacing.md,
-          mainAxisSpacing: AppSpacing.md,
+          crossAxisCount: 3,
+          childAspectRatio: 0.52,
+          crossAxisSpacing: AppSpacing.sm,
+          mainAxisSpacing: AppSpacing.sm,
         ),
       ),
     );

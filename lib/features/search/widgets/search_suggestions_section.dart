@@ -51,6 +51,9 @@ class SearchSuggestionsSection extends ConsumerWidget {
                           name: poet.name,
                           era: poet.era,
                           poemCount: poet.poemCount,
+                          birthPlace: poet.birthPlace,
+                          country: poet.country,
+                          countryFlag: poet.countryFlag,
                           onTap: () {
                             context.push('/main/poets/${poet.publicId}');
                           },
@@ -86,6 +89,9 @@ class _SuggestedPoetCard extends StatelessWidget {
   final String name;
   final String? era;
   final int poemCount;
+  final String? birthPlace;
+  final String? country;
+  final String? countryFlag;
   final VoidCallback onTap;
 
   const _SuggestedPoetCard({
@@ -93,6 +99,9 @@ class _SuggestedPoetCard extends StatelessWidget {
     required this.name,
     this.era,
     required this.poemCount,
+    this.birthPlace,
+    this.country,
+    this.countryFlag,
     required this.onTap,
   });
 
@@ -185,6 +194,37 @@ class _SuggestedPoetCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: AppSpacing.xs),
+                  // Location with Country Flag
+                  if (birthPlace != null || country != null)
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (countryFlag != null)
+                          Text(
+                            countryFlag!,
+                            style: const TextStyle(fontSize: 10),
+                          ),
+                        if (countryFlag != null &&
+                            (birthPlace != null || country != null))
+                          const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            birthPlace ?? country!,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(
+                                  color: Colors.grey[600],
+                                  fontSize: 10,
+                                ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  if (birthPlace != null || country != null)
+                    const SizedBox(height: AppSpacing.xs),
                   Row(
                     children: [
                       Icon(

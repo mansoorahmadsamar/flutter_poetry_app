@@ -60,10 +60,10 @@ class _SearchResultsGridState extends ConsumerState<SearchResultsGrid> {
           // Results grid
           SliverGrid(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.65,
-              crossAxisSpacing: AppSpacing.md,
-              mainAxisSpacing: AppSpacing.md,
+              crossAxisCount: 3,
+              childAspectRatio: 0.52,
+              crossAxisSpacing: AppSpacing.sm,
+              mainAxisSpacing: AppSpacing.sm,
             ),
             delegate: SliverChildBuilderDelegate(
               (context, index) {
