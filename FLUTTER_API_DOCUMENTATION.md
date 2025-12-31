@@ -1,10 +1,43 @@
 # Poetry Backend API - Flutter Mobile App Documentation
 
 **Version:** 1.0.0
-**Last Updated:** December 28, 2025
+**Last Updated:** December 31, 2025
 **Base URL (Production):** `https://api.poetry.com`
 **Base URL (Development):** `https://dev-api.poetry.com`
 **Base URL (Local):** `http://localhost:8080`
+
+---
+
+## Recent Updates (December 2025)
+
+### Bookmark Language Context Preservation (Phase 1 & 2)
+
+**What's New:**
+- ✅ **Language-Aware Bookmarks**: All bookmark endpoints (poems, couplets, images) now accept a `lang` query parameter
+- ✅ **Multi-Language Bookmark Display**: Bookmarks preserve the language context in which they were created
+- ✅ **Image Poetry Bookmarks**: New bookmark system for generated poetry images (separate from collections)
+- ✅ **Cross-Language Filtering**: Filter bookmarks by language or view all in mixed languages
+
+**Key Features:**
+1. **Bookmark in Any Language**: When users bookmark content in Urdu, English, or Hindi, that language context is preserved
+2. **Natural Mixed Display**: Bookmark screens show content in their original bookmarked languages (Urdu poems in Urdu, English in English)
+3. **Optional Language Filtering**: Filter bookmarks by specific language or view all together
+4. **Three Bookmark Types**: Poems, couplets, and generated poetry images all support language-aware bookmarking
+
+**New Endpoints:**
+- `POST /api/poetry-images/{imageId}/bookmark?lang=ur` - Bookmark generated image
+- `GET /api/users/me/image-bookmarks?lang=ur` - Get bookmarked images with language filter
+- `GET /api/poetry-images/{imageId}/is-bookmarked` - Check bookmark status
+
+**Updated Endpoints:**
+- `POST /api/poems/{publicId}/bookmark?lang=ur` - Now accepts language parameter
+- `POST /api/couplets/{coupletPublicId}/bookmark?lang=ur` - Now accepts language parameter
+
+**Migration Notes for Flutter Developers:**
+- All existing bookmark calls will continue to work (default: `lang=ur`)
+- To support multi-language bookmarks, pass the current app language when calling bookmark endpoints
+- When displaying bookmarks, respect the stored `languageCode` field for each bookmark
+- Use language filtering for dedicated language-specific bookmark screens
 
 ---
 
@@ -114,14 +147,17 @@
   - [7.3.1 Generate Image for Couplet](#731-generate-image-for-couplet)
   - [7.3.2 Upload Custom Background](#732-upload-custom-background)
   - [7.3.3 Get Couplet Images](#733-get-couplet-images)
-- [7.4 User Collections](#74-user-collections)
-  - [7.4.1 Save Image to Collection](#741-save-image-to-collection)
-  - [7.4.2 Get Saved Images](#742-get-saved-images)
-  - [7.4.3 Get Collection Names](#743-get-collection-names)
-  - [7.4.4 Toggle Favorite](#744-toggle-favorite)
-  - [7.4.5 Remove from Collection](#745-remove-from-collection)
-  - [7.4.6 Get Collection Statistics](#746-get-collection-statistics)
-- [7.5 Use Cases & Workflows](#75-use-cases-workflows)
+- [7.4 Upload Custom Background](#74-upload-custom-background)
+- [7.5 User Collections & Bookmarks](#75-user-collections-bookmarks)
+  - [7.5.1 Save Image to Collection](#751-save-image-to-collection)
+  - [7.5.2 Get Saved Images](#752-get-saved-images)
+  - [7.5.3 Toggle Favorite](#753-toggle-favorite)
+  - [7.5.4 Remove from Collection](#754-remove-from-collection)
+  - [7.5.5 Get Collection Names](#755-get-collection-names)
+  - [7.5.6 Get Collection Statistics](#756-get-collection-statistics)
+  - [7.5.7 Toggle Image Bookmark (NEW)](#757-toggle-image-bookmark-new)
+  - [7.5.8 Get Bookmarked Images (NEW)](#758-get-bookmarked-images-new)
+  - [7.5.9 Check Image Bookmark Status (NEW)](#759-check-image-bookmark-status-new)
 
 ### 8. Book Management
 - [8.1 Overview](#81-overview-books)
@@ -1888,12 +1924,15 @@ Authorization: Bearer <access_token>
 
 ### 4.8 Toggle Bookmark
 
-**Endpoint:** `POST /api/poems/{publicId}/bookmark`
+**Endpoint:** `POST /api/poems/{publicId}/bookmark?lang=ur`
 
-**Description:** Bookmark or unbookmark a poem (toggles)
+**Description:** Bookmark or unbookmark a poem (toggles). The language parameter preserves the language context in which the user bookmarked the content.
 
 **Path Parameters:**
 - `publicId`: Public ID of the poem
+
+**Query Parameters:**
+- `lang` (optional, default: "ur"): Language code when bookmarking (ur, en, hi, etc.). This is stored with the bookmark so the content can be displayed in the bookmarked language later.
 
 **Request Headers:**
 ```
@@ -4030,17 +4069,20 @@ IconButton(
 
 #### 6.3.2 Bookmark Couplet {#632-bookmark-couplet}
 
-**Endpoint:** `POST /api/couplets/{coupletPublicId}/bookmark`
+**Endpoint:** `POST /api/couplets/{coupletPublicId}/bookmark?lang=ur`
 
 **Authentication Required:** Yes
 
 **Description:**
-Toggle bookmark status on a couplet for later reference. Bookmarked couplets appear in user's collection.
+Toggle bookmark status on a couplet for later reference. Bookmarked couplets appear in user's collection. The language parameter preserves the language context in which the user bookmarked the content.
 
 **Path Parameters:**
 - `coupletPublicId` (required): Public ID of the couplet
 
-**Example:** `POST /api/couplets/couplet_abc123/bookmark`
+**Query Parameters:**
+- `lang` (optional, default: "ur"): Language code when bookmarking (ur, en, hi, etc.). This is stored with the bookmark so the content can be displayed in the bookmarked language later.
+
+**Example:** `POST /api/couplets/couplet_abc123/bookmark?lang=ur`
 
 **Success Response (200):**
 ```json
@@ -4659,15 +4701,274 @@ Upload custom image (multipart/form-data, max 5MB).
 
 ---
 
-### 7.5 User Collections
+### 7.5 User Collections & Bookmarks
 
-**Save Image:** `POST /api/poetry-images/{imageId}/save`
+This section covers both traditional collections (save/favorite) and the new bookmark system for generated poetry images.
 
-**Get Saved:** `GET /api/users/me/saved-images?page=0`
+---
 
-**Toggle Favorite:** `POST /api/poetry-images/{imageId}/toggle-favorite`
+#### 7.5.1 Save Image to Collection
 
-**Remove:** `DELETE /api/users/me/saved-images/{imageId}`
+**Endpoint:** `POST /api/poetry-images/{imageId}/save`
+
+**Authentication Required:** Yes
+
+**Description:** Save a generated poetry image to user's collection with optional collection name and favorite flag.
+
+**Path Parameters:**
+- `imageId` (required): Public ID of the generated image
+
+**Request Body:**
+```json
+{
+  "collectionName": "My Favorites",
+  "isFavorite": true
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Image saved to collection"
+}
+```
+
+---
+
+#### 7.5.2 Get Saved Images
+
+**Endpoint:** `GET /api/users/me/saved-images?page=0&size=20&collectionName=My%20Favorites&favoritesOnly=true`
+
+**Authentication Required:** Yes
+
+**Description:** Retrieve user's saved images with optional filtering by collection name or favorites.
+
+**Query Parameters:**
+- `page` (optional, default: 0): Page number
+- `size` (optional, default: 20): Page size
+- `collectionName` (optional): Filter by specific collection name
+- `favoritesOnly` (optional): If true, only return favorite images
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Saved images retrieved",
+  "data": {
+    "content": [{
+      "publicId": "img_xyz789",
+      "imageUrl": "https://cdn.poetry.com/generated/img_xyz789.jpg",
+      "thumbnailUrl": "https://cdn.poetry.com/generated/thumbs/img_xyz789.jpg",
+      "createdAt": "2024-01-15T10:30:00Z"
+    }],
+    "totalElements": 45,
+    "totalPages": 3
+  }
+}
+```
+
+---
+
+#### 7.5.3 Toggle Favorite
+
+**Endpoint:** `POST /api/poetry-images/{imageId}/toggle-favorite`
+
+**Authentication Required:** Yes
+
+**Description:** Toggle favorite status on a saved image.
+
+**Path Parameters:**
+- `imageId` (required): Public ID of the generated image
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Favorite toggled",
+  "data": true
+}
+```
+
+---
+
+#### 7.5.4 Remove from Collection
+
+**Endpoint:** `DELETE /api/users/me/saved-images/{imageId}`
+
+**Authentication Required:** Yes
+
+**Description:** Remove a saved image from user's collection.
+
+**Path Parameters:**
+- `imageId` (required): Public ID of the generated image
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Image removed from collection"
+}
+```
+
+---
+
+#### 7.5.5 Get Collection Names
+
+**Endpoint:** `GET /api/users/me/collection-names`
+
+**Authentication Required:** Yes
+
+**Description:** Get list of all collection names created by the user.
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Collection names retrieved",
+  "data": [
+    "My Favorites",
+    "Ghalib Special",
+    "Love Poetry"
+  ]
+}
+```
+
+---
+
+#### 7.5.6 Get Collection Statistics
+
+**Endpoint:** `GET /api/users/me/collection-stats`
+
+**Authentication Required:** Yes
+
+**Description:** Get statistics about user's image collections.
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Stats retrieved",
+  "data": {
+    "totalImages": 45,
+    "favoriteCount": 12,
+    "collectionCount": 3,
+    "collectionNames": [
+      "My Favorites",
+      "Ghalib Special",
+      "Love Poetry"
+    ]
+  }
+}
+```
+
+---
+
+#### 7.5.7 Toggle Image Bookmark (NEW)
+
+**Endpoint:** `POST /api/poetry-images/{imageId}/bookmark?lang=ur`
+
+**Authentication Required:** Yes
+
+**Description:**
+Bookmark or unbookmark a generated poetry image (toggles). Similar to poem and couplet bookmarks, this preserves the language context in which the user bookmarked the image. This is separate from the collection/favorite system and is used for quick access to bookmarked images.
+
+**Path Parameters:**
+- `imageId` (required): Public ID of the generated poetry image
+
+**Query Parameters:**
+- `lang` (optional, default: "ur"): Language code when bookmarking (ur, en, hi, etc.). This is stored with the bookmark so the image can be displayed with the correct language context later.
+
+**Example:** `POST /api/poetry-images/img_xyz789/bookmark?lang=ur`
+
+**Success Response (200) - Bookmarked:**
+```json
+{
+  "success": true,
+  "message": "Image bookmarked successfully",
+  "data": true
+}
+```
+
+**Success Response (200) - Unbookmarked:**
+```json
+{
+  "success": true,
+  "message": "Bookmark removed successfully",
+  "data": false
+}
+```
+
+**Note:** Creates engagement activity record for personalization and analytics.
+
+---
+
+#### 7.5.8 Get Bookmarked Images (NEW)
+
+**Endpoint:** `GET /api/users/me/image-bookmarks?page=0&size=20&lang=ur`
+
+**Authentication Required:** Yes
+
+**Description:**
+Retrieve user's bookmarked images with optional language filtering. Bookmarks are returned in their original bookmarked language to preserve context.
+
+**Query Parameters:**
+- `page` (optional, default: 0): Page number
+- `size` (optional, default: 20): Page size
+- `lang` (optional): Filter bookmarks by language code. If omitted, returns all bookmarked images regardless of language.
+
+**Example:** `GET /api/users/me/image-bookmarks?page=0&size=20&lang=ur`
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Bookmarked images retrieved successfully",
+  "data": {
+    "content": [{
+      "publicId": "img_xyz789",
+      "imageUrl": "https://cdn.poetry.com/generated/img_xyz789.jpg",
+      "thumbnailUrl": "https://cdn.poetry.com/generated/thumbs/img_xyz789.jpg",
+      "bookmarkedAt": "2024-01-15T10:30:00Z",
+      "languageCode": "ur"
+    }],
+    "totalElements": 25,
+    "totalPages": 2
+  }
+}
+```
+
+**Usage Notes:**
+- Mixed language bookmarks: If a user has bookmarked images in multiple languages (Urdu, English, Hindi), omitting the `lang` parameter returns all bookmarks, each displaying in its original bookmarked language.
+- Language filtering: Use `lang=ur` to see only Urdu bookmarks, `lang=en` for English, etc.
+- This is separate from the collection system - an image can be both bookmarked AND saved to a collection.
+
+---
+
+#### 7.5.9 Check Image Bookmark Status (NEW)
+
+**Endpoint:** `GET /api/poetry-images/{imageId}/is-bookmarked`
+
+**Authentication Required:** Optional (returns false if not authenticated)
+
+**Description:**
+Check if a specific image is bookmarked by the current user. Useful for displaying bookmark button state in the UI.
+
+**Path Parameters:**
+- `imageId` (required): Public ID of the generated poetry image
+
+**Example:** `GET /api/poetry-images/img_xyz789/is-bookmarked`
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Bookmark status",
+  "data": true
+}
+```
+
+**Note:** If user is not authenticated, returns `false` instead of 401 error.
 
 ---
 
@@ -4931,6 +5232,16 @@ All paginated responses include:
 - Handle RTL text for Urdu/Arabic (TextDirection.rtl)
 - Use NotoNastaliqUrdu font for Urdu poetry
 
+**Bookmark Language Context Preservation:**
+- When users bookmark content (poems, couplets, or images), the `lang` parameter is stored with the bookmark
+- This allows displaying bookmarks in their original language context regardless of current app language
+- Example: If a user bookmarks a poem in Urdu (`lang=ur`) and another in English (`lang=en`), their bookmark screen will show mixed languages - each bookmark in its original language
+- When fetching bookmarks, you can optionally filter by language:
+  - `/api/users/me/bookmarks?lang=ur` - Only Urdu bookmarks
+  - `/api/users/me/image-bookmarks?lang=en` - Only English image bookmarks
+  - `/api/users/me/bookmarks` - All bookmarks (mixed languages)
+- This feature enables a more natural user experience where content is preserved as the user first encountered it
+
 ### 14.6 Error Handling
 
 ```dart
@@ -5005,17 +5316,23 @@ Read Poem:
 
 ```
 1. Select Couplet from poem
-   
+
 2. Choose Template
    → GET /api/image-templates
    → OR upload custom → POST /api/users/me/upload-background
-   
+
 3. Generate
    → POST /api/couplets/{id}/generate-image
-   
-4. Save & Share
-   → POST /api/poetry-images/{id}/save
+
+4. Save, Bookmark & Share
+   → POST /api/poetry-images/{id}/save (Save to collection)
+   → POST /api/poetry-images/{id}/bookmark?lang=ur (Quick bookmark)
    → Share.share(imageUrl)
+
+5. View Later
+   → GET /api/users/me/saved-images (Collections)
+   → GET /api/users/me/image-bookmarks?lang=ur (Bookmarks in specific language)
+   → GET /api/users/me/image-bookmarks (All bookmarks, mixed languages)
 ```
 
 ---
@@ -5033,9 +5350,18 @@ Comment on Poem:
   → GET /api/poems/{id}/comments (view all)
 
 View User Activity:
-  → GET /api/users/me/couplets/liked
-  → GET /api/users/me/couplets/bookmarked
-  → GET /api/users/me/saved-images
+  → GET /api/users/me/couplets/liked (Liked couplets)
+  → GET /api/users/me/couplets/bookmarked (Bookmarked couplets)
+  → GET /api/users/me/saved-images (Saved image collections)
+  → GET /api/users/me/image-bookmarks (Bookmarked images)
+  → GET /api/users/me/image-bookmarks?lang=ur (Urdu bookmarked images)
+
+Bookmark Content in Different Languages:
+  → Reading Urdu poem → POST /api/poems/{id}/bookmark?lang=ur
+  → Reading English translation → POST /api/poems/{id}/bookmark?lang=en
+  → Viewing Hindi couplet → POST /api/couplets/{id}/bookmark?lang=hi
+  → Generated Urdu image → POST /api/poetry-images/{id}/bookmark?lang=ur
+  → All bookmarks preserved in their original language context
 ```
 
 ---

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
+import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/couplet_model.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/couplet_providers.dart';
 import 'package:flutter_poetry_app/features/image_poetry/widgets/share_options_sheet.dart';
@@ -85,11 +86,12 @@ class CoupletEngagementButtons extends ConsumerWidget {
 
   Future<void> _handleBookmark(BuildContext context, WidgetRef ref) async {
     final isBookmarked = couplet.isBookmarkedByCurrentUser ?? false;
+    final currentLang = ref.read(selectedLanguageProvider);
 
     try {
       final enrichedCouplet = await ref
           .read(coupletActionProvider.notifier)
-          .toggleBookmark(couplet.publicId);
+          .toggleBookmark(couplet.publicId, lang: currentLang);
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

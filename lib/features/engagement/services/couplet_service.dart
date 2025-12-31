@@ -69,8 +69,12 @@ class CoupletService {
   }
 
   /// Toggle bookmark on couplet
-  Future<CoupletDetailResponse> toggleBookmark(String coupletPublicId) async {
-    final response = await _dio.post('/api/couplets/$coupletPublicId/bookmark');
+  /// [lang] - Language code when bookmarking (ur, en, hi, etc.) to preserve language context
+  Future<CoupletDetailResponse> toggleBookmark(String coupletPublicId, {String lang = 'ur'}) async {
+    final response = await _dio.post(
+      '/api/couplets/$coupletPublicId/bookmark',
+      queryParameters: {'lang': lang},
+    );
 
     final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
       response.data,

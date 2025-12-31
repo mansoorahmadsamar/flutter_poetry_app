@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/widgets/localized_text.dart';
+import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import '../models/poem_model.dart';
 import '../providers/poem_providers.dart';
 import '../providers/poet_providers.dart';
@@ -350,6 +351,7 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
 
   Widget _buildBookmarkButton(BuildContext context, WidgetRef ref, PoemModel poem) {
     final isBookmarked = poem.isBookmarkedByCurrentUser ?? false;
+    final currentLang = ref.watch(selectedLanguageProvider);
 
     return Column(
       children: [
@@ -361,7 +363,10 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
           ),
           onPressed: () async {
             try {
-              final enrichedPoem = await ref.read(bookmarkActionProvider.notifier).toggleBookmark(widget.publicId);
+              final enrichedPoem = await ref.read(bookmarkActionProvider.notifier).toggleBookmark(
+                widget.publicId,
+                lang: currentLang,
+              );
 
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(

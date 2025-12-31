@@ -9,8 +9,12 @@ class BookmarkService {
 
   /// Toggle bookmark for a poem (add if not bookmarked, remove if bookmarked)
   /// Returns the enriched poem model with updated engagement data
-  Future<PoemModel> toggleBookmark(String poemPublicId) async {
-    final response = await _dio.post('/api/poems/$poemPublicId/bookmark');
+  /// [lang] - Language code when bookmarking (ur, en, hi, etc.) to preserve language context
+  Future<PoemModel> toggleBookmark(String poemPublicId, {String lang = 'ur'}) async {
+    final response = await _dio.post(
+      '/api/poems/$poemPublicId/bookmark',
+      queryParameters: {'lang': lang},
+    );
 
     final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
       response.data,

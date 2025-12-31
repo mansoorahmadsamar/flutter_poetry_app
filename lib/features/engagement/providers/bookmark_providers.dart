@@ -108,15 +108,16 @@ class BookmarkActionNotifier extends StateNotifier<AsyncValue<void>> {
 
   /// Toggle bookmark (add if not bookmarked, remove if bookmarked)
   /// Returns the enriched poem model with updated engagement data
-  Future<PoemModel> toggleBookmark(String poemPublicId) async {
+  /// [lang] - Language code when bookmarking (ur, en, hi, etc.) to preserve language context
+  Future<PoemModel> toggleBookmark(String poemPublicId, {String lang = 'ur'}) async {
     state = const AsyncValue.loading();
 
     try {
       final service = ref.read(bookmarkServiceProvider);
-      final enrichedPoem = await service.toggleBookmark(poemPublicId);
+      final enrichedPoem = await service.toggleBookmark(poemPublicId, lang: lang);
 
       state = const AsyncValue.data(null);
-      _logger.i('✅ Bookmark toggled: $poemPublicId - isBookmarked: ${enrichedPoem.isBookmarkedByCurrentUser}');
+      _logger.i('✅ Bookmark toggled: $poemPublicId - lang: $lang - isBookmarked: ${enrichedPoem.isBookmarkedByCurrentUser}');
 
       // Invalidate bookmarks list to refresh
       ref.invalidate(bookmarksProvider);

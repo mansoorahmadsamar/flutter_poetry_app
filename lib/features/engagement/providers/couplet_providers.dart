@@ -118,12 +118,13 @@ class CoupletActionNotifier extends StateNotifier<AsyncValue<void>> {
   }
 
   /// Toggle bookmark on a couplet
-  Future<CoupletDetailResponse> toggleBookmark(String coupletPublicId) async {
+  /// [lang] - Language code when bookmarking (ur, en, hi, etc.) to preserve language context
+  Future<CoupletDetailResponse> toggleBookmark(String coupletPublicId, {String lang = 'ur'}) async {
     state = const AsyncValue.loading();
 
     try {
       final service = ref.read(coupletServiceProvider);
-      final enrichedCouplet = await service.toggleBookmark(coupletPublicId);
+      final enrichedCouplet = await service.toggleBookmark(coupletPublicId, lang: lang);
 
       state = const AsyncValue.data(null);
 

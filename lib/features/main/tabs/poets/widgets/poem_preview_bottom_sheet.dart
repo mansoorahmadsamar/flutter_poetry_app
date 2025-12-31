@@ -163,9 +163,13 @@ class _PoemPreviewBottomSheetState extends ConsumerState<PoemPreviewBottomSheet>
 
   Future<void> _handleBookmarkToggle(PoemModel poem) async {
     final isBookmarked = poem.isBookmarkedByCurrentUser ?? false;
+    final currentLang = ref.read(selectedLanguageProvider);
 
     try {
-      final enrichedPoem = await ref.read(bookmarkActionProvider.notifier).toggleBookmark(widget.poemPublicId);
+      final enrichedPoem = await ref.read(bookmarkActionProvider.notifier).toggleBookmark(
+        widget.poemPublicId,
+        lang: currentLang,
+      );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
