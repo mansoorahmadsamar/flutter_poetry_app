@@ -334,10 +334,11 @@ class _PoetDetailScreenState extends ConsumerState<PoetDetailScreen>
             children: [
               // Birth Place & Country
               if (poetProfile.birthPlace != null || poetProfile.country != null)
-                _buildInfoChip(
+                _buildLocationChip(
                   context,
-                  Icons.location_on_outlined,
-                  '${poetProfile.birthPlace ?? ''}${poetProfile.birthPlace != null && poetProfile.country != null ? ', ' : ''}${poetProfile.country ?? ''}',
+                  poetProfile.birthPlace,
+                  poetProfile.country,
+                  poetProfile.countryFlag,
                   isDark,
                   isUrdu,
                 ),
@@ -465,6 +466,65 @@ class _PoetDetailScreenState extends ConsumerState<PoetDetailScreen>
         Flexible(
           child: Text(
             text,
+            style: isUrdu
+                ? AppTypography.urduPoetNameStyle.copyWith(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
+                    height: 1.6,
+                    color: isDark
+                        ? AppColors.textSecondaryDark
+                        : AppColors.textSecondaryLight,
+                  )
+                : GoogleFonts.roboto(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
+                    color: isDark
+                        ? AppColors.textSecondaryDark
+                        : AppColors.textSecondaryLight,
+                  ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLocationChip(
+    BuildContext context,
+    String? birthPlace,
+    String? country,
+    String? countryFlag,
+    bool isDark,
+    bool isUrdu,
+  ) {
+    // Build location text
+    String locationText = '';
+    if (birthPlace != null && country != null) {
+      locationText = '$birthPlace, $country';
+    } else {
+      locationText = birthPlace ?? country ?? '';
+    }
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Country flag emoji
+        if (countryFlag != null) ...[
+          Text(
+            countryFlag,
+            style: const TextStyle(fontSize: 16),
+          ),
+          const SizedBox(width: 6),
+        ] else ...[
+          Icon(
+            Icons.location_on_outlined,
+            size: 14,
+            color: AppColors.secondary,
+          ),
+          const SizedBox(width: 4),
+        ],
+        Flexible(
+          child: Text(
+            locationText,
             style: isUrdu
                 ? AppTypography.urduPoetNameStyle.copyWith(
                     fontSize: 13,

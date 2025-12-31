@@ -22,6 +22,8 @@ class PoetProfileModel with _$PoetProfileModel {
     @JsonKey(name: 'deathDate') String? deathDate,
     @JsonKey(name: 'birthPlace') String? birthPlace,
     String? country,
+    @JsonKey(name: 'countryFlag') String? countryFlag,
+    @JsonKey(name: 'countryFlagUrl') String? countryFlagUrl,
     @JsonKey(name: 'primaryLanguageCode') String? primaryLanguageCode,
     @JsonKey(name: 'primaryLanguageName') String? primaryLanguageName,
     @JsonKey(name: 'isFeatured') required bool isFeatured,
