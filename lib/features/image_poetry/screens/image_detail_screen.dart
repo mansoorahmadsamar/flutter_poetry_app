@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
+import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/features/image_poetry/widgets/image_viewer.dart';
 import 'package:flutter_poetry_app/features/image_poetry/widgets/collection_dialog.dart';
 import 'package:flutter_poetry_app/features/image_poetry/providers/image_collection_providers.dart';
+import 'package:flutter_poetry_app/features/image_poetry/providers/image_bookmark_providers.dart';
 
 class ImageDetailScreen extends ConsumerStatefulWidget {
   final String imageId;
@@ -21,6 +23,25 @@ class ImageDetailScreen extends ConsumerStatefulWidget {
 
 class _ImageDetailScreenState extends ConsumerState<ImageDetailScreen> {
   bool _showMetadata = false;
+  bool? _isBookmarked;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBookmarkStatus();
+  }
+
+  Future<void> _loadBookmarkStatus() async {
+    final isBookmarked = await ref
+        .read(imageBookmarkActionProvider.notifier)
+        .isBookmarked(widget.imageId);
+
+    if (mounted) {
+      setState(() {
+        _isBookmarked = isBookmarked;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,9 +114,12 @@ class _ImageDetailScreenState extends ConsumerState<ImageDetailScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             _buildActionButton(
-                              icon: Icons.download,
-                              label: 'Download',
-                              onTap: () => _downloadImage(image.imageUrl),
+                              icon: _isBookmarked == true
+                                  ? Icons.bookmark
+                                  : Icons.bookmark_border,
+                              label: 'Bookmark',
+                              onTap: () => _toggleBookmark(image.publicId),
+                              isActive: _isBookmarked == true,
                             ),
                             _buildActionButton(
                               icon: Icons.share,
@@ -170,6 +194,7 @@ class _ImageDetailScreenState extends ConsumerState<ImageDetailScreen> {
     required IconData icon,
     required String label,
     required VoidCallback onTap,
+    bool isActive = false,
   }) {
     return InkWell(
       onTap: onTap,
@@ -179,13 +204,18 @@ class _ImageDetailScreenState extends ConsumerState<ImageDetailScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 24, color: AppColors.primary),
+            Icon(
+              icon,
+              size: 24,
+              color: isActive ? AppColors.primary : Colors.grey[700],
+            ),
             SizedBox(height: AppSpacing.xs),
             Text(
               label,
               style: TextStyle(
                 fontSize: 11,
-                color: Colors.grey[700],
+                color: isActive ? AppColors.primary : Colors.grey[700],
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
           ],
@@ -421,6 +451,40 @@ class _ImageDetailScreenState extends ConsumerState<ImageDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to update favorite: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _toggleBookmark(String imageId) async {
+    final currentLang = ref.read(selectedLanguageProvider);
+
+    try {
+      final isBookmarked = await ref
+          .read(imageBookmarkActionProvider.notifier)
+          .toggleBookmark(imageId, lang: currentLang);
+
+      if (mounted) {
+        setState(() {
+          _isBookmarked = isBookmarked;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              isBookmarked ? 'Image bookmarked' : 'Bookmark removed',
+            ),
+            duration: const Duration(seconds: 1),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to toggle bookmark: $e'),
             backgroundColor: Colors.red,
           ),
         );

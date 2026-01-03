@@ -138,22 +138,23 @@ class ImageCollectionService {
 
   /// Toggle bookmark for an image (NEW - Phase 1 & 2 bookmark system)
   /// [lang] - Language code when bookmarking (ur, en, hi, etc.) to preserve language context
-  Future<GeneratedImageModel> toggleBookmark(String imageId, {String lang = 'ur'}) async {
+  /// Returns true if bookmarked, false if unbookmarked
+  Future<bool> toggleBookmark(String imageId, {String lang = 'ur'}) async {
     final response = await _dio.post(
       '/api/poetry-images/$imageId/bookmark',
       queryParameters: {'lang': lang},
     );
 
-    final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+    final apiResponse = ApiResponse<bool>.fromJson(
       response.data,
-      (json) => json as Map<String, dynamic>,
+      (json) => json as bool,
     );
 
     if (!apiResponse.success || apiResponse.data == null) {
       throw Exception(apiResponse.message ?? 'Failed to toggle bookmark');
     }
 
-    return GeneratedImageModel.fromJson(apiResponse.data!);
+    return apiResponse.data!;
   }
 
   /// Get bookmarked images with pagination and language filtering (NEW - Phase 1 & 2)

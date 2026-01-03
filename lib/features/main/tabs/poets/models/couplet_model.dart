@@ -16,8 +16,8 @@ class CoupletModel with _$CoupletModel {
     @Default(0) int likeCount,
     @Default(0) int bookmarkCount,
     @Default(0) int shareCount,
-    bool? isLikedByCurrentUser,
-    bool? isBookmarkedByCurrentUser,
+    @JsonKey(name: 'isLiked') required bool isLikedByCurrentUser,
+    @JsonKey(name: 'isBookmarked') required bool isBookmarkedByCurrentUser,
     DateTime? createdAt,
   }) = _CoupletModel;
 
@@ -47,8 +47,8 @@ class CoupletDetailResponse with _$CoupletDetailResponse {
     @Default(0) int likeCount,
     @Default(0) int bookmarkCount,
     @Default(0) int shareCount,
-    bool? isLikedByCurrentUser,
-    bool? isBookmarkedByCurrentUser,
+    @JsonKey(name: 'isLiked') required bool isLikedByCurrentUser,
+    @JsonKey(name: 'isBookmarked') required bool isBookmarkedByCurrentUser,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) = _CoupletDetailResponse;
@@ -79,8 +79,8 @@ class BookmarkedCoupletResponse with _$BookmarkedCoupletResponse {
     // Engagement
     @Default(0) int likeCount,
     @Default(0) int bookmarkCount,
-    bool? isLikedByCurrentUser,
-    bool? isBookmarkedByCurrentUser,
+    @JsonKey(name: 'isLiked') required bool isLikedByCurrentUser,
+    @JsonKey(name: 'isBookmarked') required bool isBookmarkedByCurrentUser,
     DateTime? bookmarkedAt,
   }) = _BookmarkedCoupletResponse;
 

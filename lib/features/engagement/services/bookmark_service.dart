@@ -35,6 +35,7 @@ class BookmarkService {
     String? search,
     String? poetryType,
     String? poetId,
+    String? lang,
     String sortBy = 'createdAt',
     String sortDir = 'desc',
   }) async {
@@ -60,6 +61,10 @@ class BookmarkService {
 
     if (poetId != null && poetId.isNotEmpty) {
       queryParams['poetId'] = poetId;
+    }
+
+    if (lang != null && lang.isNotEmpty) {
+      queryParams['lang'] = lang;
     }
 
     final response = await _dio.get(

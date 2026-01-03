@@ -39,7 +39,10 @@ mixin _$GeneratedImageModel {
   int get viewCount => throw _privateConstructorUsedError;
   int? get userId => throw _privateConstructorUsedError;
   bool get isUserCreated => throw _privateConstructorUsedError;
-  DateTime? get createdAt => throw _privateConstructorUsedError;
+  DateTime? get createdAt =>
+      throw _privateConstructorUsedError; // Bookmark fields (NEW - Phase 1 & 2)
+  bool? get isBookmarkedByCurrentUser => throw _privateConstructorUsedError;
+  DateTime? get bookmarkedAt => throw _privateConstructorUsedError;
 
   /// Serializes this GeneratedImageModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -77,7 +80,9 @@ abstract class $GeneratedImageModelCopyWith<$Res> {
       int viewCount,
       int? userId,
       bool isUserCreated,
-      DateTime? createdAt});
+      DateTime? createdAt,
+      bool? isBookmarkedByCurrentUser,
+      DateTime? bookmarkedAt});
 }
 
 /// @nodoc
@@ -115,6 +120,8 @@ class _$GeneratedImageModelCopyWithImpl<$Res, $Val extends GeneratedImageModel>
     Object? userId = freezed,
     Object? isUserCreated = null,
     Object? createdAt = freezed,
+    Object? isBookmarkedByCurrentUser = freezed,
+    Object? bookmarkedAt = freezed,
   }) {
     return _then(_value.copyWith(
       publicId: null == publicId
@@ -197,6 +204,14 @@ class _$GeneratedImageModelCopyWithImpl<$Res, $Val extends GeneratedImageModel>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      isBookmarkedByCurrentUser: freezed == isBookmarkedByCurrentUser
+          ? _value.isBookmarkedByCurrentUser
+          : isBookmarkedByCurrentUser // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      bookmarkedAt: freezed == bookmarkedAt
+          ? _value.bookmarkedAt
+          : bookmarkedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ) as $Val);
   }
 }
@@ -229,7 +244,9 @@ abstract class _$$GeneratedImageModelImplCopyWith<$Res>
       int viewCount,
       int? userId,
       bool isUserCreated,
-      DateTime? createdAt});
+      DateTime? createdAt,
+      bool? isBookmarkedByCurrentUser,
+      DateTime? bookmarkedAt});
 }
 
 /// @nodoc
@@ -265,6 +282,8 @@ class __$$GeneratedImageModelImplCopyWithImpl<$Res>
     Object? userId = freezed,
     Object? isUserCreated = null,
     Object? createdAt = freezed,
+    Object? isBookmarkedByCurrentUser = freezed,
+    Object? bookmarkedAt = freezed,
   }) {
     return _then(_$GeneratedImageModelImpl(
       publicId: null == publicId
@@ -347,6 +366,14 @@ class __$$GeneratedImageModelImplCopyWithImpl<$Res>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      isBookmarkedByCurrentUser: freezed == isBookmarkedByCurrentUser
+          ? _value.isBookmarkedByCurrentUser
+          : isBookmarkedByCurrentUser // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      bookmarkedAt: freezed == bookmarkedAt
+          ? _value.bookmarkedAt
+          : bookmarkedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ));
   }
 }
@@ -374,7 +401,9 @@ class _$GeneratedImageModelImpl implements _GeneratedImageModel {
       this.viewCount = 0,
       this.userId,
       this.isUserCreated = false,
-      this.createdAt})
+      this.createdAt,
+      this.isBookmarkedByCurrentUser,
+      this.bookmarkedAt})
       : _coupletIds = coupletIds;
 
   factory _$GeneratedImageModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -431,10 +460,15 @@ class _$GeneratedImageModelImpl implements _GeneratedImageModel {
   final bool isUserCreated;
   @override
   final DateTime? createdAt;
+// Bookmark fields (NEW - Phase 1 & 2)
+  @override
+  final bool? isBookmarkedByCurrentUser;
+  @override
+  final DateTime? bookmarkedAt;
 
   @override
   String toString() {
-    return 'GeneratedImageModel(publicId: $publicId, coupletIds: $coupletIds, poemPublicId: $poemPublicId, poetPublicId: $poetPublicId, poetName: $poetName, languageCode: $languageCode, templateId: $templateId, templateName: $templateName, isCustom: $isCustom, imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, width: $width, height: $height, fileSizeBytes: $fileSizeBytes, format: $format, shareCount: $shareCount, viewCount: $viewCount, userId: $userId, isUserCreated: $isUserCreated, createdAt: $createdAt)';
+    return 'GeneratedImageModel(publicId: $publicId, coupletIds: $coupletIds, poemPublicId: $poemPublicId, poetPublicId: $poetPublicId, poetName: $poetName, languageCode: $languageCode, templateId: $templateId, templateName: $templateName, isCustom: $isCustom, imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, width: $width, height: $height, fileSizeBytes: $fileSizeBytes, format: $format, shareCount: $shareCount, viewCount: $viewCount, userId: $userId, isUserCreated: $isUserCreated, createdAt: $createdAt, isBookmarkedByCurrentUser: $isBookmarkedByCurrentUser, bookmarkedAt: $bookmarkedAt)';
   }
 
   @override
@@ -477,7 +511,12 @@ class _$GeneratedImageModelImpl implements _GeneratedImageModel {
             (identical(other.isUserCreated, isUserCreated) ||
                 other.isUserCreated == isUserCreated) &&
             (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt));
+                other.createdAt == createdAt) &&
+            (identical(other.isBookmarkedByCurrentUser,
+                    isBookmarkedByCurrentUser) ||
+                other.isBookmarkedByCurrentUser == isBookmarkedByCurrentUser) &&
+            (identical(other.bookmarkedAt, bookmarkedAt) ||
+                other.bookmarkedAt == bookmarkedAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -503,7 +542,9 @@ class _$GeneratedImageModelImpl implements _GeneratedImageModel {
         viewCount,
         userId,
         isUserCreated,
-        createdAt
+        createdAt,
+        isBookmarkedByCurrentUser,
+        bookmarkedAt
       ]);
 
   /// Create a copy of GeneratedImageModel
@@ -544,7 +585,9 @@ abstract class _GeneratedImageModel implements GeneratedImageModel {
       final int viewCount,
       final int? userId,
       final bool isUserCreated,
-      final DateTime? createdAt}) = _$GeneratedImageModelImpl;
+      final DateTime? createdAt,
+      final bool? isBookmarkedByCurrentUser,
+      final DateTime? bookmarkedAt}) = _$GeneratedImageModelImpl;
 
   factory _GeneratedImageModel.fromJson(Map<String, dynamic> json) =
       _$GeneratedImageModelImpl.fromJson;
@@ -588,7 +631,11 @@ abstract class _GeneratedImageModel implements GeneratedImageModel {
   @override
   bool get isUserCreated;
   @override
-  DateTime? get createdAt;
+  DateTime? get createdAt; // Bookmark fields (NEW - Phase 1 & 2)
+  @override
+  bool? get isBookmarkedByCurrentUser;
+  @override
+  DateTime? get bookmarkedAt;
 
   /// Create a copy of GeneratedImageModel
   /// with the given fields replaced by the non-null parameter values.

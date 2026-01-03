@@ -27,7 +27,8 @@
       "Bash(git restore:*)",
       "Bash(git fetch:*)",
       "Bash(dart analyze:*)",
-      "Bash(pod install)"
+      "Bash(pod install)",
+      "Bash(dart run build_runner:*)"
     ],
     "deny": [],
     "ask": []

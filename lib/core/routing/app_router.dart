@@ -139,6 +139,14 @@ final routerProvider = Provider<GoRouter>((ref) {
           imageId: state.pathParameters['imageId']!,
         ),
       ),
+      // Generic image poetry detail route (for bookmark navigation)
+      GoRoute(
+        path: '/image-poetry/:contentId',
+        name: 'image-poetry-detail',
+        builder: (context, state) => ImageDetailScreen(
+          imageId: state.pathParameters['contentId']!,
+        ),
+      ),
       // Poetry Editor (NEW - Canvas-based editor)
       GoRoute(
         path: '/poetry-editor',

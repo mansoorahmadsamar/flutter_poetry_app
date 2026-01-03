@@ -26,6 +26,9 @@ class GeneratedImageModel with _$GeneratedImageModel {
     int? userId,
     @Default(false) bool isUserCreated,
     DateTime? createdAt,
+    // Bookmark fields (NEW - Phase 1 & 2)
+    bool? isBookmarkedByCurrentUser,
+    DateTime? bookmarkedAt,
   }) = _GeneratedImageModel;
 
   factory GeneratedImageModel.fromJson(Map<String, dynamic> json) =>

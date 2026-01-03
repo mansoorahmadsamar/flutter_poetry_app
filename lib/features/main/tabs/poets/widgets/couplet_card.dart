@@ -9,11 +9,13 @@ import 'package:flutter_poetry_app/features/main/tabs/poets/widgets/couplet_enga
 class CoupletCard extends ConsumerStatefulWidget {
   final CoupletModel couplet;
   final VoidCallback? onTap;
+  final String? poemPublicId; // Optional: for invalidating the coupletsProvider
 
   const CoupletCard({
     super.key,
     required this.couplet,
     this.onTap,
+    this.poemPublicId,
   });
 
   @override
@@ -31,6 +33,8 @@ class _CoupletCardState extends ConsumerState<CoupletCard> {
 
   @override
   Widget build(BuildContext context) {
+    final couplet = widget.couplet;
+
     return GestureDetector(
       onTap: widget.onTap ?? _toggleEngagementButtons,
       onLongPress: _toggleEngagementButtons,
@@ -49,12 +53,12 @@ class _CoupletCardState extends ConsumerState<CoupletCard> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Couplet type badge
-              if (widget.couplet.coupletTypeName != null)
+              if (couplet.coupletTypeName != null)
                 Align(
                   alignment: Alignment.topLeft,
                   child: Chip(
                     label: Text(
-                      widget.couplet.coupletTypeName!,
+                      couplet.coupletTypeName!,
                       style: const TextStyle(fontSize: 11),
                     ),
                     backgroundColor: AppColors.primary.withOpacity(0.1),
@@ -68,7 +72,7 @@ class _CoupletCardState extends ConsumerState<CoupletCard> {
               SizedBox(height: AppSpacing.sm),
 
               // Verses
-              ...widget.couplet.verses.map((verse) => Padding(
+              ...couplet.verses.map((verse) => Padding(
                     padding: EdgeInsets.symmetric(vertical: AppSpacing.xs),
                     child: LocalizedText(
                       verse.text,
@@ -86,7 +90,10 @@ class _CoupletCardState extends ConsumerState<CoupletCard> {
                 SizedBox(height: AppSpacing.md),
                 Divider(color: Colors.grey[300]),
                 SizedBox(height: AppSpacing.sm),
-                CoupletEngagementButtons(couplet: widget.couplet),
+                CoupletEngagementButtons(
+                  couplet: couplet,
+                  poemPublicId: widget.poemPublicId,
+                ),
               ],
             ],
           ),

@@ -8,36 +8,60 @@
 
 ---
 
-## Recent Updates (December 2025)
+## Recent Updates (December 2025 - January 2026)
 
-### Bookmark Language Context Preservation (Phase 1 & 2)
+### Bookmark System Enhancement (Phase 1, 2 & 3) ⭐ NEW
 
 **What's New:**
-- ✅ **Language-Aware Bookmarks**: All bookmark endpoints (poems, couplets, images) now accept a `lang` query parameter
-- ✅ **Multi-Language Bookmark Display**: Bookmarks preserve the language context in which they were created
-- ✅ **Image Poetry Bookmarks**: New bookmark system for generated poetry images (separate from collections)
-- ✅ **Cross-Language Filtering**: Filter bookmarks by language or view all in mixed languages
+- ✅ **Phase 1 & 2**: Language-aware bookmarks for poems, couplets, and images
+- ✅ **Phase 3**: Unified Bookmark API - Single interface for all bookmark types
+
+#### Phase 1 & 2: Language Context Preservation
 
 **Key Features:**
-1. **Bookmark in Any Language**: When users bookmark content in Urdu, English, or Hindi, that language context is preserved
-2. **Natural Mixed Display**: Bookmark screens show content in their original bookmarked languages (Urdu poems in Urdu, English in English)
-3. **Optional Language Filtering**: Filter bookmarks by specific language or view all together
-4. **Three Bookmark Types**: Poems, couplets, and generated poetry images all support language-aware bookmarking
+1. **Language-Aware Bookmarks**: All bookmark endpoints (poems, couplets, images) now accept a `lang` query parameter
+2. **Multi-Language Bookmark Display**: Bookmarks preserve the language context in which they were created
+3. **Image Poetry Bookmarks**: New bookmark system for generated poetry images (separate from collections)
+4. **Cross-Language Filtering**: Filter bookmarks by language or view all in mixed languages
 
-**New Endpoints:**
+**Endpoints Added (Phase 1 & 2):**
 - `POST /api/poetry-images/{imageId}/bookmark?lang=ur` - Bookmark generated image
 - `GET /api/users/me/image-bookmarks?lang=ur` - Get bookmarked images with language filter
 - `GET /api/poetry-images/{imageId}/is-bookmarked` - Check bookmark status
+- `POST /api/poems/{publicId}/bookmark?lang=ur` - Updated with language parameter
+- `POST /api/couplets/{coupletPublicId}/bookmark?lang=ur` - Updated with language parameter
 
-**Updated Endpoints:**
-- `POST /api/poems/{publicId}/bookmark?lang=ur` - Now accepts language parameter
-- `POST /api/couplets/{coupletPublicId}/bookmark?lang=ur` - Now accepts language parameter
+#### Phase 3: Unified Bookmark API ⭐ NEW
+
+**What is it?**
+A single, consolidated API that provides access to all bookmark types (poems, couplets, images) through unified endpoints. No more switching between different endpoints for different content types!
+
+**Key Features:**
+1. **Unified Response Format**: All bookmarks return the same structure with type-specific fields
+2. **Mixed Content Streams**: Get recent bookmarks across all types in a single call
+3. **Type Filtering**: Filter by specific content type (poems-only, couplets-only, images-only)
+4. **Cross-Content Search**: Search across all bookmarked content in one query
+5. **Aggregated Statistics**: Get comprehensive stats across all bookmark types
+
+**New Unified Endpoints (Phase 3):**
+- `GET /api/bookmarks/recent` - Recent bookmarks across all types (mixed feed)
+- `GET /api/bookmarks/poems` - Poem bookmarks only (filtered view)
+- `GET /api/bookmarks/couplets` - Couplet bookmarks only (filtered view)
+- `GET /api/bookmarks/images` - Image bookmarks only (filtered view)
+- `GET /api/bookmarks/search?query=محبت` - Search across all bookmarks
+- `GET /api/bookmarks/stats` - Comprehensive bookmark statistics
+
+**Why Use Unified API?**
+- **Simpler App Architecture**: One controller for all bookmark screens
+- **Better UX**: Show users all their bookmarks in one feed
+- **Efficient**: Fewer API calls, better performance
+- **Flexible**: Easy to add new content types in the future
 
 **Migration Notes for Flutter Developers:**
-- All existing bookmark calls will continue to work (default: `lang=ur`)
+- All existing bookmark calls will continue to work (backward compatible)
 - To support multi-language bookmarks, pass the current app language when calling bookmark endpoints
-- When displaying bookmarks, respect the stored `languageCode` field for each bookmark
-- Use language filtering for dedicated language-specific bookmark screens
+- Use Phase 3 unified endpoints for new bookmark screens (recommended)
+- Legacy endpoints (`/api/users/me/couplets/bookmarked`, etc.) still work but unified API is preferred
 
 ---
 
@@ -167,6 +191,17 @@
   - [8.2.3 Search Books by Poet](#823-search-books-by-poet)
   - [8.2.4 Download Book](#824-download-book)
 - [8.3 Use Cases & Workflows](#83-use-cases-workflows)
+
+### 8.5 Unified Bookmark API (Phase 3) ⭐ NEW
+- [8.5.1 Overview - Unified Bookmarks](#851-overview-unified-bookmarks)
+- [8.5.2 Get Recent Bookmarks](#852-get-recent-bookmarks)
+- [8.5.3 Get Poem Bookmarks](#853-get-poem-bookmarks)
+- [8.5.4 Get Couplet Bookmarks](#854-get-couplet-bookmarks)
+- [8.5.5 Get Image Bookmarks](#855-get-image-bookmarks)
+- [8.5.6 Search Bookmarks](#856-search-bookmarks)
+- [8.5.7 Get Bookmark Statistics](#857-get-bookmark-statistics)
+- [8.5.8 Response Format](#858-response-format)
+- [8.5.9 Use Cases & Examples](#859-use-cases-examples)
 
 ### 9. Comments System
 - [9.1 Overview](#91-overview-comments)
@@ -5008,6 +5043,525 @@ Download book file (tracks download count).
 **File Types:** `PDF`, `EPUB`, `EXTERNAL`
 
 Returns CloudFront URL or redirects to external link.
+
+---
+
+## 8.5 Unified Bookmark API (Phase 3) ⭐ NEW
+
+### 8.5.1 Overview - Unified Bookmarks
+
+The Unified Bookmark API provides a single, consolidated interface for accessing bookmarks across all content types (poems, couplets, generated images). Instead of calling separate endpoints for each type, you can now fetch all bookmarks in one call.
+
+**Key Benefits:**
+- **Single Interface**: One API for all bookmark types
+- **Mixed Content Feed**: See all bookmarked content together, sorted by recency
+- **Type Filtering**: Easily filter by specific content type when needed
+- **Cross-Content Search**: Search across all bookmarks with one query
+- **Comprehensive Stats**: Get aggregated statistics across all bookmark types
+
+**Base Path:** `/api/bookmarks`
+
+**All Endpoints Require Authentication**
+
+---
+
+### 8.5.2 Get Recent Bookmarks
+
+**Endpoint:** `GET /api/bookmarks/recent?page=0&size=20&lang=ur`
+
+**Description:**
+Get recent bookmarks across ALL content types (poems, couplets, images) in a single mixed feed, sorted by most recently bookmarked.
+
+**Query Parameters:**
+- `page` (optional, default: 0) - Page number
+- `size` (optional, default: 20) - Page size
+- `lang` (optional) - Filter by language code (ur, en, hi). If omitted, returns bookmarks in all languages.
+
+**Authentication:** Required (Bearer token)
+
+**Example:** `GET /api/bookmarks/recent?page=0&size=20`
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Recent bookmarks retrieved successfully",
+  "data": {
+    "content": [
+      {
+        "type": "COUPLET",
+        "bookmarkId": "bkmk_abc123",
+        "contentId": "couplet_xyz789",
+        "languageCode": "ur",
+        "bookmarkedAt": "2026-01-01T14:30:00Z",
+        "notes": null,
+        "coupletFirstVerse": "محبت میں نہیں ہے فرق جینے اور مرنے کا",
+        "coupletSecondVerse": "اسی کو دیکھ کر جیتے ہیں جس کافر پہ دم نکلے",
+        "parentPoemTitle": "دیوان غالب",
+        "parentPoemId": "poem_abc123",
+        "poetName": "Mirza Ghalib",
+        "poetId": "poet_ghalib",
+        "likeCount": 145,
+        "bookmarkCount": 89,
+        "shareCount": 34
+      },
+      {
+        "type": "POEM",
+        "bookmarkId": "bkmk_def456",
+        "contentId": "poem_pqr567",
+        "languageCode": "en",
+        "bookmarkedAt": "2026-01-01T12:15:00Z",
+        "notes": null,
+        "poemTitle": "Shikwa",
+        "poetName": "Allama Iqbal",
+        "poetId": "poet_iqbal",
+        "likeCount": 892,
+        "bookmarkCount": null,
+        "shareCount": 234
+      },
+      {
+        "type": "IMAGE",
+        "bookmarkId": "bkmk_ghi789",
+        "contentId": "img_uvw890",
+        "languageCode": "ur",
+        "bookmarkedAt": "2026-01-01T10:00:00Z",
+        "notes": null,
+        "imageUrl": "https://cdn.poetry.com/generated/img_uvw890.jpg",
+        "thumbnailUrl": "https://cdn.poetry.com/generated/thumbs/img_uvw890.jpg",
+        "templateName": "Floral Elegance",
+        "bookmarkCount": 23
+      }
+    ],
+    "totalElements": 45,
+    "totalPages": 3,
+    "number": 0,
+    "size": 20
+  }
+}
+```
+
+**Use Case:**
+Display a unified bookmark screen showing all types of bookmarked content in chronological order.
+
+---
+
+### 8.5.3 Get Poem Bookmarks
+
+**Endpoint:** `GET /api/bookmarks/poems?page=0&size=20&lang=ur`
+
+**Description:**
+Get ONLY poem bookmarks (filtered view). Useful for dedicated poem bookmark screens.
+
+**Query Parameters:**
+- `page` (optional, default: 0) - Page number
+- `size` (optional, default: 20) - Page size
+- `lang` (optional) - Filter by language code
+
+**Authentication:** Required
+
+**Example:** `GET /api/bookmarks/poems?lang=ur`
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Poem bookmarks retrieved successfully",
+  "data": {
+    "content": [
+      {
+        "type": "POEM",
+        "bookmarkId": "bkmk_def456",
+        "contentId": "poem_pqr567",
+        "languageCode": "ur",
+        "bookmarkedAt": "2026-01-01T12:15:00Z",
+        "poemTitle": "شکوہ",
+        "poetName": "Allama Iqbal",
+        "poetId": "poet_iqbal",
+        "likeCount": 892,
+        "bookmarkCount": null,
+        "shareCount": 234
+      }
+    ],
+    "totalElements": 15,
+    "totalPages": 1
+  }
+}
+```
+
+---
+
+### 8.5.4 Get Couplet Bookmarks
+
+**Endpoint:** `GET /api/bookmarks/couplets?page=0&size=20&lang=ur`
+
+**Description:**
+Get ONLY couplet bookmarks (filtered view). Useful for dedicated couplet bookmark screens.
+
+**Query Parameters:**
+- `page` (optional, default: 0)
+- `size` (optional, default: 20)
+- `lang` (optional) - Filter by language code
+
+**Authentication:** Required
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Couplet bookmarks retrieved successfully",
+  "data": {
+    "content": [
+      {
+        "type": "COUPLET",
+        "bookmarkId": "bkmk_abc123",
+        "contentId": "couplet_xyz789",
+        "languageCode": "ur",
+        "bookmarkedAt": "2026-01-01T14:30:00Z",
+        "coupletFirstVerse": "محبت میں نہیں ہے فرق جینے اور مرنے کا",
+        "coupletSecondVerse": "اسی کو دیکھ کر جیتے ہیں جس کافر پہ دم نکلے",
+        "parentPoemTitle": "دیوان غالب",
+        "parentPoemId": "poem_abc123",
+        "poetName": "Mirza Ghalib",
+        "poetId": "poet_ghalib",
+        "likeCount": 145,
+        "bookmarkCount": 89,
+        "shareCount": 34
+      }
+    ],
+    "totalElements": 20,
+    "totalPages": 1
+  }
+}
+```
+
+---
+
+### 8.5.5 Get Image Bookmarks
+
+**Endpoint:** `GET /api/bookmarks/images?page=0&size=20&lang=ur`
+
+**Description:**
+Get ONLY generated poetry image bookmarks (filtered view).
+
+**Query Parameters:**
+- `page` (optional, default: 0)
+- `size` (optional, default: 20)
+- `lang` (optional) - Filter by language code
+
+**Authentication:** Required
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Image bookmarks retrieved successfully",
+  "data": {
+    "content": [
+      {
+        "type": "IMAGE",
+        "bookmarkId": "bkmk_ghi789",
+        "contentId": "img_uvw890",
+        "languageCode": "ur",
+        "bookmarkedAt": "2026-01-01T10:00:00Z",
+        "imageUrl": "https://cdn.poetry.com/generated/img_uvw890.jpg",
+        "thumbnailUrl": "https://cdn.poetry.com/generated/thumbs/img_uvw890.jpg",
+        "templateName": "Floral Elegance",
+        "bookmarkCount": 23
+      }
+    ],
+    "totalElements": 10,
+    "totalPages": 1
+  }
+}
+```
+
+---
+
+### 8.5.6 Search Bookmarks
+
+**Endpoint:** `GET /api/bookmarks/search?query=محبت&page=0&size=20&lang=ur`
+
+**Description:**
+Search across ALL bookmarked content (poems, couplets, images) with a single query. Searches in:
+- Poem titles and poet names
+- Couplet verse text and parent poem titles
+- Image template names and notes
+
+**Query Parameters:**
+- `query` (required) - Search term (minimum 2 characters)
+- `page` (optional, default: 0)
+- `size` (optional, default: 20)
+- `lang` (optional) - Filter results by language code
+
+**Authentication:** Required
+
+**Example:** `GET /api/bookmarks/search?query=دل&page=0`
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Found 8 bookmarks matching 'دل'",
+  "data": {
+    "content": [
+      {
+        "type": "COUPLET",
+        "coupletFirstVerse": "دل کو تو آرام ہے فریاد کا موقع ہے",
+        "coupletSecondVerse": "یہ دونوں باتیں تھیں اب کچھ کہنے کو باقی ہے",
+        "parentPoemTitle": "دیوان غالب",
+        "poetName": "Mirza Ghalib",
+        "bookmarkedAt": "2026-01-01T14:30:00Z"
+      },
+      {
+        "type": "POEM",
+        "poemTitle": "دل کی ویرانی کا کیا مذکور ہے",
+        "poetName": "Mir Taqi Mir",
+        "bookmarkedAt": "2026-01-01T12:00:00Z"
+      }
+    ],
+    "totalElements": 8,
+    "totalPages": 1
+  }
+}
+```
+
+**Error Response (400) - Query too short:**
+```json
+{
+  "success": false,
+  "message": "Search query must be at least 2 characters"
+}
+```
+
+---
+
+### 8.5.7 Get Bookmark Statistics
+
+**Endpoint:** `GET /api/bookmarks/stats`
+
+**Description:**
+Get comprehensive statistics about user's bookmarks across all types.
+
+**Authentication:** Required
+
+**Example:** `GET /api/bookmarks/stats`
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Bookmark statistics retrieved successfully",
+  "data": {
+    "totalBookmarks": 45,
+    "poemBookmarks": 15,
+    "coupletBookmarks": 20,
+    "imageBookmarks": 10,
+    "bookmarksByLanguage": {
+      "ur": 30,
+      "en": 12,
+      "hi": 3
+    },
+    "topPoets": [
+      {
+        "poetId": "poet_ghalib",
+        "poetName": "Mirza Ghalib",
+        "bookmarkCount": 18
+      },
+      {
+        "poetId": "poet_iqbal",
+        "poetName": "Allama Iqbal",
+        "bookmarkCount": 12
+      },
+      {
+        "poetId": "poet_faiz",
+        "poetName": "Faiz Ahmed Faiz",
+        "bookmarkCount": 8
+      }
+    ],
+    "recentBookmarks": 7
+  }
+}
+```
+
+**Response Fields:**
+- `totalBookmarks` - Total count across all types
+- `poemBookmarks` - Count of poem bookmarks
+- `coupletBookmarks` - Count of couplet bookmarks
+- `imageBookmarks` - Count of image bookmarks
+- `bookmarksByLanguage` - Breakdown by language code
+- `topPoets` - Top 5 poets by bookmark count (poems + couplets combined)
+- `recentBookmarks` - Bookmarks added in last 7 days
+
+---
+
+### 8.5.8 Response Format
+
+**Unified Bookmark Response Structure:**
+
+All endpoints return bookmarks with the following structure:
+
+```json
+{
+  "type": "POEM | COUPLET | IMAGE",
+  "bookmarkId": "string",
+  "contentId": "string",
+  "languageCode": "string",
+  "bookmarkedAt": "ISO 8601 timestamp",
+  "notes": "string (optional)",
+
+  // Type-specific fields (only present for relevant type)
+
+  // POEM fields:
+  "poemTitle": "string",
+  "poetName": "string",
+  "poetId": "string",
+
+  // COUPLET fields:
+  "coupletFirstVerse": "string",
+  "coupletSecondVerse": "string",
+  "parentPoemTitle": "string",
+  "parentPoemId": "string",
+  "poetName": "string",
+  "poetId": "string",
+
+  // IMAGE fields:
+  "imageUrl": "string",
+  "thumbnailUrl": "string",
+  "templateName": "string",
+
+  // Common engagement metrics
+  "likeCount": integer,
+  "bookmarkCount": integer (nullable),
+  "shareCount": integer
+}
+```
+
+**Type-Specific Rendering:**
+
+Use the `type` field to determine how to render each bookmark:
+
+```dart
+switch (bookmark.type) {
+  case 'POEM':
+    return PoemBookmarkCard(
+      title: bookmark.poemTitle,
+      poet: bookmark.poetName,
+      // ...
+    );
+  case 'COUPLET':
+    return CoupletBookmarkCard(
+      verse1: bookmark.coupletFirstVerse,
+      verse2: bookmark.coupletSecondVerse,
+      // ...
+    );
+  case 'IMAGE':
+    return ImageBookmarkCard(
+      imageUrl: bookmark.imageUrl,
+      thumbnail: bookmark.thumbnailUrl,
+      // ...
+    );
+}
+```
+
+---
+
+### 8.5.9 Use Cases & Examples
+
+#### Use Case 1: Unified Bookmark Screen
+
+Show all bookmarks in one feed (Instagram/Twitter style):
+
+```dart
+// Fetch mixed feed
+final response = await http.get(
+  '/api/bookmarks/recent?page=0&size=20'
+);
+
+// Render different card types based on bookmark.type
+ListView.builder(
+  itemBuilder: (context, index) {
+    final bookmark = bookmarks[index];
+    switch (bookmark.type) {
+      case 'POEM':
+        return PoemBookmarkCard(bookmark);
+      case 'COUPLET':
+        return CoupletBookmarkCard(bookmark);
+      case 'IMAGE':
+        return ImageBookmarkCard(bookmark);
+    }
+  }
+)
+```
+
+#### Use Case 2: Dedicated Bookmark Tabs
+
+Create tabbed interface with dedicated screens per type:
+
+```
+Bookmarks Screen
+├── Tab 1: All (mixed feed) → /api/bookmarks/recent
+├── Tab 2: Poems → /api/bookmarks/poems
+├── Tab 3: Couplets → /api/bookmarks/couplets
+└── Tab 4: Images → /api/bookmarks/images
+```
+
+#### Use Case 3: Language-Specific Bookmark Screen
+
+Show only Urdu bookmarks:
+
+```dart
+final response = await http.get(
+  '/api/bookmarks/recent?lang=ur'
+);
+```
+
+Show only English bookmarks:
+
+```dart
+final response = await http.get(
+  '/api/bookmarks/recent?lang=en'
+);
+```
+
+#### Use Case 4: Search Across All Bookmarks
+
+Implement global bookmark search:
+
+```dart
+final response = await http.get(
+  '/api/bookmarks/search?query=${searchQuery}'
+);
+
+// Results include poems, couplets, and images that match
+// Highlight matching terms in UI
+```
+
+#### Use Case 5: Bookmark Dashboard with Stats
+
+Show user their bookmark statistics:
+
+```dart
+final stats = await http.get('/api/bookmarks/stats');
+
+// Display:
+// - Total bookmark count
+// - Breakdown by type (pie chart)
+// - Breakdown by language (bar chart)
+// - Top poets (list)
+// - Recent activity (last 7 days)
+```
+
+---
+
+**Comparison: Legacy vs Unified API**
+
+| Feature | Legacy Approach | Unified API (Phase 3) |
+|---------|----------------|----------------------|
+| Get all bookmarks | 3 API calls | 1 API call |
+| Search bookmarks | 3 separate searches | 1 unified search |
+| Mixed content feed | Manual merging | Built-in |
+| Statistics | Calculate client-side | Server-provided |
+| Code complexity | High (multiple endpoints) | Low (single interface) |
 
 ---
 

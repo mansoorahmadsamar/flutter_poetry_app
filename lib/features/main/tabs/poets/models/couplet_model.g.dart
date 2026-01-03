@@ -18,8 +18,8 @@ _$CoupletModelImpl _$$CoupletModelImplFromJson(Map<String, dynamic> json) =>
       likeCount: (json['likeCount'] as num?)?.toInt() ?? 0,
       bookmarkCount: (json['bookmarkCount'] as num?)?.toInt() ?? 0,
       shareCount: (json['shareCount'] as num?)?.toInt() ?? 0,
-      isLikedByCurrentUser: json['isLikedByCurrentUser'] as bool?,
-      isBookmarkedByCurrentUser: json['isBookmarkedByCurrentUser'] as bool?,
+      isLikedByCurrentUser: json['isLiked'] as bool,
+      isBookmarkedByCurrentUser: json['isBookmarked'] as bool,
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
@@ -35,8 +35,8 @@ Map<String, dynamic> _$$CoupletModelImplToJson(_$CoupletModelImpl instance) =>
       'likeCount': instance.likeCount,
       'bookmarkCount': instance.bookmarkCount,
       'shareCount': instance.shareCount,
-      'isLikedByCurrentUser': instance.isLikedByCurrentUser,
-      'isBookmarkedByCurrentUser': instance.isBookmarkedByCurrentUser,
+      'isLiked': instance.isLikedByCurrentUser,
+      'isBookmarked': instance.isBookmarkedByCurrentUser,
       'createdAt': instance.createdAt?.toIso8601String(),
     };
 
@@ -60,8 +60,8 @@ _$CoupletDetailResponseImpl _$$CoupletDetailResponseImplFromJson(
       likeCount: (json['likeCount'] as num?)?.toInt() ?? 0,
       bookmarkCount: (json['bookmarkCount'] as num?)?.toInt() ?? 0,
       shareCount: (json['shareCount'] as num?)?.toInt() ?? 0,
-      isLikedByCurrentUser: json['isLikedByCurrentUser'] as bool?,
-      isBookmarkedByCurrentUser: json['isBookmarkedByCurrentUser'] as bool?,
+      isLikedByCurrentUser: json['isLiked'] as bool,
+      isBookmarkedByCurrentUser: json['isBookmarked'] as bool,
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
@@ -88,8 +88,8 @@ Map<String, dynamic> _$$CoupletDetailResponseImplToJson(
       'likeCount': instance.likeCount,
       'bookmarkCount': instance.bookmarkCount,
       'shareCount': instance.shareCount,
-      'isLikedByCurrentUser': instance.isLikedByCurrentUser,
-      'isBookmarkedByCurrentUser': instance.isBookmarkedByCurrentUser,
+      'isLiked': instance.isLikedByCurrentUser,
+      'isBookmarked': instance.isBookmarkedByCurrentUser,
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
     };
@@ -114,8 +114,8 @@ _$BookmarkedCoupletResponseImpl _$$BookmarkedCoupletResponseImplFromJson(
       poetProfileImageUrl: json['poetProfileImageUrl'] as String?,
       likeCount: (json['likeCount'] as num?)?.toInt() ?? 0,
       bookmarkCount: (json['bookmarkCount'] as num?)?.toInt() ?? 0,
-      isLikedByCurrentUser: json['isLikedByCurrentUser'] as bool?,
-      isBookmarkedByCurrentUser: json['isBookmarkedByCurrentUser'] as bool?,
+      isLikedByCurrentUser: json['isLiked'] as bool,
+      isBookmarkedByCurrentUser: json['isBookmarked'] as bool,
       bookmarkedAt: json['bookmarkedAt'] == null
           ? null
           : DateTime.parse(json['bookmarkedAt'] as String),
@@ -139,7 +139,7 @@ Map<String, dynamic> _$$BookmarkedCoupletResponseImplToJson(
       'poetProfileImageUrl': instance.poetProfileImageUrl,
       'likeCount': instance.likeCount,
       'bookmarkCount': instance.bookmarkCount,
-      'isLikedByCurrentUser': instance.isLikedByCurrentUser,
-      'isBookmarkedByCurrentUser': instance.isBookmarkedByCurrentUser,
+      'isLiked': instance.isLikedByCurrentUser,
+      'isBookmarked': instance.isBookmarkedByCurrentUser,
       'bookmarkedAt': instance.bookmarkedAt?.toIso8601String(),
     };

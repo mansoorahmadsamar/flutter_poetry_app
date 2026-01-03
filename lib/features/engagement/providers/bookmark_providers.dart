@@ -22,12 +22,14 @@ class BookmarksParams {
   final int page;
   final String? search;
   final String? poetryType;
+  final String? lang;
   final String sortBy;
 
   BookmarksParams({
     this.page = 0,
     this.search,
     this.poetryType,
+    this.lang,
     this.sortBy = 'NEWEST',
   });
 
@@ -39,11 +41,16 @@ class BookmarksParams {
           page == other.page &&
           search == other.search &&
           poetryType == other.poetryType &&
+          lang == other.lang &&
           sortBy == other.sortBy;
 
   @override
   int get hashCode =>
-      page.hashCode ^ search.hashCode ^ poetryType.hashCode ^ sortBy.hashCode;
+      page.hashCode ^
+      search.hashCode ^
+      poetryType.hashCode ^
+      lang.hashCode ^
+      sortBy.hashCode;
 }
 
 /// Convert UI sort option to backend field name and direction
@@ -81,10 +88,11 @@ final bookmarksProvider = FutureProvider.autoDispose
         size: 20,
         search: params.search,
         poetryType: params.poetryType,
+        lang: params.lang,
         sortBy: _mapSortByToField(params.sortBy),
         sortDir: _mapSortByToDirection(params.sortBy),
       );
-      _logger.i('✅ Bookmarks loaded - Page: ${params.page}');
+      _logger.i('✅ Bookmarks loaded - Page: ${params.page}, Lang: ${params.lang}');
       return result;
     } catch (e) {
       _logger.e('❌ Error loading bookmarks: $e');

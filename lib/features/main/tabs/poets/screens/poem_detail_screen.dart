@@ -132,6 +132,7 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
                 children: [
                   ...couplets.map((couplet) => CoupletCard(
                         couplet: couplet,
+                        poemPublicId: poem.publicId,
                       )),
                   SizedBox(height: AppSpacing.lg),
                 ],
