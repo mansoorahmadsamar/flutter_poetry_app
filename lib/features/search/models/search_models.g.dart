@@ -127,17 +127,25 @@ _$CoupletSearchResultImpl _$$CoupletSearchResultImplFromJson(
       publicId: json['publicId'] as String,
       coupletNumber: (json['coupletNumber'] as num).toInt(),
       coupletType: json['coupletType'] as String,
+      coupletTypeName: json['coupletTypeName'] as String?,
       verses: (json['verses'] as List<dynamic>)
           .map((e) => VerseModel.fromJson(e as Map<String, dynamic>))
           .toList(),
-      poem: PoemSummary.fromJson(json['poem'] as Map<String, dynamic>),
-      poet: PoetSummary.fromJson(json['poet'] as Map<String, dynamic>),
+      poem: json['poem'] == null
+          ? null
+          : PoemSummary.fromJson(json['poem'] as Map<String, dynamic>),
+      poet: json['poet'] == null
+          ? null
+          : PoetSummary.fromJson(json['poet'] as Map<String, dynamic>),
       likeCount: (json['likeCount'] as num?)?.toInt() ?? 0,
       shareCount: (json['shareCount'] as num?)?.toInt() ?? 0,
       bookmarkCount: (json['bookmarkCount'] as num?)?.toInt() ?? 0,
       engagementScore: (json['engagementScore'] as num?)?.toDouble() ?? 0.0,
-      isLiked: json['isLiked'] as bool? ?? false,
-      isBookmarked: json['isBookmarked'] as bool? ?? false,
+      isLiked: json['isLiked'] as bool?,
+      isBookmarked: json['isBookmarked'] as bool?,
+      createdAt: json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
     );
 
 Map<String, dynamic> _$$CoupletSearchResultImplToJson(
@@ -146,6 +154,7 @@ Map<String, dynamic> _$$CoupletSearchResultImplToJson(
       'publicId': instance.publicId,
       'coupletNumber': instance.coupletNumber,
       'coupletType': instance.coupletType,
+      'coupletTypeName': instance.coupletTypeName,
       'verses': instance.verses,
       'poem': instance.poem,
       'poet': instance.poet,
@@ -155,6 +164,7 @@ Map<String, dynamic> _$$CoupletSearchResultImplToJson(
       'engagementScore': instance.engagementScore,
       'isLiked': instance.isLiked,
       'isBookmarked': instance.isBookmarked,
+      'createdAt': instance.createdAt?.toIso8601String(),
     };
 
 _$PoemSummaryImpl _$$PoemSummaryImplFromJson(Map<String, dynamic> json) =>

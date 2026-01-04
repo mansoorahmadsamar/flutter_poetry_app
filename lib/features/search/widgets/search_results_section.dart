@@ -283,13 +283,9 @@ class SearchResultsSection extends ConsumerWidget {
   ) {
     return CoupletCard(
       couplet: convertSearchResultToCoupletModel(couplet),
-      onTap: () {
-        // Navigate to poem detail
-        context.pushNamed(
-          'poem-detail',
-          pathParameters: {'publicId': couplet.poem.publicId},
-        );
-      },
+      // TODO: Add navigation when poem publicId is available from search API
+      // For now, keep null to disable tap (user can still use like/bookmark/share actions)
+      onTap: null,
     );
   }
 

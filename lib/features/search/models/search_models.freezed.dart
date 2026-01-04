@@ -1269,15 +1269,22 @@ mixin _$CoupletSearchResult {
   String get publicId => throw _privateConstructorUsedError;
   int get coupletNumber => throw _privateConstructorUsedError;
   String get coupletType => throw _privateConstructorUsedError;
+  String? get coupletTypeName =>
+      throw _privateConstructorUsedError; // Added from API response
   List<VerseModel> get verses => throw _privateConstructorUsedError;
-  PoemSummary get poem => throw _privateConstructorUsedError;
-  PoetSummary get poet => throw _privateConstructorUsedError;
+  PoemSummary? get poem =>
+      throw _privateConstructorUsedError; // Made nullable - API doesn't always include this
+  PoetSummary? get poet =>
+      throw _privateConstructorUsedError; // Made nullable - API doesn't always include this
   int get likeCount => throw _privateConstructorUsedError;
   int get shareCount => throw _privateConstructorUsedError;
   int get bookmarkCount => throw _privateConstructorUsedError;
   double get engagementScore => throw _privateConstructorUsedError;
-  bool get isLiked => throw _privateConstructorUsedError;
-  bool get isBookmarked => throw _privateConstructorUsedError;
+  bool? get isLiked =>
+      throw _privateConstructorUsedError; // Made nullable - API returns null when not authenticated
+  bool? get isBookmarked =>
+      throw _privateConstructorUsedError; // Made nullable - API returns null when not authenticated
+  DateTime? get createdAt => throw _privateConstructorUsedError;
 
   /// Serializes this CoupletSearchResult to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -1299,18 +1306,20 @@ abstract class $CoupletSearchResultCopyWith<$Res> {
       {String publicId,
       int coupletNumber,
       String coupletType,
+      String? coupletTypeName,
       List<VerseModel> verses,
-      PoemSummary poem,
-      PoetSummary poet,
+      PoemSummary? poem,
+      PoetSummary? poet,
       int likeCount,
       int shareCount,
       int bookmarkCount,
       double engagementScore,
-      bool isLiked,
-      bool isBookmarked});
+      bool? isLiked,
+      bool? isBookmarked,
+      DateTime? createdAt});
 
-  $PoemSummaryCopyWith<$Res> get poem;
-  $PoetSummaryCopyWith<$Res> get poet;
+  $PoemSummaryCopyWith<$Res>? get poem;
+  $PoetSummaryCopyWith<$Res>? get poet;
 }
 
 /// @nodoc
@@ -1331,15 +1340,17 @@ class _$CoupletSearchResultCopyWithImpl<$Res, $Val extends CoupletSearchResult>
     Object? publicId = null,
     Object? coupletNumber = null,
     Object? coupletType = null,
+    Object? coupletTypeName = freezed,
     Object? verses = null,
-    Object? poem = null,
-    Object? poet = null,
+    Object? poem = freezed,
+    Object? poet = freezed,
     Object? likeCount = null,
     Object? shareCount = null,
     Object? bookmarkCount = null,
     Object? engagementScore = null,
-    Object? isLiked = null,
-    Object? isBookmarked = null,
+    Object? isLiked = freezed,
+    Object? isBookmarked = freezed,
+    Object? createdAt = freezed,
   }) {
     return _then(_value.copyWith(
       publicId: null == publicId
@@ -1354,18 +1365,22 @@ class _$CoupletSearchResultCopyWithImpl<$Res, $Val extends CoupletSearchResult>
           ? _value.coupletType
           : coupletType // ignore: cast_nullable_to_non_nullable
               as String,
+      coupletTypeName: freezed == coupletTypeName
+          ? _value.coupletTypeName
+          : coupletTypeName // ignore: cast_nullable_to_non_nullable
+              as String?,
       verses: null == verses
           ? _value.verses
           : verses // ignore: cast_nullable_to_non_nullable
               as List<VerseModel>,
-      poem: null == poem
+      poem: freezed == poem
           ? _value.poem
           : poem // ignore: cast_nullable_to_non_nullable
-              as PoemSummary,
-      poet: null == poet
+              as PoemSummary?,
+      poet: freezed == poet
           ? _value.poet
           : poet // ignore: cast_nullable_to_non_nullable
-              as PoetSummary,
+              as PoetSummary?,
       likeCount: null == likeCount
           ? _value.likeCount
           : likeCount // ignore: cast_nullable_to_non_nullable
@@ -1382,14 +1397,18 @@ class _$CoupletSearchResultCopyWithImpl<$Res, $Val extends CoupletSearchResult>
           ? _value.engagementScore
           : engagementScore // ignore: cast_nullable_to_non_nullable
               as double,
-      isLiked: null == isLiked
+      isLiked: freezed == isLiked
           ? _value.isLiked
           : isLiked // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isBookmarked: null == isBookmarked
+              as bool?,
+      isBookmarked: freezed == isBookmarked
           ? _value.isBookmarked
           : isBookmarked // ignore: cast_nullable_to_non_nullable
-              as bool,
+              as bool?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ) as $Val);
   }
 
@@ -1397,8 +1416,12 @@ class _$CoupletSearchResultCopyWithImpl<$Res, $Val extends CoupletSearchResult>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $PoemSummaryCopyWith<$Res> get poem {
-    return $PoemSummaryCopyWith<$Res>(_value.poem, (value) {
+  $PoemSummaryCopyWith<$Res>? get poem {
+    if (_value.poem == null) {
+      return null;
+    }
+
+    return $PoemSummaryCopyWith<$Res>(_value.poem!, (value) {
       return _then(_value.copyWith(poem: value) as $Val);
     });
   }
@@ -1407,8 +1430,12 @@ class _$CoupletSearchResultCopyWithImpl<$Res, $Val extends CoupletSearchResult>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $PoetSummaryCopyWith<$Res> get poet {
-    return $PoetSummaryCopyWith<$Res>(_value.poet, (value) {
+  $PoetSummaryCopyWith<$Res>? get poet {
+    if (_value.poet == null) {
+      return null;
+    }
+
+    return $PoetSummaryCopyWith<$Res>(_value.poet!, (value) {
       return _then(_value.copyWith(poet: value) as $Val);
     });
   }
@@ -1426,20 +1453,22 @@ abstract class _$$CoupletSearchResultImplCopyWith<$Res>
       {String publicId,
       int coupletNumber,
       String coupletType,
+      String? coupletTypeName,
       List<VerseModel> verses,
-      PoemSummary poem,
-      PoetSummary poet,
+      PoemSummary? poem,
+      PoetSummary? poet,
       int likeCount,
       int shareCount,
       int bookmarkCount,
       double engagementScore,
-      bool isLiked,
-      bool isBookmarked});
+      bool? isLiked,
+      bool? isBookmarked,
+      DateTime? createdAt});
 
   @override
-  $PoemSummaryCopyWith<$Res> get poem;
+  $PoemSummaryCopyWith<$Res>? get poem;
   @override
-  $PoetSummaryCopyWith<$Res> get poet;
+  $PoetSummaryCopyWith<$Res>? get poet;
 }
 
 /// @nodoc
@@ -1458,15 +1487,17 @@ class __$$CoupletSearchResultImplCopyWithImpl<$Res>
     Object? publicId = null,
     Object? coupletNumber = null,
     Object? coupletType = null,
+    Object? coupletTypeName = freezed,
     Object? verses = null,
-    Object? poem = null,
-    Object? poet = null,
+    Object? poem = freezed,
+    Object? poet = freezed,
     Object? likeCount = null,
     Object? shareCount = null,
     Object? bookmarkCount = null,
     Object? engagementScore = null,
-    Object? isLiked = null,
-    Object? isBookmarked = null,
+    Object? isLiked = freezed,
+    Object? isBookmarked = freezed,
+    Object? createdAt = freezed,
   }) {
     return _then(_$CoupletSearchResultImpl(
       publicId: null == publicId
@@ -1481,18 +1512,22 @@ class __$$CoupletSearchResultImplCopyWithImpl<$Res>
           ? _value.coupletType
           : coupletType // ignore: cast_nullable_to_non_nullable
               as String,
+      coupletTypeName: freezed == coupletTypeName
+          ? _value.coupletTypeName
+          : coupletTypeName // ignore: cast_nullable_to_non_nullable
+              as String?,
       verses: null == verses
           ? _value._verses
           : verses // ignore: cast_nullable_to_non_nullable
               as List<VerseModel>,
-      poem: null == poem
+      poem: freezed == poem
           ? _value.poem
           : poem // ignore: cast_nullable_to_non_nullable
-              as PoemSummary,
-      poet: null == poet
+              as PoemSummary?,
+      poet: freezed == poet
           ? _value.poet
           : poet // ignore: cast_nullable_to_non_nullable
-              as PoetSummary,
+              as PoetSummary?,
       likeCount: null == likeCount
           ? _value.likeCount
           : likeCount // ignore: cast_nullable_to_non_nullable
@@ -1509,14 +1544,18 @@ class __$$CoupletSearchResultImplCopyWithImpl<$Res>
           ? _value.engagementScore
           : engagementScore // ignore: cast_nullable_to_non_nullable
               as double,
-      isLiked: null == isLiked
+      isLiked: freezed == isLiked
           ? _value.isLiked
           : isLiked // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isBookmarked: null == isBookmarked
+              as bool?,
+      isBookmarked: freezed == isBookmarked
           ? _value.isBookmarked
           : isBookmarked // ignore: cast_nullable_to_non_nullable
-              as bool,
+              as bool?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ));
   }
 }
@@ -1528,15 +1567,17 @@ class _$CoupletSearchResultImpl implements _CoupletSearchResult {
       {required this.publicId,
       required this.coupletNumber,
       required this.coupletType,
+      this.coupletTypeName,
       required final List<VerseModel> verses,
-      required this.poem,
-      required this.poet,
+      this.poem,
+      this.poet,
       this.likeCount = 0,
       this.shareCount = 0,
       this.bookmarkCount = 0,
       this.engagementScore = 0.0,
-      this.isLiked = false,
-      this.isBookmarked = false})
+      this.isLiked,
+      this.isBookmarked,
+      this.createdAt})
       : _verses = verses;
 
   factory _$CoupletSearchResultImpl.fromJson(Map<String, dynamic> json) =>
@@ -1548,7 +1589,11 @@ class _$CoupletSearchResultImpl implements _CoupletSearchResult {
   final int coupletNumber;
   @override
   final String coupletType;
+  @override
+  final String? coupletTypeName;
+// Added from API response
   final List<VerseModel> _verses;
+// Added from API response
   @override
   List<VerseModel> get verses {
     if (_verses is EqualUnmodifiableListView) return _verses;
@@ -1557,9 +1602,11 @@ class _$CoupletSearchResultImpl implements _CoupletSearchResult {
   }
 
   @override
-  final PoemSummary poem;
+  final PoemSummary? poem;
+// Made nullable - API doesn't always include this
   @override
-  final PoetSummary poet;
+  final PoetSummary? poet;
+// Made nullable - API doesn't always include this
   @override
   @JsonKey()
   final int likeCount;
@@ -1573,15 +1620,17 @@ class _$CoupletSearchResultImpl implements _CoupletSearchResult {
   @JsonKey()
   final double engagementScore;
   @override
-  @JsonKey()
-  final bool isLiked;
+  final bool? isLiked;
+// Made nullable - API returns null when not authenticated
   @override
-  @JsonKey()
-  final bool isBookmarked;
+  final bool? isBookmarked;
+// Made nullable - API returns null when not authenticated
+  @override
+  final DateTime? createdAt;
 
   @override
   String toString() {
-    return 'CoupletSearchResult(publicId: $publicId, coupletNumber: $coupletNumber, coupletType: $coupletType, verses: $verses, poem: $poem, poet: $poet, likeCount: $likeCount, shareCount: $shareCount, bookmarkCount: $bookmarkCount, engagementScore: $engagementScore, isLiked: $isLiked, isBookmarked: $isBookmarked)';
+    return 'CoupletSearchResult(publicId: $publicId, coupletNumber: $coupletNumber, coupletType: $coupletType, coupletTypeName: $coupletTypeName, verses: $verses, poem: $poem, poet: $poet, likeCount: $likeCount, shareCount: $shareCount, bookmarkCount: $bookmarkCount, engagementScore: $engagementScore, isLiked: $isLiked, isBookmarked: $isBookmarked, createdAt: $createdAt)';
   }
 
   @override
@@ -1595,6 +1644,8 @@ class _$CoupletSearchResultImpl implements _CoupletSearchResult {
                 other.coupletNumber == coupletNumber) &&
             (identical(other.coupletType, coupletType) ||
                 other.coupletType == coupletType) &&
+            (identical(other.coupletTypeName, coupletTypeName) ||
+                other.coupletTypeName == coupletTypeName) &&
             const DeepCollectionEquality().equals(other._verses, _verses) &&
             (identical(other.poem, poem) || other.poem == poem) &&
             (identical(other.poet, poet) || other.poet == poet) &&
@@ -1608,7 +1659,9 @@ class _$CoupletSearchResultImpl implements _CoupletSearchResult {
                 other.engagementScore == engagementScore) &&
             (identical(other.isLiked, isLiked) || other.isLiked == isLiked) &&
             (identical(other.isBookmarked, isBookmarked) ||
-                other.isBookmarked == isBookmarked));
+                other.isBookmarked == isBookmarked) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1618,6 +1671,7 @@ class _$CoupletSearchResultImpl implements _CoupletSearchResult {
       publicId,
       coupletNumber,
       coupletType,
+      coupletTypeName,
       const DeepCollectionEquality().hash(_verses),
       poem,
       poet,
@@ -1626,7 +1680,8 @@ class _$CoupletSearchResultImpl implements _CoupletSearchResult {
       bookmarkCount,
       engagementScore,
       isLiked,
-      isBookmarked);
+      isBookmarked,
+      createdAt);
 
   /// Create a copy of CoupletSearchResult
   /// with the given fields replaced by the non-null parameter values.
@@ -1650,15 +1705,17 @@ abstract class _CoupletSearchResult implements CoupletSearchResult {
       {required final String publicId,
       required final int coupletNumber,
       required final String coupletType,
+      final String? coupletTypeName,
       required final List<VerseModel> verses,
-      required final PoemSummary poem,
-      required final PoetSummary poet,
+      final PoemSummary? poem,
+      final PoetSummary? poet,
       final int likeCount,
       final int shareCount,
       final int bookmarkCount,
       final double engagementScore,
-      final bool isLiked,
-      final bool isBookmarked}) = _$CoupletSearchResultImpl;
+      final bool? isLiked,
+      final bool? isBookmarked,
+      final DateTime? createdAt}) = _$CoupletSearchResultImpl;
 
   factory _CoupletSearchResult.fromJson(Map<String, dynamic> json) =
       _$CoupletSearchResultImpl.fromJson;
@@ -1670,11 +1727,13 @@ abstract class _CoupletSearchResult implements CoupletSearchResult {
   @override
   String get coupletType;
   @override
+  String? get coupletTypeName; // Added from API response
+  @override
   List<VerseModel> get verses;
   @override
-  PoemSummary get poem;
+  PoemSummary? get poem; // Made nullable - API doesn't always include this
   @override
-  PoetSummary get poet;
+  PoetSummary? get poet; // Made nullable - API doesn't always include this
   @override
   int get likeCount;
   @override
@@ -1684,9 +1743,12 @@ abstract class _CoupletSearchResult implements CoupletSearchResult {
   @override
   double get engagementScore;
   @override
-  bool get isLiked;
+  bool? get isLiked; // Made nullable - API returns null when not authenticated
   @override
-  bool get isBookmarked;
+  bool?
+      get isBookmarked; // Made nullable - API returns null when not authenticated
+  @override
+  DateTime? get createdAt;
 
   /// Create a copy of CoupletSearchResult
   /// with the given fields replaced by the non-null parameter values.

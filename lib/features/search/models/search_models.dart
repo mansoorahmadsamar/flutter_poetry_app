@@ -95,15 +95,17 @@ class CoupletSearchResult with _$CoupletSearchResult {
     required String publicId,
     required int coupletNumber,
     required String coupletType,
+    String? coupletTypeName,  // Added from API response
     required List<VerseModel> verses,
-    required PoemSummary poem,
-    required PoetSummary poet,
+    PoemSummary? poem,  // Made nullable - API doesn't always include this
+    PoetSummary? poet,  // Made nullable - API doesn't always include this
     @Default(0) int likeCount,
     @Default(0) int shareCount,
     @Default(0) int bookmarkCount,
     @Default(0.0) double engagementScore,
-    @Default(false) bool isLiked,
-    @Default(false) bool isBookmarked,
+    bool? isLiked,  // Made nullable - API returns null when not authenticated
+    bool? isBookmarked,  // Made nullable - API returns null when not authenticated
+    DateTime? createdAt,  // Added from API response
   }) = _CoupletSearchResult;
 
   factory CoupletSearchResult.fromJson(Map<String, dynamic> json) =>

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/widgets/localized_text.dart';
 import 'package:flutter_poetry_app/features/search/providers/search_pagination_provider.dart';
@@ -140,12 +139,8 @@ class _CategoryResultsScreenState extends ConsumerState<CategoryResultsScreen> {
           final result = paginationState.results[index];
           return CoupletCard(
             couplet: convertSearchResultToCoupletModel(result),
-            onTap: () {
-              context.pushNamed(
-                'poem-detail',
-                pathParameters: {'publicId': result.poem.publicId},
-              );
-            },
+            // Navigation disabled until poem publicId is available from search API
+            onTap: null,
           );
         },
       ),

@@ -11,13 +11,13 @@ CoupletModel convertSearchResultToCoupletModel(CoupletSearchResult result) {
     publicId: result.publicId,
     coupletNumber: result.coupletNumber,
     coupletType: result.coupletType,
-    coupletTypeName: result.coupletType, // Use type as name for now
+    coupletTypeName: result.coupletTypeName ?? result.coupletType,
     verses: result.verses,
     likeCount: result.likeCount,
     bookmarkCount: result.bookmarkCount,
     shareCount: result.shareCount,
-    isLikedByCurrentUser: result.isLiked,
-    isBookmarkedByCurrentUser: result.isBookmarked,
-    createdAt: null, // Not provided in search results
+    isLikedByCurrentUser: result.isLiked ?? false,
+    isBookmarkedByCurrentUser: result.isBookmarked ?? false,
+    createdAt: result.createdAt,
   );
 }
