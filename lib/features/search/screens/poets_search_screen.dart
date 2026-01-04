@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/features/search/providers/search_providers.dart';
-import 'package:flutter_poetry_app/features/search/providers/search_pagination_provider.dart';
 import 'package:flutter_poetry_app/features/search/widgets/search_results_grid.dart';
 import 'package:flutter_poetry_app/features/search/widgets/recent_searches_list.dart';
 import 'package:flutter_poetry_app/features/search/widgets/search_suggestions_section.dart';

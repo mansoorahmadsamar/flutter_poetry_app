@@ -1714,7 +1714,8 @@ VerseModel _$VerseModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$VerseModel {
-  String get publicId => throw _privateConstructorUsedError;
+  String? get publicId =>
+      throw _privateConstructorUsedError; // Made nullable - search API doesn't include this
   @JsonKey(name: 'verseText')
   String get text => throw _privateConstructorUsedError;
   String? get verseType => throw _privateConstructorUsedError;
@@ -1737,7 +1738,7 @@ abstract class $VerseModelCopyWith<$Res> {
       _$VerseModelCopyWithImpl<$Res, VerseModel>;
   @useResult
   $Res call(
-      {String publicId,
+      {String? publicId,
       @JsonKey(name: 'verseText') String text,
       String? verseType,
       int? verseNumber});
@@ -1758,16 +1759,16 @@ class _$VerseModelCopyWithImpl<$Res, $Val extends VerseModel>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? publicId = null,
+    Object? publicId = freezed,
     Object? text = null,
     Object? verseType = freezed,
     Object? verseNumber = freezed,
   }) {
     return _then(_value.copyWith(
-      publicId: null == publicId
+      publicId: freezed == publicId
           ? _value.publicId
           : publicId // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       text: null == text
           ? _value.text
           : text // ignore: cast_nullable_to_non_nullable
@@ -1793,7 +1794,7 @@ abstract class _$$VerseModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String publicId,
+      {String? publicId,
       @JsonKey(name: 'verseText') String text,
       String? verseType,
       int? verseNumber});
@@ -1812,16 +1813,16 @@ class __$$VerseModelImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? publicId = null,
+    Object? publicId = freezed,
     Object? text = null,
     Object? verseType = freezed,
     Object? verseNumber = freezed,
   }) {
     return _then(_$VerseModelImpl(
-      publicId: null == publicId
+      publicId: freezed == publicId
           ? _value.publicId
           : publicId // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       text: null == text
           ? _value.text
           : text // ignore: cast_nullable_to_non_nullable
@@ -1842,7 +1843,7 @@ class __$$VerseModelImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$VerseModelImpl implements _VerseModel {
   const _$VerseModelImpl(
-      {required this.publicId,
+      {this.publicId,
       @JsonKey(name: 'verseText') required this.text,
       this.verseType,
       this.verseNumber});
@@ -1851,7 +1852,8 @@ class _$VerseModelImpl implements _VerseModel {
       _$$VerseModelImplFromJson(json);
 
   @override
-  final String publicId;
+  final String? publicId;
+// Made nullable - search API doesn't include this
   @override
   @JsonKey(name: 'verseText')
   final String text;
@@ -1902,7 +1904,7 @@ class _$VerseModelImpl implements _VerseModel {
 
 abstract class _VerseModel implements VerseModel {
   const factory _VerseModel(
-      {required final String publicId,
+      {final String? publicId,
       @JsonKey(name: 'verseText') required final String text,
       final String? verseType,
       final int? verseNumber}) = _$VerseModelImpl;
@@ -1911,7 +1913,7 @@ abstract class _VerseModel implements VerseModel {
       _$VerseModelImpl.fromJson;
 
   @override
-  String get publicId;
+  String? get publicId; // Made nullable - search API doesn't include this
   @override
   @JsonKey(name: 'verseText')
   String get text;

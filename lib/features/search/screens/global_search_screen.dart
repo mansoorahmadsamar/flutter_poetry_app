@@ -11,15 +11,20 @@ import 'package:flutter_poetry_app/features/search/widgets/discovery_sections/re
 import 'package:flutter_poetry_app/features/search/widgets/discovery_sections/trending_searches_section.dart';
 import 'package:flutter_poetry_app/features/search/widgets/discovery_sections/recommendations_section.dart';
 
-/// Search tab - Global search with discovery content
+/// Global search screen with mode-based UI
 ///
 /// Features:
-/// - Discovery content visible on load (trending, recommendations, recent)
-/// - Search bar always visible at top
-/// - No auto-focus - user taps when ready to search
-/// - Mode-based content rendering
-class SearchTab extends ConsumerWidget {
-  const SearchTab({super.key});
+/// - Auto-focus search bar
+/// - Mode-based content rendering:
+///   - idle/typing → Discovery sections
+///   - autocompleting → Autocomplete + Discovery
+///   - searching → Skeleton loaders
+///   - results → Search results
+///   - error → Error state with retry
+/// - Sticky search bar (SliverAppBar)
+/// - Smooth transitions between states
+class GlobalSearchScreen extends ConsumerWidget {
+  const GlobalSearchScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -37,8 +42,8 @@ class SearchTab extends ConsumerWidget {
             backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFFFFBF7),
             elevation: 0,
             toolbarHeight: 80,
-            automaticallyImplyLeading: false,
-            title: const GlobalSearchBar(autofocus: false), // No auto-focus in tab
+            title: const GlobalSearchBar(autofocus: true),
+            automaticallyImplyLeading: true,
           ),
 
           // Content based on search mode

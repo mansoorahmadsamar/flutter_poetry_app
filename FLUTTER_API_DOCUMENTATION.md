@@ -216,7 +216,13 @@ A single, consolidated API that provides access to all bookmark types (poems, co
 - [10.1 Overview](#101-overview-search)
 - [10.2 Unified Search](#102-unified-search)
 - [10.3 Quick Search](#103-quick-search)
-- [10.4 Use Cases & Workflows](#104-use-cases-workflows)
+- [10.4 Couplet Search](#104-couplet-search)
+- [10.5 Autocomplete](#105-autocomplete)
+- [10.6 Recommendations](#106-recommendations)
+- [10.7 Search Analytics](#107-search-analytics)
+  - [10.7.1 Related Searches](#1071-related-searches)
+  - [10.7.2 Trending Searches](#1072-trending-searches)
+- [10.8 Use Cases & Workflows](#108-use-cases-workflows)
 
 ### 11. Categories, Tags & Metadata
 - [11.1 Categories](#111-categories)
@@ -5622,8 +5628,609 @@ Simplified search (all types, default pagination).
 
 ---
 
+### 10.4 Couplet Search
 
-## 11. Categories, Tags & Metadata
+**Endpoint:** `GET /api/search/couplets`
+
+**Description:** Search specifically for couplets (شعر/اشعار) with advanced filtering and sorting options. Supports multilingual search across Urdu (Arabic/Roman), English, and Hindi.
+
+**Query Parameters:**
+- `q` (required) - Search query text
+- `poet` (optional) - Filter by poet public ID
+- `sort` (optional, default: `relevance`) - Sort order
+  - `relevance` - Best match based on BM25 scoring
+  - `likes` - Most liked couplets
+  - `shares` - Most shared couplets
+  - `bookmarks` - Most bookmarked couplets
+  - `trending` - Highest engagement score
+- `lang` (optional, default: `ur`) - Language code (ur, en, hi)
+- `page` (optional, default: `0`) - Page number (zero-indexed)
+- `size` (optional, default: `10`) - Results per page
+
+**Example Request:**
+```http
+GET /api/search/couplets?q=محبت&poet=mirza-ghalib&sort=likes&lang=ur&page=0&size=10
+```
+
+**Response Format:**
+```json
+{
+  "success": true,
+  "message": "Couplets retrieved successfully",
+  "data": {
+    "content": [
+      {
+        "publicId": "abc123",
+        "coupletNumber": 3,
+        "coupletType": "MISRA",
+        "verses": [
+          {
+            "verseText": "محبت میں نہیں ہے فرق جینے اور مرنے کا",
+            "verseNumber": 1,
+            "languageCode": "ur"
+          },
+          {
+            "verseText": "اسی کو دیکھ کر جیتے ہیں جس کافر پہ دم نکلے",
+            "verseNumber": 2,
+            "languageCode": "ur"
+          }
+        ],
+        "poem": {
+          "publicId": "poem123",
+          "title": "غزل نمبر ۱",
+          "poetName": "مرزا غالب"
+        },
+        "poet": {
+          "publicId": "mirza-ghalib",
+          "name": "مرزا غالب",
+          "profileImageUrl": "https://cdn.example.com/poets/ghalib.jpg"
+        },
+        "likeCount": 245,
+        "shareCount": 89,
+        "bookmarkCount": 156,
+        "engagementScore": 623.5,
+        "isLiked": false,
+        "isBookmarked": true
+      }
+    ],
+    "totalElements": 45,
+    "totalPages": 5,
+    "pageNumber": 0,
+    "pageSize": 10,
+    "last": false,
+    "first": true
+  }
+}
+```
+
+**Engagement Score Calculation:**
+`engagementScore = (likes × 1.0) + (shares × 2.0) + (bookmarks × 1.5)`
+
+**Search Features:**
+- **Multilingual:** Automatically detects script (Arabic, Roman, Devanagari)
+- **Fuzzy Matching:** Handles typos and variations (AUTO fuzziness)
+- **Field Boosting:** Verse text gets higher relevance boost
+- **Hybrid Fallback:** Automatically falls back to PostgreSQL if Elasticsearch unavailable
+
+**Use Cases:**
+1. **Trending Couplets:** `?sort=trending&size=20`
+2. **Poet's Popular Couplets:** `?poet=faiz-ahmed-faiz&sort=likes`
+3. **Search by Theme:** `?q=عشق&sort=relevance`
+4. **Most Bookmarked:** `?sort=bookmarks&page=0`
+
+---
+
+### 10.5 Autocomplete
+
+**Endpoint:** `GET /api/search/autocomplete`
+
+**Description:** Real-time search suggestions across multiple content types (poets, poems, tags, categories). Designed for instant search-as-you-type experiences with minimal latency (<200ms).
+
+**Query Parameters:**
+- `q` (required) - Search query (minimum 2 characters)
+- `lang` (optional, default: `ur`) - Language code
+
+**Example Request:**
+```http
+GET /api/search/autocomplete?q=غا&lang=ur
+```
+
+**Response Format:**
+```json
+{
+  "success": true,
+  "message": "Autocomplete suggestions retrieved",
+  "data": {
+    "poets": [
+      {
+        "publicId": "mirza-ghalib",
+        "name": "مرزا غالب",
+        "profileImageUrl": "https://cdn.example.com/poets/ghalib.jpg",
+        "era": "CLASSICAL",
+        "score": 9.5
+      },
+      {
+        "publicId": "ghalib-lakhnavi",
+        "name": "غالب لکھنوی",
+        "profileImageUrl": "https://cdn.example.com/poets/lakhnavi.jpg",
+        "era": "MODERN",
+        "score": 7.2
+      }
+    ],
+    "poems": [
+      {
+        "publicId": "poem456",
+        "title": "غزل نمبر ۵",
+        "poetName": "مرزا غالب",
+        "poemType": "GHAZAL",
+        "score": 8.3
+      },
+      {
+        "publicId": "poem789",
+        "title": "دیوان غالب",
+        "poetName": "مرزا غالب",
+        "poemType": "GHAZAL",
+        "score": 7.8
+      }
+    ],
+    "tags": [
+      {
+        "publicId": "tag123",
+        "name": "غزل",
+        "slug": "ghazal",
+        "tagType": "POEM_GENRE",
+        "score": 9.0
+      }
+    ],
+    "categories": [
+      {
+        "publicId": "cat456",
+        "name": "غزلیات",
+        "slug": "ghazliyat",
+        "poemCount": 1250,
+        "score": 8.5
+      }
+    ],
+    "totalCount": 8
+  }
+}
+```
+
+**Result Limits:**
+- Poets: 3 results
+- Poems: 5 results
+- Tags: 3 results
+- Categories: 3 results
+- **Total:** Maximum 14 suggestions per query
+
+**Technical Features:**
+- **Edge N-gram Tokenizer:** min_gram: 2, max_gram: 15
+- **Prefix Matching:** Optimized for partial word matching
+- **Relevance Scoring:** Higher scores for exact prefix matches
+- **Caching:** Redis cache (TTL: 5 minutes)
+
+**Flutter Implementation Example:**
+```dart
+// Debounce search input (300-500ms)
+Timer? _debounce;
+
+void onSearchChanged(String query) {
+  if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+  _debounce = Timer(const Duration(milliseconds: 300), () {
+    if (query.length >= 2) {
+      _searchService.getAutocompleteSuggestions(query);
+    }
+  });
+}
+```
+
+**UI Rendering:**
+- Display results grouped by type (Poets, Poems, Tags, Categories)
+- Show avatar/icon for each type
+- Highlight matching text
+- Handle navigation to appropriate detail screen on tap
+
+---
+
+### 10.6 Recommendations
+
+**Endpoint:** `GET /api/search/recommendations`
+
+**Description:** Intelligent content recommendations using multiple strategies: personalized based on user behavior, similar content using More Like This, trending content, and hybrid approaches.
+
+**Query Parameters:**
+- `type` (optional, default: `hybrid`) - Recommendation type
+  - `personalized` - Based on user's bookmarks and likes
+  - `similar` - Similar to currently viewing content
+  - `trending` - Popular content in timeframe
+  - `hybrid` - Combined strategies (40% personalized + 60% trending)
+- `contentType` (required for `similar` type) - POEM or COUPLET
+- `contentId` (required for `similar` type) - Public ID of content
+- `timeframe` (optional for `trending`, default: `week`) - day, week, month
+- `limit` (optional, default: `10`) - Number of recommendations
+
+**Header:**
+- `X-User-Id` (optional) - User ID for personalized recommendations
+
+**Example Requests:**
+
+**1. Personalized Recommendations:**
+```http
+GET /api/search/recommendations?type=personalized&limit=10
+Header: X-User-Id: 12345
+```
+
+**2. Similar Content:**
+```http
+GET /api/search/recommendations?type=similar&contentType=POEM&contentId=poem-xyz&limit=10
+```
+
+**3. Trending Content:**
+```http
+GET /api/search/recommendations?type=trending&contentType=COUPLET&timeframe=week&limit=20
+```
+
+**4. Hybrid (Default):**
+```http
+GET /api/search/recommendations?type=hybrid&limit=10
+Header: X-User-Id: 12345
+```
+
+**Response Format:**
+```json
+{
+  "success": true,
+  "message": "Recommendations retrieved",
+  "data": {
+    "type": "PERSONALIZED",
+    "items": [
+      {
+        "contentType": "POEM",
+        "publicId": "poem-abc",
+        "title": "شکوہ",
+        "poetName": "علامہ اقبال",
+        "likeCount": 1250,
+        "shareCount": 340,
+        "bookmarkCount": 890,
+        "score": 87.5,
+        "reason": "Based on your bookmarks of Allama Iqbal's works"
+      },
+      {
+        "contentType": "COUPLET",
+        "publicId": "couplet-def",
+        "title": "Couplet from دیوان غالب",
+        "poetName": "مرزا غالب",
+        "likeCount": 2100,
+        "shareCount": 560,
+        "bookmarkCount": 1340,
+        "score": 92.3,
+        "reason": "Similar to poems you've liked"
+      }
+    ],
+    "totalCount": 10,
+    "algorithm": "personalized_mlm"
+  }
+}
+```
+
+**Recommendation Strategies:**
+
+**1. Personalized (personalized):**
+- Analyzes user's bookmarks, likes, and reading history
+- Uses Elasticsearch More Like This query
+- Finds content similar to user's preferences
+- **Reason:** "Based on your bookmarks", "Similar to poems you've liked"
+
+**2. Similar Content (similar):**
+- Uses More Like This query on specific content
+- Parameters: `minTermFreq: 1`, `maxQueryTerms: 12`
+- Matches: title, full text, poet, tags
+- **Reason:** "Similar to what you're reading"
+
+**3. Trending (trending):**
+- High engagement in specified timeframe
+- Sorts by: `likeCount`, `viewCount`, `engagementScore`
+- Timeframes: day (24h), week (7d), month (30d)
+- **Reason:** "Trending this week", "Most popular today"
+
+**4. Hybrid (hybrid):**
+- 40% personalized + 30% trending + 30% more trending
+- Removes duplicates by publicId
+- Falls back to trending for anonymous users
+- **Reason:** "Curated for you", "Popular in your interests"
+
+**Use Cases:**
+
+**For Home Feed:**
+```http
+GET /api/search/recommendations?type=hybrid&limit=20
+Header: X-User-Id: 12345
+```
+
+**For Poem Detail Screen (Similar Poems):**
+```http
+GET /api/search/recommendations?type=similar&contentType=POEM&contentId=current-poem-id&limit=5
+```
+
+**For Discover Tab:**
+```http
+GET /api/search/recommendations?type=trending&timeframe=week&limit=30
+```
+
+**For Personalized Section:**
+```http
+GET /api/search/recommendations?type=personalized&limit=15
+Header: X-User-Id: 12345
+```
+
+**Flutter Implementation:**
+```dart
+// Home feed with mixed recommendations
+Future<List<RecommendedItem>> loadHomeFeed() async {
+  final response = await dio.get(
+    '/api/search/recommendations',
+    queryParameters: {'type': 'hybrid', 'limit': 20},
+    options: Options(headers: {'X-User-Id': userId}),
+  );
+  return parseRecommendations(response.data);
+}
+
+// Similar poems carousel
+Future<List<RecommendedItem>> loadSimilarPoems(String poemId) async {
+  final response = await dio.get(
+    '/api/search/recommendations',
+    queryParameters: {
+      'type': 'similar',
+      'contentType': 'POEM',
+      'contentId': poemId,
+      'limit': 5
+    },
+  );
+  return parseRecommendations(response.data);
+}
+```
+
+---
+
+### 10.7 Search Analytics
+
+Analytics endpoints for tracking search behavior and providing "People also searched" features.
+
+#### 10.7.1 Related Searches
+
+**Endpoint:** `GET /api/search/related`
+
+**Description:** Returns related search queries based on session co-occurrence analysis. Shows what other users searched for in the same session (30-day window).
+
+**Query Parameters:**
+- `q` (required) - Original search query
+- `limit` (optional, default: `5`) - Number of related searches
+
+**Example Request:**
+```http
+GET /api/search/related?q=غالب&limit=5
+```
+
+**Response Format:**
+```json
+{
+  "success": true,
+  "message": "Related searches retrieved",
+  "data": {
+    "query": "غالب",
+    "relatedSearches": [
+      {
+        "query": "مرزا غالب",
+        "normalizedQuery": "مرزا غالب",
+        "count": 234,
+        "score": 95.5
+      },
+      {
+        "query": "دیوان غالب",
+        "normalizedQuery": "دیوان غالب",
+        "count": 189,
+        "score": 87.3
+      },
+      {
+        "query": "غالب کی شاعری",
+        "normalizedQuery": "غالب کی شاعری",
+        "count": 156,
+        "score": 78.5
+      },
+      {
+        "query": "غزلیات غالب",
+        "normalizedQuery": "غزلیات غالب",
+        "count": 142,
+        "score": 73.2
+      },
+      {
+        "query": "میر تقی میر",
+        "normalizedQuery": "میر تقی میر",
+        "count": 98,
+        "score": 62.8
+      }
+    ],
+    "totalCount": 5,
+    "timeWindow": "last 30 days"
+  }
+}
+```
+
+**Algorithm:**
+1. Find all sessions containing the original query
+2. Aggregate other queries from those sessions
+3. Rank by co-occurrence frequency
+4. Exclude the original query
+
+**Score Calculation:**
+`score = min(100, count × 10)` - Normalized to 0-100 range
+
+**Use Cases:**
+
+**People Also Searched UI:**
+```dart
+// Display as horizontal chip list below search results
+Widget buildRelatedSearches(String query) {
+  return FutureBuilder<RelatedSearchesResponse>(
+    future: searchService.getRelatedSearches(query),
+    builder: (context, snapshot) {
+      if (!snapshot.hasData) return SizedBox();
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('People also searched:', style: TextStyle(fontSize: 14)),
+          SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            children: snapshot.data!.relatedSearches.map((search) {
+              return ActionChip(
+                label: Text(search.query),
+                onPressed: () => performSearch(search.query),
+              );
+            }).toList(),
+          ),
+        ],
+      );
+    },
+  );
+}
+```
+
+**Zero Results Suggestion:**
+```http
+GET /api/search?q=غالیب  # User typo - no results
+GET /api/search/related?q=غالیب  # Suggests "غالب" (correct spelling)
+```
+
+---
+
+#### 10.7.2 Trending Searches
+
+**Endpoint:** `GET /api/search/trending`
+
+**Description:** Returns most popular search queries within a specified timeframe, ranked by search frequency.
+
+**Query Parameters:**
+- `timeframe` (optional, default: `week`) - Time window
+  - `day` - Last 24 hours
+  - `week` - Last 7 days
+  - `month` - Last 30 days
+- `limit` (optional, default: `10`) - Number of trending searches
+
+**Example Request:**
+```http
+GET /api/search/trending?timeframe=week&limit=10
+```
+
+**Response Format:**
+```json
+{
+  "success": true,
+  "message": "Trending searches retrieved",
+  "data": {
+    "searches": [
+      {
+        "query": "فیض احمد فیض",
+        "normalizedQuery": "فیض احمد فیض",
+        "count": 1245,
+        "score": 100.0
+      },
+      {
+        "query": "محبت",
+        "normalizedQuery": "محبت",
+        "count": 987,
+        "score": 79.3
+      },
+      {
+        "query": "غالب",
+        "normalizedQuery": "غالب",
+        "count": 892,
+        "score": 71.6
+      },
+      {
+        "query": "اقبال",
+        "normalizedQuery": "اقبال",
+        "count": 756,
+        "score": 60.7
+      },
+      {
+        "query": "غزل",
+        "normalizedQuery": "غزل",
+        "count": 634,
+        "score": 50.9
+      }
+    ],
+    "totalCount": 10,
+    "timeframe": "week",
+    "period": "last 7 days"
+  }
+}
+```
+
+**Score Calculation:**
+`score = min(100, count × 5)` - Normalized to 0-100 range
+
+**Use Cases:**
+
+**1. Trending Searches Widget (Home Screen):**
+```dart
+Widget buildTrendingSearches() {
+  return FutureBuilder<TrendingSearchesResponse>(
+    future: searchService.getTrendingSearches('week'),
+    builder: (context, snapshot) {
+      if (!snapshot.hasData) return CircularProgressIndicator();
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Trending This Week 🔥', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          SizedBox(height: 12),
+          ...snapshot.data!.searches.asMap().entries.map((entry) {
+            int index = entry.key;
+            var search = entry.value;
+            return ListTile(
+              leading: CircleAvatar(child: Text('${index + 1}')),
+              title: Text(search.query),
+              subtitle: Text('${search.count} searches'),
+              trailing: Icon(Icons.trending_up),
+              onTap: () => performSearch(search.query),
+            );
+          }).toList(),
+        ],
+      );
+    },
+  );
+}
+```
+
+**2. Discovery Tab (Daily/Weekly/Monthly Tabs):**
+```dart
+TabBarView(
+  children: [
+    TrendingSearchList(timeframe: 'day'),
+    TrendingSearchList(timeframe: 'week'),
+    TrendingSearchList(timeframe: 'month'),
+  ],
+);
+```
+
+**3. Search Suggestions (Empty State):**
+```http
+# When search box is empty, show trending searches
+GET /api/search/trending?timeframe=day&limit=5
+```
+
+**Implementation Notes:**
+- All search queries are logged asynchronously (non-blocking)
+- Session tracking uses client-generated session IDs
+- Related searches use Elasticsearch terms aggregations
+- Trending searches cached for 1 hour (Redis)
+
+---
+
+### 10.8 Use Cases & Workflows
 
 ### 11.1 Categories
 

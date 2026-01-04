@@ -6,6 +6,8 @@ import '../../features/main/main_screen.dart';
 import '../../features/main/tabs/poets/screens/poet_detail_screen.dart';
 import '../../features/main/tabs/poets/screens/poem_detail_screen.dart';
 import '../../features/search/screens/poets_search_screen.dart';
+import '../../features/search/screens/global_search_screen.dart';
+import '../../features/search/screens/category_results_screen.dart';
 import '../../features/engagement/screens/bookmark_search_screen.dart';
 import '../../features/engagement/screens/bookmarked_couplets_screen.dart';
 import '../../features/image_poetry/screens/template_selection_screen.dart';
@@ -77,12 +79,14 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: 'poets/:publicId',
+            name: 'poet-detail',
             builder: (context, state) => PoetDetailScreen(
               publicId: state.pathParameters['publicId']!,
             ),
           ),
           GoRoute(
             path: 'poems/:publicId',
+            name: 'poem-detail',
             builder: (context, state) => PoemDetailScreen(
               publicId: state.pathParameters['publicId']!,
             ),
@@ -156,6 +160,26 @@ final routerProvider = Provider<GoRouter>((ref) {
           return PoetryEditorScreen(
             coupletId: extra?['coupletId'] as String?,
             initialVerses: extra?['verses'] as List<String>?,
+          );
+        },
+      ),
+      // Global Search routes
+      GoRoute(
+        path: '/search',
+        name: 'global-search',
+        builder: (context, state) => const GlobalSearchScreen(),
+      ),
+      GoRoute(
+        path: '/search/results/:category',
+        name: 'category-results',
+        builder: (context, state) {
+          final category = state.pathParameters['category']!;
+          final extra = state.extra as Map<String, dynamic>?;
+          return CategoryResultsScreen(
+            query: extra?['query'] as String? ?? '',
+            sortBy: extra?['sortBy'] as String? ?? 'relevance',
+            category: category,
+            poetId: extra?['poetId'] as String?,
           );
         },
       ),

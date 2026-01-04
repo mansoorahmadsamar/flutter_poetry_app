@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/widgets/poet_card.dart';
-import 'package:flutter_poetry_app/features/search/providers/search_pagination_provider.dart';
+import 'package:flutter_poetry_app/features/search/providers/search_providers.dart';
 
 class SearchResultsGrid extends ConsumerStatefulWidget {
   const SearchResultsGrid({super.key});

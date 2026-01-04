@@ -160,3 +160,35 @@ final suggestedPoetsProvider = FutureProvider.autoDispose<
     rethrow;
   }
 });
+
+/// OLD Poet Search Pagination Provider (Stub for backward compatibility)
+/// Note: This is a minimal stub to maintain compatibility with the old PoetsSearchScreen.
+/// The new global search uses a different provider (lib/features/search/providers/search_pagination_provider.dart)
+final searchPaginationProvider =
+    StateNotifierProvider<OldSearchPaginationNotifier, SearchPaginationState>(
+  (ref) => OldSearchPaginationNotifier(),
+);
+
+/// Old search pagination notifier (stub)
+class OldSearchPaginationNotifier extends StateNotifier<SearchPaginationState> {
+  OldSearchPaginationNotifier() : super(const SearchPaginationState());
+
+  void search(String query) {
+    _logger.w('⚠️ Old search pagination is deprecated - use global search instead');
+    // Stub implementation - does nothing
+  }
+
+  void browseByFilters() {
+    _logger.w('⚠️ Old search pagination is deprecated - use global search instead');
+    // Stub implementation - does nothing
+  }
+
+  void loadMore() {
+    _logger.w('⚠️ Old search pagination is deprecated - use global search instead');
+    // Stub implementation - does nothing
+  }
+
+  void reset() {
+    state = const SearchPaginationState();
+  }
+}

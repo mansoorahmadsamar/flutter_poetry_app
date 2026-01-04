@@ -168,7 +168,7 @@ Map<String, dynamic> _$$TagModelImplToJson(_$TagModelImpl instance) =>
 
 _$VerseModelImpl _$$VerseModelImplFromJson(Map<String, dynamic> json) =>
     _$VerseModelImpl(
-      publicId: json['publicId'] as String,
+      publicId: json['publicId'] as String?,
       text: json['verseText'] as String,
       verseType: json['verseType'] as String?,
       verseNumber: (json['verseNumber'] as num?)?.toInt(),
