@@ -224,9 +224,13 @@ _$RecommendationItemImpl _$$RecommendationItemImplFromJson(
       publicId: json['publicId'] as String,
       title: json['title'] as String,
       poetName: json['poetName'] as String?,
+      poetPublicId: json['poetPublicId'] as String?,
+      poetryType: json['poetryType'] as String?,
+      categoryName: json['categoryName'] as String?,
       likeCount: (json['likeCount'] as num?)?.toInt() ?? 0,
       shareCount: (json['shareCount'] as num?)?.toInt() ?? 0,
       bookmarkCount: (json['bookmarkCount'] as num?)?.toInt() ?? 0,
+      viewCount: (json['viewCount'] as num?)?.toInt() ?? 0,
       score: json['score'] == null
           ? 0.0
           : const NaNDoubleConverter().fromJson(json['score']),
@@ -240,9 +244,13 @@ Map<String, dynamic> _$$RecommendationItemImplToJson(
       'publicId': instance.publicId,
       'title': instance.title,
       'poetName': instance.poetName,
+      'poetPublicId': instance.poetPublicId,
+      'poetryType': instance.poetryType,
+      'categoryName': instance.categoryName,
       'likeCount': instance.likeCount,
       'shareCount': instance.shareCount,
       'bookmarkCount': instance.bookmarkCount,
+      'viewCount': instance.viewCount,
       'score': const NaNDoubleConverter().toJson(instance.score),
       'reason': instance.reason,
     };

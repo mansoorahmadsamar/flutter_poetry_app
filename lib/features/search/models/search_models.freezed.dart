@@ -2377,9 +2377,17 @@ mixin _$RecommendationItem {
   String get publicId => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
   String? get poetName => throw _privateConstructorUsedError;
+  String? get poetPublicId =>
+      throw _privateConstructorUsedError; // Added from API response
+  String? get poetryType =>
+      throw _privateConstructorUsedError; // Added from API response
+  String? get categoryName =>
+      throw _privateConstructorUsedError; // Added from API response
   int get likeCount => throw _privateConstructorUsedError;
   int get shareCount => throw _privateConstructorUsedError;
   int get bookmarkCount => throw _privateConstructorUsedError;
+  int get viewCount =>
+      throw _privateConstructorUsedError; // Added from API response
   @NaNDoubleConverter()
   double get score =>
       throw _privateConstructorUsedError; // Handle "NaN" from API
@@ -2406,9 +2414,13 @@ abstract class $RecommendationItemCopyWith<$Res> {
       String publicId,
       String title,
       String? poetName,
+      String? poetPublicId,
+      String? poetryType,
+      String? categoryName,
       int likeCount,
       int shareCount,
       int bookmarkCount,
+      int viewCount,
       @NaNDoubleConverter() double score,
       String? reason});
 }
@@ -2432,9 +2444,13 @@ class _$RecommendationItemCopyWithImpl<$Res, $Val extends RecommendationItem>
     Object? publicId = null,
     Object? title = null,
     Object? poetName = freezed,
+    Object? poetPublicId = freezed,
+    Object? poetryType = freezed,
+    Object? categoryName = freezed,
     Object? likeCount = null,
     Object? shareCount = null,
     Object? bookmarkCount = null,
+    Object? viewCount = null,
     Object? score = null,
     Object? reason = freezed,
   }) {
@@ -2455,6 +2471,18 @@ class _$RecommendationItemCopyWithImpl<$Res, $Val extends RecommendationItem>
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
               as String?,
+      poetPublicId: freezed == poetPublicId
+          ? _value.poetPublicId
+          : poetPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetryType: freezed == poetryType
+          ? _value.poetryType
+          : poetryType // ignore: cast_nullable_to_non_nullable
+              as String?,
+      categoryName: freezed == categoryName
+          ? _value.categoryName
+          : categoryName // ignore: cast_nullable_to_non_nullable
+              as String?,
       likeCount: null == likeCount
           ? _value.likeCount
           : likeCount // ignore: cast_nullable_to_non_nullable
@@ -2466,6 +2494,10 @@ class _$RecommendationItemCopyWithImpl<$Res, $Val extends RecommendationItem>
       bookmarkCount: null == bookmarkCount
           ? _value.bookmarkCount
           : bookmarkCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      viewCount: null == viewCount
+          ? _value.viewCount
+          : viewCount // ignore: cast_nullable_to_non_nullable
               as int,
       score: null == score
           ? _value.score
@@ -2492,9 +2524,13 @@ abstract class _$$RecommendationItemImplCopyWith<$Res>
       String publicId,
       String title,
       String? poetName,
+      String? poetPublicId,
+      String? poetryType,
+      String? categoryName,
       int likeCount,
       int shareCount,
       int bookmarkCount,
+      int viewCount,
       @NaNDoubleConverter() double score,
       String? reason});
 }
@@ -2516,9 +2552,13 @@ class __$$RecommendationItemImplCopyWithImpl<$Res>
     Object? publicId = null,
     Object? title = null,
     Object? poetName = freezed,
+    Object? poetPublicId = freezed,
+    Object? poetryType = freezed,
+    Object? categoryName = freezed,
     Object? likeCount = null,
     Object? shareCount = null,
     Object? bookmarkCount = null,
+    Object? viewCount = null,
     Object? score = null,
     Object? reason = freezed,
   }) {
@@ -2539,6 +2579,18 @@ class __$$RecommendationItemImplCopyWithImpl<$Res>
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
               as String?,
+      poetPublicId: freezed == poetPublicId
+          ? _value.poetPublicId
+          : poetPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetryType: freezed == poetryType
+          ? _value.poetryType
+          : poetryType // ignore: cast_nullable_to_non_nullable
+              as String?,
+      categoryName: freezed == categoryName
+          ? _value.categoryName
+          : categoryName // ignore: cast_nullable_to_non_nullable
+              as String?,
       likeCount: null == likeCount
           ? _value.likeCount
           : likeCount // ignore: cast_nullable_to_non_nullable
@@ -2550,6 +2602,10 @@ class __$$RecommendationItemImplCopyWithImpl<$Res>
       bookmarkCount: null == bookmarkCount
           ? _value.bookmarkCount
           : bookmarkCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      viewCount: null == viewCount
+          ? _value.viewCount
+          : viewCount // ignore: cast_nullable_to_non_nullable
               as int,
       score: null == score
           ? _value.score
@@ -2571,9 +2627,13 @@ class _$RecommendationItemImpl implements _RecommendationItem {
       required this.publicId,
       required this.title,
       this.poetName,
+      this.poetPublicId,
+      this.poetryType,
+      this.categoryName,
       this.likeCount = 0,
       this.shareCount = 0,
       this.bookmarkCount = 0,
+      this.viewCount = 0,
       @NaNDoubleConverter() this.score = 0.0,
       this.reason});
 
@@ -2590,6 +2650,15 @@ class _$RecommendationItemImpl implements _RecommendationItem {
   @override
   final String? poetName;
   @override
+  final String? poetPublicId;
+// Added from API response
+  @override
+  final String? poetryType;
+// Added from API response
+  @override
+  final String? categoryName;
+// Added from API response
+  @override
   @JsonKey()
   final int likeCount;
   @override
@@ -2600,6 +2669,10 @@ class _$RecommendationItemImpl implements _RecommendationItem {
   final int bookmarkCount;
   @override
   @JsonKey()
+  final int viewCount;
+// Added from API response
+  @override
+  @JsonKey()
   @NaNDoubleConverter()
   final double score;
 // Handle "NaN" from API
@@ -2608,7 +2681,7 @@ class _$RecommendationItemImpl implements _RecommendationItem {
 
   @override
   String toString() {
-    return 'RecommendationItem(contentType: $contentType, publicId: $publicId, title: $title, poetName: $poetName, likeCount: $likeCount, shareCount: $shareCount, bookmarkCount: $bookmarkCount, score: $score, reason: $reason)';
+    return 'RecommendationItem(contentType: $contentType, publicId: $publicId, title: $title, poetName: $poetName, poetPublicId: $poetPublicId, poetryType: $poetryType, categoryName: $categoryName, likeCount: $likeCount, shareCount: $shareCount, bookmarkCount: $bookmarkCount, viewCount: $viewCount, score: $score, reason: $reason)';
   }
 
   @override
@@ -2623,20 +2696,41 @@ class _$RecommendationItemImpl implements _RecommendationItem {
             (identical(other.title, title) || other.title == title) &&
             (identical(other.poetName, poetName) ||
                 other.poetName == poetName) &&
+            (identical(other.poetPublicId, poetPublicId) ||
+                other.poetPublicId == poetPublicId) &&
+            (identical(other.poetryType, poetryType) ||
+                other.poetryType == poetryType) &&
+            (identical(other.categoryName, categoryName) ||
+                other.categoryName == categoryName) &&
             (identical(other.likeCount, likeCount) ||
                 other.likeCount == likeCount) &&
             (identical(other.shareCount, shareCount) ||
                 other.shareCount == shareCount) &&
             (identical(other.bookmarkCount, bookmarkCount) ||
                 other.bookmarkCount == bookmarkCount) &&
+            (identical(other.viewCount, viewCount) ||
+                other.viewCount == viewCount) &&
             (identical(other.score, score) || other.score == score) &&
             (identical(other.reason, reason) || other.reason == reason));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, contentType, publicId, title,
-      poetName, likeCount, shareCount, bookmarkCount, score, reason);
+  int get hashCode => Object.hash(
+      runtimeType,
+      contentType,
+      publicId,
+      title,
+      poetName,
+      poetPublicId,
+      poetryType,
+      categoryName,
+      likeCount,
+      shareCount,
+      bookmarkCount,
+      viewCount,
+      score,
+      reason);
 
   /// Create a copy of RecommendationItem
   /// with the given fields replaced by the non-null parameter values.
@@ -2661,9 +2755,13 @@ abstract class _RecommendationItem implements RecommendationItem {
       required final String publicId,
       required final String title,
       final String? poetName,
+      final String? poetPublicId,
+      final String? poetryType,
+      final String? categoryName,
       final int likeCount,
       final int shareCount,
       final int bookmarkCount,
+      final int viewCount,
       @NaNDoubleConverter() final double score,
       final String? reason}) = _$RecommendationItemImpl;
 
@@ -2679,11 +2777,19 @@ abstract class _RecommendationItem implements RecommendationItem {
   @override
   String? get poetName;
   @override
+  String? get poetPublicId; // Added from API response
+  @override
+  String? get poetryType; // Added from API response
+  @override
+  String? get categoryName; // Added from API response
+  @override
   int get likeCount;
   @override
   int get shareCount;
   @override
   int get bookmarkCount;
+  @override
+  int get viewCount; // Added from API response
   @override
   @NaNDoubleConverter()
   double get score; // Handle "NaN" from API

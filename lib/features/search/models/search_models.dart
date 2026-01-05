@@ -183,9 +183,13 @@ class RecommendationItem with _$RecommendationItem {
     required String publicId,
     required String title,
     String? poetName,
+    String? poetPublicId,  // Added from API response
+    String? poetryType,  // Added from API response
+    String? categoryName,  // Added from API response
     @Default(0) int likeCount,
     @Default(0) int shareCount,
     @Default(0) int bookmarkCount,
+    @Default(0) int viewCount,  // Added from API response
     @NaNDoubleConverter() @Default(0.0) double score,  // Handle "NaN" from API
     String? reason,
   }) = _RecommendationItem;
