@@ -156,6 +156,25 @@ class RecommendationResponse with _$RecommendationResponse {
       _$RecommendationResponseFromJson(json);
 }
 
+/// JSON converter to handle "NaN" string from API
+class NaNDoubleConverter implements JsonConverter<double, Object?> {
+  const NaNDoubleConverter();
+
+  @override
+  double fromJson(Object? json) {
+    if (json == null) return 0.0;
+    if (json is num) return json.toDouble();
+    if (json is String) {
+      if (json == 'NaN' || json.isEmpty) return 0.0;
+      return double.tryParse(json) ?? 0.0;
+    }
+    return 0.0;
+  }
+
+  @override
+  Object? toJson(double object) => object;
+}
+
 /// Individual recommendation item
 @freezed
 class RecommendationItem with _$RecommendationItem {
@@ -167,7 +186,7 @@ class RecommendationItem with _$RecommendationItem {
     @Default(0) int likeCount,
     @Default(0) int shareCount,
     @Default(0) int bookmarkCount,
-    @Default(0.0) double score,
+    @NaNDoubleConverter() @Default(0.0) double score,  // Handle "NaN" from API
     String? reason,
   }) = _RecommendationItem;
 

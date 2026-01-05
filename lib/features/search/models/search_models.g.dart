@@ -227,7 +227,9 @@ _$RecommendationItemImpl _$$RecommendationItemImplFromJson(
       likeCount: (json['likeCount'] as num?)?.toInt() ?? 0,
       shareCount: (json['shareCount'] as num?)?.toInt() ?? 0,
       bookmarkCount: (json['bookmarkCount'] as num?)?.toInt() ?? 0,
-      score: (json['score'] as num?)?.toDouble() ?? 0.0,
+      score: json['score'] == null
+          ? 0.0
+          : const NaNDoubleConverter().fromJson(json['score']),
       reason: json['reason'] as String?,
     );
 
@@ -241,7 +243,7 @@ Map<String, dynamic> _$$RecommendationItemImplToJson(
       'likeCount': instance.likeCount,
       'shareCount': instance.shareCount,
       'bookmarkCount': instance.bookmarkCount,
-      'score': instance.score,
+      'score': const NaNDoubleConverter().toJson(instance.score),
       'reason': instance.reason,
     };
 

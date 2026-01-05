@@ -2380,7 +2380,9 @@ mixin _$RecommendationItem {
   int get likeCount => throw _privateConstructorUsedError;
   int get shareCount => throw _privateConstructorUsedError;
   int get bookmarkCount => throw _privateConstructorUsedError;
-  double get score => throw _privateConstructorUsedError;
+  @NaNDoubleConverter()
+  double get score =>
+      throw _privateConstructorUsedError; // Handle "NaN" from API
   String? get reason => throw _privateConstructorUsedError;
 
   /// Serializes this RecommendationItem to a JSON map.
@@ -2407,7 +2409,7 @@ abstract class $RecommendationItemCopyWith<$Res> {
       int likeCount,
       int shareCount,
       int bookmarkCount,
-      double score,
+      @NaNDoubleConverter() double score,
       String? reason});
 }
 
@@ -2493,7 +2495,7 @@ abstract class _$$RecommendationItemImplCopyWith<$Res>
       int likeCount,
       int shareCount,
       int bookmarkCount,
-      double score,
+      @NaNDoubleConverter() double score,
       String? reason});
 }
 
@@ -2572,7 +2574,7 @@ class _$RecommendationItemImpl implements _RecommendationItem {
       this.likeCount = 0,
       this.shareCount = 0,
       this.bookmarkCount = 0,
-      this.score = 0.0,
+      @NaNDoubleConverter() this.score = 0.0,
       this.reason});
 
   factory _$RecommendationItemImpl.fromJson(Map<String, dynamic> json) =>
@@ -2598,7 +2600,9 @@ class _$RecommendationItemImpl implements _RecommendationItem {
   final int bookmarkCount;
   @override
   @JsonKey()
+  @NaNDoubleConverter()
   final double score;
+// Handle "NaN" from API
   @override
   final String? reason;
 
@@ -2660,7 +2664,7 @@ abstract class _RecommendationItem implements RecommendationItem {
       final int likeCount,
       final int shareCount,
       final int bookmarkCount,
-      final double score,
+      @NaNDoubleConverter() final double score,
       final String? reason}) = _$RecommendationItemImpl;
 
   factory _RecommendationItem.fromJson(Map<String, dynamic> json) =
@@ -2681,7 +2685,8 @@ abstract class _RecommendationItem implements RecommendationItem {
   @override
   int get bookmarkCount;
   @override
-  double get score;
+  @NaNDoubleConverter()
+  double get score; // Handle "NaN" from API
   @override
   String? get reason;
 
