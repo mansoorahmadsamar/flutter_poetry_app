@@ -53,27 +53,27 @@ class Pageable {
 @JsonSerializable(genericArgumentFactories: true)
 class PaginatedResponse<T> {
   final List<T> content;
-  final Pageable pageable;
+  final Pageable? pageable;  // Made nullable - search API doesn't include this
   final int totalElements;
   final int totalPages;
   final bool last;
   final bool first;
-  final int numberOfElements;
-  final int size;
-  final int number;
-  final bool empty;
+  @JsonKey(name: 'numberOfElements') final int? numberOfElements;  // Made nullable
+  @JsonKey(name: 'pageSize') final int size;  // Maps from pageSize
+  @JsonKey(name: 'pageNumber') final int number;  // Maps from pageNumber
+  final bool? empty;  // Made nullable
 
   PaginatedResponse({
     required this.content,
-    required this.pageable,
+    this.pageable,
     required this.totalElements,
     required this.totalPages,
     required this.last,
     required this.first,
-    required this.numberOfElements,
+    this.numberOfElements,
     required this.size,
     required this.number,
-    required this.empty,
+    this.empty,
   });
 
   factory PaginatedResponse.fromJson(
