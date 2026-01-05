@@ -96,6 +96,9 @@ class VerseModel with _$VerseModel {
     @JsonKey(name: 'verseText') required String text,
     String? verseType,
     int? verseNumber,
+    int? coupletNumber,  // Added - present in search API response
+    String? romanizedText,  // Added - present in search API response
+    String? translation,  // Added - present in search API response
   }) = _VerseModel;
 
   factory VerseModel.fromJson(Map<String, dynamic> json) =>

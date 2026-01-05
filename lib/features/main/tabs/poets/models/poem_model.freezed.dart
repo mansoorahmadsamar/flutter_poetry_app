@@ -1720,6 +1720,11 @@ mixin _$VerseModel {
   String get text => throw _privateConstructorUsedError;
   String? get verseType => throw _privateConstructorUsedError;
   int? get verseNumber => throw _privateConstructorUsedError;
+  int? get coupletNumber =>
+      throw _privateConstructorUsedError; // Added - present in search API response
+  String? get romanizedText =>
+      throw _privateConstructorUsedError; // Added - present in search API response
+  String? get translation => throw _privateConstructorUsedError;
 
   /// Serializes this VerseModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -1741,7 +1746,10 @@ abstract class $VerseModelCopyWith<$Res> {
       {String? publicId,
       @JsonKey(name: 'verseText') String text,
       String? verseType,
-      int? verseNumber});
+      int? verseNumber,
+      int? coupletNumber,
+      String? romanizedText,
+      String? translation});
 }
 
 /// @nodoc
@@ -1763,6 +1771,9 @@ class _$VerseModelCopyWithImpl<$Res, $Val extends VerseModel>
     Object? text = null,
     Object? verseType = freezed,
     Object? verseNumber = freezed,
+    Object? coupletNumber = freezed,
+    Object? romanizedText = freezed,
+    Object? translation = freezed,
   }) {
     return _then(_value.copyWith(
       publicId: freezed == publicId
@@ -1781,6 +1792,18 @@ class _$VerseModelCopyWithImpl<$Res, $Val extends VerseModel>
           ? _value.verseNumber
           : verseNumber // ignore: cast_nullable_to_non_nullable
               as int?,
+      coupletNumber: freezed == coupletNumber
+          ? _value.coupletNumber
+          : coupletNumber // ignore: cast_nullable_to_non_nullable
+              as int?,
+      romanizedText: freezed == romanizedText
+          ? _value.romanizedText
+          : romanizedText // ignore: cast_nullable_to_non_nullable
+              as String?,
+      translation: freezed == translation
+          ? _value.translation
+          : translation // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -1797,7 +1820,10 @@ abstract class _$$VerseModelImplCopyWith<$Res>
       {String? publicId,
       @JsonKey(name: 'verseText') String text,
       String? verseType,
-      int? verseNumber});
+      int? verseNumber,
+      int? coupletNumber,
+      String? romanizedText,
+      String? translation});
 }
 
 /// @nodoc
@@ -1817,6 +1843,9 @@ class __$$VerseModelImplCopyWithImpl<$Res>
     Object? text = null,
     Object? verseType = freezed,
     Object? verseNumber = freezed,
+    Object? coupletNumber = freezed,
+    Object? romanizedText = freezed,
+    Object? translation = freezed,
   }) {
     return _then(_$VerseModelImpl(
       publicId: freezed == publicId
@@ -1835,6 +1864,18 @@ class __$$VerseModelImplCopyWithImpl<$Res>
           ? _value.verseNumber
           : verseNumber // ignore: cast_nullable_to_non_nullable
               as int?,
+      coupletNumber: freezed == coupletNumber
+          ? _value.coupletNumber
+          : coupletNumber // ignore: cast_nullable_to_non_nullable
+              as int?,
+      romanizedText: freezed == romanizedText
+          ? _value.romanizedText
+          : romanizedText // ignore: cast_nullable_to_non_nullable
+              as String?,
+      translation: freezed == translation
+          ? _value.translation
+          : translation // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -1846,7 +1887,10 @@ class _$VerseModelImpl implements _VerseModel {
       {this.publicId,
       @JsonKey(name: 'verseText') required this.text,
       this.verseType,
-      this.verseNumber});
+      this.verseNumber,
+      this.coupletNumber,
+      this.romanizedText,
+      this.translation});
 
   factory _$VerseModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$VerseModelImplFromJson(json);
@@ -1861,10 +1905,18 @@ class _$VerseModelImpl implements _VerseModel {
   final String? verseType;
   @override
   final int? verseNumber;
+  @override
+  final int? coupletNumber;
+// Added - present in search API response
+  @override
+  final String? romanizedText;
+// Added - present in search API response
+  @override
+  final String? translation;
 
   @override
   String toString() {
-    return 'VerseModel(publicId: $publicId, text: $text, verseType: $verseType, verseNumber: $verseNumber)';
+    return 'VerseModel(publicId: $publicId, text: $text, verseType: $verseType, verseNumber: $verseNumber, coupletNumber: $coupletNumber, romanizedText: $romanizedText, translation: $translation)';
   }
 
   @override
@@ -1878,13 +1930,19 @@ class _$VerseModelImpl implements _VerseModel {
             (identical(other.verseType, verseType) ||
                 other.verseType == verseType) &&
             (identical(other.verseNumber, verseNumber) ||
-                other.verseNumber == verseNumber));
+                other.verseNumber == verseNumber) &&
+            (identical(other.coupletNumber, coupletNumber) ||
+                other.coupletNumber == coupletNumber) &&
+            (identical(other.romanizedText, romanizedText) ||
+                other.romanizedText == romanizedText) &&
+            (identical(other.translation, translation) ||
+                other.translation == translation));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, publicId, text, verseType, verseNumber);
+  int get hashCode => Object.hash(runtimeType, publicId, text, verseType,
+      verseNumber, coupletNumber, romanizedText, translation);
 
   /// Create a copy of VerseModel
   /// with the given fields replaced by the non-null parameter values.
@@ -1907,7 +1965,10 @@ abstract class _VerseModel implements VerseModel {
       {final String? publicId,
       @JsonKey(name: 'verseText') required final String text,
       final String? verseType,
-      final int? verseNumber}) = _$VerseModelImpl;
+      final int? verseNumber,
+      final int? coupletNumber,
+      final String? romanizedText,
+      final String? translation}) = _$VerseModelImpl;
 
   factory _VerseModel.fromJson(Map<String, dynamic> json) =
       _$VerseModelImpl.fromJson;
@@ -1921,6 +1982,12 @@ abstract class _VerseModel implements VerseModel {
   String? get verseType;
   @override
   int? get verseNumber;
+  @override
+  int? get coupletNumber; // Added - present in search API response
+  @override
+  String? get romanizedText; // Added - present in search API response
+  @override
+  String? get translation;
 
   /// Create a copy of VerseModel
   /// with the given fields replaced by the non-null parameter values.

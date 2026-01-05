@@ -172,6 +172,9 @@ _$VerseModelImpl _$$VerseModelImplFromJson(Map<String, dynamic> json) =>
       text: json['verseText'] as String,
       verseType: json['verseType'] as String?,
       verseNumber: (json['verseNumber'] as num?)?.toInt(),
+      coupletNumber: (json['coupletNumber'] as num?)?.toInt(),
+      romanizedText: json['romanizedText'] as String?,
+      translation: json['translation'] as String?,
     );
 
 Map<String, dynamic> _$$VerseModelImplToJson(_$VerseModelImpl instance) =>
@@ -180,4 +183,7 @@ Map<String, dynamic> _$$VerseModelImplToJson(_$VerseModelImpl instance) =>
       'verseText': instance.text,
       'verseType': instance.verseType,
       'verseNumber': instance.verseNumber,
+      'coupletNumber': instance.coupletNumber,
+      'romanizedText': instance.romanizedText,
+      'translation': instance.translation,
     };
