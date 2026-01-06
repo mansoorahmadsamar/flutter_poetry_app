@@ -31,10 +31,30 @@ class GlobalSearchScreen extends ConsumerWidget {
     final searchState = ref.watch(globalSearchProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    debugPrint('🏗️ GlobalSearchScreen rebuild - mode: ${searchState.mode}');
+    debugPrint('🏗️ unifiedResults: ${searchState.unifiedResults?.totalResults}');
+
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFFFFBF7),
       body: CustomScrollView(
         slivers: [
+          // DEBUG: Screen identifier
+          SliverToBoxAdapter(
+            child: Container(
+              color: Colors.green,
+              padding: const EdgeInsets.all(8),
+              child: const Text(
+                '🔍 GLOBAL SEARCH SCREEN 🔍',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+
           // Sticky search bar
           SliverAppBar(
             pinned: true,
@@ -62,12 +82,17 @@ class GlobalSearchScreen extends ConsumerWidget {
     GlobalSearchState searchState,
     bool isDark,
   ) {
+    debugPrint('🔀 _buildContent called with mode: ${searchState.mode}');
+    debugPrint('🔀 unifiedResults: ${searchState.unifiedResults?.totalResults}');
+
     switch (searchState.mode) {
       case SearchMode.idle:
       case SearchMode.typing:
+        debugPrint('🔀 -> Building discovery content (idle/typing)');
         return _buildDiscoveryContent(searchState);
 
       case SearchMode.autocompleting:
+        debugPrint('🔀 -> Building autocomplete');
         return Column(
           children: [
             // Autocomplete suggestions
@@ -85,12 +110,15 @@ class GlobalSearchScreen extends ConsumerWidget {
         );
 
       case SearchMode.searching:
+        debugPrint('🔀 -> Building loading state');
         return _buildLoadingState();
 
       case SearchMode.results:
+        debugPrint('🔀 -> Building results state');
         return _buildResultsState(searchState);
 
       case SearchMode.error:
+        debugPrint('🔀 -> Building error state');
         return _buildErrorState(context, ref, searchState, isDark);
     }
   }
@@ -125,11 +153,17 @@ class GlobalSearchScreen extends ConsumerWidget {
 
   /// Build results state
   Widget _buildResultsState(GlobalSearchState searchState) {
-    if (searchState.coupletResults == null ||
-        searchState.coupletResults!.content.isEmpty) {
+    debugPrint('📺 _buildResultsState called');
+    debugPrint('📺 unifiedResults null? ${searchState.unifiedResults == null}');
+    debugPrint('📺 totalResults: ${searchState.unifiedResults?.totalResults}');
+
+    if (searchState.unifiedResults == null ||
+        searchState.unifiedResults!.totalResults == 0) {
+      debugPrint('📺 Showing empty state');
       return _buildEmptyState();
     }
 
+    debugPrint('📺 Showing SearchResultsSection with ${searchState.unifiedResults!.totalResults} results');
     return Column(
       children: [
         SizedBox(height: AppSpacing.md),

@@ -1,25 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
-import 'package:flutter_poetry_app/core/providers/language_provider.dart';
+import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/widgets/localized_text.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
 
 /// Recommendations discovery section
 ///
 /// Features:
-/// - Horizontal scrollable list
-/// - Content cards with title and poet
-/// - Tap to navigate/search
-/// - Language-aware labels
-/// - Paper aesthetic with minimal design
+/// - Horizontal scrollable cards
+/// - Urdu text prominent and large
+/// - Poet name secondary and subtle
+/// - Gentle shadows, rounded corners
+/// - Literary aesthetic
 class RecommendationsSection extends ConsumerWidget {
   const RecommendationsSection({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final searchState = ref.watch(globalSearchProvider);
-    final languageCode = ref.watch(selectedLanguageProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (searchState.recommendations == null ||
@@ -37,35 +36,22 @@ class RecommendationsSection extends ConsumerWidget {
           // Section header
           Padding(
             padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.recommend_outlined,
-                  size: 18,
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.7)
-                      : Colors.black.withValues(alpha: 0.7),
-                ),
-                SizedBox(width: AppSpacing.xs),
-                Text(
-                  _getLabel('Recommended For You', languageCode),
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.9)
-                        : Colors.black.withValues(alpha: 0.9),
-                  ),
-                ),
-              ],
+            child: Text(
+              'Recommended For You',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.2,
+                color: isDark ? Colors.white : Colors.black87,
+              ),
             ),
           ),
 
-          SizedBox(height: AppSpacing.sm),
+          SizedBox(height: AppSpacing.md),
 
           // Horizontal scrollable recommendations
           SizedBox(
-            height: 120,
+            height: 140,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
@@ -93,22 +79,33 @@ class RecommendationsSection extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     String title,
-    String subtitle,
+    String poetName,
     String publicId,
     bool isDark,
   ) {
+    final isUrdu = _isUrduText(title);
+
     return Container(
-      width: 160,
-      margin: EdgeInsets.only(right: AppSpacing.sm),
+      width: 180,
+      margin: EdgeInsets.only(right: AppSpacing.md),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFFFFBF7),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isDark
-              ? Colors.white.withValues(alpha: 0.1)
-              : Colors.black.withValues(alpha: 0.12),
+              ? Colors.white.withValues(alpha: 0.06)
+              : Colors.black.withValues(alpha: 0.04),
           width: 1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: isDark
+                ? Colors.black.withValues(alpha: 0.3)
+                : Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: InkWell(
         onTap: () {
@@ -116,51 +113,55 @@ class RecommendationsSection extends ConsumerWidget {
           // For now, execute search with title
           ref.read(globalSearchProvider.notifier).executeSearch(query: title);
         },
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: EdgeInsets.all(AppSpacing.md),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Title
-              LocalizedText(
-                title,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : Colors.black87,
+              // Poetry title - Hero element
+              Expanded(
+                child: LocalizedText(
+                  title,
+                  style: TextStyle(
+                    fontSize: isUrdu ? 17 : 15,
+                    fontFamily: isUrdu ? 'JameelNoori' : null,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.white : Colors.black87,
+                    height: isUrdu ? 1.8 : 1.4,
+                  ),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
 
               SizedBox(height: AppSpacing.xs),
 
-              // Subtitle (poet name)
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.6)
-                      : Colors.black.withValues(alpha: 0.6),
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-
-              const Spacer(),
-
-              // View button
-              Align(
-                alignment: Alignment.centerRight,
-                child: Icon(
-                  Icons.arrow_forward_ios,
-                  size: 14,
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.5)
-                      : Colors.black.withValues(alpha: 0.5),
-                ),
+              // Poet name - Secondary element
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      poetName,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.secondary,
+                        letterSpacing: 0.2,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    size: 10,
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.3)
+                        : Colors.black.withValues(alpha: 0.3),
+                  ),
+                ],
               ),
             ],
           ),
@@ -169,20 +170,10 @@ class RecommendationsSection extends ConsumerWidget {
     );
   }
 
-  /// Get localized label
-  String _getLabel(String key, String languageCode) {
-    final labels = {
-      'ur': {
-        'Recommended For You': 'آپ کے لیے تجویز کردہ',
-      },
-      'hi': {
-        'Recommended For You': 'आपके लिए अनुशंसित',
-      },
-      'en': {
-        'Recommended For You': 'Recommended For You',
-      },
-    };
-
-    return labels[languageCode]?[key] ?? labels['en']![key]!;
+  /// Detect if text is primarily Urdu
+  bool _isUrduText(String text) {
+    final urduPattern = RegExp(r'[\u0600-\u06FF]');
+    final urduMatches = urduPattern.allMatches(text).length;
+    return urduMatches > text.length / 3;
   }
 }

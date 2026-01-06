@@ -68,8 +68,8 @@ PaginatedResponse<T> _$PaginatedResponseFromJson<T>(
       last: json['last'] as bool,
       first: json['first'] as bool,
       numberOfElements: (json['numberOfElements'] as num?)?.toInt(),
-      size: (json['pageSize'] as num).toInt(),
-      number: (json['pageNumber'] as num).toInt(),
+      size: (json['size'] as num).toInt(),
+      number: (json['number'] as num).toInt(),
       empty: json['empty'] as bool?,
     );
 
@@ -85,7 +85,7 @@ Map<String, dynamic> _$PaginatedResponseToJson<T>(
       'last': instance.last,
       'first': instance.first,
       'numberOfElements': instance.numberOfElements,
-      'pageSize': instance.size,
-      'pageNumber': instance.number,
+      'size': instance.size,
+      'number': instance.number,
       'empty': instance.empty,
     };

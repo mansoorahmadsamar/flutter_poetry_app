@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
-import 'package:flutter_poetry_app/core/providers/language_provider.dart';
+import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
 
 /// Trending searches discovery section
 ///
 /// Features:
-/// - Numbered list with rank badges
-/// - Top 3 searches highlighted with special styling
-/// - Tap to execute search
-/// - Language-aware labels
-/// - Paper aesthetic with minimal design
+/// - Card container with soft elevation
+/// - Clean numbered list (top 5 only for cleanliness)
+/// - Subtle trend indicator
+/// - Larger Urdu text
+/// - No loud fire emoji in heading
 class TrendingSearchesSection extends ConsumerWidget {
   const TrendingSearchesSection({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final searchState = ref.watch(globalSearchProvider);
-    final languageCode = ref.watch(selectedLanguageProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (searchState.trendingSearches == null ||
@@ -26,12 +25,20 @@ class TrendingSearchesSection extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
-    final trending = searchState.trendingSearches!.searches;
+    final trending = searchState.trendingSearches!.searches.take(5).toList();
 
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: AppSpacing.md),
+      padding: EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFFFFBF7),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.06)
+              : Colors.black.withValues(alpha: 0.04),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,33 +46,46 @@ class TrendingSearchesSection extends ConsumerWidget {
           // Section header
           Row(
             children: [
-              Icon(
-                Icons.local_fire_department,
-                size: 18,
-                color: Colors.orange,
+              Text(
+                'Trending Searches',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.2,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
               ),
               SizedBox(width: AppSpacing.xs),
-              Text(
-                _getLabel('Trending Searches', languageCode),
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.9)
-                      : Colors.black.withValues(alpha: 0.9),
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 6,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.secondary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  'POPULAR',
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                    color: AppColors.secondary,
+                  ),
                 ),
               ),
             ],
           ),
 
-          SizedBox(height: AppSpacing.sm),
+          SizedBox(height: AppSpacing.md),
 
           // Trending searches list
           ...trending.asMap().entries.map((entry) {
             final index = entry.key;
             final search = entry.value;
             final rank = index + 1;
-            final isTopThree = rank <= 3;
+            final isUrdu = _isUrduText(search.query);
 
             return InkWell(
               onTap: () {
@@ -73,44 +93,25 @@ class TrendingSearchesSection extends ConsumerWidget {
                   query: search.query,
                 );
               },
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+              borderRadius: BorderRadius.circular(8),
               child: Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: AppSpacing.sm,
-                  vertical: AppSpacing.xs,
+                  horizontal: AppSpacing.xs,
+                  vertical: AppSpacing.sm,
                 ),
                 child: Row(
                   children: [
-                    // Rank badge
+                    // Rank number
                     Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: isTopThree
-                            ? _getTopThreeColor(rank).withValues(alpha: 0.15)
-                            : (isDark
-                                ? Colors.white.withValues(alpha: 0.05)
-                                : Colors.black.withValues(alpha: 0.05)),
-                        shape: BoxShape.circle,
-                        border: isTopThree
-                            ? Border.all(
-                                color: _getTopThreeColor(rank),
-                                width: 1.5,
-                              )
-                            : null,
-                      ),
-                      child: Center(
-                        child: Text(
-                          '$rank',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: isTopThree ? FontWeight.w700 : FontWeight.w500,
-                            color: isTopThree
-                                ? _getTopThreeColor(rank)
-                                : (isDark
-                                    ? Colors.white.withValues(alpha: 0.6)
-                                    : Colors.black.withValues(alpha: 0.6)),
-                          ),
+                      width: 24,
+                      height: 24,
+                      alignment: Alignment.center,
+                      child: Text(
+                        '$rank',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
                         ),
                       ),
                     ),
@@ -122,20 +123,22 @@ class TrendingSearchesSection extends ConsumerWidget {
                       child: Text(
                         search.query,
                         style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: isTopThree ? FontWeight.w600 : FontWeight.w400,
+                          fontSize: isUrdu ? 16 : 14,
+                          fontFamily: isUrdu ? 'JameelNoori' : null,
+                          fontWeight: FontWeight.w500,
                           color: isDark ? Colors.white : Colors.black87,
+                          height: isUrdu ? 1.7 : 1.4,
                         ),
                       ),
                     ),
 
-                    // Trend indicator
+                    // Subtle indicator
                     Icon(
-                      Icons.trending_up,
-                      size: 16,
+                      Icons.arrow_forward_ios,
+                      size: 12,
                       color: isDark
-                          ? Colors.white.withValues(alpha: 0.4)
-                          : Colors.black.withValues(alpha: 0.4),
+                          ? Colors.white.withValues(alpha: 0.3)
+                          : Colors.black.withValues(alpha: 0.3),
                     ),
                   ],
                 ),
@@ -147,34 +150,10 @@ class TrendingSearchesSection extends ConsumerWidget {
     );
   }
 
-  /// Get color for top 3 ranks
-  Color _getTopThreeColor(int rank) {
-    switch (rank) {
-      case 1:
-        return const Color(0xFFFFD700); // Gold
-      case 2:
-        return const Color(0xFFC0C0C0); // Silver
-      case 3:
-        return const Color(0xFFCD7F32); // Bronze
-      default:
-        return Colors.grey;
-    }
-  }
-
-  /// Get localized label
-  String _getLabel(String key, String languageCode) {
-    final labels = {
-      'ur': {
-        'Trending Searches': 'مقبول تلاش',
-      },
-      'hi': {
-        'Trending Searches': 'ट्रेंडिंग खोजें',
-      },
-      'en': {
-        'Trending Searches': 'Trending Searches',
-      },
-    };
-
-    return labels[languageCode]?[key] ?? labels['en']![key]!;
+  /// Detect if text is primarily Urdu
+  bool _isUrduText(String text) {
+    final urduPattern = RegExp(r'[\u0600-\u06FF]');
+    final urduMatches = urduPattern.allMatches(text).length;
+    return urduMatches > text.length / 3;
   }
 }

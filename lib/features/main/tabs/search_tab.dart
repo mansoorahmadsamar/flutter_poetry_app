@@ -120,11 +120,17 @@ class SearchTab extends ConsumerWidget {
 
   /// Build results state
   Widget _buildResultsState(GlobalSearchState searchState) {
-    if (searchState.coupletResults == null ||
-        searchState.coupletResults!.content.isEmpty) {
+    debugPrint('🔵 SearchTab _buildResultsState called');
+    debugPrint('🔵 unifiedResults null? ${searchState.unifiedResults == null}');
+    debugPrint('🔵 totalResults: ${searchState.unifiedResults?.totalResults}');
+
+    if (searchState.unifiedResults == null ||
+        searchState.unifiedResults!.totalResults == 0) {
+      debugPrint('🔵 Showing empty state');
       return _buildEmptyState();
     }
 
+    debugPrint('🔵 Showing SearchResultsSection with ${searchState.unifiedResults!.totalResults} results');
     return Column(
       children: [
         SizedBox(height: AppSpacing.md),

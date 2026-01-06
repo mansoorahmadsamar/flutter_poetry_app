@@ -36,6 +36,9 @@ class _GlobalSearchBarState extends ConsumerState<GlobalSearchBar> {
   void initState() {
     super.initState();
     _controller = TextEditingController();
+    _focusNode.addListener(() {
+      setState(() {}); // Rebuild on focus change
+    });
   }
 
   @override
@@ -54,17 +57,29 @@ class _GlobalSearchBarState extends ConsumerState<GlobalSearchBar> {
     // Language-specific hint text
     final hintText = _getHintText(languageCode);
     final textDirection = languageCode == 'ur' ? TextDirection.rtl : TextDirection.ltr;
+    final hasFocus = _focusNode.hasFocus;
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFFFFBF7), // Paper background
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFFFFBF7),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.1)
-              : Colors.black.withValues(alpha: 0.12),
-          width: 1,
+          color: hasFocus
+              ? AppColors.primary.withValues(alpha: 0.5)
+              : (isDark
+                  ? Colors.white.withValues(alpha: 0.1)
+                  : Colors.black.withValues(alpha: 0.08)),
+          width: hasFocus ? 1.5 : 1,
         ),
+        boxShadow: hasFocus
+            ? [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.08),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ]
+            : null,
       ),
       child: TextField(
         controller: _controller,
@@ -72,23 +87,29 @@ class _GlobalSearchBarState extends ConsumerState<GlobalSearchBar> {
         autofocus: widget.autofocus,
         textDirection: textDirection,
         style: TextStyle(
-          fontSize: 16,
+          fontSize: languageCode == 'ur' ? 18 : 16,
+          fontFamily: languageCode == 'ur' ? 'JameelNoori' : null,
           color: isDark ? Colors.white : Colors.black87,
+          height: 1.5,
         ),
         decoration: InputDecoration(
           hintText: hintText,
           hintTextDirection: textDirection,
           hintStyle: TextStyle(
-            fontSize: 16,
+            fontSize: languageCode == 'ur' ? 16 : 15,
+            fontFamily: languageCode == 'ur' ? 'JameelNoori' : null,
             color: isDark
-                ? Colors.white.withValues(alpha: 0.5)
-                : Colors.black.withValues(alpha: 0.5),
+                ? Colors.white.withValues(alpha: 0.4)
+                : Colors.black.withValues(alpha: 0.4),
           ),
           prefixIcon: Icon(
             Icons.search,
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.6)
-                : Colors.black.withValues(alpha: 0.6),
+            size: 22,
+            color: hasFocus
+                ? AppColors.primary
+                : (isDark
+                    ? Colors.white.withValues(alpha: 0.5)
+                    : Colors.black.withValues(alpha: 0.5)),
           ),
           suffixIcon: _buildSuffixIcon(searchState.isLoadingAutocomplete),
           border: InputBorder.none,
@@ -98,7 +119,7 @@ class _GlobalSearchBarState extends ConsumerState<GlobalSearchBar> {
           ),
         ),
         onChanged: (value) {
-          // Notify provider of query change (debounced internally)
+          setState(() {}); // Rebuild to update focus state
           ref.read(globalSearchProvider.notifier).onQueryChanged(value);
         },
         onSubmitted: (value) {
@@ -147,12 +168,12 @@ class _GlobalSearchBarState extends ConsumerState<GlobalSearchBar> {
   String _getHintText(String languageCode) {
     switch (languageCode) {
       case 'ur':
-        return 'شاعر، شعر، یا اشعار تلاش کریں...';
+        return 'شاعر، نظم، غزل تلاش کریں...';
       case 'hi':
-        return 'कवि, कविता, या छंद खोजें...';
+        return 'कवि, कविता खोजें...';
       case 'en':
       default:
-        return 'Search poets, poems, or verses...';
+        return 'Search poets, poems, verses…';
     }
   }
 }

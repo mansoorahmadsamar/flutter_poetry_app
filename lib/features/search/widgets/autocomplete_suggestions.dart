@@ -38,19 +38,19 @@ class AutocompleteSuggestions extends ConsumerWidget {
       margin: EdgeInsets.symmetric(horizontal: AppSpacing.md),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isDark
-              ? Colors.white.withValues(alpha: 0.1)
-              : Colors.black.withValues(alpha: 0.12),
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.black.withValues(alpha: 0.06),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withValues(alpha: 0.4)
-                : Colors.black.withValues(alpha: 0.1),
-            blurRadius: 12,
+                ? Colors.black.withValues(alpha: 0.5)
+                : Colors.black.withValues(alpha: 0.08),
+            blurRadius: 16,
             offset: const Offset(0, 4),
           ),
         ],
@@ -58,7 +58,7 @@ class AutocompleteSuggestions extends ConsumerWidget {
       child: ListView(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
+        padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
         children: [
           // Poets Section
           if (suggestions.poets.isNotEmpty) ...[
@@ -142,31 +142,18 @@ class AutocompleteSuggestions extends ConsumerWidget {
     return Padding(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.md,
-        AppSpacing.sm,
+        AppSpacing.xs,
         AppSpacing.md,
         AppSpacing.xs,
       ),
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            size: 16,
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.6)
-                : Colors.black.withValues(alpha: 0.6),
-          ),
-          SizedBox(width: AppSpacing.xs),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.7)
-                  : Colors.black.withValues(alpha: 0.7),
-            ),
-          ),
-        ],
+      child: Text(
+        label.toUpperCase(),
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.8,
+          color: AppColors.primary.withValues(alpha: 0.7),
+        ),
       ),
     );
   }
@@ -178,20 +165,22 @@ class AutocompleteSuggestions extends ConsumerWidget {
     AutocompletePoet poet,
     bool isDark,
   ) {
+    final isUrdu = _isUrduText(poet.name);
+
     return ListTile(
-      dense: true,
       contentPadding: EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
-        vertical: 2,
+        vertical: AppSpacing.xs,
       ),
       leading: CircleAvatar(
-        radius: 20,
-        backgroundColor: AppColors.primary.withValues(alpha: 0.2),
+        radius: 22,
+        backgroundColor: AppColors.primary.withValues(alpha: 0.15),
         child: Text(
           poet.name.isNotEmpty ? poet.name[0] : 'P',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 17,
             fontWeight: FontWeight.w600,
+            fontFamily: isUrdu ? 'JameelNoori' : null,
             color: AppColors.primary,
           ),
         ),
@@ -199,9 +188,11 @@ class AutocompleteSuggestions extends ConsumerWidget {
       title: LocalizedText(
         poet.name,
         style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
+          fontSize: isUrdu ? 16 : 15,
+          fontFamily: isUrdu ? 'JameelNoori' : null,
+          fontWeight: FontWeight.w600,
           color: isDark ? Colors.white : Colors.black87,
+          height: isUrdu ? 1.6 : 1.3,
         ),
       ),
       subtitle: poet.era != null
@@ -209,14 +200,14 @@ class AutocompleteSuggestions extends ConsumerWidget {
               poet.era!,
               style: TextStyle(
                 fontSize: 11,
+                fontWeight: FontWeight.w500,
                 color: isDark
-                    ? Colors.white.withValues(alpha: 0.5)
-                    : Colors.black.withValues(alpha: 0.5),
+                    ? Colors.white.withValues(alpha: 0.4)
+                    : Colors.black.withValues(alpha: 0.4),
               ),
             )
           : null,
       onTap: () {
-        // Navigate to poet detail screen
         context.pushNamed(
           'poet-detail',
           pathParameters: {'publicId': poet.publicId},
@@ -232,31 +223,33 @@ class AutocompleteSuggestions extends ConsumerWidget {
     AutocompletePoem poem,
     bool isDark,
   ) {
+    final isUrdu = _isUrduText(poem.title);
+
     return ListTile(
-      dense: true,
       contentPadding: EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
-        vertical: 2,
+        vertical: AppSpacing.xs,
       ),
       title: LocalizedText(
         poem.title,
         style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
+          fontSize: isUrdu ? 16 : 15,
+          fontFamily: isUrdu ? 'JameelNoori' : null,
+          fontWeight: FontWeight.w600,
           color: isDark ? Colors.white : Colors.black87,
+          height: isUrdu ? 1.6 : 1.3,
         ),
       ),
       subtitle: Text(
         poem.poetName,
         style: TextStyle(
           fontSize: 11,
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.5)
-              : Colors.black.withValues(alpha: 0.5),
+          fontWeight: FontWeight.w500,
+          color: AppColors.secondary,
+          letterSpacing: 0.2,
         ),
       ),
       onTap: () {
-        // Navigate to poem detail screen
         context.pushNamed(
           'poem-detail',
           pathParameters: {'publicId': poem.publicId},
@@ -272,35 +265,29 @@ class AutocompleteSuggestions extends ConsumerWidget {
     AutocompleteTag tag,
     bool isDark,
   ) {
+    final isUrdu = _isUrduText(tag.name);
+
     return ListTile(
-      dense: true,
       contentPadding: EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
-        vertical: 2,
-      ),
-      leading: Icon(
-        Icons.tag,
-        size: 18,
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.5)
-            : Colors.black.withValues(alpha: 0.5),
+        vertical: 6,
       ),
       title: LocalizedText(
         tag.name,
         style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w400,
+          fontSize: isUrdu ? 15 : 14,
+          fontFamily: isUrdu ? 'JameelNoori' : null,
+          fontWeight: FontWeight.w500,
           color: isDark ? Colors.white : Colors.black87,
+          height: isUrdu ? 1.6 : 1.3,
         ),
       ),
-      trailing: Text(
-        tag.tagType,
-        style: TextStyle(
-          fontSize: 11,
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.5)
-              : Colors.black.withValues(alpha: 0.5),
-        ),
+      trailing: Icon(
+        Icons.arrow_forward_ios,
+        size: 12,
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.3)
+            : Colors.black.withValues(alpha: 0.3),
       ),
       onTap: () {
         ref.read(globalSearchProvider.notifier).executeSearch(query: tag.name);
@@ -315,38 +302,47 @@ class AutocompleteSuggestions extends ConsumerWidget {
     AutocompleteCategory category,
     bool isDark,
   ) {
+    final isUrdu = _isUrduText(category.name);
+
     return ListTile(
-      dense: true,
       contentPadding: EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
-        vertical: 2,
-      ),
-      leading: Icon(
-        Icons.folder_outlined,
-        size: 18,
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.5)
-            : Colors.black.withValues(alpha: 0.5),
+        vertical: 6,
       ),
       title: LocalizedText(
         category.name,
         style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w400,
+          fontSize: isUrdu ? 15 : 14,
+          fontFamily: isUrdu ? 'JameelNoori' : null,
+          fontWeight: FontWeight.w500,
           color: isDark ? Colors.white : Colors.black87,
+          height: isUrdu ? 1.6 : 1.3,
         ),
       ),
-      trailing: category.poemCount > 0
-          ? Text(
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (category.poemCount > 0)
+            Text(
               '${category.poemCount}',
               style: TextStyle(
                 fontSize: 11,
+                fontWeight: FontWeight.w500,
                 color: isDark
-                    ? Colors.white.withValues(alpha: 0.5)
-                    : Colors.black.withValues(alpha: 0.5),
+                    ? Colors.white.withValues(alpha: 0.4)
+                    : Colors.black.withValues(alpha: 0.4),
               ),
-            )
-          : null,
+            ),
+          SizedBox(width: AppSpacing.xs),
+          Icon(
+            Icons.arrow_forward_ios,
+            size: 12,
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.3)
+                : Colors.black.withValues(alpha: 0.3),
+          ),
+        ],
+      ),
       onTap: () {
         ref.read(globalSearchProvider.notifier).executeSearch(query: category.name);
       },
@@ -358,13 +354,14 @@ class AutocompleteSuggestions extends ConsumerWidget {
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
-        vertical: AppSpacing.xs,
+        vertical: AppSpacing.sm,
       ),
       child: Divider(
         height: 1,
+        thickness: 1,
         color: isDark
-            ? Colors.white.withValues(alpha: 0.1)
-            : Colors.black.withValues(alpha: 0.1),
+            ? Colors.white.withValues(alpha: 0.06)
+            : Colors.black.withValues(alpha: 0.04),
       ),
     );
   }
@@ -400,5 +397,12 @@ class AutocompleteSuggestions extends ConsumerWidget {
     };
 
     return labels[languageCode]?[key] ?? labels['en']![key]!;
+  }
+
+  /// Detect if text is primarily Urdu
+  bool _isUrduText(String text) {
+    final urduPattern = RegExp(r'[\u0600-\u06FF]');
+    final urduMatches = urduPattern.allMatches(text).length;
+    return urduMatches > text.length / 3;
   }
 }

@@ -28,7 +28,8 @@ class GlobalSearchState with _$GlobalSearchState {
     @Default(false) bool isLoadingAutocomplete,
 
     // Search results data
-    PaginatedResponse<CoupletSearchResult>? coupletResults,
+    UnifiedSearchResponse? unifiedResults,  // New unified search results
+    PaginatedResponse<CoupletSearchResult>? coupletResults,  // Legacy - will be deprecated
     @Default(false) bool isLoadingResults,
 
     // Discovery data

@@ -126,7 +126,7 @@ _$CoupletSearchResultImpl _$$CoupletSearchResultImplFromJson(
     _$CoupletSearchResultImpl(
       publicId: json['publicId'] as String,
       coupletNumber: (json['coupletNumber'] as num).toInt(),
-      coupletType: json['coupletType'] as String,
+      coupletType: json['coupletType'] as String?,
       coupletTypeName: json['coupletTypeName'] as String?,
       verses: (json['verses'] as List<dynamic>)
           .map((e) => VerseModel.fromJson(e as Map<String, dynamic>))
@@ -167,6 +167,32 @@ Map<String, dynamic> _$$CoupletSearchResultImplToJson(
       'createdAt': instance.createdAt?.toIso8601String(),
     };
 
+_$VerseSearchResultImpl _$$VerseSearchResultImplFromJson(
+        Map<String, dynamic> json) =>
+    _$VerseSearchResultImpl(
+      verse: VerseModel.fromJson(json['verse'] as Map<String, dynamic>),
+      poemPublicId: json['poemPublicId'] as String,
+      poemTitle: json['poemTitle'] as String,
+      poetryType: json['poetryType'] as String,
+      poetryTypeName: json['poetryTypeName'] as String?,
+      poetPublicId: json['poetPublicId'] as String,
+      poetName: json['poetName'] as String,
+      poetProfileImageUrl: json['poetProfileImageUrl'] as String?,
+    );
+
+Map<String, dynamic> _$$VerseSearchResultImplToJson(
+        _$VerseSearchResultImpl instance) =>
+    <String, dynamic>{
+      'verse': instance.verse,
+      'poemPublicId': instance.poemPublicId,
+      'poemTitle': instance.poemTitle,
+      'poetryType': instance.poetryType,
+      'poetryTypeName': instance.poetryTypeName,
+      'poetPublicId': instance.poetPublicId,
+      'poetName': instance.poetName,
+      'poetProfileImageUrl': instance.poetProfileImageUrl,
+    };
+
 _$PoemSummaryImpl _$$PoemSummaryImplFromJson(Map<String, dynamic> json) =>
     _$PoemSummaryImpl(
       publicId: json['publicId'] as String,
@@ -205,7 +231,9 @@ _$RecommendationResponseImpl _$$RecommendationResponseImplFromJson(
               .toList() ??
           const [],
       totalCount: (json['totalCount'] as num?)?.toInt() ?? 0,
-      algorithm: json['algorithm'] as String,
+      message: json['message'] as String?,
+      isPersonalized: json['isPersonalized'] as bool? ?? false,
+      count: (json['count'] as num?)?.toInt() ?? 0,
     );
 
 Map<String, dynamic> _$$RecommendationResponseImplToJson(
@@ -214,7 +242,9 @@ Map<String, dynamic> _$$RecommendationResponseImplToJson(
       'type': instance.type,
       'items': instance.items,
       'totalCount': instance.totalCount,
-      'algorithm': instance.algorithm,
+      'message': instance.message,
+      'isPersonalized': instance.isPersonalized,
+      'count': instance.count,
     };
 
 _$RecommendationItemImpl _$$RecommendationItemImplFromJson(
@@ -253,6 +283,63 @@ Map<String, dynamic> _$$RecommendationItemImplToJson(
       'viewCount': instance.viewCount,
       'score': const NaNDoubleConverter().toJson(instance.score),
       'reason': instance.reason,
+    };
+
+_$UnifiedSearchResponseImpl _$$UnifiedSearchResponseImplFromJson(
+        Map<String, dynamic> json) =>
+    _$UnifiedSearchResponseImpl(
+      totalResults: (json['totalResults'] as num?)?.toInt() ?? 0,
+      poetCount: (json['poetCount'] as num?)?.toInt() ?? 0,
+      poemCount: (json['poemCount'] as num?)?.toInt() ?? 0,
+      verseCount: (json['verseCount'] as num?)?.toInt() ?? 0,
+      coupletCount: (json['coupletCount'] as num?)?.toInt() ?? 0,
+      tagCount: (json['tagCount'] as num?)?.toInt() ?? 0,
+      categoryCount: (json['categoryCount'] as num?)?.toInt() ?? 0,
+      poets: (json['poets'] as List<dynamic>?)
+              ?.map((e) => PoetModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      poems: (json['poems'] as List<dynamic>?)
+              ?.map((e) => PoemModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      verses: (json['verses'] as List<dynamic>?)
+              ?.map(
+                  (e) => VerseSearchResult.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      couplets: (json['couplets'] as List<dynamic>?)
+              ?.map((e) =>
+                  CoupletSearchResult.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      tags: (json['tags'] as List<dynamic>?)
+              ?.map((e) => AutocompleteTag.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      categories: (json['categories'] as List<dynamic>?)
+              ?.map((e) =>
+                  AutocompleteCategory.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+    );
+
+Map<String, dynamic> _$$UnifiedSearchResponseImplToJson(
+        _$UnifiedSearchResponseImpl instance) =>
+    <String, dynamic>{
+      'totalResults': instance.totalResults,
+      'poetCount': instance.poetCount,
+      'poemCount': instance.poemCount,
+      'verseCount': instance.verseCount,
+      'coupletCount': instance.coupletCount,
+      'tagCount': instance.tagCount,
+      'categoryCount': instance.categoryCount,
+      'poets': instance.poets,
+      'poems': instance.poems,
+      'verses': instance.verses,
+      'couplets': instance.couplets,
+      'tags': instance.tags,
+      'categories': instance.categories,
     };
 
 _$TrendingSearchImpl _$$TrendingSearchImplFromJson(Map<String, dynamic> json) =>

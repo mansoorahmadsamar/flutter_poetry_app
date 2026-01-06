@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logger/logger.dart';
 import 'package:flutter_poetry_app/core/network/dio_client.dart';
-import 'package:flutter_poetry_app/core/network/dto/api_response.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/features/search/models/global_search_state.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
@@ -39,6 +39,7 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
   final SearchService _searchService;
   final SearchHistoryService _historyService;
   final String _languageCode;
+  final Logger _logger = Logger();
 
   Timer? _debounceTimer;
 
@@ -191,14 +192,12 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
     );
 
     try {
-      // Fetch search results and related searches in parallel
+      // Fetch unified search results and related searches in parallel
       final results = await Future.wait([
-        _searchService.searchCouplets(
+        _searchService.searchUnified(
           query: searchQuery,
-          sortBy: state.sortBy,
+          type: 'all',  // Search all content types
           lang: _languageCode,
-          page: 0,
-          size: 20,
         ),
         _searchService.getRelatedSearches(
           query: searchQuery,
@@ -206,18 +205,28 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
         ),
       ]);
 
+      final unifiedResults = results[0] as UnifiedSearchResponse;
+      final relatedSearches = results[1] as RelatedSearchesResponse;
+
+      _logger.i('🔍 Setting state with unified results: totalResults=${unifiedResults.totalResults}');
+      _logger.i('   Poets: ${unifiedResults.poets.length}, Poems: ${unifiedResults.poems.length}, Couplets: ${unifiedResults.couplets.length}');
+
       // Update state with results
       state = state.copyWith(
         mode: SearchMode.results,
         isLoadingResults: false,
-        coupletResults: results[0] as PaginatedResponse<CoupletSearchResult>,
-        relatedSearches: results[1] as RelatedSearchesResponse,
+        unifiedResults: unifiedResults,
+        relatedSearches: relatedSearches,
       );
+
+      _logger.i('✅ State updated - mode: ${state.mode}, unifiedResults.totalResults: ${state.unifiedResults?.totalResults}');
 
       // Reload recent searches to show latest
       final history = await _historyService.getHistory();
       state = state.copyWith(recentSearches: history);
-    } catch (e) {
+    } catch (e, stackTrace) {
+      _logger.e('❌ ERROR in executeSearch: $e');
+      _logger.e('❌ Stack trace: $stackTrace');
       state = state.copyWith(
         mode: SearchMode.error,
         isLoadingResults: false,

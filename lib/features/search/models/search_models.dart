@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.dart';
+import 'package:flutter_poetry_app/features/main/tabs/poets/models/poet_model.dart';
 
 part 'search_models.freezed.dart';
 part 'search_models.g.dart';
@@ -94,8 +95,8 @@ class CoupletSearchResult with _$CoupletSearchResult {
   const factory CoupletSearchResult({
     required String publicId,
     required int coupletNumber,
-    required String coupletType,
-    String? coupletTypeName,  // Added from API response
+    String? coupletType,  // Made nullable - unified search doesn't return this
+    String? coupletTypeName,  // Made nullable - API doesn't always include this
     required List<VerseModel> verses,
     PoemSummary? poem,  // Made nullable - API doesn't always include this
     PoetSummary? poet,  // Made nullable - API doesn't always include this
@@ -110,6 +111,25 @@ class CoupletSearchResult with _$CoupletSearchResult {
 
   factory CoupletSearchResult.fromJson(Map<String, dynamic> json) =>
       _$CoupletSearchResultFromJson(json);
+}
+
+/// Verse search result from unified search API
+/// This has a different structure than CoupletSearchResult
+@freezed
+class VerseSearchResult with _$VerseSearchResult {
+  const factory VerseSearchResult({
+    required VerseModel verse,
+    required String poemPublicId,
+    required String poemTitle,
+    required String poetryType,
+    String? poetryTypeName,
+    required String poetPublicId,
+    required String poetName,
+    String? poetProfileImageUrl,
+  }) = _VerseSearchResult;
+
+  factory VerseSearchResult.fromJson(Map<String, dynamic> json) =>
+      _$VerseSearchResultFromJson(json);
 }
 
 /// Summary information about a poem
@@ -149,7 +169,9 @@ class RecommendationResponse with _$RecommendationResponse {
     required String type, // PERSONALIZED, SIMILAR, TRENDING, HYBRID
     @Default([]) List<RecommendationItem> items,
     @Default(0) int totalCount,
-    required String algorithm,
+    String? message,  // Changed from 'algorithm' to match API response
+    @Default(false) bool isPersonalized,  // Added from API response
+    @Default(0) int count,  // Added from API response
   }) = _RecommendationResponse;
 
   factory RecommendationResponse.fromJson(Map<String, dynamic> json) =>
@@ -196,6 +218,34 @@ class RecommendationItem with _$RecommendationItem {
 
   factory RecommendationItem.fromJson(Map<String, dynamic> json) =>
       _$RecommendationItemFromJson(json);
+}
+
+// ============================================================================
+// UNIFIED SEARCH MODELS
+// ============================================================================
+
+/// Unified search response from /api/search endpoint
+/// Returns all content types (poets, poems, verses, couplets, tags, categories)
+@freezed
+class UnifiedSearchResponse with _$UnifiedSearchResponse {
+  const factory UnifiedSearchResponse({
+    @Default(0) int totalResults,
+    @Default(0) int poetCount,
+    @Default(0) int poemCount,
+    @Default(0) int verseCount,
+    @Default(0) int coupletCount,
+    @Default(0) int tagCount,
+    @Default(0) int categoryCount,
+    @Default([]) List<PoetModel> poets,  // Full poet objects from API
+    @Default([]) List<PoemModel> poems,  // Full poem objects from API
+    @Default([]) List<VerseSearchResult> verses,  // Verse results with nested structure
+    @Default([]) List<CoupletSearchResult> couplets,
+    @Default([]) List<AutocompleteTag> tags,
+    @Default([]) List<AutocompleteCategory> categories,
+  }) = _UnifiedSearchResponse;
+
+  factory UnifiedSearchResponse.fromJson(Map<String, dynamic> json) =>
+      _$UnifiedSearchResponseFromJson(json);
 }
 
 // ============================================================================

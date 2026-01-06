@@ -27,8 +27,10 @@ mixin _$GlobalSearchState {
       throw _privateConstructorUsedError;
   bool get isLoadingAutocomplete =>
       throw _privateConstructorUsedError; // Search results data
+  UnifiedSearchResponse? get unifiedResults =>
+      throw _privateConstructorUsedError; // New unified search results
   PaginatedResponse<CoupletSearchResult>? get coupletResults =>
-      throw _privateConstructorUsedError;
+      throw _privateConstructorUsedError; // Legacy - will be deprecated
   bool get isLoadingResults =>
       throw _privateConstructorUsedError; // Discovery data
   List<String> get recentSearches => throw _privateConstructorUsedError;
@@ -60,6 +62,7 @@ abstract class $GlobalSearchStateCopyWith<$Res> {
       String sortBy,
       AutocompleteResponse? autocompleteResults,
       bool isLoadingAutocomplete,
+      UnifiedSearchResponse? unifiedResults,
       PaginatedResponse<CoupletSearchResult>? coupletResults,
       bool isLoadingResults,
       List<String> recentSearches,
@@ -69,6 +72,7 @@ abstract class $GlobalSearchStateCopyWith<$Res> {
       String? errorMessage});
 
   $AutocompleteResponseCopyWith<$Res>? get autocompleteResults;
+  $UnifiedSearchResponseCopyWith<$Res>? get unifiedResults;
   $TrendingSearchesResponseCopyWith<$Res>? get trendingSearches;
   $RecommendationResponseCopyWith<$Res>? get recommendations;
   $RelatedSearchesResponseCopyWith<$Res>? get relatedSearches;
@@ -95,6 +99,7 @@ class _$GlobalSearchStateCopyWithImpl<$Res, $Val extends GlobalSearchState>
     Object? sortBy = null,
     Object? autocompleteResults = freezed,
     Object? isLoadingAutocomplete = null,
+    Object? unifiedResults = freezed,
     Object? coupletResults = freezed,
     Object? isLoadingResults = null,
     Object? recentSearches = null,
@@ -128,6 +133,10 @@ class _$GlobalSearchStateCopyWithImpl<$Res, $Val extends GlobalSearchState>
           ? _value.isLoadingAutocomplete
           : isLoadingAutocomplete // ignore: cast_nullable_to_non_nullable
               as bool,
+      unifiedResults: freezed == unifiedResults
+          ? _value.unifiedResults
+          : unifiedResults // ignore: cast_nullable_to_non_nullable
+              as UnifiedSearchResponse?,
       coupletResults: freezed == coupletResults
           ? _value.coupletResults
           : coupletResults // ignore: cast_nullable_to_non_nullable
@@ -171,6 +180,21 @@ class _$GlobalSearchStateCopyWithImpl<$Res, $Val extends GlobalSearchState>
     return $AutocompleteResponseCopyWith<$Res>(_value.autocompleteResults!,
         (value) {
       return _then(_value.copyWith(autocompleteResults: value) as $Val);
+    });
+  }
+
+  /// Create a copy of GlobalSearchState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UnifiedSearchResponseCopyWith<$Res>? get unifiedResults {
+    if (_value.unifiedResults == null) {
+      return null;
+    }
+
+    return $UnifiedSearchResponseCopyWith<$Res>(_value.unifiedResults!,
+        (value) {
+      return _then(_value.copyWith(unifiedResults: value) as $Val);
     });
   }
 
@@ -235,6 +259,7 @@ abstract class _$$GlobalSearchStateImplCopyWith<$Res>
       String sortBy,
       AutocompleteResponse? autocompleteResults,
       bool isLoadingAutocomplete,
+      UnifiedSearchResponse? unifiedResults,
       PaginatedResponse<CoupletSearchResult>? coupletResults,
       bool isLoadingResults,
       List<String> recentSearches,
@@ -245,6 +270,8 @@ abstract class _$$GlobalSearchStateImplCopyWith<$Res>
 
   @override
   $AutocompleteResponseCopyWith<$Res>? get autocompleteResults;
+  @override
+  $UnifiedSearchResponseCopyWith<$Res>? get unifiedResults;
   @override
   $TrendingSearchesResponseCopyWith<$Res>? get trendingSearches;
   @override
@@ -272,6 +299,7 @@ class __$$GlobalSearchStateImplCopyWithImpl<$Res>
     Object? sortBy = null,
     Object? autocompleteResults = freezed,
     Object? isLoadingAutocomplete = null,
+    Object? unifiedResults = freezed,
     Object? coupletResults = freezed,
     Object? isLoadingResults = null,
     Object? recentSearches = null,
@@ -305,6 +333,10 @@ class __$$GlobalSearchStateImplCopyWithImpl<$Res>
           ? _value.isLoadingAutocomplete
           : isLoadingAutocomplete // ignore: cast_nullable_to_non_nullable
               as bool,
+      unifiedResults: freezed == unifiedResults
+          ? _value.unifiedResults
+          : unifiedResults // ignore: cast_nullable_to_non_nullable
+              as UnifiedSearchResponse?,
       coupletResults: freezed == coupletResults
           ? _value.coupletResults
           : coupletResults // ignore: cast_nullable_to_non_nullable
@@ -347,6 +379,7 @@ class _$GlobalSearchStateImpl implements _GlobalSearchState {
       this.sortBy = 'relevance',
       this.autocompleteResults,
       this.isLoadingAutocomplete = false,
+      this.unifiedResults,
       this.coupletResults,
       this.isLoadingResults = false,
       final List<String> recentSearches = const [],
@@ -377,7 +410,11 @@ class _$GlobalSearchStateImpl implements _GlobalSearchState {
   final bool isLoadingAutocomplete;
 // Search results data
   @override
+  final UnifiedSearchResponse? unifiedResults;
+// New unified search results
+  @override
   final PaginatedResponse<CoupletSearchResult>? coupletResults;
+// Legacy - will be deprecated
   @override
   @JsonKey()
   final bool isLoadingResults;
@@ -404,7 +441,7 @@ class _$GlobalSearchStateImpl implements _GlobalSearchState {
 
   @override
   String toString() {
-    return 'GlobalSearchState(mode: $mode, currentQuery: $currentQuery, selectedFilter: $selectedFilter, sortBy: $sortBy, autocompleteResults: $autocompleteResults, isLoadingAutocomplete: $isLoadingAutocomplete, coupletResults: $coupletResults, isLoadingResults: $isLoadingResults, recentSearches: $recentSearches, trendingSearches: $trendingSearches, recommendations: $recommendations, relatedSearches: $relatedSearches, errorMessage: $errorMessage)';
+    return 'GlobalSearchState(mode: $mode, currentQuery: $currentQuery, selectedFilter: $selectedFilter, sortBy: $sortBy, autocompleteResults: $autocompleteResults, isLoadingAutocomplete: $isLoadingAutocomplete, unifiedResults: $unifiedResults, coupletResults: $coupletResults, isLoadingResults: $isLoadingResults, recentSearches: $recentSearches, trendingSearches: $trendingSearches, recommendations: $recommendations, relatedSearches: $relatedSearches, errorMessage: $errorMessage)';
   }
 
   @override
@@ -422,6 +459,8 @@ class _$GlobalSearchStateImpl implements _GlobalSearchState {
                 other.autocompleteResults == autocompleteResults) &&
             (identical(other.isLoadingAutocomplete, isLoadingAutocomplete) ||
                 other.isLoadingAutocomplete == isLoadingAutocomplete) &&
+            (identical(other.unifiedResults, unifiedResults) ||
+                other.unifiedResults == unifiedResults) &&
             (identical(other.coupletResults, coupletResults) ||
                 other.coupletResults == coupletResults) &&
             (identical(other.isLoadingResults, isLoadingResults) ||
@@ -447,6 +486,7 @@ class _$GlobalSearchStateImpl implements _GlobalSearchState {
       sortBy,
       autocompleteResults,
       isLoadingAutocomplete,
+      unifiedResults,
       coupletResults,
       isLoadingResults,
       const DeepCollectionEquality().hash(_recentSearches),
@@ -473,6 +513,7 @@ abstract class _GlobalSearchState implements GlobalSearchState {
       final String sortBy,
       final AutocompleteResponse? autocompleteResults,
       final bool isLoadingAutocomplete,
+      final UnifiedSearchResponse? unifiedResults,
       final PaginatedResponse<CoupletSearchResult>? coupletResults,
       final bool isLoadingResults,
       final List<String> recentSearches,
@@ -495,7 +536,10 @@ abstract class _GlobalSearchState implements GlobalSearchState {
   @override
   bool get isLoadingAutocomplete; // Search results data
   @override
-  PaginatedResponse<CoupletSearchResult>? get coupletResults;
+  UnifiedSearchResponse? get unifiedResults; // New unified search results
+  @override
+  PaginatedResponse<CoupletSearchResult>?
+      get coupletResults; // Legacy - will be deprecated
   @override
   bool get isLoadingResults; // Discovery data
   @override

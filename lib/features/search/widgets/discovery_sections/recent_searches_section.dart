@@ -1,34 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
-import 'package:flutter_poetry_app/core/providers/language_provider.dart';
+import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
 
 /// Recent searches discovery section
 ///
 /// Features:
-/// - ActionChips with history icon
-/// - "Clear All" button
-/// - Tap to execute search
-/// - Language-aware labels
-/// - Paper aesthetic with minimal design
+/// - Soft card container with gentle elevation
+/// - Clean English heading (always)
+/// - Subtle "Clear All" button
+/// - Urdu-aware chips with proper sizing
+/// - Literary, calm aesthetic
 class RecentSearchesSection extends ConsumerWidget {
   const RecentSearchesSection({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final searchState = ref.watch(globalSearchProvider);
-    final languageCode = ref.watch(selectedLanguageProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (searchState.recentSearches.isEmpty) {
       return const SizedBox.shrink();
     }
 
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: AppSpacing.md),
+      padding: EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFFFFBF7),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.06)
+              : Colors.black.withValues(alpha: 0.04),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,71 +44,74 @@ class RecentSearchesSection extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Icon(
-                    Icons.history,
-                    size: 18,
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.7)
-                        : Colors.black.withValues(alpha: 0.7),
-                  ),
-                  SizedBox(width: AppSpacing.xs),
-                  Text(
-                    _getLabel('Recent Searches', languageCode),
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.9)
-                          : Colors.black.withValues(alpha: 0.9),
-                    ),
-                  ),
-                ],
+              Text(
+                'Recent Searches',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.2,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
               ),
               TextButton(
                 onPressed: () async {
-                  // Clear all recent searches
                   final historyService = ref.read(searchHistoryServiceProvider);
                   await historyService.clearAll();
-
-                  // Refresh recent searches in state
                   await ref.read(globalSearchProvider.notifier).refreshRecentSearches();
                 },
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                    vertical: AppSpacing.xs,
+                  ),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
                 child: Text(
-                  _getLabel('Clear All', languageCode),
+                  'Clear All',
                   style: TextStyle(
                     fontSize: 12,
+                    fontWeight: FontWeight.w500,
                     color: isDark
-                        ? Colors.white.withValues(alpha: 0.6)
-                        : Colors.black.withValues(alpha: 0.6),
+                        ? Colors.white.withValues(alpha: 0.5)
+                        : Colors.black.withValues(alpha: 0.5),
                   ),
                 ),
               ),
             ],
           ),
 
-          SizedBox(height: AppSpacing.xs),
+          SizedBox(height: AppSpacing.sm),
 
           // Recent searches chips
           Wrap(
             spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.xs,
+            runSpacing: AppSpacing.sm,
             children: searchState.recentSearches.map((query) {
+              final isUrdu = _isUrduText(query);
               return ActionChip(
-                label: Text(query),
-                labelStyle: TextStyle(
-                  fontSize: 13,
-                  color: isDark ? Colors.white : Colors.black87,
+                label: Text(
+                  query,
+                  style: TextStyle(
+                    fontSize: isUrdu ? 15 : 13,
+                    fontFamily: isUrdu ? 'JameelNoori' : null,
+                    fontWeight: FontWeight.w500,
+                    color: isDark ? Colors.white : Colors.black87,
+                    height: isUrdu ? 1.6 : 1.3,
+                  ),
                 ),
                 backgroundColor: isDark
-                    ? Colors.white.withValues(alpha: 0.08)
-                    : Colors.black.withValues(alpha: 0.05),
+                    ? Colors.white.withValues(alpha: 0.06)
+                    : AppColors.primary.withValues(alpha: 0.04),
                 side: BorderSide(
                   color: isDark
-                      ? Colors.white.withValues(alpha: 0.1)
-                      : Colors.black.withValues(alpha: 0.1),
+                      ? Colors.white.withValues(alpha: 0.08)
+                      : AppColors.primary.withValues(alpha: 0.12),
                   width: 1,
+                ),
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: isUrdu ? AppSpacing.xs + 2 : AppSpacing.xs,
                 ),
                 onPressed: () {
                   ref.read(globalSearchProvider.notifier).executeSearch(query: query);
@@ -114,23 +124,10 @@ class RecentSearchesSection extends ConsumerWidget {
     );
   }
 
-  /// Get localized label
-  String _getLabel(String key, String languageCode) {
-    final labels = {
-      'ur': {
-        'Recent Searches': 'حالیہ تلاش',
-        'Clear All': 'سب صاف کریں',
-      },
-      'hi': {
-        'Recent Searches': 'हाल की खोजें',
-        'Clear All': 'सभी साफ़ करें',
-      },
-      'en': {
-        'Recent Searches': 'Recent Searches',
-        'Clear All': 'Clear All',
-      },
-    };
-
-    return labels[languageCode]?[key] ?? labels['en']![key]!;
+  /// Detect if text is primarily Urdu
+  bool _isUrduText(String text) {
+    final urduPattern = RegExp(r'[\u0600-\u06FF]');
+    final urduMatches = urduPattern.allMatches(text).length;
+    return urduMatches > text.length / 3;
   }
 }

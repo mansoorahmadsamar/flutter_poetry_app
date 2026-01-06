@@ -58,9 +58,9 @@ class PaginatedResponse<T> {
   final int totalPages;
   final bool last;
   final bool first;
-  @JsonKey(name: 'numberOfElements') final int? numberOfElements;  // Made nullable
-  @JsonKey(name: 'pageSize') final int size;  // Maps from pageSize
-  @JsonKey(name: 'pageNumber') final int number;  // Maps from pageNumber
+  final int? numberOfElements;  // Made nullable
+  final int size;  // API provides 'size'
+  final int number;  // API provides 'number'
   final bool? empty;  // Made nullable
 
   PaginatedResponse({

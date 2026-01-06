@@ -1268,9 +1268,10 @@ CoupletSearchResult _$CoupletSearchResultFromJson(Map<String, dynamic> json) {
 mixin _$CoupletSearchResult {
   String get publicId => throw _privateConstructorUsedError;
   int get coupletNumber => throw _privateConstructorUsedError;
-  String get coupletType => throw _privateConstructorUsedError;
+  String? get coupletType =>
+      throw _privateConstructorUsedError; // Made nullable - unified search doesn't return this
   String? get coupletTypeName =>
-      throw _privateConstructorUsedError; // Added from API response
+      throw _privateConstructorUsedError; // Made nullable - API doesn't always include this
   List<VerseModel> get verses => throw _privateConstructorUsedError;
   PoemSummary? get poem =>
       throw _privateConstructorUsedError; // Made nullable - API doesn't always include this
@@ -1305,7 +1306,7 @@ abstract class $CoupletSearchResultCopyWith<$Res> {
   $Res call(
       {String publicId,
       int coupletNumber,
-      String coupletType,
+      String? coupletType,
       String? coupletTypeName,
       List<VerseModel> verses,
       PoemSummary? poem,
@@ -1339,7 +1340,7 @@ class _$CoupletSearchResultCopyWithImpl<$Res, $Val extends CoupletSearchResult>
   $Res call({
     Object? publicId = null,
     Object? coupletNumber = null,
-    Object? coupletType = null,
+    Object? coupletType = freezed,
     Object? coupletTypeName = freezed,
     Object? verses = null,
     Object? poem = freezed,
@@ -1361,10 +1362,10 @@ class _$CoupletSearchResultCopyWithImpl<$Res, $Val extends CoupletSearchResult>
           ? _value.coupletNumber
           : coupletNumber // ignore: cast_nullable_to_non_nullable
               as int,
-      coupletType: null == coupletType
+      coupletType: freezed == coupletType
           ? _value.coupletType
           : coupletType // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       coupletTypeName: freezed == coupletTypeName
           ? _value.coupletTypeName
           : coupletTypeName // ignore: cast_nullable_to_non_nullable
@@ -1452,7 +1453,7 @@ abstract class _$$CoupletSearchResultImplCopyWith<$Res>
   $Res call(
       {String publicId,
       int coupletNumber,
-      String coupletType,
+      String? coupletType,
       String? coupletTypeName,
       List<VerseModel> verses,
       PoemSummary? poem,
@@ -1486,7 +1487,7 @@ class __$$CoupletSearchResultImplCopyWithImpl<$Res>
   $Res call({
     Object? publicId = null,
     Object? coupletNumber = null,
-    Object? coupletType = null,
+    Object? coupletType = freezed,
     Object? coupletTypeName = freezed,
     Object? verses = null,
     Object? poem = freezed,
@@ -1508,10 +1509,10 @@ class __$$CoupletSearchResultImplCopyWithImpl<$Res>
           ? _value.coupletNumber
           : coupletNumber // ignore: cast_nullable_to_non_nullable
               as int,
-      coupletType: null == coupletType
+      coupletType: freezed == coupletType
           ? _value.coupletType
           : coupletType // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       coupletTypeName: freezed == coupletTypeName
           ? _value.coupletTypeName
           : coupletTypeName // ignore: cast_nullable_to_non_nullable
@@ -1566,7 +1567,7 @@ class _$CoupletSearchResultImpl implements _CoupletSearchResult {
   const _$CoupletSearchResultImpl(
       {required this.publicId,
       required this.coupletNumber,
-      required this.coupletType,
+      this.coupletType,
       this.coupletTypeName,
       required final List<VerseModel> verses,
       this.poem,
@@ -1588,12 +1589,13 @@ class _$CoupletSearchResultImpl implements _CoupletSearchResult {
   @override
   final int coupletNumber;
   @override
-  final String coupletType;
+  final String? coupletType;
+// Made nullable - unified search doesn't return this
   @override
   final String? coupletTypeName;
-// Added from API response
+// Made nullable - API doesn't always include this
   final List<VerseModel> _verses;
-// Added from API response
+// Made nullable - API doesn't always include this
   @override
   List<VerseModel> get verses {
     if (_verses is EqualUnmodifiableListView) return _verses;
@@ -1704,7 +1706,7 @@ abstract class _CoupletSearchResult implements CoupletSearchResult {
   const factory _CoupletSearchResult(
       {required final String publicId,
       required final int coupletNumber,
-      required final String coupletType,
+      final String? coupletType,
       final String? coupletTypeName,
       required final List<VerseModel> verses,
       final PoemSummary? poem,
@@ -1725,9 +1727,10 @@ abstract class _CoupletSearchResult implements CoupletSearchResult {
   @override
   int get coupletNumber;
   @override
-  String get coupletType;
+  String? get coupletType; // Made nullable - unified search doesn't return this
   @override
-  String? get coupletTypeName; // Added from API response
+  String?
+      get coupletTypeName; // Made nullable - API doesn't always include this
   @override
   List<VerseModel> get verses;
   @override
@@ -1755,6 +1758,323 @@ abstract class _CoupletSearchResult implements CoupletSearchResult {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$CoupletSearchResultImplCopyWith<_$CoupletSearchResultImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+VerseSearchResult _$VerseSearchResultFromJson(Map<String, dynamic> json) {
+  return _VerseSearchResult.fromJson(json);
+}
+
+/// @nodoc
+mixin _$VerseSearchResult {
+  VerseModel get verse => throw _privateConstructorUsedError;
+  String get poemPublicId => throw _privateConstructorUsedError;
+  String get poemTitle => throw _privateConstructorUsedError;
+  String get poetryType => throw _privateConstructorUsedError;
+  String? get poetryTypeName => throw _privateConstructorUsedError;
+  String get poetPublicId => throw _privateConstructorUsedError;
+  String get poetName => throw _privateConstructorUsedError;
+  String? get poetProfileImageUrl => throw _privateConstructorUsedError;
+
+  /// Serializes this VerseSearchResult to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of VerseSearchResult
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $VerseSearchResultCopyWith<VerseSearchResult> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $VerseSearchResultCopyWith<$Res> {
+  factory $VerseSearchResultCopyWith(
+          VerseSearchResult value, $Res Function(VerseSearchResult) then) =
+      _$VerseSearchResultCopyWithImpl<$Res, VerseSearchResult>;
+  @useResult
+  $Res call(
+      {VerseModel verse,
+      String poemPublicId,
+      String poemTitle,
+      String poetryType,
+      String? poetryTypeName,
+      String poetPublicId,
+      String poetName,
+      String? poetProfileImageUrl});
+
+  $VerseModelCopyWith<$Res> get verse;
+}
+
+/// @nodoc
+class _$VerseSearchResultCopyWithImpl<$Res, $Val extends VerseSearchResult>
+    implements $VerseSearchResultCopyWith<$Res> {
+  _$VerseSearchResultCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of VerseSearchResult
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? verse = null,
+    Object? poemPublicId = null,
+    Object? poemTitle = null,
+    Object? poetryType = null,
+    Object? poetryTypeName = freezed,
+    Object? poetPublicId = null,
+    Object? poetName = null,
+    Object? poetProfileImageUrl = freezed,
+  }) {
+    return _then(_value.copyWith(
+      verse: null == verse
+          ? _value.verse
+          : verse // ignore: cast_nullable_to_non_nullable
+              as VerseModel,
+      poemPublicId: null == poemPublicId
+          ? _value.poemPublicId
+          : poemPublicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      poemTitle: null == poemTitle
+          ? _value.poemTitle
+          : poemTitle // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetryType: null == poetryType
+          ? _value.poetryType
+          : poetryType // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetryTypeName: freezed == poetryTypeName
+          ? _value.poetryTypeName
+          : poetryTypeName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetPublicId: null == poetPublicId
+          ? _value.poetPublicId
+          : poetPublicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetName: null == poetName
+          ? _value.poetName
+          : poetName // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetProfileImageUrl: freezed == poetProfileImageUrl
+          ? _value.poetProfileImageUrl
+          : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+
+  /// Create a copy of VerseSearchResult
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $VerseModelCopyWith<$Res> get verse {
+    return $VerseModelCopyWith<$Res>(_value.verse, (value) {
+      return _then(_value.copyWith(verse: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$VerseSearchResultImplCopyWith<$Res>
+    implements $VerseSearchResultCopyWith<$Res> {
+  factory _$$VerseSearchResultImplCopyWith(_$VerseSearchResultImpl value,
+          $Res Function(_$VerseSearchResultImpl) then) =
+      __$$VerseSearchResultImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {VerseModel verse,
+      String poemPublicId,
+      String poemTitle,
+      String poetryType,
+      String? poetryTypeName,
+      String poetPublicId,
+      String poetName,
+      String? poetProfileImageUrl});
+
+  @override
+  $VerseModelCopyWith<$Res> get verse;
+}
+
+/// @nodoc
+class __$$VerseSearchResultImplCopyWithImpl<$Res>
+    extends _$VerseSearchResultCopyWithImpl<$Res, _$VerseSearchResultImpl>
+    implements _$$VerseSearchResultImplCopyWith<$Res> {
+  __$$VerseSearchResultImplCopyWithImpl(_$VerseSearchResultImpl _value,
+      $Res Function(_$VerseSearchResultImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of VerseSearchResult
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? verse = null,
+    Object? poemPublicId = null,
+    Object? poemTitle = null,
+    Object? poetryType = null,
+    Object? poetryTypeName = freezed,
+    Object? poetPublicId = null,
+    Object? poetName = null,
+    Object? poetProfileImageUrl = freezed,
+  }) {
+    return _then(_$VerseSearchResultImpl(
+      verse: null == verse
+          ? _value.verse
+          : verse // ignore: cast_nullable_to_non_nullable
+              as VerseModel,
+      poemPublicId: null == poemPublicId
+          ? _value.poemPublicId
+          : poemPublicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      poemTitle: null == poemTitle
+          ? _value.poemTitle
+          : poemTitle // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetryType: null == poetryType
+          ? _value.poetryType
+          : poetryType // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetryTypeName: freezed == poetryTypeName
+          ? _value.poetryTypeName
+          : poetryTypeName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetPublicId: null == poetPublicId
+          ? _value.poetPublicId
+          : poetPublicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetName: null == poetName
+          ? _value.poetName
+          : poetName // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetProfileImageUrl: freezed == poetProfileImageUrl
+          ? _value.poetProfileImageUrl
+          : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$VerseSearchResultImpl implements _VerseSearchResult {
+  const _$VerseSearchResultImpl(
+      {required this.verse,
+      required this.poemPublicId,
+      required this.poemTitle,
+      required this.poetryType,
+      this.poetryTypeName,
+      required this.poetPublicId,
+      required this.poetName,
+      this.poetProfileImageUrl});
+
+  factory _$VerseSearchResultImpl.fromJson(Map<String, dynamic> json) =>
+      _$$VerseSearchResultImplFromJson(json);
+
+  @override
+  final VerseModel verse;
+  @override
+  final String poemPublicId;
+  @override
+  final String poemTitle;
+  @override
+  final String poetryType;
+  @override
+  final String? poetryTypeName;
+  @override
+  final String poetPublicId;
+  @override
+  final String poetName;
+  @override
+  final String? poetProfileImageUrl;
+
+  @override
+  String toString() {
+    return 'VerseSearchResult(verse: $verse, poemPublicId: $poemPublicId, poemTitle: $poemTitle, poetryType: $poetryType, poetryTypeName: $poetryTypeName, poetPublicId: $poetPublicId, poetName: $poetName, poetProfileImageUrl: $poetProfileImageUrl)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$VerseSearchResultImpl &&
+            (identical(other.verse, verse) || other.verse == verse) &&
+            (identical(other.poemPublicId, poemPublicId) ||
+                other.poemPublicId == poemPublicId) &&
+            (identical(other.poemTitle, poemTitle) ||
+                other.poemTitle == poemTitle) &&
+            (identical(other.poetryType, poetryType) ||
+                other.poetryType == poetryType) &&
+            (identical(other.poetryTypeName, poetryTypeName) ||
+                other.poetryTypeName == poetryTypeName) &&
+            (identical(other.poetPublicId, poetPublicId) ||
+                other.poetPublicId == poetPublicId) &&
+            (identical(other.poetName, poetName) ||
+                other.poetName == poetName) &&
+            (identical(other.poetProfileImageUrl, poetProfileImageUrl) ||
+                other.poetProfileImageUrl == poetProfileImageUrl));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, verse, poemPublicId, poemTitle,
+      poetryType, poetryTypeName, poetPublicId, poetName, poetProfileImageUrl);
+
+  /// Create a copy of VerseSearchResult
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$VerseSearchResultImplCopyWith<_$VerseSearchResultImpl> get copyWith =>
+      __$$VerseSearchResultImplCopyWithImpl<_$VerseSearchResultImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$VerseSearchResultImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _VerseSearchResult implements VerseSearchResult {
+  const factory _VerseSearchResult(
+      {required final VerseModel verse,
+      required final String poemPublicId,
+      required final String poemTitle,
+      required final String poetryType,
+      final String? poetryTypeName,
+      required final String poetPublicId,
+      required final String poetName,
+      final String? poetProfileImageUrl}) = _$VerseSearchResultImpl;
+
+  factory _VerseSearchResult.fromJson(Map<String, dynamic> json) =
+      _$VerseSearchResultImpl.fromJson;
+
+  @override
+  VerseModel get verse;
+  @override
+  String get poemPublicId;
+  @override
+  String get poemTitle;
+  @override
+  String get poetryType;
+  @override
+  String? get poetryTypeName;
+  @override
+  String get poetPublicId;
+  @override
+  String get poetName;
+  @override
+  String? get poetProfileImageUrl;
+
+  /// Create a copy of VerseSearchResult
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$VerseSearchResultImplCopyWith<_$VerseSearchResultImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -2143,7 +2463,11 @@ mixin _$RecommendationResponse {
       throw _privateConstructorUsedError; // PERSONALIZED, SIMILAR, TRENDING, HYBRID
   List<RecommendationItem> get items => throw _privateConstructorUsedError;
   int get totalCount => throw _privateConstructorUsedError;
-  String get algorithm => throw _privateConstructorUsedError;
+  String? get message =>
+      throw _privateConstructorUsedError; // Changed from 'algorithm' to match API response
+  bool get isPersonalized =>
+      throw _privateConstructorUsedError; // Added from API response
+  int get count => throw _privateConstructorUsedError;
 
   /// Serializes this RecommendationResponse to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -2165,7 +2489,9 @@ abstract class $RecommendationResponseCopyWith<$Res> {
       {String type,
       List<RecommendationItem> items,
       int totalCount,
-      String algorithm});
+      String? message,
+      bool isPersonalized,
+      int count});
 }
 
 /// @nodoc
@@ -2187,7 +2513,9 @@ class _$RecommendationResponseCopyWithImpl<$Res,
     Object? type = null,
     Object? items = null,
     Object? totalCount = null,
-    Object? algorithm = null,
+    Object? message = freezed,
+    Object? isPersonalized = null,
+    Object? count = null,
   }) {
     return _then(_value.copyWith(
       type: null == type
@@ -2202,10 +2530,18 @@ class _$RecommendationResponseCopyWithImpl<$Res,
           ? _value.totalCount
           : totalCount // ignore: cast_nullable_to_non_nullable
               as int,
-      algorithm: null == algorithm
-          ? _value.algorithm
-          : algorithm // ignore: cast_nullable_to_non_nullable
-              as String,
+      message: freezed == message
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isPersonalized: null == isPersonalized
+          ? _value.isPersonalized
+          : isPersonalized // ignore: cast_nullable_to_non_nullable
+              as bool,
+      count: null == count
+          ? _value.count
+          : count // ignore: cast_nullable_to_non_nullable
+              as int,
     ) as $Val);
   }
 }
@@ -2223,7 +2559,9 @@ abstract class _$$RecommendationResponseImplCopyWith<$Res>
       {String type,
       List<RecommendationItem> items,
       int totalCount,
-      String algorithm});
+      String? message,
+      bool isPersonalized,
+      int count});
 }
 
 /// @nodoc
@@ -2244,7 +2582,9 @@ class __$$RecommendationResponseImplCopyWithImpl<$Res>
     Object? type = null,
     Object? items = null,
     Object? totalCount = null,
-    Object? algorithm = null,
+    Object? message = freezed,
+    Object? isPersonalized = null,
+    Object? count = null,
   }) {
     return _then(_$RecommendationResponseImpl(
       type: null == type
@@ -2259,10 +2599,18 @@ class __$$RecommendationResponseImplCopyWithImpl<$Res>
           ? _value.totalCount
           : totalCount // ignore: cast_nullable_to_non_nullable
               as int,
-      algorithm: null == algorithm
-          ? _value.algorithm
-          : algorithm // ignore: cast_nullable_to_non_nullable
-              as String,
+      message: freezed == message
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isPersonalized: null == isPersonalized
+          ? _value.isPersonalized
+          : isPersonalized // ignore: cast_nullable_to_non_nullable
+              as bool,
+      count: null == count
+          ? _value.count
+          : count // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -2274,7 +2622,9 @@ class _$RecommendationResponseImpl implements _RecommendationResponse {
       {required this.type,
       final List<RecommendationItem> items = const [],
       this.totalCount = 0,
-      required this.algorithm})
+      this.message,
+      this.isPersonalized = false,
+      this.count = 0})
       : _items = items;
 
   factory _$RecommendationResponseImpl.fromJson(Map<String, dynamic> json) =>
@@ -2297,11 +2647,19 @@ class _$RecommendationResponseImpl implements _RecommendationResponse {
   @JsonKey()
   final int totalCount;
   @override
-  final String algorithm;
+  final String? message;
+// Changed from 'algorithm' to match API response
+  @override
+  @JsonKey()
+  final bool isPersonalized;
+// Added from API response
+  @override
+  @JsonKey()
+  final int count;
 
   @override
   String toString() {
-    return 'RecommendationResponse(type: $type, items: $items, totalCount: $totalCount, algorithm: $algorithm)';
+    return 'RecommendationResponse(type: $type, items: $items, totalCount: $totalCount, message: $message, isPersonalized: $isPersonalized, count: $count)';
   }
 
   @override
@@ -2313,14 +2671,22 @@ class _$RecommendationResponseImpl implements _RecommendationResponse {
             const DeepCollectionEquality().equals(other._items, _items) &&
             (identical(other.totalCount, totalCount) ||
                 other.totalCount == totalCount) &&
-            (identical(other.algorithm, algorithm) ||
-                other.algorithm == algorithm));
+            (identical(other.message, message) || other.message == message) &&
+            (identical(other.isPersonalized, isPersonalized) ||
+                other.isPersonalized == isPersonalized) &&
+            (identical(other.count, count) || other.count == count));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, type,
-      const DeepCollectionEquality().hash(_items), totalCount, algorithm);
+  int get hashCode => Object.hash(
+      runtimeType,
+      type,
+      const DeepCollectionEquality().hash(_items),
+      totalCount,
+      message,
+      isPersonalized,
+      count);
 
   /// Create a copy of RecommendationResponse
   /// with the given fields replaced by the non-null parameter values.
@@ -2344,7 +2710,9 @@ abstract class _RecommendationResponse implements RecommendationResponse {
       {required final String type,
       final List<RecommendationItem> items,
       final int totalCount,
-      required final String algorithm}) = _$RecommendationResponseImpl;
+      final String? message,
+      final bool isPersonalized,
+      final int count}) = _$RecommendationResponseImpl;
 
   factory _RecommendationResponse.fromJson(Map<String, dynamic> json) =
       _$RecommendationResponseImpl.fromJson;
@@ -2356,7 +2724,11 @@ abstract class _RecommendationResponse implements RecommendationResponse {
   @override
   int get totalCount;
   @override
-  String get algorithm;
+  String? get message; // Changed from 'algorithm' to match API response
+  @override
+  bool get isPersonalized; // Added from API response
+  @override
+  int get count;
 
   /// Create a copy of RecommendationResponse
   /// with the given fields replaced by the non-null parameter values.
@@ -2802,6 +3174,491 @@ abstract class _RecommendationItem implements RecommendationItem {
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$RecommendationItemImplCopyWith<_$RecommendationItemImpl> get copyWith =>
       throw _privateConstructorUsedError;
+}
+
+UnifiedSearchResponse _$UnifiedSearchResponseFromJson(
+    Map<String, dynamic> json) {
+  return _UnifiedSearchResponse.fromJson(json);
+}
+
+/// @nodoc
+mixin _$UnifiedSearchResponse {
+  int get totalResults => throw _privateConstructorUsedError;
+  int get poetCount => throw _privateConstructorUsedError;
+  int get poemCount => throw _privateConstructorUsedError;
+  int get verseCount => throw _privateConstructorUsedError;
+  int get coupletCount => throw _privateConstructorUsedError;
+  int get tagCount => throw _privateConstructorUsedError;
+  int get categoryCount => throw _privateConstructorUsedError;
+  List<PoetModel> get poets =>
+      throw _privateConstructorUsedError; // Full poet objects from API
+  List<PoemModel> get poems =>
+      throw _privateConstructorUsedError; // Full poem objects from API
+  List<VerseSearchResult> get verses =>
+      throw _privateConstructorUsedError; // Verse results with nested structure
+  List<CoupletSearchResult> get couplets => throw _privateConstructorUsedError;
+  List<AutocompleteTag> get tags => throw _privateConstructorUsedError;
+  List<AutocompleteCategory> get categories =>
+      throw _privateConstructorUsedError;
+
+  /// Serializes this UnifiedSearchResponse to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of UnifiedSearchResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $UnifiedSearchResponseCopyWith<UnifiedSearchResponse> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $UnifiedSearchResponseCopyWith<$Res> {
+  factory $UnifiedSearchResponseCopyWith(UnifiedSearchResponse value,
+          $Res Function(UnifiedSearchResponse) then) =
+      _$UnifiedSearchResponseCopyWithImpl<$Res, UnifiedSearchResponse>;
+  @useResult
+  $Res call(
+      {int totalResults,
+      int poetCount,
+      int poemCount,
+      int verseCount,
+      int coupletCount,
+      int tagCount,
+      int categoryCount,
+      List<PoetModel> poets,
+      List<PoemModel> poems,
+      List<VerseSearchResult> verses,
+      List<CoupletSearchResult> couplets,
+      List<AutocompleteTag> tags,
+      List<AutocompleteCategory> categories});
+}
+
+/// @nodoc
+class _$UnifiedSearchResponseCopyWithImpl<$Res,
+        $Val extends UnifiedSearchResponse>
+    implements $UnifiedSearchResponseCopyWith<$Res> {
+  _$UnifiedSearchResponseCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of UnifiedSearchResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? totalResults = null,
+    Object? poetCount = null,
+    Object? poemCount = null,
+    Object? verseCount = null,
+    Object? coupletCount = null,
+    Object? tagCount = null,
+    Object? categoryCount = null,
+    Object? poets = null,
+    Object? poems = null,
+    Object? verses = null,
+    Object? couplets = null,
+    Object? tags = null,
+    Object? categories = null,
+  }) {
+    return _then(_value.copyWith(
+      totalResults: null == totalResults
+          ? _value.totalResults
+          : totalResults // ignore: cast_nullable_to_non_nullable
+              as int,
+      poetCount: null == poetCount
+          ? _value.poetCount
+          : poetCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      poemCount: null == poemCount
+          ? _value.poemCount
+          : poemCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      verseCount: null == verseCount
+          ? _value.verseCount
+          : verseCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      coupletCount: null == coupletCount
+          ? _value.coupletCount
+          : coupletCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      tagCount: null == tagCount
+          ? _value.tagCount
+          : tagCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      categoryCount: null == categoryCount
+          ? _value.categoryCount
+          : categoryCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      poets: null == poets
+          ? _value.poets
+          : poets // ignore: cast_nullable_to_non_nullable
+              as List<PoetModel>,
+      poems: null == poems
+          ? _value.poems
+          : poems // ignore: cast_nullable_to_non_nullable
+              as List<PoemModel>,
+      verses: null == verses
+          ? _value.verses
+          : verses // ignore: cast_nullable_to_non_nullable
+              as List<VerseSearchResult>,
+      couplets: null == couplets
+          ? _value.couplets
+          : couplets // ignore: cast_nullable_to_non_nullable
+              as List<CoupletSearchResult>,
+      tags: null == tags
+          ? _value.tags
+          : tags // ignore: cast_nullable_to_non_nullable
+              as List<AutocompleteTag>,
+      categories: null == categories
+          ? _value.categories
+          : categories // ignore: cast_nullable_to_non_nullable
+              as List<AutocompleteCategory>,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$UnifiedSearchResponseImplCopyWith<$Res>
+    implements $UnifiedSearchResponseCopyWith<$Res> {
+  factory _$$UnifiedSearchResponseImplCopyWith(
+          _$UnifiedSearchResponseImpl value,
+          $Res Function(_$UnifiedSearchResponseImpl) then) =
+      __$$UnifiedSearchResponseImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {int totalResults,
+      int poetCount,
+      int poemCount,
+      int verseCount,
+      int coupletCount,
+      int tagCount,
+      int categoryCount,
+      List<PoetModel> poets,
+      List<PoemModel> poems,
+      List<VerseSearchResult> verses,
+      List<CoupletSearchResult> couplets,
+      List<AutocompleteTag> tags,
+      List<AutocompleteCategory> categories});
+}
+
+/// @nodoc
+class __$$UnifiedSearchResponseImplCopyWithImpl<$Res>
+    extends _$UnifiedSearchResponseCopyWithImpl<$Res,
+        _$UnifiedSearchResponseImpl>
+    implements _$$UnifiedSearchResponseImplCopyWith<$Res> {
+  __$$UnifiedSearchResponseImplCopyWithImpl(_$UnifiedSearchResponseImpl _value,
+      $Res Function(_$UnifiedSearchResponseImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of UnifiedSearchResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? totalResults = null,
+    Object? poetCount = null,
+    Object? poemCount = null,
+    Object? verseCount = null,
+    Object? coupletCount = null,
+    Object? tagCount = null,
+    Object? categoryCount = null,
+    Object? poets = null,
+    Object? poems = null,
+    Object? verses = null,
+    Object? couplets = null,
+    Object? tags = null,
+    Object? categories = null,
+  }) {
+    return _then(_$UnifiedSearchResponseImpl(
+      totalResults: null == totalResults
+          ? _value.totalResults
+          : totalResults // ignore: cast_nullable_to_non_nullable
+              as int,
+      poetCount: null == poetCount
+          ? _value.poetCount
+          : poetCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      poemCount: null == poemCount
+          ? _value.poemCount
+          : poemCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      verseCount: null == verseCount
+          ? _value.verseCount
+          : verseCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      coupletCount: null == coupletCount
+          ? _value.coupletCount
+          : coupletCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      tagCount: null == tagCount
+          ? _value.tagCount
+          : tagCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      categoryCount: null == categoryCount
+          ? _value.categoryCount
+          : categoryCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      poets: null == poets
+          ? _value._poets
+          : poets // ignore: cast_nullable_to_non_nullable
+              as List<PoetModel>,
+      poems: null == poems
+          ? _value._poems
+          : poems // ignore: cast_nullable_to_non_nullable
+              as List<PoemModel>,
+      verses: null == verses
+          ? _value._verses
+          : verses // ignore: cast_nullable_to_non_nullable
+              as List<VerseSearchResult>,
+      couplets: null == couplets
+          ? _value._couplets
+          : couplets // ignore: cast_nullable_to_non_nullable
+              as List<CoupletSearchResult>,
+      tags: null == tags
+          ? _value._tags
+          : tags // ignore: cast_nullable_to_non_nullable
+              as List<AutocompleteTag>,
+      categories: null == categories
+          ? _value._categories
+          : categories // ignore: cast_nullable_to_non_nullable
+              as List<AutocompleteCategory>,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$UnifiedSearchResponseImpl implements _UnifiedSearchResponse {
+  const _$UnifiedSearchResponseImpl(
+      {this.totalResults = 0,
+      this.poetCount = 0,
+      this.poemCount = 0,
+      this.verseCount = 0,
+      this.coupletCount = 0,
+      this.tagCount = 0,
+      this.categoryCount = 0,
+      final List<PoetModel> poets = const [],
+      final List<PoemModel> poems = const [],
+      final List<VerseSearchResult> verses = const [],
+      final List<CoupletSearchResult> couplets = const [],
+      final List<AutocompleteTag> tags = const [],
+      final List<AutocompleteCategory> categories = const []})
+      : _poets = poets,
+        _poems = poems,
+        _verses = verses,
+        _couplets = couplets,
+        _tags = tags,
+        _categories = categories;
+
+  factory _$UnifiedSearchResponseImpl.fromJson(Map<String, dynamic> json) =>
+      _$$UnifiedSearchResponseImplFromJson(json);
+
+  @override
+  @JsonKey()
+  final int totalResults;
+  @override
+  @JsonKey()
+  final int poetCount;
+  @override
+  @JsonKey()
+  final int poemCount;
+  @override
+  @JsonKey()
+  final int verseCount;
+  @override
+  @JsonKey()
+  final int coupletCount;
+  @override
+  @JsonKey()
+  final int tagCount;
+  @override
+  @JsonKey()
+  final int categoryCount;
+  final List<PoetModel> _poets;
+  @override
+  @JsonKey()
+  List<PoetModel> get poets {
+    if (_poets is EqualUnmodifiableListView) return _poets;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_poets);
+  }
+
+// Full poet objects from API
+  final List<PoemModel> _poems;
+// Full poet objects from API
+  @override
+  @JsonKey()
+  List<PoemModel> get poems {
+    if (_poems is EqualUnmodifiableListView) return _poems;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_poems);
+  }
+
+// Full poem objects from API
+  final List<VerseSearchResult> _verses;
+// Full poem objects from API
+  @override
+  @JsonKey()
+  List<VerseSearchResult> get verses {
+    if (_verses is EqualUnmodifiableListView) return _verses;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_verses);
+  }
+
+// Verse results with nested structure
+  final List<CoupletSearchResult> _couplets;
+// Verse results with nested structure
+  @override
+  @JsonKey()
+  List<CoupletSearchResult> get couplets {
+    if (_couplets is EqualUnmodifiableListView) return _couplets;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_couplets);
+  }
+
+  final List<AutocompleteTag> _tags;
+  @override
+  @JsonKey()
+  List<AutocompleteTag> get tags {
+    if (_tags is EqualUnmodifiableListView) return _tags;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_tags);
+  }
+
+  final List<AutocompleteCategory> _categories;
+  @override
+  @JsonKey()
+  List<AutocompleteCategory> get categories {
+    if (_categories is EqualUnmodifiableListView) return _categories;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_categories);
+  }
+
+  @override
+  String toString() {
+    return 'UnifiedSearchResponse(totalResults: $totalResults, poetCount: $poetCount, poemCount: $poemCount, verseCount: $verseCount, coupletCount: $coupletCount, tagCount: $tagCount, categoryCount: $categoryCount, poets: $poets, poems: $poems, verses: $verses, couplets: $couplets, tags: $tags, categories: $categories)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$UnifiedSearchResponseImpl &&
+            (identical(other.totalResults, totalResults) ||
+                other.totalResults == totalResults) &&
+            (identical(other.poetCount, poetCount) ||
+                other.poetCount == poetCount) &&
+            (identical(other.poemCount, poemCount) ||
+                other.poemCount == poemCount) &&
+            (identical(other.verseCount, verseCount) ||
+                other.verseCount == verseCount) &&
+            (identical(other.coupletCount, coupletCount) ||
+                other.coupletCount == coupletCount) &&
+            (identical(other.tagCount, tagCount) ||
+                other.tagCount == tagCount) &&
+            (identical(other.categoryCount, categoryCount) ||
+                other.categoryCount == categoryCount) &&
+            const DeepCollectionEquality().equals(other._poets, _poets) &&
+            const DeepCollectionEquality().equals(other._poems, _poems) &&
+            const DeepCollectionEquality().equals(other._verses, _verses) &&
+            const DeepCollectionEquality().equals(other._couplets, _couplets) &&
+            const DeepCollectionEquality().equals(other._tags, _tags) &&
+            const DeepCollectionEquality()
+                .equals(other._categories, _categories));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      totalResults,
+      poetCount,
+      poemCount,
+      verseCount,
+      coupletCount,
+      tagCount,
+      categoryCount,
+      const DeepCollectionEquality().hash(_poets),
+      const DeepCollectionEquality().hash(_poems),
+      const DeepCollectionEquality().hash(_verses),
+      const DeepCollectionEquality().hash(_couplets),
+      const DeepCollectionEquality().hash(_tags),
+      const DeepCollectionEquality().hash(_categories));
+
+  /// Create a copy of UnifiedSearchResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$UnifiedSearchResponseImplCopyWith<_$UnifiedSearchResponseImpl>
+      get copyWith => __$$UnifiedSearchResponseImplCopyWithImpl<
+          _$UnifiedSearchResponseImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$UnifiedSearchResponseImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _UnifiedSearchResponse implements UnifiedSearchResponse {
+  const factory _UnifiedSearchResponse(
+          {final int totalResults,
+          final int poetCount,
+          final int poemCount,
+          final int verseCount,
+          final int coupletCount,
+          final int tagCount,
+          final int categoryCount,
+          final List<PoetModel> poets,
+          final List<PoemModel> poems,
+          final List<VerseSearchResult> verses,
+          final List<CoupletSearchResult> couplets,
+          final List<AutocompleteTag> tags,
+          final List<AutocompleteCategory> categories}) =
+      _$UnifiedSearchResponseImpl;
+
+  factory _UnifiedSearchResponse.fromJson(Map<String, dynamic> json) =
+      _$UnifiedSearchResponseImpl.fromJson;
+
+  @override
+  int get totalResults;
+  @override
+  int get poetCount;
+  @override
+  int get poemCount;
+  @override
+  int get verseCount;
+  @override
+  int get coupletCount;
+  @override
+  int get tagCount;
+  @override
+  int get categoryCount;
+  @override
+  List<PoetModel> get poets; // Full poet objects from API
+  @override
+  List<PoemModel> get poems; // Full poem objects from API
+  @override
+  List<VerseSearchResult> get verses; // Verse results with nested structure
+  @override
+  List<CoupletSearchResult> get couplets;
+  @override
+  List<AutocompleteTag> get tags;
+  @override
+  List<AutocompleteCategory> get categories;
+
+  /// Create a copy of UnifiedSearchResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$UnifiedSearchResponseImplCopyWith<_$UnifiedSearchResponseImpl>
+      get copyWith => throw _privateConstructorUsedError;
 }
 
 TrendingSearch _$TrendingSearchFromJson(Map<String, dynamic> json) {

@@ -10,7 +10,7 @@ CoupletModel convertSearchResultToCoupletModel(CoupletSearchResult result) {
   return CoupletModel(
     publicId: result.publicId,
     coupletNumber: result.coupletNumber,
-    coupletType: result.coupletType,
+    coupletType: result.coupletType ?? 'SHER',  // Default to SHER if null
     coupletTypeName: result.coupletTypeName ?? result.coupletType,
     verses: result.verses,
     likeCount: result.likeCount,

@@ -70,13 +70,21 @@ class SearchService {
       );
 
       if (apiResponse.success && apiResponse.data != null) {
-        final paginatedResponse = PaginatedResponse<CoupletSearchResult>.fromJson(
-          apiResponse.data!,
-          (json) => CoupletSearchResult.fromJson(json as Map<String, dynamic>? ?? {}),
-        );
+        try {
+          _logger.d('📋 Parsing paginated response...');
+          final paginatedResponse = PaginatedResponse<CoupletSearchResult>.fromJson(
+            apiResponse.data!,
+            (json) => CoupletSearchResult.fromJson(json as Map<String, dynamic>? ?? {}),
+          );
 
-        _logger.i('✅ Couplet search: "${query}" - ${paginatedResponse.totalElements} results');
-        return paginatedResponse;
+          _logger.i('✅ Couplet search: "${query}" - ${paginatedResponse.totalElements} results');
+          return paginatedResponse;
+        } catch (parseError, stackTrace) {
+          _logger.e('❌ Error parsing couplet response: $parseError');
+          _logger.e('Stack: $stackTrace');
+          _logger.e('Data keys: ${apiResponse.data!.keys.toList()}');
+          rethrow;
+        }
       } else {
         throw Exception(apiResponse.message ?? 'Search failed');
       }
@@ -86,6 +94,71 @@ class SearchService {
     } catch (e) {
       _logger.e('❌ Unexpected error searching couplets: $e');
       throw Exception('Failed to search couplets: ${e.toString()}');
+    }
+  }
+
+  // ============================================================================
+  // UNIFIED SEARCH (All Content Types)
+  // ============================================================================
+
+  /// Unified search across all content types
+  ///
+  /// Endpoint: GET /api/search
+  ///
+  /// This is the MAIN search endpoint that should be used when users hit enter
+  /// to search. It returns poets, poems, verses, couplets, tags, and categories.
+  ///
+  /// Parameters:
+  /// - [query]: Search query (required)
+  /// - [type]: Content type filter ('all', 'poets', 'poems', 'couplets') - defaults to 'all'
+  /// - [lang]: Language code (ur, en, hi) - defaults to 'ur'
+  ///
+  /// Returns: Unified search results with all content types
+  Future<UnifiedSearchResponse> searchUnified({
+    required String query,
+    String type = 'all',
+    String lang = 'ur',
+  }) async {
+    try {
+      _logger.i('🔍 Unified search: "$query" (type: $type, lang: $lang)');
+
+      final response = await _dio.get(
+        _baseEndpoint,
+        queryParameters: {
+          'q': query,
+          'type': type,
+          'lang': lang,
+        },
+      );
+
+      _logger.d('📦 Raw unified search response: ${response.data}');
+
+      final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+        response.data,
+        (json) => json as Map<String, dynamic>,
+      );
+
+      if (apiResponse.success && apiResponse.data != null) {
+        try {
+          final unifiedResponse = UnifiedSearchResponse.fromJson(apiResponse.data!);
+          _logger.i('✅ Unified search: "$query" - ${unifiedResponse.totalResults} total results');
+          _logger.i('   Poets: ${unifiedResponse.poetCount}, Poems: ${unifiedResponse.poemCount}, Couplets: ${unifiedResponse.coupletCount}');
+          return unifiedResponse;
+        } catch (parseError, stackTrace) {
+          _logger.e('❌ Error parsing unified search response: $parseError');
+          _logger.e('Stack: $stackTrace');
+          _logger.e('Data keys: ${apiResponse.data!.keys.toList()}');
+          rethrow;
+        }
+      } else {
+        throw Exception(apiResponse.message ?? 'Unified search failed');
+      }
+    } on DioException catch (e) {
+      _logger.e('❌ Error in unified search: ${e.message}');
+      rethrow;
+    } catch (e) {
+      _logger.e('❌ Unexpected error in unified search: $e');
+      throw Exception('Failed to perform unified search: ${e.toString()}');
     }
   }
 

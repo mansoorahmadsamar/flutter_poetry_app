@@ -101,6 +101,23 @@ class _PoetsSearchScreenState extends ConsumerState<PoetsSearchScreen> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
+          // DEBUG: Screen identifier
+          SliverToBoxAdapter(
+            child: Container(
+              color: Colors.blue,
+              padding: const EdgeInsets.all(8),
+              child: const Text(
+                '👥 POETS SEARCH SCREEN 👥',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+
           // Search App Bar
           _buildSearchAppBar(context, isDark),
 
