@@ -76,8 +76,13 @@ class AutocompleteCategory with _$AutocompleteCategory {
   const factory AutocompleteCategory({
     required String publicId,
     required String name,
-    required String slug,
+    String? description,
+    String? iconUrl,
     @Default(0) int poemCount,
+    @Default(0) int displayOrder,
+    @Default(true) bool isActive,
+    String? parentCategoryPublicId,
+    String? parentCategoryName,
     @Default(0.0) double score,
   }) = _AutocompleteCategory;
 

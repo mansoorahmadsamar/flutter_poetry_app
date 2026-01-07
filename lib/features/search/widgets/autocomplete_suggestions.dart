@@ -3,16 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
-import 'package:flutter_poetry_app/core/widgets/localized_text.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
+import 'package:flutter_poetry_app/features/search/widgets/top_match_card.dart';
 
 /// Autocomplete suggestions overlay widget
 ///
 /// Features:
+/// - Top match card (first poet or poem result)
 /// - Grouped suggestions (Poets max 3, Poems max 5, Tags max 3, Categories max 3)
-/// - Section headers with icons
+/// - Bilingual section headers
 /// - Poet avatars with CircleAvatar
 /// - Tap actions: Navigate to detail OR execute search
 /// - Floating card with shadow and border
@@ -34,48 +35,57 @@ class AutocompleteSuggestions extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: AppSpacing.md),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.08)
-              : Colors.black.withValues(alpha: 0.06),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: isDark
-                ? Colors.black.withValues(alpha: 0.5)
-                : Colors.black.withValues(alpha: 0.08),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ListView(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
-        children: [
-          // Poets Section
-          if (suggestions.poets.isNotEmpty) ...[
-            _buildSectionHeader(
-              context,
-              _getLabel('Poets', languageCode),
-              Icons.person_outline,
-              isDark,
+    // Get top match (first poet or first poem)
+    final hasTopMatch = suggestions.poets.isNotEmpty || suggestions.poems.isNotEmpty;
+
+    return Column(
+      children: [
+        // Top Match Card
+        if (hasTopMatch) _buildTopMatch(context, suggestions),
+
+        // Grouped Suggestions
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: AppSpacing.md),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.08)
+                  : Colors.black.withValues(alpha: 0.06),
+              width: 1,
             ),
-            ...suggestions.poets.map((poet) => _buildPoetItem(
+            boxShadow: [
+              BoxShadow(
+                color: isDark
+                    ? Colors.black.withValues(alpha: 0.5)
+                    : Colors.black.withValues(alpha: 0.08),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: ListView(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
+            children: [
+              // Poets Section (skip first if shown as top match)
+              if (suggestions.poets.isNotEmpty) ...[
+                _buildSectionHeader(
                   context,
-                  ref,
-                  poet,
+                  _getLabel('Poets', languageCode),
+                  Icons.person_outline,
                   isDark,
-                )),
-            if (_hasMoreSections(suggestions)) _buildDivider(isDark),
-          ],
+                ),
+                ...suggestions.poets.skip(1).map((poet) => _buildPoetItem(
+                      context,
+                      ref,
+                      poet,
+                      isDark,
+                    )),
+                if (_hasMoreSections(suggestions)) _buildDivider(isDark),
+              ],
 
           // Poems Section
           if (suggestions.poems.isNotEmpty) ...[
@@ -129,7 +139,44 @@ class AutocompleteSuggestions extends ConsumerWidget {
           ],
         ],
       ),
+        ),
+      ],
     );
+  }
+
+  /// Build top match card
+  Widget _buildTopMatch(BuildContext context, AutocompleteResponse suggestions) {
+    // Prioritize poet, fallback to poem
+    if (suggestions.poets.isNotEmpty) {
+      final poet = suggestions.poets.first;
+      return TopMatchCard(
+        title: poet.name,
+        type: 'poet',
+        subtitle: poet.era,
+        imageUrl: null, // Could add poet image URL if available
+        onTap: () {
+          context.pushNamed(
+            'poet-detail',
+            pathParameters: {'publicId': poet.publicId},
+          );
+        },
+      );
+    } else if (suggestions.poems.isNotEmpty) {
+      final poem = suggestions.poems.first;
+      return TopMatchCard(
+        title: poem.title,
+        type: 'poem',
+        subtitle: poem.poetName,
+        imageUrl: null,
+        onTap: () {
+          context.pushNamed(
+            'poem-detail',
+            pathParameters: {'publicId': poem.publicId},
+          );
+        },
+      );
+    }
+    return const SizedBox.shrink();
   }
 
   /// Build section header with icon
@@ -180,19 +227,20 @@ class AutocompleteSuggestions extends ConsumerWidget {
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.w600,
-            fontFamily: isUrdu ? 'JameelNoori' : null,
+            fontFamily: isUrdu ? 'Jameel Noori Nastaleeq' : null,
             color: AppColors.primary,
           ),
         ),
       ),
-      title: LocalizedText(
+      title: Text(
         poet.name,
+        textDirection: isUrdu ? TextDirection.rtl : TextDirection.ltr,
         style: TextStyle(
-          fontSize: isUrdu ? 16 : 15,
-          fontFamily: isUrdu ? 'JameelNoori' : null,
+          fontSize: isUrdu ? 17 : 15,
+          fontFamily: isUrdu ? 'Jameel Noori Nastaleeq' : null,
           fontWeight: FontWeight.w600,
           color: isDark ? Colors.white : Colors.black87,
-          height: isUrdu ? 1.6 : 1.3,
+          height: isUrdu ? 1.8 : 1.3,
         ),
       ),
       subtitle: poet.era != null
@@ -230,14 +278,15 @@ class AutocompleteSuggestions extends ConsumerWidget {
         horizontal: AppSpacing.md,
         vertical: AppSpacing.xs,
       ),
-      title: LocalizedText(
+      title: Text(
         poem.title,
+        textDirection: isUrdu ? TextDirection.rtl : TextDirection.ltr,
         style: TextStyle(
-          fontSize: isUrdu ? 16 : 15,
-          fontFamily: isUrdu ? 'JameelNoori' : null,
+          fontSize: isUrdu ? 17 : 15,
+          fontFamily: isUrdu ? 'Jameel Noori Nastaleeq' : null,
           fontWeight: FontWeight.w600,
           color: isDark ? Colors.white : Colors.black87,
-          height: isUrdu ? 1.6 : 1.3,
+          height: isUrdu ? 1.8 : 1.3,
         ),
       ),
       subtitle: Text(
@@ -272,14 +321,15 @@ class AutocompleteSuggestions extends ConsumerWidget {
         horizontal: AppSpacing.md,
         vertical: 6,
       ),
-      title: LocalizedText(
+      title: Text(
         tag.name,
+        textDirection: isUrdu ? TextDirection.rtl : TextDirection.ltr,
         style: TextStyle(
-          fontSize: isUrdu ? 15 : 14,
-          fontFamily: isUrdu ? 'JameelNoori' : null,
+          fontSize: isUrdu ? 16 : 14,
+          fontFamily: isUrdu ? 'Jameel Noori Nastaleeq' : null,
           fontWeight: FontWeight.w500,
           color: isDark ? Colors.white : Colors.black87,
-          height: isUrdu ? 1.6 : 1.3,
+          height: isUrdu ? 1.8 : 1.3,
         ),
       ),
       trailing: Icon(
@@ -309,14 +359,15 @@ class AutocompleteSuggestions extends ConsumerWidget {
         horizontal: AppSpacing.md,
         vertical: 6,
       ),
-      title: LocalizedText(
+      title: Text(
         category.name,
+        textDirection: isUrdu ? TextDirection.rtl : TextDirection.ltr,
         style: TextStyle(
-          fontSize: isUrdu ? 15 : 14,
-          fontFamily: isUrdu ? 'JameelNoori' : null,
+          fontSize: isUrdu ? 16 : 14,
+          fontFamily: isUrdu ? 'Jameel Noori Nastaleeq' : null,
           fontWeight: FontWeight.w500,
           color: isDark ? Colors.white : Colors.black87,
-          height: isUrdu ? 1.6 : 1.3,
+          height: isUrdu ? 1.8 : 1.3,
         ),
       ),
       trailing: Row(

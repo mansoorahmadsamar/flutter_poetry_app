@@ -14,6 +14,27 @@ enum SearchMode {
   error, // Error state
 }
 
+/// Discover segment enum
+enum DiscoverSegment {
+  all, // All content types
+  poets, // Poets only
+  poems, // Poems only
+  verses, // Verses/couplets only
+  categories, // Categories only
+  dictionary, // Dictionary (placeholder)
+  watch, // Watch (placeholder)
+}
+
+/// Couplet sort options
+enum CoupletSortOption {
+  relevance, // Best match (default)
+  trending, // Highest engagement
+  likes, // Most liked
+  shares, // Most shared
+  bookmarks, // Most bookmarked
+  recent, // Most recent
+}
+
 /// Main state for global search screen
 @freezed
 class GlobalSearchState with _$GlobalSearchState {
@@ -22,6 +43,8 @@ class GlobalSearchState with _$GlobalSearchState {
     @Default('') String currentQuery,
     String? selectedFilter, // Poet filter (publicId)
     @Default('relevance') String sortBy, // relevance, likes, shares, bookmarks, trending
+    @Default(DiscoverSegment.all) DiscoverSegment activeSegment,
+    @Default(CoupletSortOption.relevance) CoupletSortOption coupletSort,
 
     // Autocomplete data
     AutocompleteResponse? autocompleteResults,

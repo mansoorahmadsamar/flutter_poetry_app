@@ -274,6 +274,39 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
     }
   }
 
+  /// Set active segment and re-execute search if needed
+  ///
+  /// Parameters:
+  /// - [segment]: New active segment
+  void setActiveSegment(DiscoverSegment segment) {
+    state = state.copyWith(activeSegment: segment);
+
+    // If placeholder segment, don't execute search
+    if (segment == DiscoverSegment.dictionary ||
+        segment == DiscoverSegment.watch) {
+      return;
+    }
+
+    // Re-execute search with segment filter if in results mode
+    if (state.mode == SearchMode.results) {
+      executeSearch();
+    }
+  }
+
+  /// Set couplet sort option and re-execute search
+  ///
+  /// Parameters:
+  /// - [sortOption]: New couplet sort option
+  void setCoupletSort(CoupletSortOption sortOption) {
+    state = state.copyWith(coupletSort: sortOption);
+
+    // Re-execute search if in verses segment
+    if (state.activeSegment == DiscoverSegment.verses &&
+        state.mode == SearchMode.results) {
+      executeSearch();
+    }
+  }
+
   // ==========================================================================
   // STATE MANAGEMENT
   // ==========================================================================

@@ -1035,8 +1035,13 @@ AutocompleteCategory _$AutocompleteCategoryFromJson(Map<String, dynamic> json) {
 mixin _$AutocompleteCategory {
   String get publicId => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
-  String get slug => throw _privateConstructorUsedError;
+  String? get description => throw _privateConstructorUsedError;
+  String? get iconUrl => throw _privateConstructorUsedError;
   int get poemCount => throw _privateConstructorUsedError;
+  int get displayOrder => throw _privateConstructorUsedError;
+  bool get isActive => throw _privateConstructorUsedError;
+  String? get parentCategoryPublicId => throw _privateConstructorUsedError;
+  String? get parentCategoryName => throw _privateConstructorUsedError;
   double get score => throw _privateConstructorUsedError;
 
   /// Serializes this AutocompleteCategory to a JSON map.
@@ -1056,7 +1061,16 @@ abstract class $AutocompleteCategoryCopyWith<$Res> {
       _$AutocompleteCategoryCopyWithImpl<$Res, AutocompleteCategory>;
   @useResult
   $Res call(
-      {String publicId, String name, String slug, int poemCount, double score});
+      {String publicId,
+      String name,
+      String? description,
+      String? iconUrl,
+      int poemCount,
+      int displayOrder,
+      bool isActive,
+      String? parentCategoryPublicId,
+      String? parentCategoryName,
+      double score});
 }
 
 /// @nodoc
@@ -1077,8 +1091,13 @@ class _$AutocompleteCategoryCopyWithImpl<$Res,
   $Res call({
     Object? publicId = null,
     Object? name = null,
-    Object? slug = null,
+    Object? description = freezed,
+    Object? iconUrl = freezed,
     Object? poemCount = null,
+    Object? displayOrder = null,
+    Object? isActive = null,
+    Object? parentCategoryPublicId = freezed,
+    Object? parentCategoryName = freezed,
     Object? score = null,
   }) {
     return _then(_value.copyWith(
@@ -1090,14 +1109,34 @@ class _$AutocompleteCategoryCopyWithImpl<$Res,
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      slug: null == slug
-          ? _value.slug
-          : slug // ignore: cast_nullable_to_non_nullable
-              as String,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      iconUrl: freezed == iconUrl
+          ? _value.iconUrl
+          : iconUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
       poemCount: null == poemCount
           ? _value.poemCount
           : poemCount // ignore: cast_nullable_to_non_nullable
               as int,
+      displayOrder: null == displayOrder
+          ? _value.displayOrder
+          : displayOrder // ignore: cast_nullable_to_non_nullable
+              as int,
+      isActive: null == isActive
+          ? _value.isActive
+          : isActive // ignore: cast_nullable_to_non_nullable
+              as bool,
+      parentCategoryPublicId: freezed == parentCategoryPublicId
+          ? _value.parentCategoryPublicId
+          : parentCategoryPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      parentCategoryName: freezed == parentCategoryName
+          ? _value.parentCategoryName
+          : parentCategoryName // ignore: cast_nullable_to_non_nullable
+              as String?,
       score: null == score
           ? _value.score
           : score // ignore: cast_nullable_to_non_nullable
@@ -1115,7 +1154,16 @@ abstract class _$$AutocompleteCategoryImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String publicId, String name, String slug, int poemCount, double score});
+      {String publicId,
+      String name,
+      String? description,
+      String? iconUrl,
+      int poemCount,
+      int displayOrder,
+      bool isActive,
+      String? parentCategoryPublicId,
+      String? parentCategoryName,
+      double score});
 }
 
 /// @nodoc
@@ -1133,8 +1181,13 @@ class __$$AutocompleteCategoryImplCopyWithImpl<$Res>
   $Res call({
     Object? publicId = null,
     Object? name = null,
-    Object? slug = null,
+    Object? description = freezed,
+    Object? iconUrl = freezed,
     Object? poemCount = null,
+    Object? displayOrder = null,
+    Object? isActive = null,
+    Object? parentCategoryPublicId = freezed,
+    Object? parentCategoryName = freezed,
     Object? score = null,
   }) {
     return _then(_$AutocompleteCategoryImpl(
@@ -1146,14 +1199,34 @@ class __$$AutocompleteCategoryImplCopyWithImpl<$Res>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      slug: null == slug
-          ? _value.slug
-          : slug // ignore: cast_nullable_to_non_nullable
-              as String,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      iconUrl: freezed == iconUrl
+          ? _value.iconUrl
+          : iconUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
       poemCount: null == poemCount
           ? _value.poemCount
           : poemCount // ignore: cast_nullable_to_non_nullable
               as int,
+      displayOrder: null == displayOrder
+          ? _value.displayOrder
+          : displayOrder // ignore: cast_nullable_to_non_nullable
+              as int,
+      isActive: null == isActive
+          ? _value.isActive
+          : isActive // ignore: cast_nullable_to_non_nullable
+              as bool,
+      parentCategoryPublicId: freezed == parentCategoryPublicId
+          ? _value.parentCategoryPublicId
+          : parentCategoryPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      parentCategoryName: freezed == parentCategoryName
+          ? _value.parentCategoryName
+          : parentCategoryName // ignore: cast_nullable_to_non_nullable
+              as String?,
       score: null == score
           ? _value.score
           : score // ignore: cast_nullable_to_non_nullable
@@ -1168,8 +1241,13 @@ class _$AutocompleteCategoryImpl implements _AutocompleteCategory {
   const _$AutocompleteCategoryImpl(
       {required this.publicId,
       required this.name,
-      required this.slug,
+      this.description,
+      this.iconUrl,
       this.poemCount = 0,
+      this.displayOrder = 0,
+      this.isActive = true,
+      this.parentCategoryPublicId,
+      this.parentCategoryName,
       this.score = 0.0});
 
   factory _$AutocompleteCategoryImpl.fromJson(Map<String, dynamic> json) =>
@@ -1180,17 +1258,29 @@ class _$AutocompleteCategoryImpl implements _AutocompleteCategory {
   @override
   final String name;
   @override
-  final String slug;
+  final String? description;
+  @override
+  final String? iconUrl;
   @override
   @JsonKey()
   final int poemCount;
+  @override
+  @JsonKey()
+  final int displayOrder;
+  @override
+  @JsonKey()
+  final bool isActive;
+  @override
+  final String? parentCategoryPublicId;
+  @override
+  final String? parentCategoryName;
   @override
   @JsonKey()
   final double score;
 
   @override
   String toString() {
-    return 'AutocompleteCategory(publicId: $publicId, name: $name, slug: $slug, poemCount: $poemCount, score: $score)';
+    return 'AutocompleteCategory(publicId: $publicId, name: $name, description: $description, iconUrl: $iconUrl, poemCount: $poemCount, displayOrder: $displayOrder, isActive: $isActive, parentCategoryPublicId: $parentCategoryPublicId, parentCategoryName: $parentCategoryName, score: $score)';
   }
 
   @override
@@ -1201,16 +1291,36 @@ class _$AutocompleteCategoryImpl implements _AutocompleteCategory {
             (identical(other.publicId, publicId) ||
                 other.publicId == publicId) &&
             (identical(other.name, name) || other.name == name) &&
-            (identical(other.slug, slug) || other.slug == slug) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.iconUrl, iconUrl) || other.iconUrl == iconUrl) &&
             (identical(other.poemCount, poemCount) ||
                 other.poemCount == poemCount) &&
+            (identical(other.displayOrder, displayOrder) ||
+                other.displayOrder == displayOrder) &&
+            (identical(other.isActive, isActive) ||
+                other.isActive == isActive) &&
+            (identical(other.parentCategoryPublicId, parentCategoryPublicId) ||
+                other.parentCategoryPublicId == parentCategoryPublicId) &&
+            (identical(other.parentCategoryName, parentCategoryName) ||
+                other.parentCategoryName == parentCategoryName) &&
             (identical(other.score, score) || other.score == score));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, publicId, name, slug, poemCount, score);
+  int get hashCode => Object.hash(
+      runtimeType,
+      publicId,
+      name,
+      description,
+      iconUrl,
+      poemCount,
+      displayOrder,
+      isActive,
+      parentCategoryPublicId,
+      parentCategoryName,
+      score);
 
   /// Create a copy of AutocompleteCategory
   /// with the given fields replaced by the non-null parameter values.
@@ -1234,8 +1344,13 @@ abstract class _AutocompleteCategory implements AutocompleteCategory {
   const factory _AutocompleteCategory(
       {required final String publicId,
       required final String name,
-      required final String slug,
+      final String? description,
+      final String? iconUrl,
       final int poemCount,
+      final int displayOrder,
+      final bool isActive,
+      final String? parentCategoryPublicId,
+      final String? parentCategoryName,
       final double score}) = _$AutocompleteCategoryImpl;
 
   factory _AutocompleteCategory.fromJson(Map<String, dynamic> json) =
@@ -1246,9 +1361,19 @@ abstract class _AutocompleteCategory implements AutocompleteCategory {
   @override
   String get name;
   @override
-  String get slug;
+  String? get description;
+  @override
+  String? get iconUrl;
   @override
   int get poemCount;
+  @override
+  int get displayOrder;
+  @override
+  bool get isActive;
+  @override
+  String? get parentCategoryPublicId;
+  @override
+  String? get parentCategoryName;
   @override
   double get score;
 

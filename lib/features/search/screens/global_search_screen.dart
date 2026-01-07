@@ -3,25 +3,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
 import 'package:flutter_poetry_app/features/search/models/global_search_state.dart';
-import 'package:flutter_poetry_app/features/search/widgets/search_bar_widget.dart';
+import 'package:flutter_poetry_app/features/search/widgets/discover_hero_header.dart';
+import 'package:flutter_poetry_app/features/search/widgets/discover_segment_control.dart';
 import 'package:flutter_poetry_app/features/search/widgets/autocomplete_suggestions.dart';
 import 'package:flutter_poetry_app/features/search/widgets/search_results_section.dart';
 import 'package:flutter_poetry_app/features/search/widgets/skeleton_loaders/couplet_skeleton.dart';
 import 'package:flutter_poetry_app/features/search/widgets/discovery_sections/recent_searches_section.dart';
 import 'package:flutter_poetry_app/features/search/widgets/discovery_sections/trending_searches_section.dart';
 import 'package:flutter_poetry_app/features/search/widgets/discovery_sections/recommendations_section.dart';
+import 'package:flutter_poetry_app/features/search/widgets/coming_soon_state.dart';
 
-/// Global search screen with mode-based UI
+/// Global search screen (standalone) with premium discover UI
 ///
 /// Features:
-/// - Auto-focus search bar
-/// - Mode-based content rendering:
-///   - idle/typing → Discovery sections
-///   - autocompleting → Autocomplete + Discovery
-///   - searching → Skeleton loaders
-///   - results → Search results
-///   - error → Error state with retry
-/// - Sticky search bar (SliverAppBar)
+/// - Hero header with back button and auto-focus search
+/// - 7-segment filter (All, Poets, Poems, Verses, Categories, Dictionary, Watch)
+/// - Mode-based and segment-based content rendering
+/// - Discovery content visible on load
 /// - Smooth transitions between states
 class GlobalSearchScreen extends ConsumerWidget {
   const GlobalSearchScreen({super.key});
@@ -31,42 +29,33 @@ class GlobalSearchScreen extends ConsumerWidget {
     final searchState = ref.watch(globalSearchProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    debugPrint('🏗️ GlobalSearchScreen rebuild - mode: ${searchState.mode}');
-    debugPrint('🏗️ unifiedResults: ${searchState.unifiedResults?.totalResults}');
-
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFFFFBF7),
       body: CustomScrollView(
         slivers: [
-          // DEBUG: Screen identifier
+          // Hero header with back button
           SliverToBoxAdapter(
-            child: Container(
-              color: Colors.green,
-              padding: const EdgeInsets.all(8),
-              child: const Text(
-                '🔍 GLOBAL SEARCH SCREEN 🔍',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
+            child: DiscoverHeroHeader(
+              autofocus: true, // Auto-focus in standalone screen
+              showBackButton: true, // Show back button
+              onMenuTap: () {
+                // Back button handled by DiscoverHeroHeader
+              },
+              onProfileTap: () {
+                // TODO: Navigate to profile
+              },
             ),
           ),
 
-          // Sticky search bar
-          SliverAppBar(
+          // Sticky segment control
+          SliverPersistentHeader(
             pinned: true,
-            floating: false,
-            backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFFFFBF7),
-            elevation: 0,
-            toolbarHeight: 80,
-            title: const GlobalSearchBar(autofocus: true),
-            automaticallyImplyLeading: true,
+            delegate: DiscoverSegmentDelegate(
+              child: const DiscoverSegmentControl(),
+            ),
           ),
 
-          // Content based on search mode
+          // Content based on search mode and segment
           SliverToBoxAdapter(
             child: _buildContent(context, ref, searchState, isDark),
           ),
@@ -75,24 +64,26 @@ class GlobalSearchScreen extends ConsumerWidget {
     );
   }
 
-  /// Build content based on current search mode
+  /// Build content based on current search mode and active segment
   Widget _buildContent(
     BuildContext context,
     WidgetRef ref,
     GlobalSearchState searchState,
     bool isDark,
   ) {
-    debugPrint('🔀 _buildContent called with mode: ${searchState.mode}');
-    debugPrint('🔀 unifiedResults: ${searchState.unifiedResults?.totalResults}');
+    // Check for placeholder segments first (Dictionary/Watch)
+    if (searchState.activeSegment == DiscoverSegment.dictionary ||
+        searchState.activeSegment == DiscoverSegment.watch) {
+      return ComingSoonState(segment: searchState.activeSegment);
+    }
 
+    // Handle search modes
     switch (searchState.mode) {
       case SearchMode.idle:
       case SearchMode.typing:
-        debugPrint('🔀 -> Building discovery content (idle/typing)');
         return _buildDiscoveryContent(searchState);
 
       case SearchMode.autocompleting:
-        debugPrint('🔀 -> Building autocomplete');
         return Column(
           children: [
             // Autocomplete suggestions
@@ -110,15 +101,12 @@ class GlobalSearchScreen extends ConsumerWidget {
         );
 
       case SearchMode.searching:
-        debugPrint('🔀 -> Building loading state');
         return _buildLoadingState();
 
       case SearchMode.results:
-        debugPrint('🔀 -> Building results state');
         return _buildResultsState(searchState);
 
       case SearchMode.error:
-        debugPrint('🔀 -> Building error state');
         return _buildErrorState(context, ref, searchState, isDark);
     }
   }

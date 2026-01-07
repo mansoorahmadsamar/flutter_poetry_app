@@ -3,21 +3,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
 import 'package:flutter_poetry_app/features/search/models/global_search_state.dart';
-import 'package:flutter_poetry_app/features/search/widgets/search_bar_widget.dart';
+import 'package:flutter_poetry_app/features/search/widgets/discover_hero_header.dart';
+import 'package:flutter_poetry_app/features/search/widgets/discover_segment_control.dart';
 import 'package:flutter_poetry_app/features/search/widgets/autocomplete_suggestions.dart';
 import 'package:flutter_poetry_app/features/search/widgets/search_results_section.dart';
 import 'package:flutter_poetry_app/features/search/widgets/skeleton_loaders/couplet_skeleton.dart';
 import 'package:flutter_poetry_app/features/search/widgets/discovery_sections/recent_searches_section.dart';
 import 'package:flutter_poetry_app/features/search/widgets/discovery_sections/trending_searches_section.dart';
 import 'package:flutter_poetry_app/features/search/widgets/discovery_sections/recommendations_section.dart';
+import 'package:flutter_poetry_app/features/search/widgets/coming_soon_state.dart';
 
-/// Search tab - Global search with discovery content
+/// Discover tab - Premium search with discovery content
 ///
 /// Features:
+/// - Hero header with integrated search
+/// - 7-segment filter (All, Poets, Poems, Verses, Categories, Dictionary, Watch)
 /// - Discovery content visible on load (trending, recommendations, recent)
-/// - Search bar always visible at top
 /// - No auto-focus - user taps when ready to search
-/// - Mode-based content rendering
+/// - Mode-based and segment-based content rendering
 class SearchTab extends ConsumerWidget {
   const SearchTab({super.key});
 
@@ -30,18 +33,28 @@ class SearchTab extends ConsumerWidget {
       backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFFFFBF7),
       body: CustomScrollView(
         slivers: [
-          // Sticky search bar
-          SliverAppBar(
-            pinned: true,
-            floating: false,
-            backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFFFFBF7),
-            elevation: 0,
-            toolbarHeight: 80,
-            automaticallyImplyLeading: false,
-            title: const GlobalSearchBar(autofocus: false), // No auto-focus in tab
+          // Hero header
+          SliverToBoxAdapter(
+            child: DiscoverHeroHeader(
+              autofocus: false,
+              onMenuTap: () {
+                // TODO: Open drawer/menu
+              },
+              onProfileTap: () {
+                // TODO: Navigate to profile
+              },
+            ),
           ),
 
-          // Content based on search mode
+          // Sticky segment control
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: DiscoverSegmentDelegate(
+              child: const DiscoverSegmentControl(),
+            ),
+          ),
+
+          // Content based on search mode and segment
           SliverToBoxAdapter(
             child: _buildContent(context, ref, searchState, isDark),
           ),
@@ -50,13 +63,20 @@ class SearchTab extends ConsumerWidget {
     );
   }
 
-  /// Build content based on current search mode
+  /// Build content based on current search mode and active segment
   Widget _buildContent(
     BuildContext context,
     WidgetRef ref,
     GlobalSearchState searchState,
     bool isDark,
   ) {
+    // Check for placeholder segments first (Dictionary/Watch)
+    if (searchState.activeSegment == DiscoverSegment.dictionary ||
+        searchState.activeSegment == DiscoverSegment.watch) {
+      return ComingSoonState(segment: searchState.activeSegment);
+    }
+
+    // Handle search modes
     switch (searchState.mode) {
       case SearchMode.idle:
       case SearchMode.typing:

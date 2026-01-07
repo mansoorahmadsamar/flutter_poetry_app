@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
-import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
 
 /// Trending searches discovery section
 ///
 /// Features:
-/// - Card container with soft elevation
-/// - Clean numbered list (top 5 only for cleanliness)
-/// - Subtle trend indicator
-/// - Larger Urdu text
-/// - No loud fire emoji in heading
+/// - 6-10 trending search chips
+/// - Fire icon on chips
+/// - Consistent chip height (34px)
+/// - Bilingual query display (Urdu/English/Hindi)
+/// - Full pill border radius
+/// - Soft shadows
 class TrendingSearchesSection extends ConsumerWidget {
   const TrendingSearchesSection({super.key});
 
@@ -25,127 +25,127 @@ class TrendingSearchesSection extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
-    final trending = searchState.trendingSearches!.searches.take(5).toList();
+    final trending = searchState.trendingSearches!.searches.take(10).toList();
 
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: AppSpacing.md),
-      padding: EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFFFFBF7),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.06)
-              : Colors.black.withValues(alpha: 0.04),
-          width: 1,
-        ),
-      ),
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Section header
-          Row(
-            children: [
-              Text(
-                'Trending Searches',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: -0.2,
-                  color: isDark ? Colors.white : Colors.black87,
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.trending_up,
+                  size: 20,
+                  color: const Color(0xFFC5A059), // Gold
                 ),
-              ),
-              SizedBox(width: AppSpacing.xs),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 6,
-                  vertical: 2,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.secondary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  'POPULAR',
+                SizedBox(width: AppSpacing.xs),
+                Text(
+                  'Trending Now',
                   style: TextStyle(
-                    fontSize: 9,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.5,
-                    color: AppColors.secondary,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: -0.2,
+                    color: isDark ? Colors.white : Colors.black87,
                   ),
                 ),
-              ),
-            ],
+                SizedBox(width: AppSpacing.xs),
+                Text(
+                  '/ مقبول تلاش',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontFamily: 'Jameel Noori Nastaleeq',
+                    fontWeight: FontWeight.w500,
+                    color: (isDark ? Colors.white : Colors.black87).withValues(alpha: 0.6),
+                    height: 1.8,
+                  ),
+                ),
+              ],
+            ),
           ),
 
           SizedBox(height: AppSpacing.md),
 
-          // Trending searches list
-          ...trending.asMap().entries.map((entry) {
-            final index = entry.key;
-            final search = entry.value;
-            final rank = index + 1;
-            final isUrdu = _isUrduText(search.query);
-
-            return InkWell(
-              onTap: () {
-                ref.read(globalSearchProvider.notifier).executeSearch(
-                  query: search.query,
+          // Trending chips (wrap layout)
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            child: Wrap(
+              spacing: AppSpacing.xs,
+              runSpacing: AppSpacing.xs,
+              children: trending.map((search) {
+                return _buildTrendingChip(
+                  context,
+                  ref,
+                  search.query,
+                  isDark,
                 );
-              },
-              borderRadius: BorderRadius.circular(8),
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppSpacing.xs,
-                  vertical: AppSpacing.sm,
-                ),
-                child: Row(
-                  children: [
-                    // Rank number
-                    Container(
-                      width: 24,
-                      height: 24,
-                      alignment: Alignment.center,
-                      child: Text(
-                        '$rank',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ),
-
-                    SizedBox(width: AppSpacing.sm),
-
-                    // Query text
-                    Expanded(
-                      child: Text(
-                        search.query,
-                        style: TextStyle(
-                          fontSize: isUrdu ? 16 : 14,
-                          fontFamily: isUrdu ? 'JameelNoori' : null,
-                          fontWeight: FontWeight.w500,
-                          color: isDark ? Colors.white : Colors.black87,
-                          height: isUrdu ? 1.7 : 1.4,
-                        ),
-                      ),
-                    ),
-
-                    // Subtle indicator
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      size: 12,
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.3)
-                          : Colors.black.withValues(alpha: 0.3),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }),
+              }).toList(),
+            ),
+          ),
         ],
+      ),
+    );
+  }
+
+  /// Build a single trending chip
+  Widget _buildTrendingChip(
+    BuildContext context,
+    WidgetRef ref,
+    String query,
+    bool isDark,
+  ) {
+    final isUrdu = _isUrduText(query);
+
+    return GestureDetector(
+      onTap: () {
+        ref.read(globalSearchProvider.notifier).executeSearch(query: query);
+      },
+      child: Container(
+        height: 34,
+        padding: EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.xs,
+        ),
+        decoration: BoxDecoration(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.06)
+              : const Color(0xFF1B4D3E).withValues(alpha: 0.04),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.08)
+                : const Color(0xFF1B4D3E).withValues(alpha: 0.12),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.local_fire_department,
+              size: 14,
+              color: const Color(0xFFC5A059), // Gold
+            ),
+            SizedBox(width: AppSpacing.xs),
+            Flexible(
+              child: Text(
+                query,
+                style: TextStyle(
+                  fontSize: isUrdu ? 16 : 13,
+                  fontFamily: isUrdu ? 'Jameel Noori Nastaleeq' : null,
+                  fontWeight: FontWeight.w500,
+                  color: isDark ? Colors.white : Colors.black87,
+                  height: isUrdu ? 1.8 : 1.4,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

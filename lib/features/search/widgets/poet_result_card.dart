@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
-import 'package:flutter_poetry_app/core/widgets/localized_text.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
 
 /// Poet result card for search results
@@ -70,16 +69,17 @@ class PoetResultCard extends ConsumerWidget {
               SizedBox(height: AppSpacing.md),
 
               // Poet name
-              LocalizedText(
+              Text(
                 poet.name,
+                textDirection: isUrdu ? TextDirection.rtl : TextDirection.ltr,
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: isUrdu ? 20 : 16,
-                  fontFamily: isUrdu ? 'JameelNoori' : null,
+                  fontSize: isUrdu ? 21 : 16,
+                  fontFamily: isUrdu ? 'Jameel Noori Nastaleeq' : null,
                   fontWeight: FontWeight.w600,
                   color: isDark ? Colors.white : Colors.black87,
                   height: isUrdu ? 1.8 : 1.3,
                 ),
-                textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -124,7 +124,7 @@ class PoetResultCard extends ConsumerWidget {
         poet.name.isNotEmpty ? poet.name[0] : 'P',
         style: TextStyle(
           fontSize: 28,
-          fontFamily: isUrdu ? 'JameelNoori' : null,
+          fontFamily: isUrdu ? 'Jameel Noori Nastaleeq' : null,
           fontWeight: FontWeight.w600,
           color: AppColors.primary,
         ),

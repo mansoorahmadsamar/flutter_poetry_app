@@ -22,7 +22,9 @@ mixin _$GlobalSearchState {
       throw _privateConstructorUsedError; // Poet filter (publicId)
   String get sortBy =>
       throw _privateConstructorUsedError; // relevance, likes, shares, bookmarks, trending
-// Autocomplete data
+  DiscoverSegment get activeSegment => throw _privateConstructorUsedError;
+  CoupletSortOption get coupletSort =>
+      throw _privateConstructorUsedError; // Autocomplete data
   AutocompleteResponse? get autocompleteResults =>
       throw _privateConstructorUsedError;
   bool get isLoadingAutocomplete =>
@@ -60,6 +62,8 @@ abstract class $GlobalSearchStateCopyWith<$Res> {
       String currentQuery,
       String? selectedFilter,
       String sortBy,
+      DiscoverSegment activeSegment,
+      CoupletSortOption coupletSort,
       AutocompleteResponse? autocompleteResults,
       bool isLoadingAutocomplete,
       UnifiedSearchResponse? unifiedResults,
@@ -97,6 +101,8 @@ class _$GlobalSearchStateCopyWithImpl<$Res, $Val extends GlobalSearchState>
     Object? currentQuery = null,
     Object? selectedFilter = freezed,
     Object? sortBy = null,
+    Object? activeSegment = null,
+    Object? coupletSort = null,
     Object? autocompleteResults = freezed,
     Object? isLoadingAutocomplete = null,
     Object? unifiedResults = freezed,
@@ -125,6 +131,14 @@ class _$GlobalSearchStateCopyWithImpl<$Res, $Val extends GlobalSearchState>
           ? _value.sortBy
           : sortBy // ignore: cast_nullable_to_non_nullable
               as String,
+      activeSegment: null == activeSegment
+          ? _value.activeSegment
+          : activeSegment // ignore: cast_nullable_to_non_nullable
+              as DiscoverSegment,
+      coupletSort: null == coupletSort
+          ? _value.coupletSort
+          : coupletSort // ignore: cast_nullable_to_non_nullable
+              as CoupletSortOption,
       autocompleteResults: freezed == autocompleteResults
           ? _value.autocompleteResults
           : autocompleteResults // ignore: cast_nullable_to_non_nullable
@@ -257,6 +271,8 @@ abstract class _$$GlobalSearchStateImplCopyWith<$Res>
       String currentQuery,
       String? selectedFilter,
       String sortBy,
+      DiscoverSegment activeSegment,
+      CoupletSortOption coupletSort,
       AutocompleteResponse? autocompleteResults,
       bool isLoadingAutocomplete,
       UnifiedSearchResponse? unifiedResults,
@@ -297,6 +313,8 @@ class __$$GlobalSearchStateImplCopyWithImpl<$Res>
     Object? currentQuery = null,
     Object? selectedFilter = freezed,
     Object? sortBy = null,
+    Object? activeSegment = null,
+    Object? coupletSort = null,
     Object? autocompleteResults = freezed,
     Object? isLoadingAutocomplete = null,
     Object? unifiedResults = freezed,
@@ -325,6 +343,14 @@ class __$$GlobalSearchStateImplCopyWithImpl<$Res>
           ? _value.sortBy
           : sortBy // ignore: cast_nullable_to_non_nullable
               as String,
+      activeSegment: null == activeSegment
+          ? _value.activeSegment
+          : activeSegment // ignore: cast_nullable_to_non_nullable
+              as DiscoverSegment,
+      coupletSort: null == coupletSort
+          ? _value.coupletSort
+          : coupletSort // ignore: cast_nullable_to_non_nullable
+              as CoupletSortOption,
       autocompleteResults: freezed == autocompleteResults
           ? _value.autocompleteResults
           : autocompleteResults // ignore: cast_nullable_to_non_nullable
@@ -377,6 +403,8 @@ class _$GlobalSearchStateImpl implements _GlobalSearchState {
       this.currentQuery = '',
       this.selectedFilter,
       this.sortBy = 'relevance',
+      this.activeSegment = DiscoverSegment.all,
+      this.coupletSort = CoupletSortOption.relevance,
       this.autocompleteResults,
       this.isLoadingAutocomplete = false,
       this.unifiedResults,
@@ -402,6 +430,12 @@ class _$GlobalSearchStateImpl implements _GlobalSearchState {
   @JsonKey()
   final String sortBy;
 // relevance, likes, shares, bookmarks, trending
+  @override
+  @JsonKey()
+  final DiscoverSegment activeSegment;
+  @override
+  @JsonKey()
+  final CoupletSortOption coupletSort;
 // Autocomplete data
   @override
   final AutocompleteResponse? autocompleteResults;
@@ -441,7 +475,7 @@ class _$GlobalSearchStateImpl implements _GlobalSearchState {
 
   @override
   String toString() {
-    return 'GlobalSearchState(mode: $mode, currentQuery: $currentQuery, selectedFilter: $selectedFilter, sortBy: $sortBy, autocompleteResults: $autocompleteResults, isLoadingAutocomplete: $isLoadingAutocomplete, unifiedResults: $unifiedResults, coupletResults: $coupletResults, isLoadingResults: $isLoadingResults, recentSearches: $recentSearches, trendingSearches: $trendingSearches, recommendations: $recommendations, relatedSearches: $relatedSearches, errorMessage: $errorMessage)';
+    return 'GlobalSearchState(mode: $mode, currentQuery: $currentQuery, selectedFilter: $selectedFilter, sortBy: $sortBy, activeSegment: $activeSegment, coupletSort: $coupletSort, autocompleteResults: $autocompleteResults, isLoadingAutocomplete: $isLoadingAutocomplete, unifiedResults: $unifiedResults, coupletResults: $coupletResults, isLoadingResults: $isLoadingResults, recentSearches: $recentSearches, trendingSearches: $trendingSearches, recommendations: $recommendations, relatedSearches: $relatedSearches, errorMessage: $errorMessage)';
   }
 
   @override
@@ -455,6 +489,10 @@ class _$GlobalSearchStateImpl implements _GlobalSearchState {
             (identical(other.selectedFilter, selectedFilter) ||
                 other.selectedFilter == selectedFilter) &&
             (identical(other.sortBy, sortBy) || other.sortBy == sortBy) &&
+            (identical(other.activeSegment, activeSegment) ||
+                other.activeSegment == activeSegment) &&
+            (identical(other.coupletSort, coupletSort) ||
+                other.coupletSort == coupletSort) &&
             (identical(other.autocompleteResults, autocompleteResults) ||
                 other.autocompleteResults == autocompleteResults) &&
             (identical(other.isLoadingAutocomplete, isLoadingAutocomplete) ||
@@ -484,6 +522,8 @@ class _$GlobalSearchStateImpl implements _GlobalSearchState {
       currentQuery,
       selectedFilter,
       sortBy,
+      activeSegment,
+      coupletSort,
       autocompleteResults,
       isLoadingAutocomplete,
       unifiedResults,
@@ -511,6 +551,8 @@ abstract class _GlobalSearchState implements GlobalSearchState {
       final String currentQuery,
       final String? selectedFilter,
       final String sortBy,
+      final DiscoverSegment activeSegment,
+      final CoupletSortOption coupletSort,
       final AutocompleteResponse? autocompleteResults,
       final bool isLoadingAutocomplete,
       final UnifiedSearchResponse? unifiedResults,
@@ -530,7 +572,10 @@ abstract class _GlobalSearchState implements GlobalSearchState {
   String? get selectedFilter; // Poet filter (publicId)
   @override
   String get sortBy; // relevance, likes, shares, bookmarks, trending
-// Autocomplete data
+  @override
+  DiscoverSegment get activeSegment;
+  @override
+  CoupletSortOption get coupletSort; // Autocomplete data
   @override
   AutocompleteResponse? get autocompleteResults;
   @override

@@ -5612,44 +5612,158 @@ Soft delete (shows as "[deleted]").
 
 ### 10.1 Unified Search
 
-**Endpoint:** `GET /api/search?q=محبت&type=all&lang=ur&page=0`
+**Endpoint:** `GET /api/search?q={query}&type={type}&lang={lang}`
 
-Search across poems, verses, poets, categories.
+**Description:** Search across all content types (poems, verses, poets, categories, tags) with a unified interface. Powered by Elasticsearch with PostgreSQL fallback.
 
-**Types:** `all`, `poems`, `verses`, `poets`, `categories`
+**Query Parameters:**
+- `q` (required) - Search query
+- `type` (optional, default: `all`) - Search type
+  - `all` - Search across all content types
+  - `poems` - Search only poems
+  - `verses` - Search only verses/couplets
+  - `poets` - Search only poets
+  - `categories` - Search only categories
+- `lang` (optional, default: `ur`) - Language code (ur, en, hi)
+- `script` (optional) - Script filter (ARABIC, ROMAN, DEVANAGARI, LATIN)
+- `page` (optional, default: 0) - Page number
+- `size` (optional, default: 10) - Results per page
+
+**Example Requests:**
+
+**Search All Content:**
+```bash
+curl "http://localhost:8080/api/search?q=love&type=all&lang=en"
+```
+
+**Search Only Poets:**
+```bash
+curl "http://localhost:8080/api/search?q=poetry&type=poets&lang=en"
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Found 14 total results (0 poems, 0 verses, 1 poets)",
+  "data": {
+    "poems": [],
+    "verses": [],
+    "poets": [
+      {
+        "publicId": "cc44d698-c4e2-4375-839b-f5ddfa05b167",
+        "name": "Mirza Ghalib",
+        "shortBio": "Mirza Asadullah Khan "Ghalib" (1797–1869) was one of the greatest Urdu and Persian poets...",
+        "birthYear": 1797,
+        "deathYear": 1869,
+        "profileImageUrl": "https://d8e5xg2x6e8y1.cloudfront.net/poets/mirza-ghalib/profile/profile.jpeg",
+        "gender": "MALE",
+        "era": "CLASSICAL",
+        "poemCount": 0,
+        "viewCount": 13,
+        "isFeatured": true,
+        "isTrending": true
+      }
+    ],
+    "categories": [
+      {
+        "publicId": "efb77fbf-2937-46a0-97f9-8d9a49ddd575",
+        "name": "Love Poetry",
+        "description": "Poetry expressing romantic and divine love"
+      }
+    ],
+    "tags": [
+      {
+        "publicId": "a71d4649-e948-417f-8532-f2ccf2df80dd",
+        "name": "ashiq",
+        "slug": "ashiq",
+        "color": "#C2185B",
+        "tagType": "GENERAL",
+        "description": "Lover"
+      }
+    ],
+    "couplets": [],
+    "totalResults": 14,
+    "poemCount": 0,
+    "verseCount": 0,
+    "poetCount": 1,
+    "categoryCount": 3,
+    "coupletCount": 0,
+    "tagCount": 10
+  }
+}
+```
+
+**Use Cases:**
+- Main search bar in app
+- Cross-content discovery
+- Universal search results page
 
 ---
 
 ### 10.2 Quick Search
 
-**Endpoint:** `GET /api/search/quick?q=دل&lang=ur`
+**Endpoint:** `GET /api/search/quick?q={query}&lang={lang}`
 
-Simplified search (all types, default pagination).
+**Description:** Simplified search endpoint - searches all content types with default pagination. Shorthand for `/api/search?type=all`.
+
+**Query Parameters:**
+- `q` (required) - Search query
+- `lang` (optional, default: `ur`) - Language code
+
+**Example Request:**
+```bash
+curl "http://localhost:8080/api/search/quick?q=love&lang=en"
+```
+
+**Success Response (200):**
+Same format as Unified Search (returns all content types)
 
 ---
 
-### 10.4 Couplet Search
+### 10.3 Couplet Search
 
-**Endpoint:** `GET /api/search/couplets`
+**Endpoint:** `GET /api/search/couplets?q={query}&sort={sort}&lang={lang}`
 
-**Description:** Search specifically for couplets (شعر/اشعار) with advanced filtering and sorting options. Supports multilingual search across Urdu (Arabic/Roman), English, and Hindi.
+**Description:** Search specifically for couplets (شعر/اشعار) with advanced filtering and sorting options. Supports multilingual search across Urdu (Arabic/Roman), English, and Hindi. Returns individual couplets with engagement metrics.
 
 **Query Parameters:**
 - `q` (required) - Search query text
 - `poet` (optional) - Filter by poet public ID
+- `poem` (optional) - Filter by poem public ID
+- `category` (optional) - Filter by category public ID
 - `sort` (optional, default: `relevance`) - Sort order
   - `relevance` - Best match based on BM25 scoring
   - `likes` - Most liked couplets
   - `shares` - Most shared couplets
   - `bookmarks` - Most bookmarked couplets
   - `trending` - Highest engagement score
+  - `recent` - Most recently created
 - `lang` (optional, default: `ur`) - Language code (ur, en, hi)
+- `script` (optional) - Script filter (ARABIC, ROMAN, DEVANAGARI, LATIN)
 - `page` (optional, default: `0`) - Page number (zero-indexed)
-- `size` (optional, default: `10`) - Results per page
+- `size` (optional, default: `10`, max: 50) - Results per page
 
-**Example Request:**
-```http
-GET /api/search/couplets?q=محبت&poet=mirza-ghalib&sort=likes&lang=ur&page=0&size=10
+**Example Requests:**
+
+**Search all couplets:**
+```bash
+curl "http://localhost:8080/api/search/couplets?q=love&lang=en&sort=relevance"
+```
+
+**Search by poet:**
+```bash
+curl "http://localhost:8080/api/search/couplets?q=محبت&poet=mirza-ghalib&sort=likes&lang=ur"
+```
+
+**Trending couplets:**
+```bash
+curl "http://localhost:8080/api/search/couplets?q=*&sort=trending&size=20"
+```
+
+**Most liked couplets:**
+```bash
+curl "http://localhost:8080/api/search/couplets?q=*&sort=likes&size=20"
 ```
 
 **Response Format:**
@@ -5722,7 +5836,7 @@ GET /api/search/couplets?q=محبت&poet=mirza-ghalib&sort=likes&lang=ur&page=0&
 
 ### 10.5 Autocomplete
 
-**Endpoint:** `GET /api/search/autocomplete`
+**Endpoint:** `GET /api/search/autocomplete?q={query}&lang={lang}`
 
 **Description:** Real-time search suggestions across multiple content types (poets, poems, tags, categories). Designed for instant search-as-you-type experiences with minimal latency (<200ms).
 
@@ -5730,69 +5844,56 @@ GET /api/search/couplets?q=محبت&poet=mirza-ghalib&sort=likes&lang=ur&page=0&
 - `q` (required) - Search query (minimum 2 characters)
 - `lang` (optional, default: `ur`) - Language code
 
-**Example Request:**
-```http
-GET /api/search/autocomplete?q=غا&lang=ur
+**Example Requests:**
+
+**English Query:**
+```bash
+curl "http://localhost:8080/api/search/autocomplete?q=gha&lang=en"
 ```
 
-**Response Format:**
+**Urdu Query:**
+```bash
+curl "http://localhost:8080/api/search/autocomplete?q=love&lang=en"
+```
+
+**Success Response (200):**
 ```json
 {
   "success": true,
-  "message": "Autocomplete suggestions retrieved",
+  "message": "Found 5 suggestions",
   "data": {
     "poets": [
       {
-        "publicId": "mirza-ghalib",
-        "name": "مرزا غالب",
-        "profileImageUrl": "https://cdn.example.com/poets/ghalib.jpg",
+        "publicId": "cc44d698-c4e2-4375-839b-f5ddfa05b167",
+        "name": "Mirza Ghalib",
+        "profileImageUrl": "-",
         "era": "CLASSICAL",
-        "score": 9.5
-      },
-      {
-        "publicId": "ghalib-lakhnavi",
-        "name": "غالب لکھنوی",
-        "profileImageUrl": "https://cdn.example.com/poets/lakhnavi.jpg",
-        "era": "MODERN",
-        "score": 7.2
+        "score": 2.0
       }
     ],
-    "poems": [
-      {
-        "publicId": "poem456",
-        "title": "غزل نمبر ۵",
-        "poetName": "مرزا غالب",
-        "poemType": "GHAZAL",
-        "score": 8.3
-      },
-      {
-        "publicId": "poem789",
-        "title": "دیوان غالب",
-        "poetName": "مرزا غالب",
-        "poemType": "GHAZAL",
-        "score": 7.8
-      }
-    ],
-    "tags": [
-      {
-        "publicId": "tag123",
-        "name": "غزل",
-        "slug": "ghazal",
-        "tagType": "POEM_GENRE",
-        "score": 9.0
-      }
-    ],
+    "poems": [],
+    "tags": [],
     "categories": [
       {
-        "publicId": "cat456",
-        "name": "غزلیات",
-        "slug": "ghazliyat",
-        "poemCount": 1250,
-        "score": 8.5
+        "publicId": "efb77fbf-2937-46a0-97f9-8d9a49ddd575",
+        "name": "Love Poetry",
+        "slug": "love-poetry",
+        "parentCategoryName": "Thematic Poetry",
+        "poemCount": 0,
+        "score": 3.0
       }
     ],
-    "totalCount": 8
+    "totalCount": 5
   }
+}
+```
+
+**Error Response (400) - Query too short:**
+```json
+{
+  "success": false,
+  "message": "Query must be at least 2 characters",
+  "data": null
 }
 ```
 
@@ -5835,7 +5936,7 @@ void onSearchChanged(String query) {
 
 ### 10.6 Recommendations
 
-**Endpoint:** `GET /api/search/recommendations`
+**Endpoint:** `GET /api/search/recommendations?type={type}&limit={limit}`
 
 **Description:** Intelligent content recommendations using multiple strategies: personalized based on user behavior, similar content using More Like This, trending content, and hybrid approaches.
 
@@ -5845,71 +5946,112 @@ void onSearchChanged(String query) {
   - `similar` - Similar to currently viewing content
   - `trending` - Popular content in timeframe
   - `hybrid` - Combined strategies (40% personalized + 60% trending)
-- `contentType` (required for `similar` type) - POEM or COUPLET
+- `contentType` (required for `similar` type) - POEM or COUPLET or ALL
 - `contentId` (required for `similar` type) - Public ID of content
 - `timeframe` (optional for `trending`, default: `week`) - day, week, month
-- `limit` (optional, default: `10`) - Number of recommendations
+- `limit` (optional, default: `10`, max: 20) - Number of recommendations
 
 **Header:**
 - `X-User-Id` (optional) - User ID for personalized recommendations
 
 **Example Requests:**
 
-**1. Personalized Recommendations:**
-```http
-GET /api/search/recommendations?type=personalized&limit=10
-Header: X-User-Id: 12345
+**1. Hybrid Recommendations (Default):**
+```bash
+curl "http://localhost:8080/api/search/recommendations?type=hybrid&limit=10"
 ```
 
-**2. Similar Content:**
-```http
-GET /api/search/recommendations?type=similar&contentType=POEM&contentId=poem-xyz&limit=10
+**2. Trending Content:**
+```bash
+curl "http://localhost:8080/api/search/recommendations?type=trending&timeframe=week&limit=5"
 ```
 
-**3. Trending Content:**
-```http
-GET /api/search/recommendations?type=trending&contentType=COUPLET&timeframe=week&limit=20
+**3. Personalized Recommendations:**
+```bash
+curl -H "X-User-Id: 12345" \
+  "http://localhost:8080/api/search/recommendations?type=personalized&limit=10"
 ```
 
-**4. Hybrid (Default):**
-```http
-GET /api/search/recommendations?type=hybrid&limit=10
-Header: X-User-Id: 12345
+**4. Similar Content:**
+```bash
+curl "http://localhost:8080/api/search/recommendations?type=similar&contentType=POEM&contentId=poem-xyz&limit=10"
 ```
 
-**Response Format:**
+**Success Response (200) - Hybrid:**
 ```json
 {
   "success": true,
-  "message": "Recommendations retrieved",
+  "message": "Curated recommendations",
   "data": {
-    "type": "PERSONALIZED",
+    "type": "HYBRID",
     "items": [
       {
         "contentType": "POEM",
-        "publicId": "poem-abc",
-        "title": "شکوہ",
-        "poetName": "علامہ اقبال",
-        "likeCount": 1250,
-        "shareCount": 340,
-        "bookmarkCount": 890,
-        "score": 87.5,
-        "reason": "Based on your bookmarks of Allama Iqbal's works"
+        "publicId": "6feeaf84-3d73-4a90-8f50-b14579bd95ad",
+        "title": "ایک آرزو",
+        "poetName": "Shoaib Ahmad Shajar",
+        "poetPublicId": "e9cd0914-9ae7-4271-bfd6-60b3ca1dad4c",
+        "poetryType": "NAZAM",
+        "categoryName": "Classical Poetry",
+        "likeCount": 1,
+        "shareCount": 0,
+        "bookmarkCount": 0,
+        "viewCount": 14,
+        "score": "NaN",
+        "reason": "Curated for you"
       },
       {
         "contentType": "COUPLET",
-        "publicId": "couplet-def",
-        "title": "Couplet from دیوان غالب",
-        "poetName": "مرزا غالب",
-        "likeCount": 2100,
-        "shareCount": 560,
-        "bookmarkCount": 1340,
-        "score": 92.3,
-        "reason": "Similar to poems you've liked"
+        "publicId": "b92370ce-ca56-49a5-8a8d-28774a93cbd3",
+        "title": "द्नीअ की म्ह्फ़्लूञ् सॆ अक्त गीअ हुउञ् ईअ र्ब्...",
+        "poetName": "شعیب احمد شجر ",
+        "poetPublicId": "e9cd0914-9ae7-4271-bfd6-60b3ca1dad4c",
+        "poetryType": "NAZAM",
+        "categoryName": "Classical Poetry",
+        "likeCount": 0,
+        "shareCount": 0,
+        "bookmarkCount": 0,
+        "viewCount": 0,
+        "score": 0.0,
+        "reason": "Curated for you"
+      }
+    ],
+    "totalCount": 8,
+    "message": "Curated recommendations",
+    "isPersonalized": false,
+    "count": 8
+  }
+}
+```
+
+**Success Response (200) - Trending:**
+```json
+{
+  "success": true,
+  "message": "Trending content for week",
+  "data": {
+    "type": "TRENDING",
+    "items": [
+      {
+        "contentType": "POEM",
+        "publicId": "c4b95980-1b7a-47bd-93a8-9c0ce9cff10c",
+        "title": "سارے عالم کا یہی ارمان ہونا چاہئے",
+        "poetName": "Mansoor Ahmad Samar",
+        "poetPublicId": "32aa606d-435f-4536-9c8b-99003bf8c1d8",
+        "poetryType": "GHAZAL",
+        "categoryName": "Ghazal",
+        "likeCount": 1,
+        "shareCount": 0,
+        "bookmarkCount": 0,
+        "viewCount": 25,
+        "score": "NaN",
+        "reason": "Trending this week"
       }
     ],
     "totalCount": 10,
-    "algorithm": "personalized_mlm"
+    "message": "Trending content for week",
+    "isPersonalized": false,
+    "count": 10
   }
 }
 ```
@@ -5999,60 +6141,83 @@ Analytics endpoints for tracking search behavior and providing "People also sear
 
 #### 10.7.1 Related Searches
 
-**Endpoint:** `GET /api/search/related`
+**Endpoint:** `GET /api/search/related?q={query}&limit={limit}`
 
-**Description:** Returns related search queries based on session co-occurrence analysis. Shows what other users searched for in the same session (30-day window).
+**Description:** Returns related search queries based on session co-occurrence analysis. Shows what other users searched for in the same session (30-day window). Perfect for "People also searched" features.
 
 **Query Parameters:**
 - `q` (required) - Original search query
-- `limit` (optional, default: `5`) - Number of related searches
+- `limit` (optional, default: `5`, max: 10) - Number of related searches
 
-**Example Request:**
-```http
-GET /api/search/related?q=غالب&limit=5
+**Example Requests:**
+
+**Related searches for "love":**
+```bash
+curl "http://localhost:8080/api/search/related?q=love&limit=5"
 ```
 
-**Response Format:**
+**Related searches for "غالب":**
+```bash
+curl "http://localhost:8080/api/search/related?q=غالب&limit=5"
+```
+
+**Success Response (200):**
 ```json
 {
   "success": true,
-  "message": "Related searches retrieved",
+  "message": "Found 5 related searches",
   "data": {
-    "query": "غالب",
+    "query": "love",
     "relatedSearches": [
       {
-        "query": "مرزا غالب",
-        "normalizedQuery": "مرزا غالب",
-        "count": 234,
-        "score": 95.5
+        "query": "فیض",
+        "normalizedQuery": "فیض",
+        "count": 20,
+        "score": 100.0
       },
       {
-        "query": "دیوان غالب",
-        "normalizedQuery": "دیوان غالب",
-        "count": 189,
-        "score": 87.3
+        "query": "غالب",
+        "normalizedQuery": "غالب",
+        "count": 19,
+        "score": 100.0
       },
       {
-        "query": "غالب کی شاعری",
-        "normalizedQuery": "غالب کی شاعری",
-        "count": 156,
-        "score": 78.5
+        "query": "نظم",
+        "normalizedQuery": "نظم",
+        "count": 18,
+        "score": 100.0
       },
       {
-        "query": "غزلیات غالب",
-        "normalizedQuery": "غزلیات غالب",
-        "count": 142,
-        "score": 73.2
+        "query": "عشق",
+        "normalizedQuery": "عشق",
+        "count": 17,
+        "score": 100.0
       },
       {
-        "query": "میر تقی میر",
-        "normalizedQuery": "میر تقی میر",
-        "count": 98,
-        "score": 62.8
+        "query": "غزل",
+        "normalizedQuery": "غزل",
+        "count": 16,
+        "score": 100.0
       }
     ],
     "totalCount": 5,
-    "timeWindow": "last 30 days"
+    "timeWindow": "last 30 days",
+    "count": 5
+  }
+}
+```
+
+**Empty Response (200) - No related searches:**
+```json
+{
+  "success": true,
+  "message": "No related searches found",
+  "data": {
+    "query": "xyz123",
+    "relatedSearches": [],
+    "totalCount": 0,
+    "timeWindow": "last 30 days",
+    "count": 0
   }
 }
 ```
@@ -6108,63 +6273,121 @@ GET /api/search/related?q=غالیب  # Suggests "غالب" (correct spelling)
 
 #### 10.7.2 Trending Searches
 
-**Endpoint:** `GET /api/search/trending`
+**Endpoint:** `GET /api/search/trending?timeframe={timeframe}&limit={limit}`
 
-**Description:** Returns most popular search queries within a specified timeframe, ranked by search frequency.
+**Description:** Returns most popular search queries within a specified timeframe, ranked by search frequency. Perfect for discovery sections showing "What's trending".
 
 **Query Parameters:**
 - `timeframe` (optional, default: `week`) - Time window
   - `day` - Last 24 hours
   - `week` - Last 7 days
   - `month` - Last 30 days
-- `limit` (optional, default: `10`) - Number of trending searches
+- `limit` (optional, default: `10`, max: 20) - Number of trending searches
 
-**Example Request:**
-```http
-GET /api/search/trending?timeframe=week&limit=10
+**Example Requests:**
+
+**Trending this week:**
+```bash
+curl "http://localhost:8080/api/search/trending?timeframe=week&limit=10"
 ```
 
-**Response Format:**
+**Trending today:**
+```bash
+curl "http://localhost:8080/api/search/trending?timeframe=day&limit=5"
+```
+
+**Trending this month:**
+```bash
+curl "http://localhost:8080/api/search/trending?timeframe=month&limit=20"
+```
+
+**Success Response (200):**
 ```json
 {
   "success": true,
-  "message": "Trending searches retrieved",
+  "message": "Found 10 trending searches for last 7 days",
   "data": {
     "searches": [
       {
-        "query": "فیض احمد فیض",
-        "normalizedQuery": "فیض احمد فیض",
-        "count": 1245,
+        "query": "غالب",
+        "normalizedQuery": "غالب",
+        "count": 21,
         "score": 100.0
       },
       {
-        "query": "محبت",
-        "normalizedQuery": "محبت",
-        "count": 987,
-        "score": 79.3
+        "query": "فیض",
+        "normalizedQuery": "فیض",
+        "count": 20,
+        "score": 100.0
       },
       {
-        "query": "غالب",
-        "normalizedQuery": "غالب",
-        "count": 892,
-        "score": 71.6
+        "query": "نظم",
+        "normalizedQuery": "نظم",
+        "count": 20,
+        "score": 100.0
       },
       {
-        "query": "اقبال",
-        "normalizedQuery": "اقبال",
-        "count": 756,
-        "score": 60.7
+        "query": "عشق",
+        "normalizedQuery": "عشق",
+        "count": 18,
+        "score": 90.0
       },
       {
         "query": "غزل",
         "normalizedQuery": "غزل",
-        "count": 634,
-        "score": 50.9
+        "count": 18,
+        "score": 90.0
+      },
+      {
+        "query": "poetry",
+        "normalizedQuery": "poetry",
+        "count": 18,
+        "score": 90.0
+      },
+      {
+        "query": "محبت",
+        "normalizedQuery": "محبت",
+        "count": 17,
+        "score": 85.0
+      },
+      {
+        "query": "love",
+        "normalizedQuery": "love",
+        "count": 17,
+        "score": 85.0
+      },
+      {
+        "query": "اقبال",
+        "normalizedQuery": "اقبال",
+        "count": 17,
+        "score": 85.0
+      },
+      {
+        "query": "دل",
+        "normalizedQuery": "دل",
+        "count": 16,
+        "score": 80.0
       }
     ],
     "totalCount": 10,
     "timeframe": "week",
-    "period": "last 7 days"
+    "period": "last 7 days",
+    "count": 10
+  }
+}
+```
+
+**Empty Response (200) - No trending data:**
+```json
+{
+  "success": true,
+  "message": "No trending searches found",
+  "data": {
+    "searches": [],
+    "totalCount": 0,
+    "timeframe": "week",
+    "period": "last 7 days",
+    "count": 0
   }
 }
 ```
@@ -6227,10 +6450,42 @@ GET /api/search/trending?timeframe=day&limit=5
 - Session tracking uses client-generated session IDs
 - Related searches use Elasticsearch terms aggregations
 - Trending searches cached for 1 hour (Redis)
+- **Dummy test data is available**: Run `./scripts/populate-search-analytics.sh` to populate test data (282 search queries)
 
 ---
 
-### 10.8 Use Cases & Workflows
+### 10.8 Search Endpoints Quick Reference
+
+**Complete list of all search endpoints with test data available:**
+
+| Endpoint | Purpose | Curl Example | Test Data |
+|----------|---------|--------------|-----------|
+| `/api/search` | Unified search across all content | `curl "localhost:8080/api/search?q=love&type=all&lang=en"` | ✅ Working |
+| `/api/search/quick` | Simplified unified search | `curl "localhost:8080/api/search/quick?q=love&lang=en"` | ✅ Working |
+| `/api/search/couplets` | Advanced couplet search | `curl "localhost:8080/api/search/couplets?q=love&sort=relevance"` | ✅ Working |
+| `/api/search/autocomplete` | Real-time suggestions | `curl "localhost:8080/api/search/autocomplete?q=gha&lang=en"` | ✅ Working |
+| `/api/search/recommendations` | Content recommendations | `curl "localhost:8080/api/search/recommendations?type=hybrid&limit=10"` | ✅ Working with data |
+| `/api/search/trending` | Trending searches | `curl "localhost:8080/api/search/trending?timeframe=week&limit=10"` | ✅ Working with 282 queries |
+| `/api/search/related` | Related searches | `curl "localhost:8080/api/search/related?q=love&limit=5"` | ✅ Working with data |
+
+**Sample Test Queries (from dummy data):**
+- Popular queries: `محبت`, `عشق`, `دل`, `غزل`, `نظم`, `love`, `poetry`, `romantic`
+- Poet names: `غالب`, `اقبال`, `فیض`, `میر تقی میر`
+- Related searches work for queries that appear in same sessions
+
+**To Regenerate Test Data:**
+```bash
+# Delete and recreate index
+curl -X DELETE "http://localhost:9200/search_queries"
+./scripts/create-search-index.sh
+
+# Populate with dummy data (282 queries)
+./scripts/populate-search-analytics.sh
+```
+
+---
+
+### 10.9 Use Cases & Workflows
 
 ### 11.1 Categories
 

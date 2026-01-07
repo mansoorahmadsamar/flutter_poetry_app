@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
-import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
+import 'package:flutter_poetry_app/features/search/models/global_search_state.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poet_model.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/widgets/couplet_card.dart';
 import 'package:flutter_poetry_app/features/search/utils/search_adapters.dart';
 import 'package:flutter_poetry_app/features/search/widgets/poet_result_card.dart';
+import 'package:flutter_poetry_app/features/search/widgets/couplet_sort_dropdown.dart';
 
-/// Search results section with editorial layout
+/// Search results section with segment-aware rendering
 ///
 /// Features:
-/// - Strong query heading with confident typography
-/// - Subtle results count
-/// - Secondary filters
+/// - Segment-based content display (All, Poets, Poems, Verses, Categories)
+/// - Sort dropdown for Verses segment
 /// - Generous spacing between couplets
 /// - Urdu text as hero element
+/// - Related searches at bottom
 class SearchResultsSection extends ConsumerWidget {
   const SearchResultsSection({super.key});
 
@@ -25,20 +26,12 @@ class SearchResultsSection extends ConsumerWidget {
     final searchState = ref.watch(globalSearchProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    debugPrint('🎨 SearchResultsSection build - mode: ${searchState.mode}');
-    debugPrint('🎨 unifiedResults null? ${searchState.unifiedResults == null}');
-
     if (searchState.unifiedResults == null) {
-      debugPrint('🎨 Returning empty - unifiedResults is null');
       return const SizedBox.shrink();
     }
 
     final results = searchState.unifiedResults!;
-    final poets = results.poets;
-    final couplets = results.couplets;
-
-    debugPrint('🎨 SearchResultsSection - totalResults: ${results.totalResults}');
-    debugPrint('🎨 Poets: ${poets.length}, Poems: ${results.poems.length}, Couplets: ${couplets.length}');
+    final activeSegment = searchState.activeSegment;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,35 +44,24 @@ class SearchResultsSection extends ConsumerWidget {
           isDark,
         ),
 
-        SizedBox(height: AppSpacing.sm),
+        SizedBox(height: AppSpacing.md),
 
-        // Filter chips
-        _buildFilterChips(context, ref, isDark),
+        // Sort dropdown for Verses segment
+        if (activeSegment == DiscoverSegment.verses)
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                const CoupletSortDropdown(),
+              ],
+            ),
+          ),
 
         SizedBox(height: AppSpacing.lg),
 
-        // "Relevant Results" section header
-        _buildSectionTitle(context, 'Relevant Results', isDark),
-
-        SizedBox(height: AppSpacing.md),
-
-        // Poet cards (horizontal scroll)
-        if (poets.isNotEmpty) ...[
-          _buildPoetsSection(context, poets, isDark),
-          SizedBox(height: AppSpacing.lg),
-        ],
-
-        // Couplets with generous spacing
-        if (couplets.isNotEmpty) ...[
-          ...couplets.map((couplet) => Padding(
-                padding: EdgeInsets.only(bottom: AppSpacing.lg),
-                child: _buildCoupletResultCard(context, ref, couplet),
-              )),
-
-          // Load more button removed for now - unified search doesn't support pagination yet
-
-          SizedBox(height: AppSpacing.xl),
-        ],
+        // Segment-based content rendering
+        _buildSegmentContent(context, ref, searchState, results, isDark),
 
         // Related searches
         if (searchState.relatedSearches != null &&
@@ -93,6 +75,176 @@ class SearchResultsSection extends ConsumerWidget {
           SizedBox(height: AppSpacing.xl),
         ],
       ],
+    );
+  }
+
+  /// Build content based on active segment
+  Widget _buildSegmentContent(
+    BuildContext context,
+    WidgetRef ref,
+    GlobalSearchState searchState,
+    UnifiedSearchResponse results,
+    bool isDark,
+  ) {
+    switch (searchState.activeSegment) {
+      case DiscoverSegment.all:
+        return _buildAllResults(context, ref, results, isDark);
+
+      case DiscoverSegment.poets:
+        return _buildPoetsOnlyResults(context, results.poets, isDark);
+
+      case DiscoverSegment.poems:
+        return _buildPoemsOnlyResults(context, results.poems, isDark);
+
+      case DiscoverSegment.verses:
+        return _buildVersesOnlyResults(context, ref, results.couplets, isDark);
+
+      case DiscoverSegment.categories:
+        return _buildCategoriesResults(context, isDark);
+
+      case DiscoverSegment.dictionary:
+      case DiscoverSegment.watch:
+        // Should never reach here as these are handled in SearchTab
+        return const SizedBox.shrink();
+    }
+  }
+
+  /// Build "All" segment results (mixed content)
+  Widget _buildAllResults(
+    BuildContext context,
+    WidgetRef ref,
+    UnifiedSearchResponse results,
+    bool isDark,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Poet cards (horizontal scroll)
+        if (results.poets.isNotEmpty) ...[
+          _buildSectionTitle(context, 'Poets', isDark),
+          SizedBox(height: AppSpacing.md),
+          _buildPoetsSection(context, results.poets, isDark),
+          SizedBox(height: AppSpacing.lg),
+        ],
+
+        // Couplets/Verses
+        if (results.couplets.isNotEmpty) ...[
+          _buildSectionTitle(context, 'Verses', isDark),
+          SizedBox(height: AppSpacing.md),
+          ...results.couplets.map((couplet) => Padding(
+                padding: EdgeInsets.only(bottom: AppSpacing.md),
+                child: _buildCoupletResultCard(context, ref, couplet),
+              )),
+          SizedBox(height: AppSpacing.xl),
+        ],
+      ],
+    );
+  }
+
+  /// Build Poets-only results (compact list)
+  Widget _buildPoetsOnlyResults(
+    BuildContext context,
+    List<PoetModel> poets,
+    bool isDark,
+  ) {
+    if (poets.isEmpty) {
+      return _buildEmptySegmentState(context, 'No poets found', isDark);
+    }
+
+    return Column(
+      children: poets.map((poet) {
+        final poetSummary = PoetSummary(
+          publicId: poet.publicId,
+          name: poet.name,
+          profileImageUrl: poet.profileImageUrl,
+        );
+        final eraText = _formatEra(poet.birthYear, poet.deathYear);
+        return Padding(
+          padding: EdgeInsets.only(
+            left: AppSpacing.md,
+            right: AppSpacing.md,
+            bottom: AppSpacing.md,
+          ),
+          child: PoetResultCard(
+            poet: poetSummary,
+            era: eraText,
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  /// Build Poems-only results
+  Widget _buildPoemsOnlyResults(
+    BuildContext context,
+    List<dynamic> poems,
+    bool isDark,
+  ) {
+    if (poems.isEmpty) {
+      return _buildEmptySegmentState(context, 'No poems found', isDark);
+    }
+
+    // TODO: Implement poem cards when poem model is ready
+    return _buildEmptySegmentState(
+      context,
+      'Poem results coming soon',
+      isDark,
+    );
+  }
+
+  /// Build Verses-only results (sorted)
+  Widget _buildVersesOnlyResults(
+    BuildContext context,
+    WidgetRef ref,
+    List<CoupletSearchResult> couplets,
+    bool isDark,
+  ) {
+    if (couplets.isEmpty) {
+      return _buildEmptySegmentState(context, 'No verses found', isDark);
+    }
+
+    return Column(
+      children: couplets.map((couplet) => Padding(
+            padding: EdgeInsets.only(
+              bottom: AppSpacing.md,
+            ),
+            child: _buildCoupletResultCard(context, ref, couplet),
+          )).toList(),
+    );
+  }
+
+  /// Build Categories results
+  Widget _buildCategoriesResults(
+    BuildContext context,
+    bool isDark,
+  ) {
+    // TODO: Implement when categories API is available
+    return _buildEmptySegmentState(
+      context,
+      'Category results coming soon',
+      isDark,
+    );
+  }
+
+  /// Build empty segment state
+  Widget _buildEmptySegmentState(
+    BuildContext context,
+    String message,
+    bool isDark,
+  ) {
+    return Padding(
+      padding: EdgeInsets.all(AppSpacing.xl),
+      child: Center(
+        child: Text(
+          message,
+          style: TextStyle(
+            fontSize: 14,
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.5)
+                : Colors.black.withValues(alpha: 0.5),
+          ),
+        ),
+      ),
     );
   }
 
@@ -114,65 +266,6 @@ class SearchResultsSection extends ConsumerWidget {
               ? Colors.white.withValues(alpha: 0.5)
               : Colors.black.withValues(alpha: 0.5),
         ),
-      ),
-    );
-  }
-
-  /// Build filter chips (All, Read, Watch, Dictionary)
-  Widget _buildFilterChips(
-    BuildContext context,
-    WidgetRef ref,
-    bool isDark,
-  ) {
-    final filters = ['All', 'Read', 'Watch', 'Dictionary'];
-    const selectedFilter = 'All'; // For now, always All is selected
-
-    return SizedBox(
-      height: 42,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
-        itemCount: filters.length,
-        itemBuilder: (context, index) {
-          final filter = filters[index];
-          final isSelected = filter == selectedFilter;
-
-          return Padding(
-            padding: EdgeInsets.only(right: AppSpacing.sm),
-            child: FilterChip(
-              label: Text(filter),
-              selected: isSelected,
-              onSelected: (selected) {
-                // TODO: Implement filter selection
-              },
-              labelStyle: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: isSelected
-                    ? Colors.white
-                    : (isDark ? Colors.white : Colors.black87),
-              ),
-              backgroundColor: isDark
-                  ? Colors.white.withValues(alpha: 0.05)
-                  : Colors.black.withValues(alpha: 0.03),
-              selectedColor: AppColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-                side: BorderSide(
-                  color: isSelected
-                      ? AppColors.primary
-                      : (isDark
-                          ? Colors.white.withValues(alpha: 0.1)
-                          : Colors.black.withValues(alpha: 0.1)),
-                ),
-              ),
-              padding: EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: AppSpacing.xs,
-              ),
-            ),
-          );
-        },
       ),
     );
   }
@@ -283,11 +376,11 @@ class SearchResultsSection extends ConsumerWidget {
                 label: Text(
                   query,
                   style: TextStyle(
-                    fontSize: isUrdu ? 15 : 13,
-                    fontFamily: isUrdu ? 'JameelNoori' : null,
+                    fontSize: isUrdu ? 16 : 13,
+                    fontFamily: isUrdu ? 'Jameel Noori Nastaleeq' : null,
                     fontWeight: FontWeight.w500,
                     color: isDark ? Colors.white : Colors.black87,
-                    height: isUrdu ? 1.6 : 1.3,
+                    height: isUrdu ? 1.8 : 1.4,
                   ),
                 ),
                 backgroundColor: isDark

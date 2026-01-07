@@ -106,8 +106,13 @@ _$AutocompleteCategoryImpl _$$AutocompleteCategoryImplFromJson(
     _$AutocompleteCategoryImpl(
       publicId: json['publicId'] as String,
       name: json['name'] as String,
-      slug: json['slug'] as String,
+      description: json['description'] as String?,
+      iconUrl: json['iconUrl'] as String?,
       poemCount: (json['poemCount'] as num?)?.toInt() ?? 0,
+      displayOrder: (json['displayOrder'] as num?)?.toInt() ?? 0,
+      isActive: json['isActive'] as bool? ?? true,
+      parentCategoryPublicId: json['parentCategoryPublicId'] as String?,
+      parentCategoryName: json['parentCategoryName'] as String?,
       score: (json['score'] as num?)?.toDouble() ?? 0.0,
     );
 
@@ -116,8 +121,13 @@ Map<String, dynamic> _$$AutocompleteCategoryImplToJson(
     <String, dynamic>{
       'publicId': instance.publicId,
       'name': instance.name,
-      'slug': instance.slug,
+      'description': instance.description,
+      'iconUrl': instance.iconUrl,
       'poemCount': instance.poemCount,
+      'displayOrder': instance.displayOrder,
+      'isActive': instance.isActive,
+      'parentCategoryPublicId': instance.parentCategoryPublicId,
+      'parentCategoryName': instance.parentCategoryName,
       'score': instance.score,
     };
 

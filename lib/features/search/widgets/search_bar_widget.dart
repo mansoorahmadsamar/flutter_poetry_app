@@ -88,19 +88,20 @@ class _GlobalSearchBarState extends ConsumerState<GlobalSearchBar> {
         textDirection: textDirection,
         style: TextStyle(
           fontSize: languageCode == 'ur' ? 18 : 16,
-          fontFamily: languageCode == 'ur' ? 'JameelNoori' : null,
+          fontFamily: languageCode == 'ur' ? 'Jameel Noori Nastaleeq' : null,
           color: isDark ? Colors.white : Colors.black87,
-          height: 1.5,
+          height: languageCode == 'ur' ? 1.8 : 1.5,
         ),
         decoration: InputDecoration(
           hintText: hintText,
           hintTextDirection: textDirection,
           hintStyle: TextStyle(
             fontSize: languageCode == 'ur' ? 16 : 15,
-            fontFamily: languageCode == 'ur' ? 'JameelNoori' : null,
+            fontFamily: languageCode == 'ur' ? 'Jameel Noori Nastaleeq' : null,
             color: isDark
                 ? Colors.white.withValues(alpha: 0.4)
                 : Colors.black.withValues(alpha: 0.4),
+            height: languageCode == 'ur' ? 1.8 : 1.5,
           ),
           prefixIcon: Icon(
             Icons.search,
