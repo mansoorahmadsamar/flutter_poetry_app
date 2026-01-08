@@ -28,7 +28,10 @@
       "Bash(git fetch:*)",
       "Bash(dart analyze:*)",
       "Bash(pod install)",
-      "Bash(dart run build_runner:*)"
+      "Bash(dart run build_runner:*)",
+      "Bash(dart run:*)",
+      "Bash(ls:*)",
+      "Bash(pod deintegrate:*)"
     ],
     "deny": [],
     "ask": []

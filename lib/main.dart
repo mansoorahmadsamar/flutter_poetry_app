@@ -16,10 +16,16 @@ void main() async {
   developer.Timeline.startSync('AppInit');
   developer.Timeline.finishSync();
 
-  // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  try {
+    // Initialize Firebase
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    developer.log('Firebase initialized successfully');
+  } catch (e) {
+    developer.log('Firebase initialization error: $e', error: e);
+    // Continue app initialization even if Firebase fails
+  }
 
   // Initialize app configuration
   initializeAppConfig();

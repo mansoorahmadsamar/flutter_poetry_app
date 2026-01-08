@@ -9,8 +9,20 @@ class PlatformUtils {
     } else if (Platform.isAndroid) {
       // Android emulator uses 10.0.2.2 to access host machine's localhost
       return 'http://10.0.2.2:$port';
+    } else if (Platform.isIOS) {
+      // For iOS physical devices, use your Mac's local network IP
+      // For iOS simulator, localhost works fine
+      // You can set this via environment variable or build config
+      const String devMachineIP = String.fromEnvironment(
+        'DEV_MACHINE_IP',
+        defaultValue: '192.168.100.54', // Your Mac's IP on local network
+      );
+
+      if (devMachineIP.isNotEmpty) {
+        return 'http://$devMachineIP:$port';
+      }
+      return 'http://localhost:$port'; // Fallback for simulator
     } else {
-      // iOS simulator and real devices can use localhost
       return 'http://localhost:$port';
     }
   }
