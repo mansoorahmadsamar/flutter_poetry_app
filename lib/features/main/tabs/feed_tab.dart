@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/design_system/app_colors.dart';
+import '../../../core/widgets/standard_app_bar.dart';
 
 /// Feed tab - Shows personalized poetry feed
 class FeedTab extends ConsumerWidget {
@@ -20,15 +21,8 @@ class FeedTab extends ConsumerWidget {
       body: CustomScrollView(
         slivers: [
           // App bar
-          SliverAppBar(
-            floating: true,
-            snap: true,
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
-            title: const Text(
-              'Feed',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+          StandardSliverAppBar(
+            title: 'Feed',
             actions: [
               IconButton(
                 icon: const Icon(Icons.notifications_outlined),

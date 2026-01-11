@@ -120,6 +120,7 @@ flutter:
 
   # Assets
   assets:
+    - assets/
     - assets/images/
     - assets/icons/
     - lib/core/l10n/

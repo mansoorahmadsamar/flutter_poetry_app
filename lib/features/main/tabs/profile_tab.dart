@@ -5,6 +5,7 @@ import '../../../core/auth/auth_provider.dart';
 import '../../../core/design_system/app_colors.dart';
 import '../../../core/providers/user_provider.dart';
 import '../../../core/providers/language_provider.dart';
+import '../../../core/widgets/standard_app_bar.dart';
 
 /// Profile tab - User profile and settings
 class ProfileTab extends ConsumerWidget {
@@ -54,15 +55,8 @@ class ProfileTab extends ConsumerWidget {
     return CustomScrollView(
       slivers: [
         // App bar
-        SliverAppBar(
-          floating: true,
-          snap: true,
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-          title: const Text(
-            'Profile',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
+        const StandardSliverAppBar(
+          title: 'Profile',
         ),
 
         // Profile content

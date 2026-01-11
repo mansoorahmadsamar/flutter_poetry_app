@@ -13,6 +13,7 @@ import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/core/widgets/localized_text.dart';
+import 'package:flutter_poetry_app/core/widgets/standard_app_bar.dart';
 
 class PoetDetailScreen extends ConsumerStatefulWidget {
   final String publicId;
@@ -68,33 +69,17 @@ class _PoetDetailScreenState extends ConsumerState<PoetDetailScreen>
           controller: _scrollController,
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
             // Simple App Bar
-            SliverAppBar(
-              floating: true,
-              snap: true,
-              elevation: _showElevation ? 2 : 0,
-              backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
-              leading: IconButton(
-                icon: Icon(
-                  Icons.arrow_back,
-                  color: isDark ? Colors.white : AppColors.primary,
-                ),
-                onPressed: () => Navigator.pop(context),
-              ),
+            StandardSliverAppBar(
+              title: poet.name,
               actions: [
                 IconButton(
-                  icon: Icon(
-                    Icons.share,
-                    color: isDark ? Colors.white : AppColors.primary,
-                  ),
+                  icon: const Icon(Icons.share),
                   onPressed: () {
                     // Share functionality
                   },
                 ),
                 IconButton(
-                  icon: Icon(
-                    Icons.more_vert,
-                    color: isDark ? Colors.white : AppColors.primary,
-                  ),
+                  icon: const Icon(Icons.more_vert),
                   onPressed: () {
                     // More options
                   },

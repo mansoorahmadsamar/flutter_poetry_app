@@ -5,6 +5,7 @@ import '../providers/poets_pagination_provider.dart';
 import '../widgets/poet_card.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
+import 'package:flutter_poetry_app/core/widgets/standard_app_bar.dart';
 
 class PoetsListScreen extends ConsumerStatefulWidget {
   const PoetsListScreen({super.key});
@@ -66,16 +67,8 @@ class _PoetsListScreenState extends ConsumerState<PoetsListScreen> {
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             // App Bar
-            SliverAppBar(
-              floating: true,
-              snap: true,
-              elevation: 0,
-              backgroundColor:
-                  isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-              title: Text(
-                'Poets',
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
+            StandardSliverAppBar(
+              title: 'Poets',
               actions: [
                 IconButton(
                   icon: const Icon(Icons.search),

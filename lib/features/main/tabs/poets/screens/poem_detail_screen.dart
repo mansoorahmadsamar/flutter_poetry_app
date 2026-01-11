@@ -5,6 +5,7 @@ import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/widgets/localized_text.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
+import 'package:flutter_poetry_app/core/widgets/standard_app_bar.dart';
 import '../models/poem_model.dart';
 import '../providers/poem_providers.dart';
 import '../providers/poet_providers.dart';
@@ -32,27 +33,21 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
     final isUrdu = ref.watch(selectedLanguageProvider) == 'ur';
 
     return Scaffold(
-      appBar: AppBar(
-        title: poemAsync.maybeWhen(
-          data: (poem) => LocalizedText(
-            poem.getDisplayTitle(isUrdu ? 'ur' : 'en'),
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+      appBar: poemAsync.maybeWhen(
+        data: (poem) => StandardAppBar(
+          title: poem.getDisplayTitle(isUrdu ? 'ur' : 'en'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.share),
+              onPressed: () {/* TODO: Share */},
             ),
-          ),
-          orElse: () => Text('Loading...'),
+            IconButton(
+              icon: const Icon(Icons.more_vert),
+              onPressed: () {/* TODO: More options */},
+            ),
+          ],
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.share),
-            onPressed: () {/* TODO: Share */},
-          ),
-          IconButton(
-            icon: Icon(Icons.more_vert),
-            onPressed: () {/* TODO: More options */},
-          ),
-        ],
+        orElse: () => const StandardAppBar(title: 'Loading...'),
       ),
       body: poemAsync.when(
         data: (poem) => _buildContent(context, ref, poem, isUrdu),

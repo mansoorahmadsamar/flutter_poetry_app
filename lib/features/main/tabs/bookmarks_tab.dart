@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
+import 'package:flutter_poetry_app/core/widgets/standard_app_bar.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/unified_bookmark_provider.dart';
 import 'package:flutter_poetry_app/features/main/tabs/bookmarks/models/unified_bookmark_model.dart';
 import 'package:flutter_poetry_app/features/main/tabs/bookmarks/widgets/unified_bookmark_card.dart';
@@ -113,25 +114,12 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
           controller: _scrollController,
           slivers: [
             // App Bar
-            SliverAppBar(
-              floating: true,
-              backgroundColor: isDark ? const Color(0xFF1A1A1A) : Colors.white,
-              elevation: 0,
-              title: Text(
-                'My Bookmarks',
-                style: GoogleFonts.roboto(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                  color: isDark ? Colors.white : AppColors.primary,
-                ),
-              ),
+            StandardSliverAppBar(
+              title: 'My Bookmarks',
               actions: [
                 // Sort Menu
                 PopupMenuButton<String>(
-                  icon: Icon(
-                    Icons.sort_rounded,
-                    color: isDark ? Colors.white70 : AppColors.primary,
-                  ),
+                  icon: const Icon(Icons.sort_rounded),
                   onSelected: _onSortChange,
                   itemBuilder: (context) => [
                     const PopupMenuItem(

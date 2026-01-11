@@ -68,6 +68,7 @@ class PoetCard extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     // Era Badge
                     if (poet.era != null)
@@ -90,39 +91,39 @@ class PoetCard extends ConsumerWidget {
                           ),
                         ),
                       ),
-                    const SizedBox(height: 6),
+                    if (poet.era != null) const SizedBox(height: 4),
 
                     // Poet Name
-                    Text(
-                      poet.name,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: isUrdu
-                          ? AppTypography.urduPoetNameStyle.copyWith(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                              height: 1.7,
-                              color: isDark ? Colors.white : Colors.black87,
-                            )
-                          : GoogleFonts.roboto(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              height: 1.2,
-                              color: isDark ? Colors.white : Colors.black87,
-                            ),
+                    Flexible(
+                      child: Text(
+                        poet.name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: isUrdu
+                            ? AppTypography.urduPoetNameStyle.copyWith(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                height: 1.7,
+                                color: isDark ? Colors.white : Colors.black87,
+                              )
+                            : GoogleFonts.roboto(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                height: 1.2,
+                                color: isDark ? Colors.white : Colors.black87,
+                              ),
+                      ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 3),
 
                     // Life Dates
-                    if (_buildLifeDates(isDark) != null) ...[
+                    if (_buildLifeDates(isDark) != null)
                       _buildLifeDates(isDark)!,
-                      const SizedBox(height: 4),
-                    ],
 
                     // Location with Country Flag
                     if (_buildLocationRow(isDark, isUrdu) != null) ...[
+                      const SizedBox(height: 2),
                       _buildLocationRow(isDark, isUrdu)!,
-                      const SizedBox(height: 4),
                     ],
 
                     const Spacer(),
