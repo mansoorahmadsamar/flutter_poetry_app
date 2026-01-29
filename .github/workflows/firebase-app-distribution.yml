@@ -41,11 +41,15 @@ jobs:
       - name: Build Android APK
         run: flutter build apk --release
 
+      - name: Decode Firebase service account
+        run: |
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 --decode > ${{ runner.temp }}/firebase-credentials.json
+
       - name: Upload APK to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
-          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          serviceCredentialsFile: ${{ runner.temp }}/firebase-credentials.json
           groups: testers
           file: build/app/outputs/flutter-apk/app-release.apk
           releaseNotes: ${{ github.event.inputs.release_notes || format('Build from {0} - {1}', github.ref_name, github.sha) }}
@@ -89,11 +93,15 @@ jobs:
         run: |
           flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
 
+      - name: Decode Firebase service account
+        run: |
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 --decode > ${{ runner.temp }}/firebase-credentials.json
+
       - name: Upload IPA to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{ secrets.FIREBASE_IOS_APP_ID }}
-          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          serviceCredentialsFile: ${{ runner.temp }}/firebase-credentials.json
           groups: testers
           file: build/ios/ipa/*.ipa
           releaseNotes: ${{ github.event.inputs.release_notes || format('Build from {0} - {1}', github.ref_name, github.sha) }}
