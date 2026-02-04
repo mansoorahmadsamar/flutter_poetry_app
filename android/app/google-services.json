@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "381838704656-42sq5jcs313f8qfi3hjf6mrdel79ebge.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.techhikes.poetry_app",
+            "certificate_hash": "36cab260a1b46e48bac6ce4d4387d3f02c9e1939"
+          }
+        },
+        {
           "client_id": "381838704656-4mhqe5ej6tjhtj9p16l4uvoc9bij95dq.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -37,6 +45,13 @@
             {
               "client_id": "381838704656-7d1r4avegn7vf56413lg8c3nqgvehvbq.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "381838704656-p6eop70fhpv51ibck93ga9dd4mlt7k33.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.techhikes.poetryapp"
+              }
             }
           ]
         }
