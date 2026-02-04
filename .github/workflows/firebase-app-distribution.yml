@@ -48,7 +48,7 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
-          KEYSTORE_PATH: app/keystore/release.keystore
+          KEYSTORE_PATH: keystore/release.keystore
         run: flutter build apk --release
 
       - name: Decode Firebase service account
