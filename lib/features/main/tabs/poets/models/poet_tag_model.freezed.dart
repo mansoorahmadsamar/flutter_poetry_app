@@ -28,12 +28,8 @@ mixin _$PoetTagModel {
   String get tagType => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
 
-  /// Serializes this PoetTagModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of PoetTagModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $PoetTagModelCopyWith<PoetTagModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -63,8 +59,6 @@ class _$PoetTagModelCopyWithImpl<$Res, $Val extends PoetTagModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of PoetTagModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -129,8 +123,6 @@ class __$$PoetTagModelImplCopyWithImpl<$Res>
       _$PoetTagModelImpl _value, $Res Function(_$PoetTagModelImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of PoetTagModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -218,14 +210,12 @@ class _$PoetTagModelImpl implements _PoetTagModel {
                 other.description == description));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType, publicId, name, slug, color, tagType, description);
 
-  /// Create a copy of PoetTagModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$PoetTagModelImplCopyWith<_$PoetTagModelImpl> get copyWith =>
@@ -264,11 +254,8 @@ abstract class _PoetTagModel implements PoetTagModel {
   String get tagType;
   @override
   String? get description;
-
-  /// Create a copy of PoetTagModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$PoetTagModelImplCopyWith<_$PoetTagModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

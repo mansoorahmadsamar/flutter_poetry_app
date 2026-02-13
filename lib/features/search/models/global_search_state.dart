@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter_poetry_app/core/network/dto/api_response.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
+import 'package:flutter_poetry_app/features/discover/models/discover_bundle_model.dart';
 
 part 'global_search_state.freezed.dart';
 
@@ -60,6 +61,7 @@ class GlobalSearchState with _$GlobalSearchState {
     TrendingSearchesResponse? trendingSearches,
     RecommendationResponse? recommendations,
     RelatedSearchesResponse? relatedSearches,
+    DiscoverBundle? discoverBundle, // New: unified discover bundle
 
     // Error state
     String? errorMessage,

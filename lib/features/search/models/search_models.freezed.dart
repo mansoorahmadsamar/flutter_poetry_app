@@ -27,12 +27,8 @@ mixin _$AutocompleteResponse {
       throw _privateConstructorUsedError;
   int get totalCount => throw _privateConstructorUsedError;
 
-  /// Serializes this AutocompleteResponse to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of AutocompleteResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $AutocompleteResponseCopyWith<AutocompleteResponse> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -62,8 +58,6 @@ class _$AutocompleteResponseCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of AutocompleteResponse
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -122,8 +116,6 @@ class __$$AutocompleteResponseImplCopyWithImpl<$Res>
       $Res Function(_$AutocompleteResponseImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of AutocompleteResponse
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -234,7 +226,7 @@ class _$AutocompleteResponseImpl implements _AutocompleteResponse {
                 other.totalCount == totalCount));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -244,9 +236,7 @@ class _$AutocompleteResponseImpl implements _AutocompleteResponse {
       const DeepCollectionEquality().hash(_categories),
       totalCount);
 
-  /// Create a copy of AutocompleteResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$AutocompleteResponseImplCopyWith<_$AutocompleteResponseImpl>
@@ -283,11 +273,8 @@ abstract class _AutocompleteResponse implements AutocompleteResponse {
   List<AutocompleteCategory> get categories;
   @override
   int get totalCount;
-
-  /// Create a copy of AutocompleteResponse
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$AutocompleteResponseImplCopyWith<_$AutocompleteResponseImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
@@ -304,12 +291,8 @@ mixin _$AutocompletePoet {
   String? get era => throw _privateConstructorUsedError;
   double get score => throw _privateConstructorUsedError;
 
-  /// Serializes this AutocompletePoet to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of AutocompletePoet
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $AutocompletePoetCopyWith<AutocompletePoet> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -338,8 +321,6 @@ class _$AutocompletePoetCopyWithImpl<$Res, $Val extends AutocompletePoet>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of AutocompletePoet
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -398,8 +379,6 @@ class __$$AutocompletePoetImplCopyWithImpl<$Res>
       $Res Function(_$AutocompletePoetImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of AutocompletePoet
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -478,14 +457,12 @@ class _$AutocompletePoetImpl implements _AutocompletePoet {
             (identical(other.score, score) || other.score == score));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode =>
       Object.hash(runtimeType, publicId, name, profileImageUrl, era, score);
 
-  /// Create a copy of AutocompletePoet
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$AutocompletePoetImplCopyWith<_$AutocompletePoetImpl> get copyWith =>
@@ -521,11 +498,8 @@ abstract class _AutocompletePoet implements AutocompletePoet {
   String? get era;
   @override
   double get score;
-
-  /// Create a copy of AutocompletePoet
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$AutocompletePoetImplCopyWith<_$AutocompletePoetImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -543,12 +517,8 @@ mixin _$AutocompletePoem {
   String get poetryType => throw _privateConstructorUsedError;
   double get score => throw _privateConstructorUsedError;
 
-  /// Serializes this AutocompletePoem to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of AutocompletePoem
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $AutocompletePoemCopyWith<AutocompletePoem> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -578,8 +548,6 @@ class _$AutocompletePoemCopyWithImpl<$Res, $Val extends AutocompletePoem>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of AutocompletePoem
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -644,8 +612,6 @@ class __$$AutocompletePoemImplCopyWithImpl<$Res>
       $Res Function(_$AutocompletePoemImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of AutocompletePoem
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -735,14 +701,12 @@ class _$AutocompletePoemImpl implements _AutocompletePoem {
             (identical(other.score, score) || other.score == score));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType, publicId, title, poetName, poetPublicId, poetryType, score);
 
-  /// Create a copy of AutocompletePoem
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$AutocompletePoemImplCopyWith<_$AutocompletePoemImpl> get copyWith =>
@@ -781,11 +745,8 @@ abstract class _AutocompletePoem implements AutocompletePoem {
   String get poetryType;
   @override
   double get score;
-
-  /// Create a copy of AutocompletePoem
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$AutocompletePoemImplCopyWith<_$AutocompletePoemImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -802,12 +763,8 @@ mixin _$AutocompleteTag {
   String get tagType => throw _privateConstructorUsedError;
   double get score => throw _privateConstructorUsedError;
 
-  /// Serializes this AutocompleteTag to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of AutocompleteTag
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $AutocompleteTagCopyWith<AutocompleteTag> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -836,8 +793,6 @@ class _$AutocompleteTagCopyWithImpl<$Res, $Val extends AutocompleteTag>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of AutocompleteTag
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -896,8 +851,6 @@ class __$$AutocompleteTagImplCopyWithImpl<$Res>
       _$AutocompleteTagImpl _value, $Res Function(_$AutocompleteTagImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of AutocompleteTag
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -975,14 +928,12 @@ class _$AutocompleteTagImpl implements _AutocompleteTag {
             (identical(other.score, score) || other.score == score));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode =>
       Object.hash(runtimeType, publicId, name, slug, tagType, score);
 
-  /// Create a copy of AutocompleteTag
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$AutocompleteTagImplCopyWith<_$AutocompleteTagImpl> get copyWith =>
@@ -1018,11 +969,8 @@ abstract class _AutocompleteTag implements AutocompleteTag {
   String get tagType;
   @override
   double get score;
-
-  /// Create a copy of AutocompleteTag
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$AutocompleteTagImplCopyWith<_$AutocompleteTagImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1044,12 +992,8 @@ mixin _$AutocompleteCategory {
   String? get parentCategoryName => throw _privateConstructorUsedError;
   double get score => throw _privateConstructorUsedError;
 
-  /// Serializes this AutocompleteCategory to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of AutocompleteCategory
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $AutocompleteCategoryCopyWith<AutocompleteCategory> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1084,8 +1028,6 @@ class _$AutocompleteCategoryCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of AutocompleteCategory
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1174,8 +1116,6 @@ class __$$AutocompleteCategoryImplCopyWithImpl<$Res>
       $Res Function(_$AutocompleteCategoryImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of AutocompleteCategory
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1307,7 +1247,7 @@ class _$AutocompleteCategoryImpl implements _AutocompleteCategory {
             (identical(other.score, score) || other.score == score));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -1322,9 +1262,7 @@ class _$AutocompleteCategoryImpl implements _AutocompleteCategory {
       parentCategoryName,
       score);
 
-  /// Create a copy of AutocompleteCategory
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$AutocompleteCategoryImplCopyWith<_$AutocompleteCategoryImpl>
@@ -1376,11 +1314,8 @@ abstract class _AutocompleteCategory implements AutocompleteCategory {
   String? get parentCategoryName;
   @override
   double get score;
-
-  /// Create a copy of AutocompleteCategory
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$AutocompleteCategoryImplCopyWith<_$AutocompleteCategoryImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
@@ -1412,12 +1347,8 @@ mixin _$CoupletSearchResult {
       throw _privateConstructorUsedError; // Made nullable - API returns null when not authenticated
   DateTime? get createdAt => throw _privateConstructorUsedError;
 
-  /// Serializes this CoupletSearchResult to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of CoupletSearchResult
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $CoupletSearchResultCopyWith<CoupletSearchResult> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1458,8 +1389,6 @@ class _$CoupletSearchResultCopyWithImpl<$Res, $Val extends CoupletSearchResult>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of CoupletSearchResult
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1538,8 +1467,6 @@ class _$CoupletSearchResultCopyWithImpl<$Res, $Val extends CoupletSearchResult>
     ) as $Val);
   }
 
-  /// Create a copy of CoupletSearchResult
-  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $PoemSummaryCopyWith<$Res>? get poem {
@@ -1552,8 +1479,6 @@ class _$CoupletSearchResultCopyWithImpl<$Res, $Val extends CoupletSearchResult>
     });
   }
 
-  /// Create a copy of CoupletSearchResult
-  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $PoetSummaryCopyWith<$Res>? get poet {
@@ -1605,8 +1530,6 @@ class __$$CoupletSearchResultImplCopyWithImpl<$Res>
       $Res Function(_$CoupletSearchResultImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of CoupletSearchResult
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1791,7 +1714,7 @@ class _$CoupletSearchResultImpl implements _CoupletSearchResult {
                 other.createdAt == createdAt));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -1810,9 +1733,7 @@ class _$CoupletSearchResultImpl implements _CoupletSearchResult {
       isBookmarked,
       createdAt);
 
-  /// Create a copy of CoupletSearchResult
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$CoupletSearchResultImplCopyWith<_$CoupletSearchResultImpl> get copyWith =>
@@ -1852,17 +1773,16 @@ abstract class _CoupletSearchResult implements CoupletSearchResult {
   @override
   int get coupletNumber;
   @override
-  String? get coupletType; // Made nullable - unified search doesn't return this
-  @override
-  String?
-      get coupletTypeName; // Made nullable - API doesn't always include this
-  @override
+  String? get coupletType;
+  @override // Made nullable - unified search doesn't return this
+  String? get coupletTypeName;
+  @override // Made nullable - API doesn't always include this
   List<VerseModel> get verses;
   @override
-  PoemSummary? get poem; // Made nullable - API doesn't always include this
-  @override
-  PoetSummary? get poet; // Made nullable - API doesn't always include this
-  @override
+  PoemSummary? get poem;
+  @override // Made nullable - API doesn't always include this
+  PoetSummary? get poet;
+  @override // Made nullable - API doesn't always include this
   int get likeCount;
   @override
   int get shareCount;
@@ -1871,17 +1791,13 @@ abstract class _CoupletSearchResult implements CoupletSearchResult {
   @override
   double get engagementScore;
   @override
-  bool? get isLiked; // Made nullable - API returns null when not authenticated
-  @override
-  bool?
-      get isBookmarked; // Made nullable - API returns null when not authenticated
-  @override
+  bool? get isLiked;
+  @override // Made nullable - API returns null when not authenticated
+  bool? get isBookmarked;
+  @override // Made nullable - API returns null when not authenticated
   DateTime? get createdAt;
-
-  /// Create a copy of CoupletSearchResult
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$CoupletSearchResultImplCopyWith<_$CoupletSearchResultImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1901,12 +1817,8 @@ mixin _$VerseSearchResult {
   String get poetName => throw _privateConstructorUsedError;
   String? get poetProfileImageUrl => throw _privateConstructorUsedError;
 
-  /// Serializes this VerseSearchResult to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of VerseSearchResult
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $VerseSearchResultCopyWith<VerseSearchResult> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1940,8 +1852,6 @@ class _$VerseSearchResultCopyWithImpl<$Res, $Val extends VerseSearchResult>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of VerseSearchResult
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1990,8 +1900,6 @@ class _$VerseSearchResultCopyWithImpl<$Res, $Val extends VerseSearchResult>
     ) as $Val);
   }
 
-  /// Create a copy of VerseSearchResult
-  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $VerseModelCopyWith<$Res> get verse {
@@ -2031,8 +1939,6 @@ class __$$VerseSearchResultImplCopyWithImpl<$Res>
       $Res Function(_$VerseSearchResultImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of VerseSearchResult
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -2142,14 +2048,12 @@ class _$VerseSearchResultImpl implements _VerseSearchResult {
                 other.poetProfileImageUrl == poetProfileImageUrl));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, verse, poemPublicId, poemTitle,
       poetryType, poetryTypeName, poetPublicId, poetName, poetProfileImageUrl);
 
-  /// Create a copy of VerseSearchResult
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$VerseSearchResultImplCopyWith<_$VerseSearchResultImpl> get copyWith =>
@@ -2194,11 +2098,8 @@ abstract class _VerseSearchResult implements VerseSearchResult {
   String get poetName;
   @override
   String? get poetProfileImageUrl;
-
-  /// Create a copy of VerseSearchResult
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$VerseSearchResultImplCopyWith<_$VerseSearchResultImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -2213,12 +2114,8 @@ mixin _$PoemSummary {
   String get title => throw _privateConstructorUsedError;
   String get poetName => throw _privateConstructorUsedError;
 
-  /// Serializes this PoemSummary to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of PoemSummary
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $PoemSummaryCopyWith<PoemSummary> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -2242,8 +2139,6 @@ class _$PoemSummaryCopyWithImpl<$Res, $Val extends PoemSummary>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of PoemSummary
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -2287,8 +2182,6 @@ class __$$PoemSummaryImplCopyWithImpl<$Res>
       _$PoemSummaryImpl _value, $Res Function(_$PoemSummaryImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of PoemSummary
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -2346,13 +2239,11 @@ class _$PoemSummaryImpl implements _PoemSummary {
                 other.poetName == poetName));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, publicId, title, poetName);
 
-  /// Create a copy of PoemSummary
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$PoemSummaryImplCopyWith<_$PoemSummaryImpl> get copyWith =>
@@ -2381,11 +2272,8 @@ abstract class _PoemSummary implements PoemSummary {
   String get title;
   @override
   String get poetName;
-
-  /// Create a copy of PoemSummary
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$PoemSummaryImplCopyWith<_$PoemSummaryImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -2400,12 +2288,8 @@ mixin _$PoetSummary {
   String get name => throw _privateConstructorUsedError;
   String? get profileImageUrl => throw _privateConstructorUsedError;
 
-  /// Serializes this PoetSummary to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of PoetSummary
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $PoetSummaryCopyWith<PoetSummary> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -2429,8 +2313,6 @@ class _$PoetSummaryCopyWithImpl<$Res, $Val extends PoetSummary>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of PoetSummary
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -2474,8 +2356,6 @@ class __$$PoetSummaryImplCopyWithImpl<$Res>
       _$PoetSummaryImpl _value, $Res Function(_$PoetSummaryImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of PoetSummary
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -2533,13 +2413,11 @@ class _$PoetSummaryImpl implements _PoetSummary {
                 other.profileImageUrl == profileImageUrl));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, publicId, name, profileImageUrl);
 
-  /// Create a copy of PoetSummary
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$PoetSummaryImplCopyWith<_$PoetSummaryImpl> get copyWith =>
@@ -2568,11 +2446,8 @@ abstract class _PoetSummary implements PoetSummary {
   String get name;
   @override
   String? get profileImageUrl;
-
-  /// Create a copy of PoetSummary
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$PoetSummaryImplCopyWith<_$PoetSummaryImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -2594,12 +2469,8 @@ mixin _$RecommendationResponse {
       throw _privateConstructorUsedError; // Added from API response
   int get count => throw _privateConstructorUsedError;
 
-  /// Serializes this RecommendationResponse to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of RecommendationResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $RecommendationResponseCopyWith<RecommendationResponse> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -2630,8 +2501,6 @@ class _$RecommendationResponseCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of RecommendationResponse
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -2699,8 +2568,6 @@ class __$$RecommendationResponseImplCopyWithImpl<$Res>
       $Res Function(_$RecommendationResponseImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of RecommendationResponse
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -2802,7 +2669,7 @@ class _$RecommendationResponseImpl implements _RecommendationResponse {
             (identical(other.count, count) || other.count == count));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -2813,9 +2680,7 @@ class _$RecommendationResponseImpl implements _RecommendationResponse {
       isPersonalized,
       count);
 
-  /// Create a copy of RecommendationResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$RecommendationResponseImplCopyWith<_$RecommendationResponseImpl>
@@ -2843,22 +2708,19 @@ abstract class _RecommendationResponse implements RecommendationResponse {
       _$RecommendationResponseImpl.fromJson;
 
   @override
-  String get type; // PERSONALIZED, SIMILAR, TRENDING, HYBRID
-  @override
+  String get type;
+  @override // PERSONALIZED, SIMILAR, TRENDING, HYBRID
   List<RecommendationItem> get items;
   @override
   int get totalCount;
   @override
-  String? get message; // Changed from 'algorithm' to match API response
-  @override
-  bool get isPersonalized; // Added from API response
-  @override
+  String? get message;
+  @override // Changed from 'algorithm' to match API response
+  bool get isPersonalized;
+  @override // Added from API response
   int get count;
-
-  /// Create a copy of RecommendationResponse
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$RecommendationResponseImplCopyWith<_$RecommendationResponseImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
@@ -2890,12 +2752,8 @@ mixin _$RecommendationItem {
       throw _privateConstructorUsedError; // Handle "NaN" from API
   String? get reason => throw _privateConstructorUsedError;
 
-  /// Serializes this RecommendationItem to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of RecommendationItem
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $RecommendationItemCopyWith<RecommendationItem> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -2932,8 +2790,6 @@ class _$RecommendationItemCopyWithImpl<$Res, $Val extends RecommendationItem>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of RecommendationItem
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -3040,8 +2896,6 @@ class __$$RecommendationItemImplCopyWithImpl<$Res>
       $Res Function(_$RecommendationItemImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of RecommendationItem
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -3211,7 +3065,7 @@ class _$RecommendationItemImpl implements _RecommendationItem {
             (identical(other.reason, reason) || other.reason == reason));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -3229,9 +3083,7 @@ class _$RecommendationItemImpl implements _RecommendationItem {
       score,
       reason);
 
-  /// Create a copy of RecommendationItem
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$RecommendationItemImplCopyWith<_$RecommendationItemImpl> get copyWith =>
@@ -3266,37 +3118,34 @@ abstract class _RecommendationItem implements RecommendationItem {
       _$RecommendationItemImpl.fromJson;
 
   @override
-  String get contentType; // POEM, COUPLET, POET
-  @override
+  String get contentType;
+  @override // POEM, COUPLET, POET
   String get publicId;
   @override
   String get title;
   @override
   String? get poetName;
   @override
-  String? get poetPublicId; // Added from API response
-  @override
-  String? get poetryType; // Added from API response
-  @override
-  String? get categoryName; // Added from API response
-  @override
+  String? get poetPublicId;
+  @override // Added from API response
+  String? get poetryType;
+  @override // Added from API response
+  String? get categoryName;
+  @override // Added from API response
   int get likeCount;
   @override
   int get shareCount;
   @override
   int get bookmarkCount;
   @override
-  int get viewCount; // Added from API response
-  @override
+  int get viewCount;
+  @override // Added from API response
   @NaNDoubleConverter()
-  double get score; // Handle "NaN" from API
-  @override
+  double get score;
+  @override // Handle "NaN" from API
   String? get reason;
-
-  /// Create a copy of RecommendationItem
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$RecommendationItemImplCopyWith<_$RecommendationItemImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -3326,12 +3175,8 @@ mixin _$UnifiedSearchResponse {
   List<AutocompleteCategory> get categories =>
       throw _privateConstructorUsedError;
 
-  /// Serializes this UnifiedSearchResponse to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of UnifiedSearchResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $UnifiedSearchResponseCopyWith<UnifiedSearchResponse> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -3369,8 +3214,6 @@ class _$UnifiedSearchResponseCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of UnifiedSearchResponse
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -3479,8 +3322,6 @@ class __$$UnifiedSearchResponseImplCopyWithImpl<$Res>
       $Res Function(_$UnifiedSearchResponseImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of UnifiedSearchResponse
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -3696,7 +3537,7 @@ class _$UnifiedSearchResponseImpl implements _UnifiedSearchResponse {
                 .equals(other._categories, _categories));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -3714,9 +3555,7 @@ class _$UnifiedSearchResponseImpl implements _UnifiedSearchResponse {
       const DeepCollectionEquality().hash(_tags),
       const DeepCollectionEquality().hash(_categories));
 
-  /// Create a copy of UnifiedSearchResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$UnifiedSearchResponseImplCopyWith<_$UnifiedSearchResponseImpl>
@@ -3766,22 +3605,19 @@ abstract class _UnifiedSearchResponse implements UnifiedSearchResponse {
   @override
   int get categoryCount;
   @override
-  List<PoetModel> get poets; // Full poet objects from API
-  @override
-  List<PoemModel> get poems; // Full poem objects from API
-  @override
-  List<VerseSearchResult> get verses; // Verse results with nested structure
-  @override
+  List<PoetModel> get poets;
+  @override // Full poet objects from API
+  List<PoemModel> get poems;
+  @override // Full poem objects from API
+  List<VerseSearchResult> get verses;
+  @override // Verse results with nested structure
   List<CoupletSearchResult> get couplets;
   @override
   List<AutocompleteTag> get tags;
   @override
   List<AutocompleteCategory> get categories;
-
-  /// Create a copy of UnifiedSearchResponse
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$UnifiedSearchResponseImplCopyWith<_$UnifiedSearchResponseImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
@@ -3797,12 +3633,8 @@ mixin _$TrendingSearch {
   int get count => throw _privateConstructorUsedError;
   double get score => throw _privateConstructorUsedError;
 
-  /// Serializes this TrendingSearch to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of TrendingSearch
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $TrendingSearchCopyWith<TrendingSearch> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -3826,8 +3658,6 @@ class _$TrendingSearchCopyWithImpl<$Res, $Val extends TrendingSearch>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of TrendingSearch
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -3876,8 +3706,6 @@ class __$$TrendingSearchImplCopyWithImpl<$Res>
       _$TrendingSearchImpl _value, $Res Function(_$TrendingSearchImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of TrendingSearch
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -3947,14 +3775,12 @@ class _$TrendingSearchImpl implements _TrendingSearch {
             (identical(other.score, score) || other.score == score));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode =>
       Object.hash(runtimeType, query, normalizedQuery, count, score);
 
-  /// Create a copy of TrendingSearch
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$TrendingSearchImplCopyWith<_$TrendingSearchImpl> get copyWith =>
@@ -3987,11 +3813,8 @@ abstract class _TrendingSearch implements TrendingSearch {
   int get count;
   @override
   double get score;
-
-  /// Create a copy of TrendingSearch
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$TrendingSearchImplCopyWith<_$TrendingSearchImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -4009,12 +3832,8 @@ mixin _$RelatedSearchesResponse {
   int get totalCount => throw _privateConstructorUsedError;
   String get timeWindow => throw _privateConstructorUsedError;
 
-  /// Serializes this RelatedSearchesResponse to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of RelatedSearchesResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $RelatedSearchesResponseCopyWith<RelatedSearchesResponse> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -4043,8 +3862,6 @@ class _$RelatedSearchesResponseCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of RelatedSearchesResponse
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -4100,8 +3917,6 @@ class __$$RelatedSearchesResponseImplCopyWithImpl<$Res>
       $Res Function(_$RelatedSearchesResponseImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of RelatedSearchesResponse
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -4180,7 +3995,7 @@ class _$RelatedSearchesResponseImpl implements _RelatedSearchesResponse {
                 other.timeWindow == timeWindow));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -4189,9 +4004,7 @@ class _$RelatedSearchesResponseImpl implements _RelatedSearchesResponse {
       totalCount,
       timeWindow);
 
-  /// Create a copy of RelatedSearchesResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$RelatedSearchesResponseImplCopyWith<_$RelatedSearchesResponseImpl>
@@ -4224,11 +4037,8 @@ abstract class _RelatedSearchesResponse implements RelatedSearchesResponse {
   int get totalCount;
   @override
   String get timeWindow;
-
-  /// Create a copy of RelatedSearchesResponse
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$RelatedSearchesResponseImplCopyWith<_$RelatedSearchesResponseImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
@@ -4245,12 +4055,8 @@ mixin _$TrendingSearchesResponse {
   String get timeframe => throw _privateConstructorUsedError;
   String get period => throw _privateConstructorUsedError;
 
-  /// Serializes this TrendingSearchesResponse to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of TrendingSearchesResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $TrendingSearchesResponseCopyWith<TrendingSearchesResponse> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -4279,8 +4085,6 @@ class _$TrendingSearchesResponseCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of TrendingSearchesResponse
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -4336,8 +4140,6 @@ class __$$TrendingSearchesResponseImplCopyWithImpl<$Res>
       $Res Function(_$TrendingSearchesResponseImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of TrendingSearchesResponse
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -4415,7 +4217,7 @@ class _$TrendingSearchesResponseImpl implements _TrendingSearchesResponse {
             (identical(other.period, period) || other.period == period));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -4424,9 +4226,7 @@ class _$TrendingSearchesResponseImpl implements _TrendingSearchesResponse {
       timeframe,
       period);
 
-  /// Create a copy of TrendingSearchesResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$TrendingSearchesResponseImplCopyWith<_$TrendingSearchesResponseImpl>
@@ -4459,11 +4259,8 @@ abstract class _TrendingSearchesResponse implements TrendingSearchesResponse {
   String get timeframe;
   @override
   String get period;
-
-  /// Create a copy of TrendingSearchesResponse
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$TrendingSearchesResponseImplCopyWith<_$TrendingSearchesResponseImpl>
       get copyWith => throw _privateConstructorUsedError;
 }

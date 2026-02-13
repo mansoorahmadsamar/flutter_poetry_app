@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:flutter_poetry_app/core/network/dio_client.dart';
@@ -7,6 +8,8 @@ import 'package:flutter_poetry_app/features/search/models/global_search_state.da
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
 import 'package:flutter_poetry_app/features/search/services/search_service.dart';
 import 'package:flutter_poetry_app/features/search/services/search_history_service.dart';
+import 'package:flutter_poetry_app/features/discover/services/discover_service.dart';
+import 'package:flutter_poetry_app/features/discover/models/discover_bundle_model.dart';
 
 // ============================================================================
 // SERVICE PROVIDERS
@@ -33,19 +36,22 @@ final searchHistoryServiceProvider = Provider<SearchHistoryService>((ref) {
 /// - Manage search state (idle, typing, searching, results, error)
 /// - Debounced autocomplete (400ms delay)
 /// - Execute searches and save to history
-/// - Load discovery data (trending, recommendations)
+/// - Load discovery data via Discover Bundle API (single call)
 /// - Handle sort/filter changes
 class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
   final SearchService _searchService;
   final SearchHistoryService _historyService;
+  final DiscoverService _discoverService;
   final String _languageCode;
   final Logger _logger = Logger();
 
   Timer? _debounceTimer;
+  CancelToken? _autocompleteCancelToken;
 
   GlobalSearchNotifier(
     this._searchService,
     this._historyService,
+    this._discoverService,
     this._languageCode,
   ) : super(const GlobalSearchState()) {
     _loadInitialData();
@@ -57,31 +63,99 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
 
   /// Load initial discovery data on startup
   ///
-  /// Loads in parallel:
+  /// Uses the unified Discover Bundle API (single call) instead of multiple calls
+  /// Loads in parallel with local history:
   /// - Recent search history (from SharedPreferences)
-  /// - Trending searches (from API)
-  /// - Hybrid recommendations (from API)
+  /// - Discover bundle (trending, recommendations, featured poets, categories)
   Future<void> _loadInitialData() async {
     try {
-      // Load all in parallel for better performance
+      // Load history and discover bundle in parallel
       final results = await Future.wait([
         _historyService.getHistory(),
-        _searchService.getTrendingSearches(timeframe: 'week', limit: 10),
-        _searchService.getRecommendations(type: 'hybrid', limit: 10),
+        _discoverService.getDiscoverBundle(lang: _languageCode),
       ]);
 
+      final recentSearches = results[0] as List<String>;
+      final bundle = results[1] as DiscoverBundle;
+
+      // Convert discover bundle data to legacy format for compatibility
+      final trendingSearches = _convertTrendingSearches(bundle.trendingSearches);
+      final recommendations = _convertRecommendations(bundle);
+
       state = state.copyWith(
-        recentSearches: results[0] as List<String>,
-        trendingSearches: results[1] as TrendingSearchesResponse,
-        recommendations: results[2] as RecommendationResponse,
+        recentSearches: recentSearches,
+        trendingSearches: trendingSearches,
+        recommendations: recommendations,
+        discoverBundle: bundle,
       );
+
+      _logger.i('✅ Loaded discover bundle via single API call');
     } catch (e) {
+      _logger.e('❌ Failed to load discovery data: $e');
       // Graceful degradation - continue with empty discovery data
       // User can still search
       state = state.copyWith(
         errorMessage: 'Failed to load discovery data',
       );
     }
+  }
+
+  /// Convert TrendingSearches from bundle to legacy TrendingSearchesResponse
+  TrendingSearchesResponse _convertTrendingSearches(TrendingSearches trending) {
+    final searches = trending.daily.map((item) => TrendingSearch(
+      query: item.query,
+      normalizedQuery: item.query.toLowerCase(),
+      count: item.searchCount,
+      score: item.rank.toDouble(),
+    )).toList();
+
+    return TrendingSearchesResponse(
+      searches: searches,
+      totalCount: searches.length,
+      timeframe: 'daily',
+      period: 'daily',
+    );
+  }
+
+  /// Convert bundle recommendations to legacy RecommendationResponse
+  RecommendationResponse _convertRecommendations(DiscoverBundle bundle) {
+    // Combine editorsPicks and recommended into items
+    final items = <RecommendationItem>[];
+
+    for (final card in bundle.editorsPicks.items) {
+      items.add(RecommendationItem(
+        contentType: card.type,
+        publicId: card.publicId,
+        title: card.primaryText,
+        poetName: card.secondaryText,
+        likeCount: card.metrics?.likeCount ?? 0,
+        shareCount: card.metrics?.shareCount ?? 0,
+        bookmarkCount: card.metrics?.bookmarkCount ?? 0,
+        viewCount: card.metrics?.viewCount ?? 0,
+        score: card.score ?? 0.0,
+      ));
+    }
+
+    for (final card in bundle.recommended.items) {
+      items.add(RecommendationItem(
+        contentType: card.type,
+        publicId: card.publicId,
+        title: card.primaryText,
+        poetName: card.secondaryText,
+        likeCount: card.metrics?.likeCount ?? 0,
+        shareCount: card.metrics?.shareCount ?? 0,
+        bookmarkCount: card.metrics?.bookmarkCount ?? 0,
+        viewCount: card.metrics?.viewCount ?? 0,
+        score: card.score ?? 0.0,
+      ));
+    }
+
+    return RecommendationResponse(
+      type: 'HYBRID',
+      items: items,
+      totalCount: items.length,
+      isPersonalized: bundle.personalized,
+    );
   }
 
   // ==========================================================================
@@ -106,8 +180,9 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
       mode: trimmedQuery.isEmpty ? SearchMode.idle : SearchMode.typing,
     );
 
-    // Cancel previous debounce timer
+    // Cancel previous debounce timer and pending request
     _debounceTimer?.cancel();
+    _autocompleteCancelToken?.cancel();
 
     // Clear autocomplete if query is empty
     if (trimmedQuery.isEmpty) {
@@ -134,6 +209,10 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
   Future<void> _fetchAutocomplete(String query) async {
     if (query.length < 2) return;
 
+    // Cancel any previous autocomplete request
+    _autocompleteCancelToken?.cancel();
+    _autocompleteCancelToken = CancelToken();
+
     state = state.copyWith(
       isLoadingAutocomplete: true,
       mode: SearchMode.autocompleting,
@@ -143,6 +222,7 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
       final results = await _searchService.getAutocomplete(
         query: query,
         lang: _languageCode,
+        cancelToken: _autocompleteCancelToken,
       );
 
       // Only update if query hasn't changed
@@ -152,6 +232,15 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
           isLoadingAutocomplete: false,
         );
       }
+    } on DioException catch (e) {
+      // Ignore cancelled requests
+      if (e.type == DioExceptionType.cancel) return;
+
+      // Graceful degradation - clear autocomplete on error
+      state = state.copyWith(
+        autocompleteResults: null,
+        isLoadingAutocomplete: false,
+      );
     } catch (e) {
       // Graceful degradation - clear autocomplete on error
       state = state.copyWith(
@@ -347,20 +436,25 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
     );
   }
 
-  /// Refresh discovery data (trending, recommendations)
+  /// Refresh discovery data using Discover Bundle API
   Future<void> refreshDiscovery() async {
     try {
-      final results = await Future.wait([
-        _searchService.getTrendingSearches(timeframe: 'week', limit: 10),
-        _searchService.getRecommendations(type: 'hybrid', limit: 10),
-      ]);
+      final bundle = await _discoverService.getDiscoverBundle(
+        lang: _languageCode,
+        forceRefresh: true,
+      );
+
+      final trendingSearches = _convertTrendingSearches(bundle.trendingSearches);
+      final recommendations = _convertRecommendations(bundle);
 
       state = state.copyWith(
-        trendingSearches: results[0] as TrendingSearchesResponse,
-        recommendations: results[1] as RecommendationResponse,
+        trendingSearches: trendingSearches,
+        recommendations: recommendations,
+        discoverBundle: bundle,
       );
     } catch (e) {
       // Silent fail - keep existing data
+      _logger.e('Failed to refresh discovery: $e');
     }
   }
 
@@ -381,6 +475,7 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
   @override
   void dispose() {
     _debounceTimer?.cancel();
+    _autocompleteCancelToken?.cancel();
     super.dispose();
   }
 }
@@ -396,11 +491,13 @@ final globalSearchProvider =
     StateNotifierProvider<GlobalSearchNotifier, GlobalSearchState>((ref) {
   final searchService = ref.watch(searchServiceProvider);
   final historyService = ref.watch(searchHistoryServiceProvider);
+  final discoverService = ref.watch(discoverServiceProvider);
   final languageCode = ref.watch(selectedLanguageProvider);
 
   return GlobalSearchNotifier(
     searchService,
     historyService,
+    discoverService,
     languageCode,
   );
 });

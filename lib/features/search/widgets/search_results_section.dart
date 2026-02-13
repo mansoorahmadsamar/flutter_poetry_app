@@ -110,31 +110,67 @@ class SearchResultsSection extends ConsumerWidget {
   }
 
   /// Build "All" segment results (mixed content)
+  /// Shows top 5 results per section with "See All" option
   Widget _buildAllResults(
     BuildContext context,
     WidgetRef ref,
     UnifiedSearchResponse results,
     bool isDark,
   ) {
+    const maxPoetsToShow = 5;
+    const maxCoupletsToShow = 5;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Poet cards (horizontal scroll)
+        // Poet cards (horizontal scroll) - show all poets in scroll
         if (results.poets.isNotEmpty) ...[
-          _buildSectionTitle(context, 'Poets', isDark),
+          _buildSectionTitle(
+            context,
+            'Poets',
+            isDark,
+            count: results.poetCount,
+            onSeeAll: results.poets.length > maxPoetsToShow
+                ? () => ref.read(globalSearchProvider.notifier).setActiveSegment(DiscoverSegment.poets)
+                : null,
+          ),
           SizedBox(height: AppSpacing.md),
           _buildPoetsSection(context, results.poets, isDark),
           SizedBox(height: AppSpacing.lg),
         ],
 
-        // Couplets/Verses
+        // Couplets/Verses - show top 5 with "See All"
         if (results.couplets.isNotEmpty) ...[
-          _buildSectionTitle(context, 'Verses', isDark),
+          _buildSectionTitle(
+            context,
+            'Verses',
+            isDark,
+            count: results.coupletCount,
+            onSeeAll: results.couplets.length > maxCoupletsToShow
+                ? () => ref.read(globalSearchProvider.notifier).setActiveSegment(DiscoverSegment.verses)
+                : null,
+          ),
           SizedBox(height: AppSpacing.md),
-          ...results.couplets.map((couplet) => Padding(
+          ...results.couplets.take(maxCoupletsToShow).map((couplet) => Padding(
                 padding: EdgeInsets.only(bottom: AppSpacing.md),
                 child: _buildCoupletResultCard(context, ref, couplet),
               )),
+          // "See more" button if there are more results
+          if (results.couplets.length > maxCoupletsToShow)
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
+              child: TextButton(
+                onPressed: () => ref.read(globalSearchProvider.notifier).setActiveSegment(DiscoverSegment.verses),
+                child: Text(
+                  'See all ${results.coupletCount} verses',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF1B4D3E),
+                  ),
+                ),
+              ),
+            ),
           SizedBox(height: AppSpacing.xl),
         ],
       ],
@@ -160,9 +196,9 @@ class SearchResultsSection extends ConsumerWidget {
         );
         final eraText = _formatEra(poet.birthYear, poet.deathYear);
         return Padding(
-          padding: EdgeInsets.only(
-            left: AppSpacing.md,
-            right: AppSpacing.md,
+          padding: EdgeInsetsDirectional.only(
+            start: AppSpacing.md,
+            end: AppSpacing.md,
             bottom: AppSpacing.md,
           ),
           child: PoetResultCard(
@@ -270,21 +306,85 @@ class SearchResultsSection extends ConsumerWidget {
     );
   }
 
-  /// Build section title
+  /// Build section title with count and optional "See All" button
   Widget _buildSectionTitle(
     BuildContext context,
     String title,
-    bool isDark,
-  ) {
+    bool isDark, {
+    int? count,
+    VoidCallback? onSeeAll,
+  }) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: 17,
-          fontWeight: FontWeight.w600,
-          color: isDark ? Colors.white : Colors.black87,
-        ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
+              ),
+              if (count != null) ...[
+                SizedBox(width: AppSpacing.xs),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.1)
+                        : Colors.black.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    count.toString(),
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.7)
+                          : Colors.black.withValues(alpha: 0.6),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          if (onSeeAll != null)
+            TextButton(
+              onPressed: onSeeAll,
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'See All',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF1B4D3E), // Primary green
+                    ),
+                  ),
+                  SizedBox(width: 4),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    size: 12,
+                    color: const Color(0xFF1B4D3E),
+                  ),
+                ],
+              ),
+            ),
+        ],
       ),
     );
   }

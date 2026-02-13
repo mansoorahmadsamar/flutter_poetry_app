@@ -1,14 +1,39 @@
 # Poetry Backend API - Flutter Mobile App Documentation
 
-**Version:** 1.0.0
-**Last Updated:** December 31, 2025
+**Version:** 1.1.0
+**Last Updated:** January 28, 2026
 **Base URL (Production):** `https://api.poetry.com`
 **Base URL (Development):** `https://dev-api.poetry.com`
 **Base URL (Local):** `http://localhost:8080`
 
 ---
 
-## Recent Updates (December 2025 - January 2026)
+## Recent Updates (December 2025 - February 2026)
+
+### Discover Functionality Enhancement ⭐ NEW (February 2026)
+
+**What's New:**
+- ✅ **Unified Discover Bundle Endpoint**: Single API call replaces 6-7 separate calls for discover screen
+- ✅ **UI-Ready Responses**: No more placeholder values ("Unknown", "Untitled") - strict null handling
+- ✅ **Search Result De-duplication**: Eliminates duplicate verses with different romanizations
+- ✅ **Enhanced Autocomplete**: New structured `/api/search/suggest` endpoint with flat sorted responses
+- ✅ **Result Counts**: Instant count display ("Poets (5)") without client-side array counting
+- ✅ **Score Sanitization**: No more NaN values in search results
+- ✅ **Performance Optimization**: 15-minute caching, database indexes, and optimized queries
+
+**Key Benefits:**
+1. **Faster Load Times**: Discover screen loads in single API call (500ms with cache, <2s without)
+2. **Better UX**: No flicker from placeholder text, smooth loading experience
+3. **Cleaner Code**: Single endpoint for all discover content, unified response format
+4. **Improved Search**: De-duplicated results, structured autocomplete, trending searches
+
+**New Endpoints:**
+- `GET /api/discover?lang=ur` - Complete discover bundle (trending, featured, recommended, poets, categories)
+- `GET /api/search/suggest?q=na&lang=ur&limit=10` - Structured autocomplete suggestions
+
+**See Section 10 for detailed documentation.**
+
+---
 
 ### Bookmark System Enhancement (Phase 1, 2 & 3) ⭐ NEW
 
@@ -118,7 +143,12 @@ A single, consolidated API that provides access to all bookmark types (poems, co
   - [4.4.3 Get Poet Books](#443-get-poet-books)
   - [4.4.4 Get Poet Videos](#444-get-poet-videos)
   - [4.4.5 Get Poet Facts](#445-get-poet-facts)
-- [4.5 Use Cases & Workflows](#45-use-cases-workflows)
+- [4.5 Poet Follow System](#45-poet-follow-system)
+  - [4.5.1 Follow Poet](#451-follow-poet)
+  - [4.5.2 Unfollow Poet](#452-unfollow-poet)
+  - [4.5.3 Get Following List](#453-get-following-list)
+  - [4.5.4 Check Follow Status](#454-check-follow-status)
+- [4.6 Use Cases & Workflows](#46-use-cases-workflows)
 
 ### 5. Poem Discovery & Content
 - [5.1 Overview](#51-overview-poems)
@@ -158,6 +188,7 @@ A single, consolidated API that provides access to all bookmark types (poems, co
   - [6.5.1 Most Liked Couplets](#651-most-liked-couplets)
   - [6.5.2 Most Shared Couplets](#652-most-shared-couplets)
   - [6.5.3 Trending Couplets](#653-trending-couplets)
+  - [6.5.4 Couplet Analytics (NEW)](#654-couplet-analytics-new)
 - [6.6 Use Cases & Workflows](#66-use-cases-workflows)
 
 ### 7. Image Poetry Generation
@@ -165,8 +196,8 @@ A single, consolidated API that provides access to all bookmark types (poems, co
 - [7.2 Template Management](#72-template-management)
   - [7.2.1 Get Templates](#721-get-templates)
   - [7.2.2 Get Template by ID](#722-get-template-by-id)
-  - [7.2.3 Get Popular Templates](#723-get-popular-templates)
-  - [7.2.4 Get Template Statistics](#724-get-template-statistics)
+  - [7.2.3 Get Popular Templates (NEW)](#723-get-popular-templates-new)
+  - [7.2.4 Get Template Statistics (NEW)](#724-get-template-statistics-new)
 - [7.3 Image Generation](#73-image-generation)
   - [7.3.1 Generate Image for Couplet](#731-generate-image-for-couplet)
   - [7.3.2 Upload Custom Background](#732-upload-custom-background)
@@ -218,10 +249,12 @@ A single, consolidated API that provides access to all bookmark types (poems, co
 - [10.3 Quick Search](#103-quick-search)
 - [10.4 Couplet Search](#104-couplet-search)
 - [10.5 Autocomplete](#105-autocomplete)
+  - [10.5.1 Structured Autocomplete (Suggest) ⭐ NEW](#1051-structured-autocomplete-suggest-new)
+  - [10.5.2 Discover Bundle ⭐ NEW](#1052-discover-bundle-new)
 - [10.6 Recommendations](#106-recommendations)
-- [10.7 Search Analytics](#107-search-analytics)
-  - [10.7.1 Related Searches](#1071-related-searches)
-  - [10.7.2 Trending Searches](#1072-trending-searches)
+- [10.7 Search Analytics (NEW)](#107-search-analytics-new)
+  - [10.7.1 Related Searches (NEW)](#1071-related-searches-new)
+  - [10.7.2 Trending Searches (NEW)](#1072-trending-searches-new)
 - [10.8 Use Cases & Workflows](#108-use-cases-workflows)
 
 ### 11. Categories, Tags & Metadata
@@ -243,7 +276,8 @@ A single, consolidated API that provides access to all bookmark types (poems, co
 - [11.4 Languages](#114-languages)
   - [11.4.1 Get All Languages](#1141-get-all-languages)
   - [11.4.2 Get Language by Code](#1142-get-language-by-code)
-  - [11.4.3 Get Active Languages](#1143-get-active-languages)
+  - [11.4.3 Get Active Languages (NEW)](#1143-get-active-languages-new)
+  - [11.4.4 Dictionary Sync & Stats (NEW)](#1144-dictionary-sync-stats-new)
 
 ### 12. System & Health
 - [12.1 Health Check](#121-health-check)
@@ -297,10 +331,11 @@ Welcome to the Poetry Backend API documentation for Flutter mobile applications.
 - 🔐 **Secure Authentication**: Firebase Auth + JWT tokens
 
 **API Statistics:**
-- **110+ Endpoints** across 15 major categories
-- **Multi-language support** for UI and content
+- **120+ Endpoints** across 16 major categories
+- **Multi-language support** for UI and content (6 languages)
 - **Real-time analytics** and recommendations
 - **CloudFront CDN** for fast global delivery
+- **Comprehensive social features** (follow, like, bookmark, share)
 
 ---
 
@@ -3756,7 +3791,207 @@ Authorization: Bearer <access_token>
 
 ---
 
-## 5.5 Enum Values for Poet Endpoints
+## 5.5 Poet Follow System
+
+**Base Path:** `/api/poets`
+
+The Poet Follow System allows users to follow their favorite poets and receive personalized content recommendations.
+
+### 5.5.1 Follow Poet {#451-follow-poet}
+
+**Endpoint:** `POST /api/poets/{publicId}/follow`
+
+**Authentication Required:** Yes
+
+**Description:** Follow a poet to get personalized recommendations and updates.
+
+**Path Parameters:**
+- `publicId`: Public ID of the poet
+
+**Request Headers:**
+```
+Authorization: Bearer <access_token>
+```
+
+**Example:** `POST /api/poets/poet_iqbal123/follow`
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Now following poet",
+  "data": {
+    "following": true,
+    "followerCount": 1523
+  }
+}
+```
+
+**Error Response (404):**
+```json
+{
+  "success": false,
+  "message": "Poet not found",
+  "data": null
+}
+```
+
+---
+
+### 5.5.2 Unfollow Poet {#452-unfollow-poet}
+
+**Endpoint:** `DELETE /api/poets/{publicId}/follow`
+
+**Authentication Required:** Yes
+
+**Description:** Unfollow a poet.
+
+**Path Parameters:**
+- `publicId`: Public ID of the poet
+
+**Request Headers:**
+```
+Authorization: Bearer <access_token>
+```
+
+**Example:** `DELETE /api/poets/poet_iqbal123/follow`
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Unfollowed poet",
+  "data": {
+    "following": false,
+    "followerCount": 1522
+  }
+}
+```
+
+---
+
+### 5.5.3 Get Following List {#453-get-following-list}
+
+**Endpoint:** `GET /api/users/me/following?page=0&size=20`
+
+**Authentication Required:** Yes
+
+**Description:** Get list of poets the current user is following.
+
+**Query Parameters:**
+- `page` (optional): Page number (default: 0)
+- `size` (optional): Items per page (default: 20)
+
+**Request Headers:**
+```
+Authorization: Bearer <access_token>
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Following list retrieved successfully",
+  "data": {
+    "content": [
+      {
+        "publicId": "poet_iqbal123",
+        "name": "علامہ اقبال",
+        "profileImageUrl": "https://cdn.example.com/iqbal.jpg",
+        "poemCount": 234,
+        "followerCount": 1523,
+        "followedAt": "2026-01-15T10:00:00"
+      },
+      {
+        "publicId": "poet_faiz456",
+        "name": "فیض احمد فیض",
+        "profileImageUrl": "https://cdn.example.com/faiz.jpg",
+        "poemCount": 189,
+        "followerCount": 2341,
+        "followedAt": "2026-01-20T14:30:00"
+      }
+    ],
+    "pageable": {
+      "pageNumber": 0,
+      "pageSize": 20
+    },
+    "totalElements": 12,
+    "totalPages": 1,
+    "last": true
+  }
+}
+```
+
+**Flutter Usage:**
+```dart
+Future<List<Poet>> getFollowingPoets() async {
+  final response = await dio.get(
+    '/api/users/me/following',
+    options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
+  );
+
+  final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(response.data);
+  final content = apiResponse.data!['content'] as List;
+  return content.map((json) => Poet.fromJson(json)).toList();
+}
+```
+
+---
+
+### 5.5.4 Check Follow Status {#454-check-follow-status}
+
+**Endpoint:** `GET /api/poets/{publicId}/is-following`
+
+**Authentication Required:** Yes
+
+**Description:** Check if the current user is following a specific poet.
+
+**Path Parameters:**
+- `publicId`: Public ID of the poet
+
+**Request Headers:**
+```
+Authorization: Bearer <access_token>
+```
+
+**Example:** `GET /api/poets/poet_iqbal123/is-following`
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Follow status retrieved",
+  "data": {
+    "isFollowing": true,
+    "followedAt": "2026-01-15T10:00:00"
+  }
+}
+```
+
+**Use Cases:**
+1. **Poet Profile Screen:** Show follow/unfollow button based on status
+2. **Personalized Feed:** Display content from followed poets
+3. **Following List:** Manage poets user is following
+
+**Flutter Integration:**
+```dart
+class PoetProfileScreen extends StatefulWidget {
+  final String poetId;
+
+  Future<void> toggleFollow() async {
+    if (isFollowing) {
+      await dio.delete('/api/poets/$poetId/follow');
+    } else {
+      await dio.post('/api/poets/$poetId/follow');
+    }
+    setState(() => isFollowing = !isFollowing);
+  }
+}
+```
+
+---
+
+## 5.6 Enum Values for Poet Endpoints
 
 ### Gender
 - `MALE` - Male poet
@@ -3800,7 +4035,7 @@ Authorization: Bearer <access_token>
 
 ---
 
-## 5.6 Notes for Poet Endpoints
+## 5.7 Notes for Poet Endpoints
 
 1. **Multi-Language Support:**
    - All text fields (name, biography, shortBio) are stored separately for ur/en/hi
@@ -3846,9 +4081,9 @@ Authorization: Bearer <access_token>
 
 ---
 
-## 5.7 Global Search Endpoint (NEW)
+## 5.8 Global Search Endpoint (NEW)
 
-### 5.7.1 Unified Search
+### 5.8.1 Unified Search
 
 **Endpoint:** `GET /api/search?q=محبت&type=all&lang=ur&page=0&size=10`
 
@@ -4487,6 +4722,256 @@ Same structure as most liked couplets, with additional `trendScore` field
 
 ---
 
+#### 6.5.4 Couplet Analytics (NEW) {#654-couplet-analytics-new}
+
+**Base Path:** `/api/analytics/couplets`
+
+**Description:**
+Comprehensive analytics endpoints for discovering popular and trending couplets. These endpoints power discovery features, trending sections, and personalized recommendations.
+
+##### Most Liked Couplets
+
+**Endpoint:** `GET /api/analytics/couplets/most-liked?poetId={optional}&page=0&size=20`
+
+**Authentication Required:** No (Public endpoint)
+
+**Description:**
+Get the most liked couplets globally or filtered by specific poet. Perfect for "Popular Couplets" sections.
+
+**Query Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `poetId` | string | No | Filter by specific poet's public ID |
+| `page` | number | No | Page number (default: 0) |
+| `size` | number | No | Items per page (default: 20, max: 100) |
+
+**Example Requests:**
+```http
+# Global most liked couplets
+GET /api/analytics/couplets/most-liked?page=0&size=20
+
+# Most liked couplets by Faiz
+GET /api/analytics/couplets/most-liked?poetId=poet_faiz123&size=10
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Most liked couplets retrieved successfully",
+  "data": {
+    "content": [
+      {
+        "couplet": {
+          "publicId": "couplet_abc123",
+          "coupletNumber": 1,
+          "verses": [
+            {
+              "verseText": "مجھ سے پہلی سی محبت مری محبوب نہ مانگ",
+              "verseNumber": 1
+            },
+            {
+              "verseText": "میں نے سمجھا تھا کہ تو ہے تو درخشاں ہے حیات",
+              "verseNumber": 2
+            }
+          ],
+          "likeCount": 2847,
+          "bookmarkCount": 1234,
+          "shareCount": 589
+        },
+        "poem": {
+          "publicId": "poem_xyz789",
+          "title": "مجھ سے پہلی سی محبت",
+          "poetryType": "GHAZAL"
+        },
+        "poet": {
+          "publicId": "poet_faiz123",
+          "name": "فیض احمد فیض",
+          "profileImageUrl": "https://cdn.example.com/faiz.jpg"
+        },
+        "engagementScore": 4670,
+        "rank": 1
+      }
+    ],
+    "totalElements": 1523,
+    "totalPages": 77,
+    "pageable": {
+      "pageNumber": 0,
+      "pageSize": 20
+    }
+  }
+}
+```
+
+**Flutter Usage:**
+```dart
+Future<List<CoupletWithContext>> getMostLikedCouplets({
+  String? poetId,
+  int page = 0,
+  int size = 20,
+}) async {
+  final queryParams = {
+    'page': page,
+    'size': size,
+    if (poetId != null) 'poetId': poetId,
+  };
+
+  final response = await dio.get(
+    '/api/analytics/couplets/most-liked',
+    queryParameters: queryParams,
+  );
+
+  final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(response.data);
+  final content = apiResponse.data!['content'] as List;
+  return content.map((json) => CoupletWithContext.fromJson(json)).toList();
+}
+```
+
+---
+
+##### Most Shared Couplets
+
+**Endpoint:** `GET /api/analytics/couplets/most-shared?poetId={optional}&page=0&size=20`
+
+**Authentication Required:** No (Public endpoint)
+
+**Description:**
+Get the most shared couplets. Useful for identifying viral content and popular couplets for sharing.
+
+**Query Parameters:**
+Same as Most Liked endpoint.
+
+**Example Requests:**
+```http
+# Global most shared couplets
+GET /api/analytics/couplets/most-shared?page=0&size=20
+
+# Most shared couplets by Iqbal
+GET /api/analytics/couplets/most-shared?poetId=poet_iqbal123&size=10
+```
+
+**Success Response (200):**
+Same structure as Most Liked, with `shareCount` being the primary sort field.
+
+**Use Cases:**
+1. **Viral Content Section:** "Most Shared Couplets This Month"
+2. **Poet Profile:** Show most shared couplets on poet's profile page
+3. **Share Suggestions:** Suggest popular couplets when user wants to share
+
+---
+
+##### Trending Couplets (with Timeframe)
+
+**Endpoint:** `GET /api/analytics/couplets/trending?poetId={optional}&days=30&page=0&size=20`
+
+**Authentication Required:** No (Public endpoint)
+
+**Description:**
+Get trending couplets based on recent engagement within a specified timeframe. Calculates trend score from likes, shares, and bookmarks weighted by recency.
+
+**Query Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `poetId` | string | No | Filter by specific poet |
+| `days` | number | No | Timeframe for trending calculation (7, 14, 30) - default: 30 |
+| `page` | number | No | Page number (default: 0) |
+| `size` | number | No | Items per page (default: 20) |
+
+**Example Requests:**
+```http
+# Trending in last 7 days
+GET /api/analytics/couplets/trending?days=7&size=20
+
+# Trending Ghalib couplets this month
+GET /api/analytics/couplets/trending?poetId=poet_ghalib123&days=30&size=10
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Trending couplets retrieved successfully",
+  "data": {
+    "content": [
+      {
+        "couplet": {
+          "publicId": "couplet_def456",
+          "verses": [...],
+          "likeCount": 456,
+          "bookmarkCount": 234,
+          "shareCount": 128
+        },
+        "poem": {...},
+        "poet": {...},
+        "trendScore": 892.5,
+        "trendRank": 1,
+        "periodDays": 7
+      }
+    ],
+    "totalElements": 234,
+    "totalPages": 12
+  }
+}
+```
+
+**Trend Score Calculation:**
+```
+trendScore = (likesInPeriod * 1.0) +
+             (sharesInPeriod * 2.5) +
+             (bookmarksInPeriod * 1.5)
+
+With recency boost for very recent engagements
+```
+
+**Use Cases:**
+1. **Home Screen:** "Trending This Week" widget
+2. **Discovery:** Help users discover currently popular couplets
+3. **Notifications:** Alert users about trending content from followed poets
+4. **Poet Profile:** Show trending couplets on poet's page
+
+**Flutter Integration Example:**
+```dart
+class DiscoveryScreen extends StatelessWidget {
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        // Trending this week
+        TrendingCoupletsWidget(days: 7),
+
+        // Most liked all time
+        MostLikedCoupletsWidget(),
+
+        // Most shared this month
+        MostSharedCoupletsWidget(),
+      ],
+    );
+  }
+}
+
+class TrendingCoupletsWidget extends StatelessWidget {
+  final int days;
+
+  Future<List<CoupletWithContext>> loadTrendingCouplets() async {
+    final response = await dio.get(
+      '/api/analytics/couplets/trending',
+      queryParameters: {'days': days, 'size': 10},
+    );
+
+    final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(response.data);
+    final content = apiResponse.data!['content'] as List;
+    return content.map((json) => CoupletWithContext.fromJson(json)).toList();
+  }
+}
+```
+
+**Performance Notes:**
+- Analytics endpoints are cached for 5-15 minutes
+- No authentication required - safe for public discovery
+- Optimized queries with database indices
+- Response times < 200ms for most queries
+
+---
+
 ### 6.6 Use Cases & Workflows {#66-use-cases-workflows}
 
 **1. Display Poem with Couplets:**
@@ -4693,6 +5178,232 @@ Get available templates for image generation.
   }
 }
 ```
+
+---
+
+#### 7.2.3 Get Popular Templates (NEW) {#723-get-popular-templates-new}
+
+**Endpoint:** `GET /api/image-templates/popular?limit=10`
+
+**Authentication Required:** No (Public endpoint)
+
+**Description:**
+Get most popular templates based on usage count. Perfect for featuring trending templates in the app.
+
+**Query Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `limit` | number | No | Number of templates to return (default: 10, max: 50) |
+
+**Example Request:**
+```http
+GET /api/image-templates/popular?limit=10
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Popular templates retrieved successfully",
+  "data": [
+    {
+      "publicId": "tmpl_abc123",
+      "name": "Floral Elegance",
+      "description": "Beautiful floral design with Urdu calligraphy",
+      "thumbnailUrl": "https://cdn.poetry.com/templates/thumbs/floral-001.jpg",
+      "imageUrl": "https://cdn.poetry.com/templates/floral-001.jpg",
+      "isPremium": false,
+      "usageCount": 2847,
+      "rank": 1,
+      "tags": ["floral", "elegant", "traditional"]
+    },
+    {
+      "publicId": "tmpl_def456",
+      "name": "Modern Minimalist",
+      "description": "Clean and modern design for contemporary poetry",
+      "thumbnailUrl": "https://cdn.poetry.com/templates/thumbs/modern-002.jpg",
+      "imageUrl": "https://cdn.poetry.com/templates/modern-002.jpg",
+      "isPremium": true,
+      "usageCount": 1923,
+      "rank": 2,
+      "tags": ["modern", "minimalist", "clean"]
+    }
+  ]
+}
+```
+
+**Flutter Usage:**
+```dart
+Future<List<ImageTemplate>> getPopularTemplates({int limit = 10}) async {
+  final response = await dio.get(
+    '/api/image-templates/popular',
+    queryParameters: {'limit': limit},
+  );
+
+  final apiResponse = ApiResponse<List<dynamic>>.fromJson(response.data);
+  return apiResponse.data!
+      .map((json) => ImageTemplate.fromJson(json))
+      .toList();
+}
+
+// UI Implementation
+class PopularTemplatesSection extends StatelessWidget {
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<ImageTemplate>>(
+      future: getPopularTemplates(limit: 5),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return CircularProgressIndicator();
+
+        return GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 0.8,
+          ),
+          itemCount: snapshot.data!.length,
+          itemBuilder: (context, index) {
+            final template = snapshot.data![index];
+            return TemplateCard(
+              template: template,
+              showUsageCount: true,
+            );
+          },
+        );
+      },
+    );
+  }
+}
+```
+
+**Use Cases:**
+1. **Template Selection Screen:** Show popular templates first
+2. **Onboarding:** Display most popular templates to new users
+3. **Homepage Widget:** "Popular Templates This Week"
+4. **A/B Testing:** Compare usage patterns between templates
+
+---
+
+#### 7.2.4 Get Template Statistics (NEW) {#724-get-template-statistics-new}
+
+**Endpoint:** `GET /api/image-templates/stats`
+
+**Authentication Required:** No (Public endpoint)
+
+**Description:**
+Get comprehensive statistics about image templates, including total count, premium vs free breakdown, and usage metrics.
+
+**Example Request:**
+```http
+GET /api/image-templates/stats
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Template statistics retrieved successfully",
+  "data": {
+    "totalTemplates": 156,
+    "freeTemplates": 98,
+    "premiumTemplates": 58,
+    "totalUsage": 45678,
+    "averageUsagePerTemplate": 293,
+    "mostPopularTemplate": {
+      "publicId": "tmpl_abc123",
+      "name": "Floral Elegance",
+      "usageCount": 2847
+    },
+    "recentlyAdded": 12,
+    "categories": [
+      {
+        "category": "Traditional",
+        "count": 45
+      },
+      {
+        "category": "Modern",
+        "count": 38
+      },
+      {
+        "category": "Minimalist",
+        "count": 32
+      }
+    ],
+    "usageByMonth": [
+      {
+        "month": "2026-01",
+        "totalUsage": 5634
+      },
+      {
+        "month": "2025-12",
+        "totalUsage": 4821
+      }
+    ]
+  }
+}
+```
+
+**Flutter Usage:**
+```dart
+class TemplateStatsResponse {
+  final int totalTemplates;
+  final int freeTemplates;
+  final int premiumTemplates;
+  final int totalUsage;
+  final int averageUsagePerTemplate;
+
+  TemplateStatsResponse.fromJson(Map<String, dynamic> json)
+    : totalTemplates = json['totalTemplates'],
+      freeTemplates = json['freeTemplates'],
+      premiumTemplates = json['premiumTemplates'],
+      totalUsage = json['totalUsage'],
+      averageUsagePerTemplate = json['averageUsagePerTemplate'];
+}
+
+Future<TemplateStatsResponse> getTemplateStats() async {
+  final response = await dio.get('/api/image-templates/stats');
+
+  final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(response.data);
+  return TemplateStatsResponse.fromJson(apiResponse.data!);
+}
+
+// Analytics Dashboard
+class TemplateAnalyticsDashboard extends StatelessWidget {
+  Widget build(BuildContext context) {
+    return FutureBuilder<TemplateStatsResponse>(
+      future: getTemplateStats(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return CircularProgressIndicator();
+
+        final stats = snapshot.data!;
+        return Column(
+          children: [
+            StatCard(
+              title: "Total Templates",
+              value: stats.totalTemplates.toString(),
+              subtitle: "${stats.freeTemplates} free, ${stats.premiumTemplates} premium",
+            ),
+            StatCard(
+              title: "Total Usage",
+              value: stats.totalUsage.toString(),
+              subtitle: "Avg ${stats.averageUsagePerTemplate} per template",
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+```
+
+**Use Cases:**
+1. **Admin Dashboard:** Monitor template library health
+2. **Product Analytics:** Track which template categories are popular
+3. **Content Strategy:** Identify gaps in template offerings
+4. **User Insights:** Understand user preferences for template styles
+
+**Performance Notes:**
+- Statistics are cached for 1 hour
+- Lightweight query optimized for dashboard loading
+- No authentication required for public stats
 
 ---
 
@@ -5934,6 +6645,409 @@ void onSearchChanged(String query) {
 
 ---
 
+### 10.5.1 Structured Autocomplete (Suggest) ⭐ NEW
+
+**Endpoint:** `GET /api/search/suggest?q={query}&lang={lang}&limit={limit}`
+
+**Description:** Enhanced autocomplete endpoint with flat, sorted suggestion list. Returns unified suggestions across all content types in a single sorted array (by score), making it easier to render in UI. This is the **recommended** endpoint for new implementations.
+
+**Query Parameters:**
+- `q` (required) - Search query (minimum 2 characters)
+- `lang` (optional, default: `ur`) - Language code (ur, en, hi)
+- `limit` (optional, default: `10`, max: `20`) - Maximum number of suggestions
+
+**Example Requests:**
+
+**English Query:**
+```bash
+curl "http://localhost:8081/api/search/suggest?q=love&lang=en&limit=5"
+```
+
+**Urdu Query:**
+```bash
+curl "http://localhost:8081/api/search/suggest?q=غالب&lang=ur&limit=10"
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Found 3 suggestions",
+  "data": {
+    "suggestions": [
+      {
+        "text": "Love Poetry",
+        "type": "CATEGORY",
+        "publicId": "efb77fbf-2937-46a0-97f9-8d9a49ddd575",
+        "score": 3.0,
+        "icon": "📁",
+        "subtitle": "Poetry expressing romantic and divine love"
+      },
+      {
+        "text": "Mirza Ghalib",
+        "type": "POET",
+        "publicId": "cc44d698-c4e2-4375-839b-f5ddfa05b167",
+        "score": 2.5,
+        "icon": "👤",
+        "subtitle": "Classical Era · 1797-1869"
+      },
+      {
+        "text": "Dil Ki Basti",
+        "type": "POEM",
+        "publicId": "xyz789",
+        "score": 2.0,
+        "icon": "📜",
+        "subtitle": "Nasir Kazmi"
+      }
+    ],
+    "totalCount": 3,
+    "query": "love"
+  }
+}
+```
+
+**Response Format:**
+
+Each suggestion includes:
+- `text` - Display text (poet name, poem title, category name, etc.)
+- `type` - Content type: `POET`, `POEM`, `CATEGORY`, `TAG`, `VERSE`
+- `publicId` - Unique identifier for navigation
+- `score` - Relevance score (higher = more relevant)
+- `icon` - Emoji icon for UI display
+  - 👤 Poet
+  - 📜 Poem
+  - 📁 Category
+  - 🏷️ Tag
+  - 📝 Verse
+- `subtitle` - Context information (null if not applicable)
+  - Poet: "Classical Era · 1797-1869"
+  - Poem: "Poet Name"
+  - Category: Description
+  - Verse: Poem title
+
+**Key Improvements over `/autocomplete`:**
+1. **Flat Structure:** Single sorted array instead of grouped by type
+2. **UI-Ready:** Includes icons and subtitles for instant rendering
+3. **Strict Null Handling:** No placeholder values ("Unknown", "Untitled") - uses null instead
+4. **Score-Sorted:** Results sorted by relevance score (highest first)
+5. **Simpler Parsing:** No need to iterate through multiple arrays
+
+**Flutter Implementation Example:**
+```dart
+class SearchSuggestion {
+  final String text;
+  final String type;
+  final String publicId;
+  final double score;
+  final String icon;
+  final String? subtitle;
+
+  // Navigate based on type
+  void navigate(BuildContext context) {
+    switch (type) {
+      case 'POET':
+        Navigator.push(context, PoetDetailScreen(poetId: publicId));
+        break;
+      case 'POEM':
+        Navigator.push(context, PoemDetailScreen(poemId: publicId));
+        break;
+      case 'CATEGORY':
+        Navigator.push(context, CategoryScreen(categoryId: publicId));
+        break;
+      // ... handle other types
+    }
+  }
+}
+
+// Simple ListView rendering
+ListView.builder(
+  itemCount: suggestions.length,
+  itemBuilder: (context, index) {
+    final suggestion = suggestions[index];
+    return ListTile(
+      leading: Text(suggestion.icon, style: TextStyle(fontSize: 24)),
+      title: Text(suggestion.text),
+      subtitle: suggestion.subtitle != null
+        ? Text(suggestion.subtitle!)
+        : null,
+      onTap: () => suggestion.navigate(context),
+    );
+  },
+)
+```
+
+**Performance:**
+- **Cache TTL:** 5 minutes (Redis/In-memory)
+- **Response Time:** <100ms
+- **Rate Limiting:** 60 requests/minute per IP
+
+---
+
+### 10.5.2 Discover Bundle ⭐ NEW
+
+**Endpoint:** `GET /api/discover?lang={lang}`
+
+**Description:** **Single endpoint that replaces 6-7 separate API calls** for the discover/home screen. Returns a complete bundle including trending searches, featured poems, recommended content, featured poets, and categories. Optimized with 15-minute caching for fast load times.
+
+**Authentication:** Required (JWT token via Authorization header)
+
+**Query Parameters:**
+- `lang` (optional, default: `ur`) - Language code (ur, en, hi)
+
+**Headers:**
+- `Authorization` (required) - Bearer token from login
+- `X-User-Id` (optional) - For personalized recommendations
+
+**Example Request:**
+```bash
+# Authenticated request
+curl -H "Authorization: Bearer eyJhbGci..." \
+  "http://localhost:8081/api/discover?lang=ur"
+
+# With user ID for personalization
+curl -H "Authorization: Bearer eyJhbGci..." \
+     -H "X-User-Id: 12345" \
+  "http://localhost:8081/api/discover?lang=ur"
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Discover bundle retrieved successfully",
+  "data": {
+    "trendingSearches": {
+      "daily": [
+        {
+          "query": "غالب",
+          "searchCount": 21,
+          "rank": 1
+        },
+        {
+          "query": "فیض",
+          "searchCount": 20,
+          "rank": 2
+        }
+      ],
+      "weekly": [
+        {
+          "query": "غالب",
+          "searchCount": 45,
+          "rank": 1
+        }
+      ]
+    },
+    "editorsPicks": {
+      "sectionTitle": "Editor's Picks",
+      "sectionKey": "discover.editors_picks",
+      "items": [
+        {
+          "type": "POEM",
+          "publicId": "abc123",
+          "primaryText": "دل کی بستی",
+          "secondaryText": "ناصر کاظمی",
+          "badge": "غزل",
+          "badgeKey": "poetry.type.ghazal",
+          "metrics": {
+            "likeCount": 250,
+            "shareCount": 50,
+            "bookmarkCount": 100,
+            "viewCount": 1000
+          },
+          "language": "ur",
+          "direction": "rtl",
+          "score": null
+        }
+      ],
+      "totalCount": 10
+    },
+    "recommended": {
+      "sectionTitle": "Recommended for You",
+      "sectionKey": "discover.recommended",
+      "items": [],
+      "totalCount": 0
+    },
+    "featuredPoets": {
+      "sectionTitle": "Featured Poets",
+      "sectionKey": "discover.featured_poets",
+      "items": [
+        {
+          "type": "POET",
+          "publicId": "poet123",
+          "primaryText": "مرزا غالب",
+          "secondaryText": "Classical Era · 1797-1869",
+          "badge": "شاعر",
+          "badgeKey": "content.type.poet",
+          "metrics": {
+            "viewCount": 5000
+          },
+          "language": "ur",
+          "direction": "rtl",
+          "score": null
+        }
+      ],
+      "totalCount": 6
+    },
+    "categories": {
+      "sectionTitle": "Browse by Category",
+      "sectionKey": "discover.categories",
+      "items": [
+        {
+          "type": "CATEGORY",
+          "publicId": "cat123",
+          "primaryText": "Classical Poetry",
+          "secondaryText": "-",
+          "badge": "Category",
+          "badgeKey": "content.type.category",
+          "metrics": null,
+          "language": "ur",
+          "direction": "rtl",
+          "score": null
+        }
+      ],
+      "totalCount": 8
+    },
+    "language": "ur",
+    "personalized": true,
+    "timestamp": 1738961505210
+  }
+}
+```
+
+**Bundle Sections:**
+
+1. **trendingSearches** - Trending queries (daily + weekly top 4 each)
+2. **editorsPicks** - Featured poems sorted by engagement (10 items)
+3. **recommended** - Personalized or trending content (10 items)
+   - Personalized if `X-User-Id` provided
+   - Trending content for guests
+4. **featuredPoets** - Mix of featured + trending poets (6 items)
+5. **categories** - Top 8 categories
+
+**Unified ContentCardDto Format:**
+
+All content items use the same structure:
+```typescript
+{
+  type: "POET" | "POEM" | "VERSE" | "COUPLET" | "CATEGORY" | "TAG",
+  publicId: string,
+  primaryText: string,           // Main text (name/title/verse text)
+  secondaryText: string | null,   // Context (poet name, era, etc.)
+  badge: string | null,           // Display badge text
+  badgeKey: string | null,        // i18n key for badge
+  metrics: {                      // Engagement metrics (null if not applicable)
+    likeCount?: number,
+    shareCount?: number,
+    bookmarkCount?: number,
+    viewCount?: number
+  } | null,
+  language: string,               // ur, en, hi
+  direction: "rtl" | "ltr",      // Text direction
+  score: number | null            // Relevance score (search results only)
+}
+```
+
+**Key Benefits:**
+
+1. **Single API Call:** Replaces:
+   - `/api/poems/featured`
+   - `/api/poets/featured`
+   - `/api/search/recommendations`
+   - `/api/search/trending`
+   - `/api/categories`
+   - `/api/search/related`
+   - And more...
+
+2. **Fast Performance:**
+   - **With cache:** <500ms
+   - **Without cache:** <2s
+   - **Cache duration:** 15 minutes
+   - **Cache key:** Per language + user
+
+3. **UI-Ready Data:**
+   - No placeholder values ("Unknown", "Untitled")
+   - Consistent format across all content types
+   - Pre-calculated metrics
+   - RTL/LTR direction included
+
+4. **Personalization:**
+   - Personalized recommendations for authenticated users
+   - Trending content for guests
+   - Language-aware content filtering
+
+**Flutter Implementation Example:**
+```dart
+class DiscoverScreen extends StatefulWidget {
+  @override
+  _DiscoverScreenState createState() => _DiscoverScreenState();
+}
+
+class _DiscoverScreenState extends State<DiscoverScreen> {
+  Future<DiscoverBundle>? _bundleFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _bundleFuture = _loadDiscoverBundle();
+  }
+
+  Future<DiscoverBundle> _loadDiscoverBundle() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/api/discover?lang=${AppLocalizations.currentLocale}'),
+      headers: {
+        'Authorization': 'Bearer ${AuthService.token}',
+        'X-User-Id': '${AuthService.userId}',
+      },
+    );
+    return DiscoverBundle.fromJson(jsonDecode(response.body)['data']);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: FutureBuilder<DiscoverBundle>(
+        future: _bundleFuture,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final bundle = snapshot.data!;
+            return RefreshIndicator(
+              onRefresh: () async {
+                setState(() {
+                  _bundleFuture = _loadDiscoverBundle();
+                });
+              },
+              child: ListView(
+                children: [
+                  TrendingSearchesWidget(bundle.trendingSearches),
+                  ContentSectionWidget(bundle.editorsPicks),
+                  ContentSectionWidget(bundle.recommended),
+                  ContentSectionWidget(bundle.featuredPoets),
+                  ContentSectionWidget(bundle.categories),
+                ],
+              ),
+            );
+          }
+          return LoadingWidget();
+        },
+      ),
+    );
+  }
+}
+```
+
+**Cache Strategy:**
+- Cached per language and user combination
+- 15-minute TTL (time to live)
+- Automatic invalidation on content updates
+- In-memory cache (SimpleCacheManager) or Redis
+
+**Error Handling:**
+- Graceful fallbacks for empty sections
+- Individual section errors don't break entire bundle
+- Each section wrapped in try-catch
+
+---
+
 ### 10.6 Recommendations
 
 **Endpoint:** `GET /api/search/recommendations?type={type}&limit={limit}`
@@ -6525,13 +7639,336 @@ curl -X DELETE "http://localhost:9200/search_queries"
 
 ### 11.4 Languages
 
-**Get All:** `GET /api/languages`
+#### 11.4.1 Get All Languages {#1141-get-all-languages}
 
-**By Code:** `GET /api/languages/{code}`
+**Endpoint:** `GET /api/languages`
 
-**Active Languages:** `GET /api/languages/active`
+**Authentication Required:** No
 
-Supported: Urdu (ur), English (en), Hindi (hi), Arabic (ar), Persian (fa), Punjabi (pa)
+**Description:** Get all languages in the system, including both active and inactive ones.
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Languages retrieved successfully",
+  "data": [
+    {
+      "code": "ur",
+      "name": "Urdu",
+      "nativeName": "اردو",
+      "direction": "RTL",
+      "isActive": true,
+      "displayOrder": 1
+    },
+    {
+      "code": "en",
+      "name": "English",
+      "nativeName": "English",
+      "direction": "LTR",
+      "isActive": true,
+      "displayOrder": 2
+    },
+    {
+      "code": "hi",
+      "name": "Hindi",
+      "nativeName": "हिन्दी",
+      "direction": "LTR",
+      "isActive": true,
+      "displayOrder": 3
+    },
+    {
+      "code": "ar",
+      "name": "Arabic",
+      "nativeName": "العربية",
+      "direction": "RTL",
+      "isActive": true,
+      "displayOrder": 4
+    },
+    {
+      "code": "fa",
+      "name": "Persian",
+      "nativeName": "فارسی",
+      "direction": "RTL",
+      "isActive": true,
+      "displayOrder": 5
+    },
+    {
+      "code": "pa",
+      "name": "Punjabi",
+      "nativeName": "ਪੰਜਾਬੀ",
+      "direction": "LTR",
+      "isActive": true,
+      "displayOrder": 6
+    }
+  ]
+}
+```
+
+---
+
+#### 11.4.2 Get Language by Code {#1142-get-language-by-code}
+
+**Endpoint:** `GET /api/languages/{code}`
+
+**Authentication Required:** No
+
+**Path Parameters:**
+- `code`: Language code (ur, en, hi, ar, fa, pa)
+
+**Example:** `GET /api/languages/ur`
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Language retrieved successfully",
+  "data": {
+    "code": "ur",
+    "name": "Urdu",
+    "nativeName": "اردو",
+    "direction": "RTL",
+    "isActive": true,
+    "displayOrder": 1
+  }
+}
+```
+
+---
+
+#### 11.4.3 Get Active Languages (NEW) {#1143-get-active-languages-new}
+
+**Endpoint:** `GET /api/languages/active`
+
+**Authentication Required:** No
+
+**Description:**
+Get only active languages (those enabled in the system). This is the recommended endpoint for mobile apps to populate language selection menus.
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Active languages retrieved successfully",
+  "data": [
+    {
+      "code": "ur",
+      "name": "Urdu",
+      "nativeName": "اردو",
+      "direction": "RTL",
+      "isActive": true,
+      "displayOrder": 1
+    },
+    {
+      "code": "en",
+      "name": "English",
+      "nativeName": "English",
+      "direction": "LTR",
+      "isActive": true,
+      "displayOrder": 2
+    },
+    {
+      "code": "hi",
+      "name": "Hindi",
+      "nativeName": "हिन्दी",
+      "direction": "LTR",
+      "isActive": true,
+      "displayOrder": 3
+    }
+  ]
+}
+```
+
+**Flutter Usage:**
+```dart
+class LanguageSelectionScreen extends StatelessWidget {
+  Future<List<Language>> getActiveLanguages() async {
+    final response = await dio.get('/api/languages/active');
+
+    final apiResponse = ApiResponse<List<dynamic>>.fromJson(response.data);
+    return apiResponse.data!
+        .map((json) => Language.fromJson(json))
+        .toList();
+  }
+
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<Language>>(
+      future: getActiveLanguages(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return CircularProgressIndicator();
+
+        return ListView.builder(
+          itemCount: snapshot.data!.length,
+          itemBuilder: (context, index) {
+            final lang = snapshot.data![index];
+            return ListTile(
+              title: Text(lang.name),
+              subtitle: Text(lang.nativeName),
+              trailing: Icon(
+                lang.direction == 'RTL'
+                  ? Icons.format_textdirection_r_to_l
+                  : Icons.format_textdirection_l_to_r
+              ),
+              onTap: () => setAppLanguage(lang.code),
+            );
+          },
+        );
+      },
+    );
+  }
+}
+```
+
+**Use Cases:**
+1. **Language Selector:** Show available languages in settings
+2. **Content Filter:** Allow filtering content by language
+3. **Multi-Language UI:** Support RTL and LTR layouts based on language direction
+4. **Localization:** Dynamically load language-specific resources
+
+**Supported Languages:**
+- **Urdu (ur)** - اردو - RTL - Primary language
+- **English (en)** - English - LTR - International
+- **Hindi (hi)** - हिन्दी - LTR - Regional
+- **Arabic (ar)** - العربية - RTL - Classical poetry
+- **Persian (fa)** - فارسی - RTL - Persian poetry
+- **Punjabi (pa)** - ਪੰਜਾਬੀ - LTR - Regional
+
+---
+
+#### 11.4.4 Dictionary Sync & Stats (NEW) {#1144-dictionary-sync-stats-new}
+
+**Base Path:** `/api/dictionary`
+
+**Description:**
+Endpoints for syncing transliteration dictionary and viewing dictionary statistics. Useful for offline dictionary downloads and app health monitoring.
+
+##### Dictionary Sync
+
+**Endpoint:** `GET /api/dictionary/sync`
+
+**Authentication Required:** No (Public endpoint)
+
+**Description:**
+Download the latest Urdu transliteration dictionary for offline use. Returns dictionary entries with Urdu words, Roman transliterations, and Hindi scripts.
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Dictionary synchronized successfully",
+  "data": {
+    "version": "2.0.1",
+    "lastUpdated": "2026-01-28T10:00:00Z",
+    "totalEntries": 12456,
+    "entries": [
+      {
+        "word": "محبت",
+        "roman": "muhabbat",
+        "hindi": "मुहब्बत",
+        "meaning": "love",
+        "confidence": "HIGH"
+      },
+      {
+        "word": "دل",
+        "roman": "dil",
+        "hindi": "दिल",
+        "meaning": "heart",
+        "confidence": "HIGH"
+      },
+      {
+        "word": "شعر",
+        "roman": "sher",
+        "hindi": "शेर",
+        "meaning": "poetry/couplet",
+        "confidence": "HIGH"
+      }
+    ],
+    "checksum": "a3c4e7f9..."
+  }
+}
+```
+
+**Flutter Usage:**
+```dart
+class DictionaryService {
+  Future<void> syncDictionary() async {
+    final response = await dio.get('/api/dictionary/sync');
+    final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(response.data);
+    final data = apiResponse.data!;
+
+    // Save to local database for offline transliteration
+    await localDatabase.saveDictionary(
+      version: data['version'],
+      entries: data['entries'],
+      checksum: data['checksum'],
+    );
+  }
+
+  // Check if dictionary needs update
+  Future<bool> needsUpdate() async {
+    final localVersion = await localDatabase.getDictionaryVersion();
+    final response = await dio.get('/api/dictionary/stats');
+    final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(response.data);
+    final remoteVersion = apiResponse.data!['version'];
+
+    return localVersion != remoteVersion;
+  }
+}
+```
+
+---
+
+##### Dictionary Statistics
+
+**Endpoint:** `GET /api/dictionary/stats`
+
+**Authentication Required:** No (Public endpoint)
+
+**Description:**
+Get comprehensive statistics about the transliteration dictionary. Useful for app health monitoring and displaying dictionary coverage information.
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Dictionary statistics retrieved successfully",
+  "data": {
+    "version": "2.0.1",
+    "lastUpdated": "2026-01-28T10:00:00Z",
+    "totalEntries": 12456,
+    "validatedEntries": 11234,
+    "validationCoverage": 90.2,
+    "entriesBySource": {
+      "manual": 8934,
+      "automated": 3522
+    },
+    "entriesByConfidence": {
+      "high": 9821,
+      "medium": 2145,
+      "low": 490
+    },
+    "hindiScriptCoverage": 95.6,
+    "romanScriptCoverage": 100.0,
+    "recentAdditions": {
+      "last7Days": 45,
+      "last30Days": 189
+    }
+  }
+}
+```
+
+**Use Cases:**
+1. **Offline Mode:** Download dictionary for offline transliteration
+2. **App Health:** Monitor dictionary coverage and quality
+3. **User Info:** Display dictionary version in app settings
+4. **Smart Sync:** Only sync when dictionary version changes
+5. **Quality Metrics:** Show transliteration accuracy to users
+
+**Performance Notes:**
+- Dictionary sync response cached for 1 hour
+- Gzipped response for efficient transfer
+- Incremental sync planned for future versions
+- Checksum verification for data integrity
 
 ---
 
@@ -6912,6 +8349,28 @@ class Couplet {
 
 ## Appendix C: Changelog
 
+### January 2026 ⭐ NEW
+- **Added Poet Follow System** (4 endpoints)
+  - Follow/unfollow poets
+  - Get following list
+  - Check follow status
+- **Added Couplet Analytics Endpoints** (3 endpoints)
+  - Most liked couplets (global and by poet)
+  - Most shared couplets
+  - Trending couplets with timeframe filtering
+- **Added Image Template Endpoints** (2 endpoints)
+  - Get popular templates
+  - Get template statistics
+- **Enhanced Language Endpoints**
+  - Get active languages (optimized for mobile apps)
+- **Added Dictionary Sync System** (2 endpoints)
+  - Dictionary sync for offline transliteration
+  - Dictionary statistics and health metrics
+- **Documentation Improvements**
+  - Comprehensive Flutter code examples
+  - Use case scenarios for all new features
+  - Performance notes and best practices
+
 ### December 2025
 - Added Couplet Engagement System (13 endpoints)
 - Added Image Poetry Generation (11 endpoints)
@@ -6940,7 +8399,7 @@ For issues or questions:
 - GitHub: https://github.com/your-repo/issues
 - Email: support@poetry.com
 
-**Documentation Version:** 1.0.0
-**Last Updated:** December 28, 2025
+**Documentation Version:** 1.1.0
+**Last Updated:** January 28, 2026
 
 ---

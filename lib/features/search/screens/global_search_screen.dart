@@ -38,12 +38,6 @@ class GlobalSearchScreen extends ConsumerWidget {
             child: DiscoverHeroHeader(
               autofocus: true, // Auto-focus in standalone screen
               showBackButton: true, // Show back button
-              onMenuTap: () {
-                // Back button handled by DiscoverHeroHeader
-              },
-              onProfileTap: () {
-                // TODO: Navigate to profile
-              },
             ),
           ),
 

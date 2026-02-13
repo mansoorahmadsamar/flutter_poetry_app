@@ -50,12 +50,8 @@ mixin _$PoetModel {
   @JsonKey(name: 'isActive')
   bool get isActive => throw _privateConstructorUsedError;
 
-  /// Serializes this PoetModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of PoetModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $PoetModelCopyWith<PoetModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -96,8 +92,6 @@ class _$PoetModelCopyWithImpl<$Res, $Val extends PoetModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of PoetModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -234,8 +228,6 @@ class __$$PoetModelImplCopyWithImpl<$Res>
       _$PoetModelImpl _value, $Res Function(_$PoetModelImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of PoetModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -462,7 +454,7 @@ class _$PoetModelImpl implements _PoetModel {
                 other.isActive == isActive));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -485,9 +477,7 @@ class _$PoetModelImpl implements _PoetModel {
       const DeepCollectionEquality().hash(_topTags),
       isActive);
 
-  /// Create a copy of PoetModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$PoetModelImplCopyWith<_$PoetModelImpl> get copyWith =>
@@ -540,10 +530,10 @@ abstract class _PoetModel implements PoetModel {
   @JsonKey(name: 'profileImageUrl')
   String? get profileImageUrl;
   @override
-  String? get gender; // MALE, FEMALE, OTHER
-  @override
-  String? get era; // CLASSICAL, MODERN, CONTEMPORARY, EMERGING
-  @override
+  String? get gender;
+  @override // MALE, FEMALE, OTHER
+  String? get era;
+  @override // CLASSICAL, MODERN, CONTEMPORARY, EMERGING
   int get poemCount;
   @override
   int get viewCount;
@@ -570,11 +560,8 @@ abstract class _PoetModel implements PoetModel {
   @override
   @JsonKey(name: 'isActive')
   bool get isActive;
-
-  /// Create a copy of PoetModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$PoetModelImplCopyWith<_$PoetModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

@@ -6,7 +6,7 @@ import '../../features/main/main_screen.dart';
 import '../../features/main/tabs/poets/screens/poet_detail_screen.dart';
 import '../../features/main/tabs/poets/screens/poem_detail_screen.dart';
 import '../../features/search/screens/poets_search_screen.dart';
-import '../../features/search/screens/global_search_screen.dart';
+import '../../features/search/screens/search_screen.dart';
 import '../../features/search/screens/category_results_screen.dart';
 import '../../features/engagement/screens/bookmark_search_screen.dart';
 import '../../features/engagement/screens/bookmarked_couplets_screen.dart';
@@ -167,7 +167,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/search',
         name: 'global-search',
-        builder: (context, state) => const GlobalSearchScreen(),
+        builder: (context, state) => const SearchScreen(),
       ),
       GoRoute(
         path: '/search/results/:category',

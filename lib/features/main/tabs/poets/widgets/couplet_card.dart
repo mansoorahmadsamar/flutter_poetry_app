@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
+import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/core/widgets/localized_text.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/couplet_model.dart';
+import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/widgets/couplet_engagement_buttons.dart';
 
 class CoupletCard extends ConsumerStatefulWidget {
@@ -34,6 +36,8 @@ class _CoupletCardState extends ConsumerState<CoupletCard> {
   @override
   Widget build(BuildContext context) {
     final couplet = widget.couplet;
+    final languageCode = ref.watch(selectedLanguageProvider);
+    final isUrdu = languageCode == 'ur';
 
     return GestureDetector(
       onTap: widget.onTap ?? _toggleEngagementButtons,
@@ -55,7 +59,7 @@ class _CoupletCardState extends ConsumerState<CoupletCard> {
               // Couplet type badge
               if (couplet.coupletTypeName != null)
                 Align(
-                  alignment: Alignment.topLeft,
+                  alignment: AlignmentDirectional.topStart,
                   child: Chip(
                     label: Text(
                       couplet.coupletTypeName!,
@@ -71,19 +75,8 @@ class _CoupletCardState extends ConsumerState<CoupletCard> {
 
               SizedBox(height: AppSpacing.sm),
 
-              // Verses
-              ...couplet.verses.map((verse) => Padding(
-                    padding: EdgeInsets.symmetric(vertical: AppSpacing.xs),
-                    child: LocalizedText(
-                      verse.text,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        height: 1.8,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  )),
+              // Verses - show romanization only for non-Urdu languages
+              ...couplet.verses.map((verse) => _buildVerseText(verse, isUrdu)),
 
               // Engagement buttons (shown on tap/long-press)
               if (_showEngagementButtons) ...[
@@ -98,6 +91,44 @@ class _CoupletCardState extends ConsumerState<CoupletCard> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  /// Build verse text with optional romanization
+  /// For Urdu: Show only the Arabic script text
+  /// For English/Hindi: Show primary text + romanized text (if available)
+  Widget _buildVerseText(VerseModel verse, bool isUrdu) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: AppSpacing.xs),
+      child: Column(
+        children: [
+          // Primary verse text (always shown)
+          LocalizedText(
+            verse.text,
+            style: const TextStyle(
+              fontSize: 20,
+              height: 1.8,
+              fontWeight: FontWeight.w400,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          // Romanized text (only for non-Urdu if available)
+          if (!isUrdu && verse.romanizedText != null && verse.romanizedText!.isNotEmpty) ...[
+            SizedBox(height: AppSpacing.xs),
+            Text(
+              verse.romanizedText!,
+              style: TextStyle(
+                fontSize: 14,
+                height: 1.5,
+                fontWeight: FontWeight.w300,
+                fontStyle: FontStyle.italic,
+                color: AppColors.textSecondaryLight,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ],
       ),
     );
   }

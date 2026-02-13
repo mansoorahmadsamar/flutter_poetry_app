@@ -42,9 +42,7 @@ mixin _$UnifiedBookmark {
   int? get bookmarkCount => throw _privateConstructorUsedError;
   int get shareCount => throw _privateConstructorUsedError;
 
-  /// Create a copy of UnifiedBookmark
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $UnifiedBookmarkCopyWith<UnifiedBookmark> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -87,8 +85,6 @@ class _$UnifiedBookmarkCopyWithImpl<$Res, $Val extends UnifiedBookmark>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of UnifiedBookmark
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -231,8 +227,6 @@ class __$$UnifiedBookmarkImplCopyWithImpl<$Res>
       _$UnifiedBookmarkImpl _value, $Res Function(_$UnifiedBookmarkImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of UnifiedBookmark
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -483,9 +477,7 @@ class _$UnifiedBookmarkImpl extends _UnifiedBookmark {
         shareCount
       ]);
 
-  /// Create a copy of UnifiedBookmark
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$UnifiedBookmarkImplCopyWith<_$UnifiedBookmarkImpl> get copyWith =>
@@ -519,22 +511,22 @@ abstract class _UnifiedBookmark extends UnifiedBookmark {
   @override
   String get bookmarkId;
   @override
-  String get type; // POEM, COUPLET, IMAGE
-  @override
+  String get type;
+  @override // POEM, COUPLET, IMAGE
   String get contentId;
   @override
   String get languageCode;
   @override
   DateTime get bookmarkedAt;
   @override
-  String? get notes; // POEM fields
-  @override
+  String? get notes;
+  @override // POEM fields
   String? get poemTitle;
   @override
   String? get poetName;
   @override
-  String? get poetId; // COUPLET fields
-  @override
+  String? get poetId;
+  @override // COUPLET fields
   @JsonKey(name: 'coupletFirstVerse')
   String? get coupletVerse1;
   @override
@@ -545,24 +537,21 @@ abstract class _UnifiedBookmark extends UnifiedBookmark {
   String? get coupletPoemTitle;
   @override
   @JsonKey(name: 'parentPoemId')
-  String? get coupletPoemPublicId; // IMAGE fields
-  @override
+  String? get coupletPoemPublicId;
+  @override // IMAGE fields
   String? get imageUrl;
   @override
   String? get thumbnailUrl;
   @override
-  String? get templateName; // Common metrics
-  @override
+  String? get templateName;
+  @override // Common metrics
   int get likeCount;
   @override
   int? get bookmarkCount;
   @override
   int get shareCount;
-
-  /// Create a copy of UnifiedBookmark
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$UnifiedBookmarkImplCopyWith<_$UnifiedBookmarkImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -578,9 +567,7 @@ mixin _$UnifiedBookmarksResponse {
   bool get last => throw _privateConstructorUsedError;
   bool get empty => throw _privateConstructorUsedError;
 
-  /// Create a copy of UnifiedBookmarksResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $UnifiedBookmarksResponseCopyWith<UnifiedBookmarksResponse> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -613,8 +600,6 @@ class _$UnifiedBookmarksResponseCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of UnifiedBookmarksResponse
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -694,8 +679,6 @@ class __$$UnifiedBookmarksResponseImplCopyWithImpl<$Res>
       $Res Function(_$UnifiedBookmarksResponseImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of UnifiedBookmarksResponse
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -816,9 +799,7 @@ class _$UnifiedBookmarksResponseImpl implements _UnifiedBookmarksResponse {
       last,
       empty);
 
-  /// Create a copy of UnifiedBookmarksResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$UnifiedBookmarksResponseImplCopyWith<_$UnifiedBookmarksResponseImpl>
@@ -853,11 +834,8 @@ abstract class _UnifiedBookmarksResponse implements UnifiedBookmarksResponse {
   bool get last;
   @override
   bool get empty;
-
-  /// Create a copy of UnifiedBookmarksResponse
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$UnifiedBookmarksResponseImplCopyWith<_$UnifiedBookmarksResponseImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
@@ -873,9 +851,7 @@ mixin _$BookmarkFilters {
   String get sortBy => throw _privateConstructorUsedError;
   String get sortDir => throw _privateConstructorUsedError;
 
-  /// Create a copy of BookmarkFilters
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $BookmarkFiltersCopyWith<BookmarkFilters> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -906,8 +882,6 @@ class _$BookmarkFiltersCopyWithImpl<$Res, $Val extends BookmarkFilters>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of BookmarkFilters
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -978,8 +952,6 @@ class __$$BookmarkFiltersImplCopyWithImpl<$Res>
       _$BookmarkFiltersImpl _value, $Res Function(_$BookmarkFiltersImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of BookmarkFilters
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1084,9 +1056,7 @@ class _$BookmarkFiltersImpl implements _BookmarkFilters {
   int get hashCode => Object.hash(
       runtimeType, type, language, searchQuery, page, size, sortBy, sortDir);
 
-  /// Create a copy of BookmarkFilters
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$BookmarkFiltersImplCopyWith<_$BookmarkFiltersImpl> get copyWith =>
@@ -1105,10 +1075,10 @@ abstract class _BookmarkFilters implements BookmarkFilters {
       final String sortDir}) = _$BookmarkFiltersImpl;
 
   @override
-  String get type; // ALL, POEM, COUPLET, IMAGE
-  @override
-  String get language; // ALL, ur, en, hi
-  @override
+  String get type;
+  @override // ALL, POEM, COUPLET, IMAGE
+  String get language;
+  @override // ALL, ur, en, hi
   String? get searchQuery;
   @override
   int get page;
@@ -1118,11 +1088,8 @@ abstract class _BookmarkFilters implements BookmarkFilters {
   String get sortBy;
   @override
   String get sortDir;
-
-  /// Create a copy of BookmarkFilters
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$BookmarkFiltersImplCopyWith<_$BookmarkFiltersImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1141,12 +1108,8 @@ mixin _$BookmarkStats {
   int get englishCount => throw _privateConstructorUsedError;
   int get hindiCount => throw _privateConstructorUsedError;
 
-  /// Serializes this BookmarkStats to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of BookmarkStats
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $BookmarkStatsCopyWith<BookmarkStats> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1177,8 +1140,6 @@ class _$BookmarkStatsCopyWithImpl<$Res, $Val extends BookmarkStats>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of BookmarkStats
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1249,8 +1210,6 @@ class __$$BookmarkStatsImplCopyWithImpl<$Res>
       _$BookmarkStatsImpl _value, $Res Function(_$BookmarkStatsImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of BookmarkStats
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1358,14 +1317,12 @@ class _$BookmarkStatsImpl implements _BookmarkStats {
                 other.hindiCount == hindiCount));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, totalBookmarks, poemCount,
       coupletCount, imageCount, urduCount, englishCount, hindiCount);
 
-  /// Create a copy of BookmarkStats
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$BookmarkStatsImplCopyWith<_$BookmarkStatsImpl> get copyWith =>
@@ -1406,11 +1363,8 @@ abstract class _BookmarkStats implements BookmarkStats {
   int get englishCount;
   @override
   int get hindiCount;
-
-  /// Create a copy of BookmarkStats
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$BookmarkStatsImplCopyWith<_$BookmarkStatsImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

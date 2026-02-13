@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
+import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/features/search/providers/search_providers.dart';
 
 class SearchSuggestionsSection extends ConsumerWidget {
@@ -12,6 +13,7 @@ class SearchSuggestionsSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final suggestedPoets = ref.watch(suggestedPoetsProvider);
+    final languageCode = ref.watch(selectedLanguageProvider);
 
     return suggestedPoets.when(
       data: (response) {
@@ -26,7 +28,7 @@ class SearchSuggestionsSection extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Suggested Poets',
+                  _getLocalizedTitle(languageCode),
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: AppColors.secondary,
                         fontWeight: FontWeight.bold,
@@ -34,7 +36,7 @@ class SearchSuggestionsSection extends ConsumerWidget {
                 ),
                 const SizedBox(height: AppSpacing.md),
                 SizedBox(
-                  height: 180,
+                  height: 200,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: response.content.length,
@@ -81,6 +83,18 @@ class SearchSuggestionsSection extends ConsumerWidget {
         child: SizedBox.shrink(),
       ),
     );
+  }
+
+  /// Get localized title for the section
+  String _getLocalizedTitle(String languageCode) {
+    switch (languageCode) {
+      case 'ur':
+        return 'تجویز کردہ شعراء';
+      case 'hi':
+        return 'सुझाए गए कवि';
+      default:
+        return 'Suggested Poets';
+    }
   }
 }
 
@@ -129,6 +143,7 @@ class _SuggestedPoetCard extends StatelessWidget {
           ),
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Poet Image

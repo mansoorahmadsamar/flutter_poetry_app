@@ -44,12 +44,8 @@ mixin _$GeneratedImageModel {
   bool? get isBookmarkedByCurrentUser => throw _privateConstructorUsedError;
   DateTime? get bookmarkedAt => throw _privateConstructorUsedError;
 
-  /// Serializes this GeneratedImageModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of GeneratedImageModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $GeneratedImageModelCopyWith<GeneratedImageModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -95,8 +91,6 @@ class _$GeneratedImageModelCopyWithImpl<$Res, $Val extends GeneratedImageModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of GeneratedImageModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -257,8 +251,6 @@ class __$$GeneratedImageModelImplCopyWithImpl<$Res>
       $Res Function(_$GeneratedImageModelImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of GeneratedImageModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -519,7 +511,7 @@ class _$GeneratedImageModelImpl implements _GeneratedImageModel {
                 other.bookmarkedAt == bookmarkedAt));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hashAll([
         runtimeType,
@@ -547,9 +539,7 @@ class _$GeneratedImageModelImpl implements _GeneratedImageModel {
         bookmarkedAt
       ]);
 
-  /// Create a copy of GeneratedImageModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$GeneratedImageModelImplCopyWith<_$GeneratedImageModelImpl> get copyWith =>
@@ -631,16 +621,13 @@ abstract class _GeneratedImageModel implements GeneratedImageModel {
   @override
   bool get isUserCreated;
   @override
-  DateTime? get createdAt; // Bookmark fields (NEW - Phase 1 & 2)
-  @override
+  DateTime? get createdAt;
+  @override // Bookmark fields (NEW - Phase 1 & 2)
   bool? get isBookmarkedByCurrentUser;
   @override
   DateTime? get bookmarkedAt;
-
-  /// Create a copy of GeneratedImageModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$GeneratedImageModelImplCopyWith<_$GeneratedImageModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -662,12 +649,8 @@ mixin _$GenerateImageRequest {
   Map<String, dynamic>? get customizations =>
       throw _privateConstructorUsedError;
 
-  /// Serializes this GenerateImageRequest to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of GenerateImageRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $GenerateImageRequestCopyWith<GenerateImageRequest> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -700,8 +683,6 @@ class _$GenerateImageRequestCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of GenerateImageRequest
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -778,8 +759,6 @@ class __$$GenerateImageRequestImplCopyWithImpl<$Res>
       $Res Function(_$GenerateImageRequestImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of GenerateImageRequest
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -902,7 +881,7 @@ class _$GenerateImageRequestImpl implements _GenerateImageRequest {
                 .equals(other._customizations, _customizations));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -915,9 +894,7 @@ class _$GenerateImageRequestImpl implements _GenerateImageRequest {
       customTextColor,
       const DeepCollectionEquality().hash(_customizations));
 
-  /// Create a copy of GenerateImageRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$GenerateImageRequestImplCopyWith<_$GenerateImageRequestImpl>
@@ -948,8 +925,8 @@ abstract class _GenerateImageRequest implements GenerateImageRequest {
       _$GenerateImageRequestImpl.fromJson;
 
   @override
-  String get generationType; // "SYSTEM" or "CUSTOM"
-  @override
+  String get generationType;
+  @override // "SYSTEM" or "CUSTOM"
   String? get templateId;
   @override
   String? get customBackgroundUrl;
@@ -963,11 +940,8 @@ abstract class _GenerateImageRequest implements GenerateImageRequest {
   String? get customTextColor;
   @override
   Map<String, dynamic>? get customizations;
-
-  /// Create a copy of GenerateImageRequest
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$GenerateImageRequestImplCopyWith<_$GenerateImageRequestImpl>
       get copyWith => throw _privateConstructorUsedError;
 }

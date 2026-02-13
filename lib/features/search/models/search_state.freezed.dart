@@ -25,9 +25,7 @@ mixin _$SearchPaginationState {
   String? get error => throw _privateConstructorUsedError;
   String? get currentQuery => throw _privateConstructorUsedError;
 
-  /// Create a copy of SearchPaginationState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $SearchPaginationStateCopyWith<SearchPaginationState> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -60,8 +58,6 @@ class _$SearchPaginationStateCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of SearchPaginationState
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -140,8 +136,6 @@ class __$$SearchPaginationStateImplCopyWithImpl<$Res>
       $Res Function(_$SearchPaginationStateImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of SearchPaginationState
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -272,9 +266,7 @@ class _$SearchPaginationStateImpl extends _SearchPaginationState {
       error,
       currentQuery);
 
-  /// Create a copy of SearchPaginationState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$SearchPaginationStateImplCopyWith<_$SearchPaginationStateImpl>
@@ -310,11 +302,8 @@ abstract class _SearchPaginationState extends SearchPaginationState {
   String? get error;
   @override
   String? get currentQuery;
-
-  /// Create a copy of SearchPaginationState
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$SearchPaginationStateImplCopyWith<_$SearchPaginationStateImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
@@ -326,9 +315,7 @@ mixin _$SearchFilters {
   bool get onlyFeatured => throw _privateConstructorUsedError;
   bool get onlyTrending => throw _privateConstructorUsedError;
 
-  /// Create a copy of SearchFilters
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $SearchFiltersCopyWith<SearchFilters> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -356,8 +343,6 @@ class _$SearchFiltersCopyWithImpl<$Res, $Val extends SearchFilters>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of SearchFilters
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -410,8 +395,6 @@ class __$$SearchFiltersImplCopyWithImpl<$Res>
       _$SearchFiltersImpl _value, $Res Function(_$SearchFiltersImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of SearchFilters
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -506,9 +489,7 @@ class _$SearchFiltersImpl extends _SearchFilters {
       onlyFeatured,
       onlyTrending);
 
-  /// Create a copy of SearchFilters
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$SearchFiltersImplCopyWith<_$SearchFiltersImpl> get copyWith =>
@@ -531,11 +512,8 @@ abstract class _SearchFilters extends SearchFilters {
   bool get onlyFeatured;
   @override
   bool get onlyTrending;
-
-  /// Create a copy of SearchFilters
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$SearchFiltersImplCopyWith<_$SearchFiltersImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

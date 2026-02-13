@@ -39,13 +39,13 @@ class AppConfig {
     return const AppConfig._(
       environment: AppEnvironment.dev,
       appName: 'Poetry DEV',
-      baseApiUrl: 'https://134.199.243.167', // Production server base URL
+      baseApiUrl: 'http://10.0.2.2:8081', // Android emulator -> host machine
       apiTimeout: 30000, // 30 seconds
       feedTTL: 300, // 5 minutes
       poemTTL: 1800, // 30 minutes
       enableLogging: true,
       enableAnalytics: false,
-      googleOAuthRedirectUri: 'https://134.199.243.167/auth/callback',
+      googleOAuthRedirectUri: 'http://10.0.2.2:8081/auth/callback',
       // Web Client ID from Google Cloud Console (used for native Google Sign-In)
       googleWebClientId: '461228119902-ofi032jvtvsqrenp0349rs06rahfpkru.apps.googleusercontent.com',
     );

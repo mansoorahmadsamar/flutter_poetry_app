@@ -37,12 +37,6 @@ class SearchTab extends ConsumerWidget {
           SliverToBoxAdapter(
             child: DiscoverHeroHeader(
               autofocus: false,
-              onMenuTap: () {
-                // TODO: Open drawer/menu
-              },
-              onProfileTap: () {
-                // TODO: Navigate to profile
-              },
             ),
           ),
 

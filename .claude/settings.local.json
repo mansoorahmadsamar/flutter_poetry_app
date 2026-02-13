@@ -31,7 +31,15 @@
       "Bash(dart run build_runner:*)",
       "Bash(dart run:*)",
       "Bash(ls:*)",
-      "Bash(pod deintegrate:*)"
+      "Bash(pod deintegrate:*)",
+      "Bash(git push:*)",
+      "Bash(pkill:*)",
+      "Bash(flutter --version:*)",
+      "Bash(adb devices:*)",
+      "Bash(flutter devices:*)",
+      "Bash(flutter build:*)",
+      "Bash(flutter install:*)",
+      "Bash(keytool:*)"
     ],
     "deny": [],
     "ask": []

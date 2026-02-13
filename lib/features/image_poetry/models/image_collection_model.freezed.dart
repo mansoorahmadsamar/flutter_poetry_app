@@ -23,12 +23,8 @@ mixin _$SaveImageRequest {
   String get collectionName => throw _privateConstructorUsedError;
   bool get isFavorite => throw _privateConstructorUsedError;
 
-  /// Serializes this SaveImageRequest to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of SaveImageRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $SaveImageRequestCopyWith<SaveImageRequest> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -52,8 +48,6 @@ class _$SaveImageRequestCopyWithImpl<$Res, $Val extends SaveImageRequest>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of SaveImageRequest
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -92,8 +86,6 @@ class __$$SaveImageRequestImplCopyWithImpl<$Res>
       $Res Function(_$SaveImageRequestImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of SaveImageRequest
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -145,13 +137,11 @@ class _$SaveImageRequestImpl implements _SaveImageRequest {
                 other.isFavorite == isFavorite));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, collectionName, isFavorite);
 
-  /// Create a copy of SaveImageRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$SaveImageRequestImplCopyWith<_$SaveImageRequestImpl> get copyWith =>
@@ -178,11 +168,8 @@ abstract class _SaveImageRequest implements SaveImageRequest {
   String get collectionName;
   @override
   bool get isFavorite;
-
-  /// Create a copy of SaveImageRequest
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$SaveImageRequestImplCopyWith<_$SaveImageRequestImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -198,12 +185,8 @@ mixin _$CollectionStatsModel {
   int get collectionCount => throw _privateConstructorUsedError;
   List<String> get collectionNames => throw _privateConstructorUsedError;
 
-  /// Serializes this CollectionStatsModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of CollectionStatsModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $CollectionStatsModelCopyWith<CollectionStatsModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -232,8 +215,6 @@ class _$CollectionStatsModelCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of CollectionStatsModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -286,8 +267,6 @@ class __$$CollectionStatsModelImplCopyWithImpl<$Res>
       $Res Function(_$CollectionStatsModelImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of CollectionStatsModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -368,14 +347,12 @@ class _$CollectionStatsModelImpl implements _CollectionStatsModel {
                 .equals(other._collectionNames, _collectionNames));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, totalImages, favoriteCount,
       collectionCount, const DeepCollectionEquality().hash(_collectionNames));
 
-  /// Create a copy of CollectionStatsModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$CollectionStatsModelImplCopyWith<_$CollectionStatsModelImpl>
@@ -409,11 +386,8 @@ abstract class _CollectionStatsModel implements CollectionStatsModel {
   int get collectionCount;
   @override
   List<String> get collectionNames;
-
-  /// Create a copy of CollectionStatsModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$CollectionStatsModelImplCopyWith<_$CollectionStatsModelImpl>
       get copyWith => throw _privateConstructorUsedError;
 }

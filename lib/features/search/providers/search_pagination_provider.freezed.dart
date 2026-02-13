@@ -26,9 +26,7 @@ mixin _$SearchPaginationState {
   int get pageSize => throw _privateConstructorUsedError;
   int get totalElements => throw _privateConstructorUsedError;
 
-  /// Create a copy of SearchPaginationState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $SearchPaginationStateCopyWith<SearchPaginationState> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -62,8 +60,6 @@ class _$SearchPaginationStateCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of SearchPaginationState
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -148,8 +144,6 @@ class __$$SearchPaginationStateImplCopyWithImpl<$Res>
       $Res Function(_$SearchPaginationStateImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of SearchPaginationState
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -293,9 +287,7 @@ class _$SearchPaginationStateImpl extends _SearchPaginationState {
       pageSize,
       totalElements);
 
-  /// Create a copy of SearchPaginationState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$SearchPaginationStateImplCopyWith<_$SearchPaginationStateImpl>
@@ -334,11 +326,8 @@ abstract class _SearchPaginationState extends SearchPaginationState {
   int get pageSize;
   @override
   int get totalElements;
-
-  /// Create a copy of SearchPaginationState
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$SearchPaginationStateImplCopyWith<_$SearchPaginationStateImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
@@ -349,9 +338,7 @@ mixin _$SearchPaginationParams {
   String get sortBy => throw _privateConstructorUsedError;
   String? get poetId => throw _privateConstructorUsedError;
 
-  /// Create a copy of SearchPaginationParams
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $SearchPaginationParamsCopyWith<SearchPaginationParams> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -376,8 +363,6 @@ class _$SearchPaginationParamsCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of SearchPaginationParams
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -424,8 +409,6 @@ class __$$SearchPaginationParamsImplCopyWithImpl<$Res>
       $Res Function(_$SearchPaginationParamsImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of SearchPaginationParams
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -482,9 +465,7 @@ class _$SearchPaginationParamsImpl implements _SearchPaginationParams {
   @override
   int get hashCode => Object.hash(runtimeType, query, sortBy, poetId);
 
-  /// Create a copy of SearchPaginationParams
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$SearchPaginationParamsImplCopyWith<_$SearchPaginationParamsImpl>
@@ -504,11 +485,8 @@ abstract class _SearchPaginationParams implements SearchPaginationParams {
   String get sortBy;
   @override
   String? get poetId;
-
-  /// Create a copy of SearchPaginationParams
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$SearchPaginationParamsImplCopyWith<_$SearchPaginationParamsImpl>
       get copyWith => throw _privateConstructorUsedError;
 }

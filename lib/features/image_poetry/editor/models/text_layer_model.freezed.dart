@@ -56,12 +56,8 @@ mixin _$TextLayerModel {
       throw _privateConstructorUsedError; // For Urdu: 1.8-2.2
   bool get isSelected => throw _privateConstructorUsedError;
 
-  /// Serializes this TextLayerModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of TextLayerModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $TextLayerModelCopyWith<TextLayerModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -103,8 +99,6 @@ class _$TextLayerModelCopyWithImpl<$Res, $Val extends TextLayerModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of TextLayerModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -241,8 +235,6 @@ class __$$TextLayerModelImplCopyWithImpl<$Res>
       _$TextLayerModelImpl _value, $Res Function(_$TextLayerModelImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of TextLayerModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -476,7 +468,7 @@ class _$TextLayerModelImpl implements _TextLayerModel {
                 other.isSelected == isSelected));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -499,9 +491,7 @@ class _$TextLayerModelImpl implements _TextLayerModel {
       lineHeight,
       isSelected);
 
-  /// Create a copy of TextLayerModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$TextLayerModelImplCopyWith<_$TextLayerModelImpl> get copyWith =>
@@ -541,53 +531,50 @@ abstract class _TextLayerModel implements TextLayerModel {
       _$TextLayerModelImpl.fromJson;
 
   @override
-  String get id; // Unique identifier
-  @override
-  String get text; // Urdu/English text content
-  @override
-  String get languageCode; // 'ur' or 'en'
-  @override
+  String get id;
+  @override // Unique identifier
+  String get text;
+  @override // Urdu/English text content
+  String get languageCode;
+  @override // 'ur' or 'en'
   @OffsetConverter()
-  Offset get position; // X, Y coordinates
-  @override
-  double get fontSize; // Text size
-  @override
+  Offset get position;
+  @override // X, Y coordinates
+  double get fontSize;
+  @override // Text size
   @ColorConverter()
-  Color get textColor; // Text color
-  @override
+  Color get textColor;
+  @override // Text color
   @ColorConverter()
-  Color? get backgroundColor; // Optional highlight
-  @override
+  Color? get backgroundColor;
+  @override // Optional highlight
   @ColorConverter()
-  Color? get strokeColor; // Optional outline
-  @override
-  double? get strokeWidth; // Outline width
-  @override
+  Color? get strokeColor;
+  @override // Optional outline
+  double? get strokeWidth;
+  @override // Outline width
   @ColorConverter()
-  Color? get shadowColor; // Optional shadow
-  @override
+  Color? get shadowColor;
+  @override // Optional shadow
   @OffsetConverter()
-  Offset? get shadowOffset; // Shadow offset
-  @override
-  double? get shadowBlur; // Shadow blur radius
-  @override
+  Offset? get shadowOffset;
+  @override // Shadow offset
+  double? get shadowBlur;
+  @override // Shadow blur radius
   @TextAlignConverter()
-  TextAlign get textAlign; // left, center, right
-  @override
-  double get rotation; // Rotation in radians
-  @override
-  double get scale; // Scale factor
-  @override
-  double get opacity; // 0.0 to 1.0
-  @override
-  double get lineHeight; // For Urdu: 1.8-2.2
-  @override
+  TextAlign get textAlign;
+  @override // left, center, right
+  double get rotation;
+  @override // Rotation in radians
+  double get scale;
+  @override // Scale factor
+  double get opacity;
+  @override // 0.0 to 1.0
+  double get lineHeight;
+  @override // For Urdu: 1.8-2.2
   bool get isSelected;
-
-  /// Create a copy of TextLayerModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$TextLayerModelImplCopyWith<_$TextLayerModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

@@ -68,12 +68,8 @@ mixin _$PoetProfileModel {
   @JsonKey(name: 'updatedAt')
   String? get updatedAt => throw _privateConstructorUsedError;
 
-  /// Serializes this PoetProfileModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of PoetProfileModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $PoetProfileModelCopyWith<PoetProfileModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -127,8 +123,6 @@ class _$PoetProfileModelCopyWithImpl<$Res, $Val extends PoetProfileModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of PoetProfileModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -337,8 +331,6 @@ class __$$PoetProfileModelImplCopyWithImpl<$Res>
       $Res Function(_$PoetProfileModelImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of PoetProfileModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -722,7 +714,7 @@ class _$PoetProfileModelImpl implements _PoetProfileModel {
                 other.updatedAt == updatedAt));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hashAll([
         runtimeType,
@@ -758,9 +750,7 @@ class _$PoetProfileModelImpl implements _PoetProfileModel {
         updatedAt
       ]);
 
-  /// Create a copy of PoetProfileModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$PoetProfileModelImplCopyWith<_$PoetProfileModelImpl> get copyWith =>
@@ -889,11 +879,8 @@ abstract class _PoetProfileModel implements PoetProfileModel {
   @override
   @JsonKey(name: 'updatedAt')
   String? get updatedAt;
-
-  /// Create a copy of PoetProfileModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$PoetProfileModelImplCopyWith<_$PoetProfileModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

@@ -32,12 +32,8 @@ mixin _$CanvasStateModel {
   @SizeConverter()
   Size get canvasSize => throw _privateConstructorUsedError;
 
-  /// Serializes this CanvasStateModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of CanvasStateModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $CanvasStateModelCopyWith<CanvasStateModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -67,8 +63,6 @@ class _$CanvasStateModelCopyWithImpl<$Res, $Val extends CanvasStateModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of CanvasStateModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -133,8 +127,6 @@ class __$$CanvasStateModelImplCopyWithImpl<$Res>
       $Res Function(_$CanvasStateModelImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of CanvasStateModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -244,7 +236,7 @@ class _$CanvasStateModelImpl implements _CanvasStateModel {
                 other.canvasSize == canvasSize));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -255,9 +247,7 @@ class _$CanvasStateModelImpl implements _CanvasStateModel {
       canvasOffset,
       canvasSize);
 
-  /// Create a copy of CanvasStateModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$CanvasStateModelImplCopyWith<_$CanvasStateModelImpl> get copyWith =>
@@ -285,24 +275,21 @@ abstract class _CanvasStateModel implements CanvasStateModel {
       _$CanvasStateModelImpl.fromJson;
 
   @override
-  String? get backgroundImagePath; // Local file path or URL
-  @override
-  List<TextLayerModel> get textLayers; // All text layers
-  @override
-  String? get selectedLayerId; // Currently selected layer
-  @override
-  double get canvasScale; // Zoom level
-  @override
+  String? get backgroundImagePath;
+  @override // Local file path or URL
+  List<TextLayerModel> get textLayers;
+  @override // All text layers
+  String? get selectedLayerId;
+  @override // Currently selected layer
+  double get canvasScale;
+  @override // Zoom level
   @OffsetConverter()
-  Offset get canvasOffset; // Pan offset
-  @override
+  Offset get canvasOffset;
+  @override // Pan offset
   @SizeConverter()
   Size get canvasSize;
-
-  /// Create a copy of CanvasStateModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$CanvasStateModelImplCopyWith<_$CanvasStateModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

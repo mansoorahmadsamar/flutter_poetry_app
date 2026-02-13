@@ -34,12 +34,8 @@ mixin _$CoupletModel {
   bool get isBookmarkedByCurrentUser => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
 
-  /// Serializes this CoupletModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of CoupletModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $CoupletModelCopyWith<CoupletModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -74,8 +70,6 @@ class _$CoupletModelCopyWithImpl<$Res, $Val extends CoupletModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of CoupletModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -170,8 +164,6 @@ class __$$CoupletModelImplCopyWithImpl<$Res>
       _$CoupletModelImpl _value, $Res Function(_$CoupletModelImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of CoupletModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -324,7 +316,7 @@ class _$CoupletModelImpl implements _CoupletModel {
                 other.createdAt == createdAt));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -340,9 +332,7 @@ class _$CoupletModelImpl implements _CoupletModel {
       isBookmarkedByCurrentUser,
       createdAt);
 
-  /// Create a copy of CoupletModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$CoupletModelImplCopyWith<_$CoupletModelImpl> get copyWith =>
@@ -398,11 +388,8 @@ abstract class _CoupletModel implements CoupletModel {
   bool get isBookmarkedByCurrentUser;
   @override
   DateTime? get createdAt;
-
-  /// Create a copy of CoupletModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$CoupletModelImplCopyWith<_$CoupletModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -438,12 +425,8 @@ mixin _$CoupletDetailResponse {
   DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get updatedAt => throw _privateConstructorUsedError;
 
-  /// Serializes this CoupletDetailResponse to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of CoupletDetailResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $CoupletDetailResponseCopyWith<CoupletDetailResponse> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -487,8 +470,6 @@ class _$CoupletDetailResponseCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of CoupletDetailResponse
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -633,8 +614,6 @@ class __$$CoupletDetailResponseImplCopyWithImpl<$Res>
       $Res Function(_$CoupletDetailResponseImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of CoupletDetailResponse
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -870,7 +849,7 @@ class _$CoupletDetailResponseImpl implements _CoupletDetailResponse {
                 other.updatedAt == updatedAt));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hashAll([
         runtimeType,
@@ -895,9 +874,7 @@ class _$CoupletDetailResponseImpl implements _CoupletDetailResponse {
         updatedAt
       ]);
 
-  /// Create a copy of CoupletDetailResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$CoupletDetailResponseImplCopyWith<_$CoupletDetailResponseImpl>
@@ -947,22 +924,22 @@ abstract class _CoupletDetailResponse implements CoupletDetailResponse {
   @override
   String? get coupletTypeName;
   @override
-  List<VerseModel> get verses; // Poem context
-  @override
+  List<VerseModel> get verses;
+  @override // Poem context
   String get poemPublicId;
   @override
   String? get poemTitle;
   @override
   int? get totalCoupletsInPoem;
   @override
-  String? get poetryType; // Poet context
-  @override
+  String? get poetryType;
+  @override // Poet context
   String get poetPublicId;
   @override
   String get poetName;
   @override
-  String? get poetProfileImageUrl; // Engagement
-  @override
+  String? get poetProfileImageUrl;
+  @override // Engagement
   int get likeCount;
   @override
   int get bookmarkCount;
@@ -978,11 +955,8 @@ abstract class _CoupletDetailResponse implements CoupletDetailResponse {
   DateTime? get createdAt;
   @override
   DateTime? get updatedAt;
-
-  /// Create a copy of CoupletDetailResponse
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$CoupletDetailResponseImplCopyWith<_$CoupletDetailResponseImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
@@ -1018,12 +992,8 @@ mixin _$BookmarkedCoupletResponse {
   bool get isBookmarkedByCurrentUser => throw _privateConstructorUsedError;
   DateTime? get bookmarkedAt => throw _privateConstructorUsedError;
 
-  /// Serializes this BookmarkedCoupletResponse to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of BookmarkedCoupletResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $BookmarkedCoupletResponseCopyWith<BookmarkedCoupletResponse> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1066,8 +1036,6 @@ class _$BookmarkedCoupletResponseCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of BookmarkedCoupletResponse
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1207,8 +1175,6 @@ class __$$BookmarkedCoupletResponseImplCopyWithImpl<$Res>
       $Res Function(_$BookmarkedCoupletResponseImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of BookmarkedCoupletResponse
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1433,7 +1399,7 @@ class _$BookmarkedCoupletResponseImpl implements _BookmarkedCoupletResponse {
                 other.bookmarkedAt == bookmarkedAt));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -1456,9 +1422,7 @@ class _$BookmarkedCoupletResponseImpl implements _BookmarkedCoupletResponse {
       isBookmarkedByCurrentUser,
       bookmarkedAt);
 
-  /// Create a copy of BookmarkedCoupletResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$BookmarkedCoupletResponseImplCopyWith<_$BookmarkedCoupletResponseImpl>
@@ -1507,8 +1471,8 @@ abstract class _BookmarkedCoupletResponse implements BookmarkedCoupletResponse {
   @override
   String? get coupletTypeName;
   @override
-  List<VerseModel> get verses; // Poem context
-  @override
+  List<VerseModel> get verses;
+  @override // Poem context
   String get poemPublicId;
   @override
   String? get poemTitle;
@@ -1517,14 +1481,14 @@ abstract class _BookmarkedCoupletResponse implements BookmarkedCoupletResponse {
   @override
   String? get poetryType;
   @override
-  int? get totalCoupletsInPoem; // Poet context
-  @override
+  int? get totalCoupletsInPoem;
+  @override // Poet context
   String get poetPublicId;
   @override
   String get poetName;
   @override
-  String? get poetProfileImageUrl; // Engagement
-  @override
+  String? get poetProfileImageUrl;
+  @override // Engagement
   int get likeCount;
   @override
   int get bookmarkCount;
@@ -1536,11 +1500,8 @@ abstract class _BookmarkedCoupletResponse implements BookmarkedCoupletResponse {
   bool get isBookmarkedByCurrentUser;
   @override
   DateTime? get bookmarkedAt;
-
-  /// Create a copy of BookmarkedCoupletResponse
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$BookmarkedCoupletResponseImplCopyWith<_$BookmarkedCoupletResponseImpl>
       get copyWith => throw _privateConstructorUsedError;
 }

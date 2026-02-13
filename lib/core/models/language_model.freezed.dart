@@ -26,12 +26,8 @@ mixin _$LanguageModel {
   String get direction => throw _privateConstructorUsedError;
   bool get isActive => throw _privateConstructorUsedError;
 
-  /// Serializes this LanguageModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of LanguageModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $LanguageModelCopyWith<LanguageModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -60,8 +56,6 @@ class _$LanguageModelCopyWithImpl<$Res, $Val extends LanguageModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of LanguageModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -120,8 +114,6 @@ class __$$LanguageModelImplCopyWithImpl<$Res>
       _$LanguageModelImpl _value, $Res Function(_$LanguageModelImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of LanguageModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -201,14 +193,12 @@ class _$LanguageModelImpl implements _LanguageModel {
                 other.isActive == isActive));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode =>
       Object.hash(runtimeType, code, name, nativeName, direction, isActive);
 
-  /// Create a copy of LanguageModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$LanguageModelImplCopyWith<_$LanguageModelImpl> get copyWith =>
@@ -243,11 +233,8 @@ abstract class _LanguageModel implements LanguageModel {
   String get direction;
   @override
   bool get isActive;
-
-  /// Create a copy of LanguageModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$LanguageModelImplCopyWith<_$LanguageModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

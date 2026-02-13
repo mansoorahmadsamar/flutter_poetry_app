@@ -173,6 +173,7 @@ class SearchService {
   /// Parameters:
   /// - [query]: Search query (minimum 2 characters)
   /// - [lang]: Language code (default: 'ur')
+  /// - [cancelToken]: Optional CancelToken to cancel the request
   ///
   /// Returns: Grouped suggestions by type
   /// - Poets: max 3
@@ -184,6 +185,7 @@ class SearchService {
   Future<AutocompleteResponse> getAutocomplete({
     required String query,
     String lang = 'ur',
+    CancelToken? cancelToken,
   }) async {
     // Early return for short queries
     if (query.trim().length < 2) {
@@ -205,6 +207,7 @@ class SearchService {
           'q': query.trim(),
           'lang': lang,
         },
+        cancelToken: cancelToken,
       );
 
       final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(

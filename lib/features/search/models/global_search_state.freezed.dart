@@ -41,12 +41,13 @@ mixin _$GlobalSearchState {
   RecommendationResponse? get recommendations =>
       throw _privateConstructorUsedError;
   RelatedSearchesResponse? get relatedSearches =>
-      throw _privateConstructorUsedError; // Error state
+      throw _privateConstructorUsedError;
+  DiscoverBundle? get discoverBundle =>
+      throw _privateConstructorUsedError; // New: unified discover bundle
+// Error state
   String? get errorMessage => throw _privateConstructorUsedError;
 
-  /// Create a copy of GlobalSearchState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $GlobalSearchStateCopyWith<GlobalSearchState> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -73,6 +74,7 @@ abstract class $GlobalSearchStateCopyWith<$Res> {
       TrendingSearchesResponse? trendingSearches,
       RecommendationResponse? recommendations,
       RelatedSearchesResponse? relatedSearches,
+      DiscoverBundle? discoverBundle,
       String? errorMessage});
 
   $AutocompleteResponseCopyWith<$Res>? get autocompleteResults;
@@ -80,6 +82,7 @@ abstract class $GlobalSearchStateCopyWith<$Res> {
   $TrendingSearchesResponseCopyWith<$Res>? get trendingSearches;
   $RecommendationResponseCopyWith<$Res>? get recommendations;
   $RelatedSearchesResponseCopyWith<$Res>? get relatedSearches;
+  $DiscoverBundleCopyWith<$Res>? get discoverBundle;
 }
 
 /// @nodoc
@@ -92,8 +95,6 @@ class _$GlobalSearchStateCopyWithImpl<$Res, $Val extends GlobalSearchState>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of GlobalSearchState
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -112,6 +113,7 @@ class _$GlobalSearchStateCopyWithImpl<$Res, $Val extends GlobalSearchState>
     Object? trendingSearches = freezed,
     Object? recommendations = freezed,
     Object? relatedSearches = freezed,
+    Object? discoverBundle = freezed,
     Object? errorMessage = freezed,
   }) {
     return _then(_value.copyWith(
@@ -175,6 +177,10 @@ class _$GlobalSearchStateCopyWithImpl<$Res, $Val extends GlobalSearchState>
           ? _value.relatedSearches
           : relatedSearches // ignore: cast_nullable_to_non_nullable
               as RelatedSearchesResponse?,
+      discoverBundle: freezed == discoverBundle
+          ? _value.discoverBundle
+          : discoverBundle // ignore: cast_nullable_to_non_nullable
+              as DiscoverBundle?,
       errorMessage: freezed == errorMessage
           ? _value.errorMessage
           : errorMessage // ignore: cast_nullable_to_non_nullable
@@ -182,8 +188,6 @@ class _$GlobalSearchStateCopyWithImpl<$Res, $Val extends GlobalSearchState>
     ) as $Val);
   }
 
-  /// Create a copy of GlobalSearchState
-  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $AutocompleteResponseCopyWith<$Res>? get autocompleteResults {
@@ -197,8 +201,6 @@ class _$GlobalSearchStateCopyWithImpl<$Res, $Val extends GlobalSearchState>
     });
   }
 
-  /// Create a copy of GlobalSearchState
-  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $UnifiedSearchResponseCopyWith<$Res>? get unifiedResults {
@@ -212,8 +214,6 @@ class _$GlobalSearchStateCopyWithImpl<$Res, $Val extends GlobalSearchState>
     });
   }
 
-  /// Create a copy of GlobalSearchState
-  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $TrendingSearchesResponseCopyWith<$Res>? get trendingSearches {
@@ -227,8 +227,6 @@ class _$GlobalSearchStateCopyWithImpl<$Res, $Val extends GlobalSearchState>
     });
   }
 
-  /// Create a copy of GlobalSearchState
-  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $RecommendationResponseCopyWith<$Res>? get recommendations {
@@ -242,8 +240,6 @@ class _$GlobalSearchStateCopyWithImpl<$Res, $Val extends GlobalSearchState>
     });
   }
 
-  /// Create a copy of GlobalSearchState
-  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $RelatedSearchesResponseCopyWith<$Res>? get relatedSearches {
@@ -254,6 +250,18 @@ class _$GlobalSearchStateCopyWithImpl<$Res, $Val extends GlobalSearchState>
     return $RelatedSearchesResponseCopyWith<$Res>(_value.relatedSearches!,
         (value) {
       return _then(_value.copyWith(relatedSearches: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $DiscoverBundleCopyWith<$Res>? get discoverBundle {
+    if (_value.discoverBundle == null) {
+      return null;
+    }
+
+    return $DiscoverBundleCopyWith<$Res>(_value.discoverBundle!, (value) {
+      return _then(_value.copyWith(discoverBundle: value) as $Val);
     });
   }
 }
@@ -282,6 +290,7 @@ abstract class _$$GlobalSearchStateImplCopyWith<$Res>
       TrendingSearchesResponse? trendingSearches,
       RecommendationResponse? recommendations,
       RelatedSearchesResponse? relatedSearches,
+      DiscoverBundle? discoverBundle,
       String? errorMessage});
 
   @override
@@ -294,6 +303,8 @@ abstract class _$$GlobalSearchStateImplCopyWith<$Res>
   $RecommendationResponseCopyWith<$Res>? get recommendations;
   @override
   $RelatedSearchesResponseCopyWith<$Res>? get relatedSearches;
+  @override
+  $DiscoverBundleCopyWith<$Res>? get discoverBundle;
 }
 
 /// @nodoc
@@ -304,8 +315,6 @@ class __$$GlobalSearchStateImplCopyWithImpl<$Res>
       $Res Function(_$GlobalSearchStateImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of GlobalSearchState
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -324,6 +333,7 @@ class __$$GlobalSearchStateImplCopyWithImpl<$Res>
     Object? trendingSearches = freezed,
     Object? recommendations = freezed,
     Object? relatedSearches = freezed,
+    Object? discoverBundle = freezed,
     Object? errorMessage = freezed,
   }) {
     return _then(_$GlobalSearchStateImpl(
@@ -387,6 +397,10 @@ class __$$GlobalSearchStateImplCopyWithImpl<$Res>
           ? _value.relatedSearches
           : relatedSearches // ignore: cast_nullable_to_non_nullable
               as RelatedSearchesResponse?,
+      discoverBundle: freezed == discoverBundle
+          ? _value.discoverBundle
+          : discoverBundle // ignore: cast_nullable_to_non_nullable
+              as DiscoverBundle?,
       errorMessage: freezed == errorMessage
           ? _value.errorMessage
           : errorMessage // ignore: cast_nullable_to_non_nullable
@@ -414,6 +428,7 @@ class _$GlobalSearchStateImpl implements _GlobalSearchState {
       this.trendingSearches,
       this.recommendations,
       this.relatedSearches,
+      this.discoverBundle,
       this.errorMessage})
       : _recentSearches = recentSearches;
 
@@ -469,13 +484,16 @@ class _$GlobalSearchStateImpl implements _GlobalSearchState {
   final RecommendationResponse? recommendations;
   @override
   final RelatedSearchesResponse? relatedSearches;
+  @override
+  final DiscoverBundle? discoverBundle;
+// New: unified discover bundle
 // Error state
   @override
   final String? errorMessage;
 
   @override
   String toString() {
-    return 'GlobalSearchState(mode: $mode, currentQuery: $currentQuery, selectedFilter: $selectedFilter, sortBy: $sortBy, activeSegment: $activeSegment, coupletSort: $coupletSort, autocompleteResults: $autocompleteResults, isLoadingAutocomplete: $isLoadingAutocomplete, unifiedResults: $unifiedResults, coupletResults: $coupletResults, isLoadingResults: $isLoadingResults, recentSearches: $recentSearches, trendingSearches: $trendingSearches, recommendations: $recommendations, relatedSearches: $relatedSearches, errorMessage: $errorMessage)';
+    return 'GlobalSearchState(mode: $mode, currentQuery: $currentQuery, selectedFilter: $selectedFilter, sortBy: $sortBy, activeSegment: $activeSegment, coupletSort: $coupletSort, autocompleteResults: $autocompleteResults, isLoadingAutocomplete: $isLoadingAutocomplete, unifiedResults: $unifiedResults, coupletResults: $coupletResults, isLoadingResults: $isLoadingResults, recentSearches: $recentSearches, trendingSearches: $trendingSearches, recommendations: $recommendations, relatedSearches: $relatedSearches, discoverBundle: $discoverBundle, errorMessage: $errorMessage)';
   }
 
   @override
@@ -511,6 +529,8 @@ class _$GlobalSearchStateImpl implements _GlobalSearchState {
                 other.recommendations == recommendations) &&
             (identical(other.relatedSearches, relatedSearches) ||
                 other.relatedSearches == relatedSearches) &&
+            (identical(other.discoverBundle, discoverBundle) ||
+                other.discoverBundle == discoverBundle) &&
             (identical(other.errorMessage, errorMessage) ||
                 other.errorMessage == errorMessage));
   }
@@ -533,11 +553,10 @@ class _$GlobalSearchStateImpl implements _GlobalSearchState {
       trendingSearches,
       recommendations,
       relatedSearches,
+      discoverBundle,
       errorMessage);
 
-  /// Create a copy of GlobalSearchState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$GlobalSearchStateImplCopyWith<_$GlobalSearchStateImpl> get copyWith =>
@@ -562,6 +581,7 @@ abstract class _GlobalSearchState implements GlobalSearchState {
       final TrendingSearchesResponse? trendingSearches,
       final RecommendationResponse? recommendations,
       final RelatedSearchesResponse? relatedSearches,
+      final DiscoverBundle? discoverBundle,
       final String? errorMessage}) = _$GlobalSearchStateImpl;
 
   @override
@@ -569,39 +589,38 @@ abstract class _GlobalSearchState implements GlobalSearchState {
   @override
   String get currentQuery;
   @override
-  String? get selectedFilter; // Poet filter (publicId)
-  @override
-  String get sortBy; // relevance, likes, shares, bookmarks, trending
-  @override
+  String? get selectedFilter;
+  @override // Poet filter (publicId)
+  String get sortBy;
+  @override // relevance, likes, shares, bookmarks, trending
   DiscoverSegment get activeSegment;
   @override
-  CoupletSortOption get coupletSort; // Autocomplete data
-  @override
+  CoupletSortOption get coupletSort;
+  @override // Autocomplete data
   AutocompleteResponse? get autocompleteResults;
   @override
-  bool get isLoadingAutocomplete; // Search results data
-  @override
-  UnifiedSearchResponse? get unifiedResults; // New unified search results
-  @override
-  PaginatedResponse<CoupletSearchResult>?
-      get coupletResults; // Legacy - will be deprecated
-  @override
-  bool get isLoadingResults; // Discovery data
-  @override
+  bool get isLoadingAutocomplete;
+  @override // Search results data
+  UnifiedSearchResponse? get unifiedResults;
+  @override // New unified search results
+  PaginatedResponse<CoupletSearchResult>? get coupletResults;
+  @override // Legacy - will be deprecated
+  bool get isLoadingResults;
+  @override // Discovery data
   List<String> get recentSearches;
   @override
   TrendingSearchesResponse? get trendingSearches;
   @override
   RecommendationResponse? get recommendations;
   @override
-  RelatedSearchesResponse? get relatedSearches; // Error state
+  RelatedSearchesResponse? get relatedSearches;
   @override
+  DiscoverBundle? get discoverBundle;
+  @override // New: unified discover bundle
+// Error state
   String? get errorMessage;
-
-  /// Create a copy of GlobalSearchState
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$GlobalSearchStateImplCopyWith<_$GlobalSearchStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
