@@ -130,6 +130,8 @@ class FirebaseAuthService {
           final accessToken = tokenData['accessToken'] as String?;
           final refreshToken = tokenData['refreshToken'] as String?;
           final email = tokenData['email'] as String? ?? googleUser.email;
+          final userId = tokenData['userId']?.toString() ??
+              tokenData['id']?.toString();
 
           if (accessToken == null || refreshToken == null) {
             throw Exception('Backend did not return required tokens');
@@ -147,6 +149,12 @@ class FirebaseAuthService {
 
           if (email.isNotEmpty) {
             await _secureStorage.saveUserEmail(email);
+          }
+
+          // Save user ID for personalization (X-User-Id header)
+          if (userId != null && userId.isNotEmpty) {
+            await _secureStorage.saveUserId(userId);
+            _logger.i('   User ID saved: $userId');
           }
 
           _logger.i('✅ Tokens saved successfully');
@@ -371,6 +379,7 @@ class FirebaseAuthService {
       await _secureStorage.deleteRefreshToken();
       await _secureStorage.deleteToken(_firebaseTokenKey);
       await _secureStorage.deleteUserEmail();
+      await _secureStorage.deleteUserId();
 
       _logger.i('✅ Sign out completed successfully');
     } catch (e) {

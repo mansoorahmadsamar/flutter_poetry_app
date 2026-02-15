@@ -21,7 +21,9 @@ import 'package:flutter_poetry_app/features/search/widgets/search_segment_tabs.d
 /// - Comprehensive results with sections after search
 /// - Brand colors: Deep Green (#1B4D3E), Gold (#C5A059), Cream background
 class SearchScreen extends ConsumerStatefulWidget {
-  const SearchScreen({super.key});
+  final String? initialQuery;
+
+  const SearchScreen({super.key, this.initialQuery});
 
   @override
   ConsumerState<SearchScreen> createState() => _SearchScreenState();
@@ -34,9 +36,16 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   @override
   void initState() {
     super.initState();
-    // Auto-focus the search field when screen opens
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _searchFocusNode.requestFocus();
+      final query = widget.initialQuery;
+      if (query != null && query.trim().isNotEmpty) {
+        // Pre-fill and execute search for initial query
+        _searchController.text = query;
+        ref.read(globalSearchProvider.notifier).executeSearch(query: query);
+      } else {
+        // Auto-focus the search field when screen opens
+        _searchFocusNode.requestFocus();
+      }
     });
   }
 

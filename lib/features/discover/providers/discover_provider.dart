@@ -10,6 +10,14 @@ import '../services/discover_service.dart';
 
 part 'discover_provider.freezed.dart';
 
+/// Status for the discover screen
+enum DiscoverStatus {
+  initial,
+  loading,
+  loaded,
+  error,
+}
+
 /// State for the discover screen
 @freezed
 class DiscoverState with _$DiscoverState {
@@ -19,14 +27,6 @@ class DiscoverState with _$DiscoverState {
     @Default([]) List<String> recentSearches,
     String? errorMessage,
   }) = _DiscoverState;
-}
-
-/// Status enum for discover screen
-enum DiscoverStatus {
-  initial,
-  loading,
-  loaded,
-  error,
 }
 
 /// Provider for discover state
@@ -58,7 +58,6 @@ class DiscoverNotifier extends StateNotifier<DiscoverState> {
         _historyService = historyService,
         _languageCode = languageCode,
         super(const DiscoverState()) {
-    // Load data on initialization
     _loadInitialData();
   }
 
@@ -67,7 +66,6 @@ class DiscoverNotifier extends StateNotifier<DiscoverState> {
     state = state.copyWith(status: DiscoverStatus.loading);
 
     try {
-      // Load recent searches and bundle in parallel
       final results = await Future.wait([
         _historyService.getHistory(),
         _discoverService.getDiscoverBundle(lang: _languageCode),
@@ -76,6 +74,7 @@ class DiscoverNotifier extends StateNotifier<DiscoverState> {
       final recentSearches = results[0] as List<String>;
       final bundle = results[1] as DiscoverBundle;
 
+      if (!mounted) return;
       state = state.copyWith(
         status: DiscoverStatus.loaded,
         bundle: bundle,
@@ -86,6 +85,7 @@ class DiscoverNotifier extends StateNotifier<DiscoverState> {
       _logger.i('Discover data loaded successfully');
     } catch (e) {
       _logger.e('Error loading discover data: $e');
+      if (!mounted) return;
       state = state.copyWith(
         status: DiscoverStatus.error,
         errorMessage: 'Failed to load content. Please try again.',
@@ -109,6 +109,7 @@ class DiscoverNotifier extends StateNotifier<DiscoverState> {
       final recentSearches = results[0] as List<String>;
       final bundle = results[1] as DiscoverBundle;
 
+      if (!mounted) return;
       state = state.copyWith(
         status: DiscoverStatus.loaded,
         bundle: bundle,
@@ -119,6 +120,7 @@ class DiscoverNotifier extends StateNotifier<DiscoverState> {
       _logger.i('Discover data refreshed successfully');
     } catch (e) {
       _logger.e('Error refreshing discover data: $e');
+      if (!mounted) return;
       state = state.copyWith(
         status: DiscoverStatus.error,
         errorMessage: 'Failed to refresh. Please try again.',
@@ -130,6 +132,7 @@ class DiscoverNotifier extends StateNotifier<DiscoverState> {
   Future<void> refreshRecentSearches() async {
     try {
       final recentSearches = await _historyService.getHistory();
+      if (!mounted) return;
       state = state.copyWith(recentSearches: recentSearches);
     } catch (e) {
       _logger.e('Error refreshing recent searches: $e');
@@ -140,6 +143,7 @@ class DiscoverNotifier extends StateNotifier<DiscoverState> {
   Future<void> clearRecentSearches() async {
     try {
       await _historyService.clearAll();
+      if (!mounted) return;
       state = state.copyWith(recentSearches: []);
       _logger.i('Recent searches cleared');
     } catch (e) {
@@ -151,6 +155,7 @@ class DiscoverNotifier extends StateNotifier<DiscoverState> {
   Future<void> removeRecentSearch(String query) async {
     try {
       await _historyService.removeSearch(query);
+      if (!mounted) return;
       final updatedSearches =
           state.recentSearches.where((s) => s != query).toList();
       state = state.copyWith(recentSearches: updatedSearches);

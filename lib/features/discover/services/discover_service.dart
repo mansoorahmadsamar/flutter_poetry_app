@@ -51,7 +51,9 @@ class DiscoverService {
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data;
         if (data['success'] == true && data['data'] != null) {
-          final bundle = DiscoverBundle.fromJson(data['data']);
+          final rawData = data['data'] as Map<String, dynamic>;
+          _flattenPoetAvatars(rawData);
+          final bundle = DiscoverBundle.fromJson(rawData);
 
           // Update cache
           _cachedBundle = bundle;
@@ -77,6 +79,32 @@ class DiscoverService {
     } catch (e) {
       _logger.e('Error fetching discover bundle: $e');
       rethrow;
+    }
+  }
+
+  /// Flatten nested poetInfo.profileImageUrl into imageUrl for each content card item
+  void _flattenPoetAvatars(Map<String, dynamic> data) {
+    for (final sectionKey in ['editorsPicks', 'recommended', 'featuredPoets', 'categories']) {
+      final section = data[sectionKey];
+      if (section is Map<String, dynamic> && section['items'] is List) {
+        for (final item in section['items']) {
+          if (item is Map<String, dynamic>) {
+            final currentImage = item['imageUrl'];
+            final hasValidImage = currentImage != null &&
+                currentImage is String &&
+                currentImage != '-' &&
+                currentImage.isNotEmpty;
+
+            if (!hasValidImage && item['poetInfo'] is Map<String, dynamic>) {
+              final poetInfo = item['poetInfo'] as Map<String, dynamic>;
+              final profileUrl = poetInfo['profileImageUrl'];
+              if (profileUrl != null && profileUrl != '-' && profileUrl.toString().isNotEmpty) {
+                item['imageUrl'] = profileUrl;
+              }
+            }
+          }
+        }
+      }
     }
   }
 

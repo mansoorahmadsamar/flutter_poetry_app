@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
+import '../network/dio_client.dart';
 import '../storage/secure_storage.dart';
 import 'firebase_auth_service.dart';
 import 'auth_state.dart';
@@ -14,10 +15,11 @@ final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
 
 class AuthNotifier extends StateNotifier<AuthState> {
   final SecureStorageService _secureStorage;
+  final Ref _ref;
   final Logger _logger = Logger();
   late final FirebaseAuthService _firebaseAuthService;
 
-  AuthNotifier(this._secureStorage, Ref ref) : super(const AuthState()) {
+  AuthNotifier(this._secureStorage, this._ref) : super(const AuthState()) {
     // Initialize Firebase Auth Service
     _firebaseAuthService = FirebaseAuthService(_secureStorage);
     _checkAuthStatus();
@@ -42,6 +44,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
           refreshToken: refreshToken,
           userEmail: userEmail,
         );
+
+        // Backfill numeric userId for X-User-Id header if not stored or stale UUID
+        final storedUserId = await _secureStorage.getUserId();
+        if (storedUserId == null || storedUserId.isEmpty || storedUserId.contains('-')) {
+          _logger.i('🔄 User ID missing or stale, fetching from profile...');
+          _backfillUserId();
+        }
       } else {
         _logger.i('⚠️  No stored tokens found, user is not authenticated');
         state = state.copyWith(isLoading: false);
@@ -52,6 +61,28 @@ class AuthNotifier extends StateNotifier<AuthState> {
         isLoading: false,
         errorMessage: 'Failed to check authentication status',
       );
+    }
+  }
+
+  /// Backfill userId from /api/auth/me for existing sessions
+  Future<void> _backfillUserId() async {
+    try {
+      final dioClient = _ref.read(dioClientProvider);
+      final response =
+          await dioClient.get<Map<String, dynamic>>('/api/auth/me');
+
+      if (response.statusCode == 200 && response.data != null) {
+        final data = response.data!;
+        if (data['success'] == true && data['data'] != null) {
+          final userId = data['data']['userId']?.toString();
+          if (userId != null && userId.isNotEmpty) {
+            await _secureStorage.saveUserId(userId);
+            _logger.i('✅ User ID backfilled: $userId');
+          }
+        }
+      }
+    } catch (e) {
+      _logger.w('⚠️  Failed to backfill user ID: $e');
     }
   }
 

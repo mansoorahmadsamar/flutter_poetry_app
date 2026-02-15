@@ -167,7 +167,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/search',
         name: 'global-search',
-        builder: (context, state) => const SearchScreen(),
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return SearchScreen(
+            initialQuery: extra?['query'] as String?,
+          );
+        },
       ),
       GoRoute(
         path: '/search/results/:category',

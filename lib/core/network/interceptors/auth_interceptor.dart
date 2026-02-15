@@ -32,6 +32,12 @@ class AuthInterceptor extends Interceptor {
       _logger.w('⚠️  No authorization token available');
     }
 
+    // Add user ID for personalization
+    final userId = await _secureStorage.getUserId();
+    if (userId != null && userId.isNotEmpty) {
+      options.headers['X-User-Id'] = userId;
+    }
+
     // Ensure content type is set
     options.headers[AppConstants.contentTypeHeader] =
         AppConstants.contentTypeJson;
