@@ -3157,23 +3157,37 @@ UnifiedSearchResponse _$UnifiedSearchResponseFromJson(
 
 /// @nodoc
 mixin _$UnifiedSearchResponse {
+// Current page item counts
   int get totalResults => throw _privateConstructorUsedError;
   int get poetCount => throw _privateConstructorUsedError;
   int get poemCount => throw _privateConstructorUsedError;
   int get verseCount => throw _privateConstructorUsedError;
   int get coupletCount => throw _privateConstructorUsedError;
   int get tagCount => throw _privateConstructorUsedError;
-  int get categoryCount => throw _privateConstructorUsedError;
-  List<PoetModel> get poets =>
-      throw _privateConstructorUsedError; // Full poet objects from API
-  List<PoemModel> get poems =>
-      throw _privateConstructorUsedError; // Full poem objects from API
-  List<VerseSearchResult> get verses =>
-      throw _privateConstructorUsedError; // Verse results with nested structure
+  int get categoryCount => throw _privateConstructorUsedError; // Item arrays
+  List<PoetModel> get poets => throw _privateConstructorUsedError;
+  List<PoemModel> get poems => throw _privateConstructorUsedError;
+  List<VerseSearchResult> get verses => throw _privateConstructorUsedError;
   List<CoupletSearchResult> get couplets => throw _privateConstructorUsedError;
   List<AutocompleteTag> get tags => throw _privateConstructorUsedError;
   List<AutocompleteCategory> get categories =>
-      throw _privateConstructorUsedError;
+      throw _privateConstructorUsedError; // Total counts in DB — for tab labels like "Poems (847)"
+  int get totalPoems => throw _privateConstructorUsedError;
+  int get totalVerses => throw _privateConstructorUsedError;
+  int get totalPoets => throw _privateConstructorUsedError;
+  int get totalCouplets => throw _privateConstructorUsedError;
+  int get totalTags => throw _privateConstructorUsedError;
+  int get totalCategories =>
+      throw _privateConstructorUsedError; // Per-type "has more" flags — show/hide "Load More"
+  bool get hasMorePoems => throw _privateConstructorUsedError;
+  bool get hasMoreVerses => throw _privateConstructorUsedError;
+  bool get hasMorePoets => throw _privateConstructorUsedError;
+  bool get hasMoreCouplets => throw _privateConstructorUsedError;
+  bool get hasMoreTags => throw _privateConstructorUsedError;
+  bool get hasMoreCategories =>
+      throw _privateConstructorUsedError; // Pagination echo
+  int get currentPage => throw _privateConstructorUsedError;
+  int get pageSize => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -3200,7 +3214,21 @@ abstract class $UnifiedSearchResponseCopyWith<$Res> {
       List<VerseSearchResult> verses,
       List<CoupletSearchResult> couplets,
       List<AutocompleteTag> tags,
-      List<AutocompleteCategory> categories});
+      List<AutocompleteCategory> categories,
+      int totalPoems,
+      int totalVerses,
+      int totalPoets,
+      int totalCouplets,
+      int totalTags,
+      int totalCategories,
+      bool hasMorePoems,
+      bool hasMoreVerses,
+      bool hasMorePoets,
+      bool hasMoreCouplets,
+      bool hasMoreTags,
+      bool hasMoreCategories,
+      int currentPage,
+      int pageSize});
 }
 
 /// @nodoc
@@ -3230,6 +3258,20 @@ class _$UnifiedSearchResponseCopyWithImpl<$Res,
     Object? couplets = null,
     Object? tags = null,
     Object? categories = null,
+    Object? totalPoems = null,
+    Object? totalVerses = null,
+    Object? totalPoets = null,
+    Object? totalCouplets = null,
+    Object? totalTags = null,
+    Object? totalCategories = null,
+    Object? hasMorePoems = null,
+    Object? hasMoreVerses = null,
+    Object? hasMorePoets = null,
+    Object? hasMoreCouplets = null,
+    Object? hasMoreTags = null,
+    Object? hasMoreCategories = null,
+    Object? currentPage = null,
+    Object? pageSize = null,
   }) {
     return _then(_value.copyWith(
       totalResults: null == totalResults
@@ -3284,6 +3326,62 @@ class _$UnifiedSearchResponseCopyWithImpl<$Res,
           ? _value.categories
           : categories // ignore: cast_nullable_to_non_nullable
               as List<AutocompleteCategory>,
+      totalPoems: null == totalPoems
+          ? _value.totalPoems
+          : totalPoems // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalVerses: null == totalVerses
+          ? _value.totalVerses
+          : totalVerses // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalPoets: null == totalPoets
+          ? _value.totalPoets
+          : totalPoets // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalCouplets: null == totalCouplets
+          ? _value.totalCouplets
+          : totalCouplets // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalTags: null == totalTags
+          ? _value.totalTags
+          : totalTags // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalCategories: null == totalCategories
+          ? _value.totalCategories
+          : totalCategories // ignore: cast_nullable_to_non_nullable
+              as int,
+      hasMorePoems: null == hasMorePoems
+          ? _value.hasMorePoems
+          : hasMorePoems // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasMoreVerses: null == hasMoreVerses
+          ? _value.hasMoreVerses
+          : hasMoreVerses // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasMorePoets: null == hasMorePoets
+          ? _value.hasMorePoets
+          : hasMorePoets // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasMoreCouplets: null == hasMoreCouplets
+          ? _value.hasMoreCouplets
+          : hasMoreCouplets // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasMoreTags: null == hasMoreTags
+          ? _value.hasMoreTags
+          : hasMoreTags // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasMoreCategories: null == hasMoreCategories
+          ? _value.hasMoreCategories
+          : hasMoreCategories // ignore: cast_nullable_to_non_nullable
+              as bool,
+      currentPage: null == currentPage
+          ? _value.currentPage
+          : currentPage // ignore: cast_nullable_to_non_nullable
+              as int,
+      pageSize: null == pageSize
+          ? _value.pageSize
+          : pageSize // ignore: cast_nullable_to_non_nullable
+              as int,
     ) as $Val);
   }
 }
@@ -3310,7 +3408,21 @@ abstract class _$$UnifiedSearchResponseImplCopyWith<$Res>
       List<VerseSearchResult> verses,
       List<CoupletSearchResult> couplets,
       List<AutocompleteTag> tags,
-      List<AutocompleteCategory> categories});
+      List<AutocompleteCategory> categories,
+      int totalPoems,
+      int totalVerses,
+      int totalPoets,
+      int totalCouplets,
+      int totalTags,
+      int totalCategories,
+      bool hasMorePoems,
+      bool hasMoreVerses,
+      bool hasMorePoets,
+      bool hasMoreCouplets,
+      bool hasMoreTags,
+      bool hasMoreCategories,
+      int currentPage,
+      int pageSize});
 }
 
 /// @nodoc
@@ -3338,6 +3450,20 @@ class __$$UnifiedSearchResponseImplCopyWithImpl<$Res>
     Object? couplets = null,
     Object? tags = null,
     Object? categories = null,
+    Object? totalPoems = null,
+    Object? totalVerses = null,
+    Object? totalPoets = null,
+    Object? totalCouplets = null,
+    Object? totalTags = null,
+    Object? totalCategories = null,
+    Object? hasMorePoems = null,
+    Object? hasMoreVerses = null,
+    Object? hasMorePoets = null,
+    Object? hasMoreCouplets = null,
+    Object? hasMoreTags = null,
+    Object? hasMoreCategories = null,
+    Object? currentPage = null,
+    Object? pageSize = null,
   }) {
     return _then(_$UnifiedSearchResponseImpl(
       totalResults: null == totalResults
@@ -3392,6 +3518,62 @@ class __$$UnifiedSearchResponseImplCopyWithImpl<$Res>
           ? _value._categories
           : categories // ignore: cast_nullable_to_non_nullable
               as List<AutocompleteCategory>,
+      totalPoems: null == totalPoems
+          ? _value.totalPoems
+          : totalPoems // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalVerses: null == totalVerses
+          ? _value.totalVerses
+          : totalVerses // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalPoets: null == totalPoets
+          ? _value.totalPoets
+          : totalPoets // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalCouplets: null == totalCouplets
+          ? _value.totalCouplets
+          : totalCouplets // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalTags: null == totalTags
+          ? _value.totalTags
+          : totalTags // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalCategories: null == totalCategories
+          ? _value.totalCategories
+          : totalCategories // ignore: cast_nullable_to_non_nullable
+              as int,
+      hasMorePoems: null == hasMorePoems
+          ? _value.hasMorePoems
+          : hasMorePoems // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasMoreVerses: null == hasMoreVerses
+          ? _value.hasMoreVerses
+          : hasMoreVerses // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasMorePoets: null == hasMorePoets
+          ? _value.hasMorePoets
+          : hasMorePoets // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasMoreCouplets: null == hasMoreCouplets
+          ? _value.hasMoreCouplets
+          : hasMoreCouplets // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasMoreTags: null == hasMoreTags
+          ? _value.hasMoreTags
+          : hasMoreTags // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasMoreCategories: null == hasMoreCategories
+          ? _value.hasMoreCategories
+          : hasMoreCategories // ignore: cast_nullable_to_non_nullable
+              as bool,
+      currentPage: null == currentPage
+          ? _value.currentPage
+          : currentPage // ignore: cast_nullable_to_non_nullable
+              as int,
+      pageSize: null == pageSize
+          ? _value.pageSize
+          : pageSize // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -3412,7 +3594,21 @@ class _$UnifiedSearchResponseImpl implements _UnifiedSearchResponse {
       final List<VerseSearchResult> verses = const [],
       final List<CoupletSearchResult> couplets = const [],
       final List<AutocompleteTag> tags = const [],
-      final List<AutocompleteCategory> categories = const []})
+      final List<AutocompleteCategory> categories = const [],
+      this.totalPoems = 0,
+      this.totalVerses = 0,
+      this.totalPoets = 0,
+      this.totalCouplets = 0,
+      this.totalTags = 0,
+      this.totalCategories = 0,
+      this.hasMorePoems = false,
+      this.hasMoreVerses = false,
+      this.hasMorePoets = false,
+      this.hasMoreCouplets = false,
+      this.hasMoreTags = false,
+      this.hasMoreCategories = false,
+      this.currentPage = 0,
+      this.pageSize = 10})
       : _poets = poets,
         _poems = poems,
         _verses = verses,
@@ -3423,6 +3619,7 @@ class _$UnifiedSearchResponseImpl implements _UnifiedSearchResponse {
   factory _$UnifiedSearchResponseImpl.fromJson(Map<String, dynamic> json) =>
       _$$UnifiedSearchResponseImplFromJson(json);
 
+// Current page item counts
   @override
   @JsonKey()
   final int totalResults;
@@ -3444,7 +3641,9 @@ class _$UnifiedSearchResponseImpl implements _UnifiedSearchResponse {
   @override
   @JsonKey()
   final int categoryCount;
+// Item arrays
   final List<PoetModel> _poets;
+// Item arrays
   @override
   @JsonKey()
   List<PoetModel> get poets {
@@ -3453,9 +3652,7 @@ class _$UnifiedSearchResponseImpl implements _UnifiedSearchResponse {
     return EqualUnmodifiableListView(_poets);
   }
 
-// Full poet objects from API
   final List<PoemModel> _poems;
-// Full poet objects from API
   @override
   @JsonKey()
   List<PoemModel> get poems {
@@ -3464,9 +3661,7 @@ class _$UnifiedSearchResponseImpl implements _UnifiedSearchResponse {
     return EqualUnmodifiableListView(_poems);
   }
 
-// Full poem objects from API
   final List<VerseSearchResult> _verses;
-// Full poem objects from API
   @override
   @JsonKey()
   List<VerseSearchResult> get verses {
@@ -3475,9 +3670,7 @@ class _$UnifiedSearchResponseImpl implements _UnifiedSearchResponse {
     return EqualUnmodifiableListView(_verses);
   }
 
-// Verse results with nested structure
   final List<CoupletSearchResult> _couplets;
-// Verse results with nested structure
   @override
   @JsonKey()
   List<CoupletSearchResult> get couplets {
@@ -3504,9 +3697,55 @@ class _$UnifiedSearchResponseImpl implements _UnifiedSearchResponse {
     return EqualUnmodifiableListView(_categories);
   }
 
+// Total counts in DB — for tab labels like "Poems (847)"
+  @override
+  @JsonKey()
+  final int totalPoems;
+  @override
+  @JsonKey()
+  final int totalVerses;
+  @override
+  @JsonKey()
+  final int totalPoets;
+  @override
+  @JsonKey()
+  final int totalCouplets;
+  @override
+  @JsonKey()
+  final int totalTags;
+  @override
+  @JsonKey()
+  final int totalCategories;
+// Per-type "has more" flags — show/hide "Load More"
+  @override
+  @JsonKey()
+  final bool hasMorePoems;
+  @override
+  @JsonKey()
+  final bool hasMoreVerses;
+  @override
+  @JsonKey()
+  final bool hasMorePoets;
+  @override
+  @JsonKey()
+  final bool hasMoreCouplets;
+  @override
+  @JsonKey()
+  final bool hasMoreTags;
+  @override
+  @JsonKey()
+  final bool hasMoreCategories;
+// Pagination echo
+  @override
+  @JsonKey()
+  final int currentPage;
+  @override
+  @JsonKey()
+  final int pageSize;
+
   @override
   String toString() {
-    return 'UnifiedSearchResponse(totalResults: $totalResults, poetCount: $poetCount, poemCount: $poemCount, verseCount: $verseCount, coupletCount: $coupletCount, tagCount: $tagCount, categoryCount: $categoryCount, poets: $poets, poems: $poems, verses: $verses, couplets: $couplets, tags: $tags, categories: $categories)';
+    return 'UnifiedSearchResponse(totalResults: $totalResults, poetCount: $poetCount, poemCount: $poemCount, verseCount: $verseCount, coupletCount: $coupletCount, tagCount: $tagCount, categoryCount: $categoryCount, poets: $poets, poems: $poems, verses: $verses, couplets: $couplets, tags: $tags, categories: $categories, totalPoems: $totalPoems, totalVerses: $totalVerses, totalPoets: $totalPoets, totalCouplets: $totalCouplets, totalTags: $totalTags, totalCategories: $totalCategories, hasMorePoems: $hasMorePoems, hasMoreVerses: $hasMoreVerses, hasMorePoets: $hasMorePoets, hasMoreCouplets: $hasMoreCouplets, hasMoreTags: $hasMoreTags, hasMoreCategories: $hasMoreCategories, currentPage: $currentPage, pageSize: $pageSize)';
   }
 
   @override
@@ -3534,26 +3773,69 @@ class _$UnifiedSearchResponseImpl implements _UnifiedSearchResponse {
             const DeepCollectionEquality().equals(other._couplets, _couplets) &&
             const DeepCollectionEquality().equals(other._tags, _tags) &&
             const DeepCollectionEquality()
-                .equals(other._categories, _categories));
+                .equals(other._categories, _categories) &&
+            (identical(other.totalPoems, totalPoems) ||
+                other.totalPoems == totalPoems) &&
+            (identical(other.totalVerses, totalVerses) ||
+                other.totalVerses == totalVerses) &&
+            (identical(other.totalPoets, totalPoets) ||
+                other.totalPoets == totalPoets) &&
+            (identical(other.totalCouplets, totalCouplets) ||
+                other.totalCouplets == totalCouplets) &&
+            (identical(other.totalTags, totalTags) ||
+                other.totalTags == totalTags) &&
+            (identical(other.totalCategories, totalCategories) ||
+                other.totalCategories == totalCategories) &&
+            (identical(other.hasMorePoems, hasMorePoems) ||
+                other.hasMorePoems == hasMorePoems) &&
+            (identical(other.hasMoreVerses, hasMoreVerses) ||
+                other.hasMoreVerses == hasMoreVerses) &&
+            (identical(other.hasMorePoets, hasMorePoets) ||
+                other.hasMorePoets == hasMorePoets) &&
+            (identical(other.hasMoreCouplets, hasMoreCouplets) ||
+                other.hasMoreCouplets == hasMoreCouplets) &&
+            (identical(other.hasMoreTags, hasMoreTags) ||
+                other.hasMoreTags == hasMoreTags) &&
+            (identical(other.hasMoreCategories, hasMoreCategories) ||
+                other.hasMoreCategories == hasMoreCategories) &&
+            (identical(other.currentPage, currentPage) ||
+                other.currentPage == currentPage) &&
+            (identical(other.pageSize, pageSize) ||
+                other.pageSize == pageSize));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      totalResults,
-      poetCount,
-      poemCount,
-      verseCount,
-      coupletCount,
-      tagCount,
-      categoryCount,
-      const DeepCollectionEquality().hash(_poets),
-      const DeepCollectionEquality().hash(_poems),
-      const DeepCollectionEquality().hash(_verses),
-      const DeepCollectionEquality().hash(_couplets),
-      const DeepCollectionEquality().hash(_tags),
-      const DeepCollectionEquality().hash(_categories));
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        totalResults,
+        poetCount,
+        poemCount,
+        verseCount,
+        coupletCount,
+        tagCount,
+        categoryCount,
+        const DeepCollectionEquality().hash(_poets),
+        const DeepCollectionEquality().hash(_poems),
+        const DeepCollectionEquality().hash(_verses),
+        const DeepCollectionEquality().hash(_couplets),
+        const DeepCollectionEquality().hash(_tags),
+        const DeepCollectionEquality().hash(_categories),
+        totalPoems,
+        totalVerses,
+        totalPoets,
+        totalCouplets,
+        totalTags,
+        totalCategories,
+        hasMorePoems,
+        hasMoreVerses,
+        hasMorePoets,
+        hasMoreCouplets,
+        hasMoreTags,
+        hasMoreCategories,
+        currentPage,
+        pageSize
+      ]);
 
   @JsonKey(ignore: true)
   @override
@@ -3572,25 +3854,38 @@ class _$UnifiedSearchResponseImpl implements _UnifiedSearchResponse {
 
 abstract class _UnifiedSearchResponse implements UnifiedSearchResponse {
   const factory _UnifiedSearchResponse(
-          {final int totalResults,
-          final int poetCount,
-          final int poemCount,
-          final int verseCount,
-          final int coupletCount,
-          final int tagCount,
-          final int categoryCount,
-          final List<PoetModel> poets,
-          final List<PoemModel> poems,
-          final List<VerseSearchResult> verses,
-          final List<CoupletSearchResult> couplets,
-          final List<AutocompleteTag> tags,
-          final List<AutocompleteCategory> categories}) =
-      _$UnifiedSearchResponseImpl;
+      {final int totalResults,
+      final int poetCount,
+      final int poemCount,
+      final int verseCount,
+      final int coupletCount,
+      final int tagCount,
+      final int categoryCount,
+      final List<PoetModel> poets,
+      final List<PoemModel> poems,
+      final List<VerseSearchResult> verses,
+      final List<CoupletSearchResult> couplets,
+      final List<AutocompleteTag> tags,
+      final List<AutocompleteCategory> categories,
+      final int totalPoems,
+      final int totalVerses,
+      final int totalPoets,
+      final int totalCouplets,
+      final int totalTags,
+      final int totalCategories,
+      final bool hasMorePoems,
+      final bool hasMoreVerses,
+      final bool hasMorePoets,
+      final bool hasMoreCouplets,
+      final bool hasMoreTags,
+      final bool hasMoreCategories,
+      final int currentPage,
+      final int pageSize}) = _$UnifiedSearchResponseImpl;
 
   factory _UnifiedSearchResponse.fromJson(Map<String, dynamic> json) =
       _$UnifiedSearchResponseImpl.fromJson;
 
-  @override
+  @override // Current page item counts
   int get totalResults;
   @override
   int get poetCount;
@@ -3604,18 +3899,46 @@ abstract class _UnifiedSearchResponse implements UnifiedSearchResponse {
   int get tagCount;
   @override
   int get categoryCount;
-  @override
+  @override // Item arrays
   List<PoetModel> get poets;
-  @override // Full poet objects from API
+  @override
   List<PoemModel> get poems;
-  @override // Full poem objects from API
+  @override
   List<VerseSearchResult> get verses;
-  @override // Verse results with nested structure
+  @override
   List<CoupletSearchResult> get couplets;
   @override
   List<AutocompleteTag> get tags;
   @override
   List<AutocompleteCategory> get categories;
+  @override // Total counts in DB — for tab labels like "Poems (847)"
+  int get totalPoems;
+  @override
+  int get totalVerses;
+  @override
+  int get totalPoets;
+  @override
+  int get totalCouplets;
+  @override
+  int get totalTags;
+  @override
+  int get totalCategories;
+  @override // Per-type "has more" flags — show/hide "Load More"
+  bool get hasMorePoems;
+  @override
+  bool get hasMoreVerses;
+  @override
+  bool get hasMorePoets;
+  @override
+  bool get hasMoreCouplets;
+  @override
+  bool get hasMoreTags;
+  @override
+  bool get hasMoreCategories;
+  @override // Pagination echo
+  int get currentPage;
+  @override
+  int get pageSize;
   @override
   @JsonKey(ignore: true)
   _$$UnifiedSearchResponseImplCopyWith<_$UnifiedSearchResponseImpl>

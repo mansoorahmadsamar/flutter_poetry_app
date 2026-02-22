@@ -106,21 +106,26 @@ class SearchService {
   /// Endpoint: GET /api/search
   ///
   /// This is the MAIN search endpoint that should be used when users hit enter
-  /// to search. It returns poets, poems, verses, couplets, tags, and categories.
+  /// to search. It returns poets, poems, verses, couplets, tags, and categories
+  /// with per-type pagination metadata.
   ///
   /// Parameters:
   /// - [query]: Search query (required)
-  /// - [type]: Content type filter ('all', 'poets', 'poems', 'couplets') - defaults to 'all'
+  /// - [type]: Content type filter ('all', 'poems_only', 'verses_only', etc.)
   /// - [lang]: Language code (ur, en, hi) - defaults to 'ur'
+  /// - [page]: Page number (0-based) - defaults to 0
+  /// - [size]: Page size - defaults to 10
   ///
-  /// Returns: Unified search results with all content types
+  /// Returns: Unified search results with all content types and pagination flags
   Future<UnifiedSearchResponse> searchUnified({
     required String query,
     String type = 'all',
     String lang = 'ur',
+    int page = 0,
+    int size = 10,
   }) async {
     try {
-      _logger.i('🔍 Unified search: "$query" (type: $type, lang: $lang)');
+      _logger.i('🔍 Unified search: "$query" (type: $type, lang: $lang, page: $page, size: $size)');
 
       final response = await _dio.get(
         _baseEndpoint,
@@ -128,6 +133,8 @@ class SearchService {
           'q': query,
           'type': type,
           'lang': lang,
+          'page': page,
+          'size': size,
         },
       );
 
@@ -160,6 +167,33 @@ class SearchService {
       _logger.e('❌ Unexpected error in unified search: $e');
       throw Exception('Failed to perform unified search: ${e.toString()}');
     }
+  }
+
+  /// Load more items for a specific content type (pagination).
+  ///
+  /// Use after initial `searchUnified(type: 'all')` to fetch page N+1
+  /// of a single type (e.g. poems_only, verses_only).
+  ///
+  /// Parameters:
+  /// - [query]: Same search query
+  /// - [type]: Single-type filter ('poems_only', 'verses_only', 'poets_only', 'couplets_only', etc.)
+  /// - [page]: Next page number (1-based after initial page 0)
+  /// - [lang]: Language code
+  /// - [size]: Page size
+  Future<UnifiedSearchResponse> loadMore({
+    required String query,
+    required String type,
+    required int page,
+    String lang = 'ur',
+    int size = 10,
+  }) async {
+    return searchUnified(
+      query: query,
+      type: type,
+      lang: lang,
+      page: page,
+      size: size,
+    );
   }
 
   // ============================================================================

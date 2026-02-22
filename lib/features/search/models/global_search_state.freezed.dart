@@ -30,10 +30,14 @@ mixin _$GlobalSearchState {
   bool get isLoadingAutocomplete =>
       throw _privateConstructorUsedError; // Search results data
   UnifiedSearchResponse? get unifiedResults =>
-      throw _privateConstructorUsedError; // New unified search results
+      throw _privateConstructorUsedError;
   PaginatedResponse<CoupletSearchResult>? get coupletResults =>
       throw _privateConstructorUsedError; // Legacy - will be deprecated
-  bool get isLoadingResults =>
+  bool get isLoadingResults => throw _privateConstructorUsedError;
+  bool get isLoadingMore =>
+      throw _privateConstructorUsedError; // Loading next page for a segment
+// Per-segment pagination tracking (next page to fetch)
+  Map<DiscoverSegment, int> get nextPage =>
       throw _privateConstructorUsedError; // Discovery data
   List<String> get recentSearches => throw _privateConstructorUsedError;
   TrendingSearchesResponse? get trendingSearches =>
@@ -70,6 +74,8 @@ abstract class $GlobalSearchStateCopyWith<$Res> {
       UnifiedSearchResponse? unifiedResults,
       PaginatedResponse<CoupletSearchResult>? coupletResults,
       bool isLoadingResults,
+      bool isLoadingMore,
+      Map<DiscoverSegment, int> nextPage,
       List<String> recentSearches,
       TrendingSearchesResponse? trendingSearches,
       RecommendationResponse? recommendations,
@@ -109,6 +115,8 @@ class _$GlobalSearchStateCopyWithImpl<$Res, $Val extends GlobalSearchState>
     Object? unifiedResults = freezed,
     Object? coupletResults = freezed,
     Object? isLoadingResults = null,
+    Object? isLoadingMore = null,
+    Object? nextPage = null,
     Object? recentSearches = null,
     Object? trendingSearches = freezed,
     Object? recommendations = freezed,
@@ -161,6 +169,14 @@ class _$GlobalSearchStateCopyWithImpl<$Res, $Val extends GlobalSearchState>
           ? _value.isLoadingResults
           : isLoadingResults // ignore: cast_nullable_to_non_nullable
               as bool,
+      isLoadingMore: null == isLoadingMore
+          ? _value.isLoadingMore
+          : isLoadingMore // ignore: cast_nullable_to_non_nullable
+              as bool,
+      nextPage: null == nextPage
+          ? _value.nextPage
+          : nextPage // ignore: cast_nullable_to_non_nullable
+              as Map<DiscoverSegment, int>,
       recentSearches: null == recentSearches
           ? _value.recentSearches
           : recentSearches // ignore: cast_nullable_to_non_nullable
@@ -286,6 +302,8 @@ abstract class _$$GlobalSearchStateImplCopyWith<$Res>
       UnifiedSearchResponse? unifiedResults,
       PaginatedResponse<CoupletSearchResult>? coupletResults,
       bool isLoadingResults,
+      bool isLoadingMore,
+      Map<DiscoverSegment, int> nextPage,
       List<String> recentSearches,
       TrendingSearchesResponse? trendingSearches,
       RecommendationResponse? recommendations,
@@ -329,6 +347,8 @@ class __$$GlobalSearchStateImplCopyWithImpl<$Res>
     Object? unifiedResults = freezed,
     Object? coupletResults = freezed,
     Object? isLoadingResults = null,
+    Object? isLoadingMore = null,
+    Object? nextPage = null,
     Object? recentSearches = null,
     Object? trendingSearches = freezed,
     Object? recommendations = freezed,
@@ -381,6 +401,14 @@ class __$$GlobalSearchStateImplCopyWithImpl<$Res>
           ? _value.isLoadingResults
           : isLoadingResults // ignore: cast_nullable_to_non_nullable
               as bool,
+      isLoadingMore: null == isLoadingMore
+          ? _value.isLoadingMore
+          : isLoadingMore // ignore: cast_nullable_to_non_nullable
+              as bool,
+      nextPage: null == nextPage
+          ? _value._nextPage
+          : nextPage // ignore: cast_nullable_to_non_nullable
+              as Map<DiscoverSegment, int>,
       recentSearches: null == recentSearches
           ? _value._recentSearches
           : recentSearches // ignore: cast_nullable_to_non_nullable
@@ -424,13 +452,16 @@ class _$GlobalSearchStateImpl implements _GlobalSearchState {
       this.unifiedResults,
       this.coupletResults,
       this.isLoadingResults = false,
+      this.isLoadingMore = false,
+      final Map<DiscoverSegment, int> nextPage = const {},
       final List<String> recentSearches = const [],
       this.trendingSearches,
       this.recommendations,
       this.relatedSearches,
       this.discoverBundle,
       this.errorMessage})
-      : _recentSearches = recentSearches;
+      : _nextPage = nextPage,
+        _recentSearches = recentSearches;
 
   @override
   @JsonKey()
@@ -460,13 +491,28 @@ class _$GlobalSearchStateImpl implements _GlobalSearchState {
 // Search results data
   @override
   final UnifiedSearchResponse? unifiedResults;
-// New unified search results
   @override
   final PaginatedResponse<CoupletSearchResult>? coupletResults;
 // Legacy - will be deprecated
   @override
   @JsonKey()
   final bool isLoadingResults;
+  @override
+  @JsonKey()
+  final bool isLoadingMore;
+// Loading next page for a segment
+// Per-segment pagination tracking (next page to fetch)
+  final Map<DiscoverSegment, int> _nextPage;
+// Loading next page for a segment
+// Per-segment pagination tracking (next page to fetch)
+  @override
+  @JsonKey()
+  Map<DiscoverSegment, int> get nextPage {
+    if (_nextPage is EqualUnmodifiableMapView) return _nextPage;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_nextPage);
+  }
+
 // Discovery data
   final List<String> _recentSearches;
 // Discovery data
@@ -493,7 +539,7 @@ class _$GlobalSearchStateImpl implements _GlobalSearchState {
 
   @override
   String toString() {
-    return 'GlobalSearchState(mode: $mode, currentQuery: $currentQuery, selectedFilter: $selectedFilter, sortBy: $sortBy, activeSegment: $activeSegment, coupletSort: $coupletSort, autocompleteResults: $autocompleteResults, isLoadingAutocomplete: $isLoadingAutocomplete, unifiedResults: $unifiedResults, coupletResults: $coupletResults, isLoadingResults: $isLoadingResults, recentSearches: $recentSearches, trendingSearches: $trendingSearches, recommendations: $recommendations, relatedSearches: $relatedSearches, discoverBundle: $discoverBundle, errorMessage: $errorMessage)';
+    return 'GlobalSearchState(mode: $mode, currentQuery: $currentQuery, selectedFilter: $selectedFilter, sortBy: $sortBy, activeSegment: $activeSegment, coupletSort: $coupletSort, autocompleteResults: $autocompleteResults, isLoadingAutocomplete: $isLoadingAutocomplete, unifiedResults: $unifiedResults, coupletResults: $coupletResults, isLoadingResults: $isLoadingResults, isLoadingMore: $isLoadingMore, nextPage: $nextPage, recentSearches: $recentSearches, trendingSearches: $trendingSearches, recommendations: $recommendations, relatedSearches: $relatedSearches, discoverBundle: $discoverBundle, errorMessage: $errorMessage)';
   }
 
   @override
@@ -521,6 +567,9 @@ class _$GlobalSearchStateImpl implements _GlobalSearchState {
                 other.coupletResults == coupletResults) &&
             (identical(other.isLoadingResults, isLoadingResults) ||
                 other.isLoadingResults == isLoadingResults) &&
+            (identical(other.isLoadingMore, isLoadingMore) ||
+                other.isLoadingMore == isLoadingMore) &&
+            const DeepCollectionEquality().equals(other._nextPage, _nextPage) &&
             const DeepCollectionEquality()
                 .equals(other._recentSearches, _recentSearches) &&
             (identical(other.trendingSearches, trendingSearches) ||
@@ -536,25 +585,28 @@ class _$GlobalSearchStateImpl implements _GlobalSearchState {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      mode,
-      currentQuery,
-      selectedFilter,
-      sortBy,
-      activeSegment,
-      coupletSort,
-      autocompleteResults,
-      isLoadingAutocomplete,
-      unifiedResults,
-      coupletResults,
-      isLoadingResults,
-      const DeepCollectionEquality().hash(_recentSearches),
-      trendingSearches,
-      recommendations,
-      relatedSearches,
-      discoverBundle,
-      errorMessage);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        mode,
+        currentQuery,
+        selectedFilter,
+        sortBy,
+        activeSegment,
+        coupletSort,
+        autocompleteResults,
+        isLoadingAutocomplete,
+        unifiedResults,
+        coupletResults,
+        isLoadingResults,
+        isLoadingMore,
+        const DeepCollectionEquality().hash(_nextPage),
+        const DeepCollectionEquality().hash(_recentSearches),
+        trendingSearches,
+        recommendations,
+        relatedSearches,
+        discoverBundle,
+        errorMessage
+      ]);
 
   @JsonKey(ignore: true)
   @override
@@ -577,6 +629,8 @@ abstract class _GlobalSearchState implements GlobalSearchState {
       final UnifiedSearchResponse? unifiedResults,
       final PaginatedResponse<CoupletSearchResult>? coupletResults,
       final bool isLoadingResults,
+      final bool isLoadingMore,
+      final Map<DiscoverSegment, int> nextPage,
       final List<String> recentSearches,
       final TrendingSearchesResponse? trendingSearches,
       final RecommendationResponse? recommendations,
@@ -602,10 +656,15 @@ abstract class _GlobalSearchState implements GlobalSearchState {
   bool get isLoadingAutocomplete;
   @override // Search results data
   UnifiedSearchResponse? get unifiedResults;
-  @override // New unified search results
+  @override
   PaginatedResponse<CoupletSearchResult>? get coupletResults;
   @override // Legacy - will be deprecated
   bool get isLoadingResults;
+  @override
+  bool get isLoadingMore;
+  @override // Loading next page for a segment
+// Per-segment pagination tracking (next page to fetch)
+  Map<DiscoverSegment, int> get nextPage;
   @override // Discovery data
   List<String> get recentSearches;
   @override

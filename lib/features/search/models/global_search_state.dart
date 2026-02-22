@@ -22,8 +22,6 @@ enum DiscoverSegment {
   poems, // Poems only
   verses, // Verses/couplets only
   categories, // Categories only
-  dictionary, // Dictionary (placeholder)
-  watch, // Watch (placeholder)
 }
 
 /// Couplet sort options
@@ -52,9 +50,13 @@ class GlobalSearchState with _$GlobalSearchState {
     @Default(false) bool isLoadingAutocomplete,
 
     // Search results data
-    UnifiedSearchResponse? unifiedResults,  // New unified search results
+    UnifiedSearchResponse? unifiedResults,
     PaginatedResponse<CoupletSearchResult>? coupletResults,  // Legacy - will be deprecated
     @Default(false) bool isLoadingResults,
+    @Default(false) bool isLoadingMore, // Loading next page for a segment
+
+    // Per-segment pagination tracking (next page to fetch)
+    @Default({}) Map<DiscoverSegment, int> nextPage,
 
     // Discovery data
     @Default([]) List<String> recentSearches,

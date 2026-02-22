@@ -11,7 +11,6 @@ import 'package:flutter_poetry_app/features/search/widgets/skeleton_loaders/coup
 import 'package:flutter_poetry_app/features/search/widgets/discovery_sections/recent_searches_section.dart';
 import 'package:flutter_poetry_app/features/search/widgets/discovery_sections/trending_searches_section.dart';
 import 'package:flutter_poetry_app/features/search/widgets/discovery_sections/recommendations_section.dart';
-import 'package:flutter_poetry_app/features/search/widgets/coming_soon_state.dart';
 
 /// Discover tab - Premium search with discovery content
 ///
@@ -64,12 +63,6 @@ class SearchTab extends ConsumerWidget {
     GlobalSearchState searchState,
     bool isDark,
   ) {
-    // Check for placeholder segments first (Dictionary/Watch)
-    if (searchState.activeSegment == DiscoverSegment.dictionary ||
-        searchState.activeSegment == DiscoverSegment.watch) {
-      return ComingSoonState(segment: searchState.activeSegment);
-    }
-
     // Handle search modes
     switch (searchState.mode) {
       case SearchMode.idle:

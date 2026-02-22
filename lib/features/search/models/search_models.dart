@@ -231,9 +231,11 @@ class RecommendationItem with _$RecommendationItem {
 
 /// Unified search response from /api/search endpoint
 /// Returns all content types (poets, poems, verses, couplets, tags, categories)
+/// with pagination metadata for per-type infinite scroll.
 @freezed
 class UnifiedSearchResponse with _$UnifiedSearchResponse {
   const factory UnifiedSearchResponse({
+    // Current page item counts
     @Default(0) int totalResults,
     @Default(0) int poetCount,
     @Default(0) int poemCount,
@@ -241,12 +243,34 @@ class UnifiedSearchResponse with _$UnifiedSearchResponse {
     @Default(0) int coupletCount,
     @Default(0) int tagCount,
     @Default(0) int categoryCount,
-    @Default([]) List<PoetModel> poets,  // Full poet objects from API
-    @Default([]) List<PoemModel> poems,  // Full poem objects from API
-    @Default([]) List<VerseSearchResult> verses,  // Verse results with nested structure
+
+    // Item arrays
+    @Default([]) List<PoetModel> poets,
+    @Default([]) List<PoemModel> poems,
+    @Default([]) List<VerseSearchResult> verses,
     @Default([]) List<CoupletSearchResult> couplets,
     @Default([]) List<AutocompleteTag> tags,
     @Default([]) List<AutocompleteCategory> categories,
+
+    // Total counts in DB — for tab labels like "Poems (847)"
+    @Default(0) int totalPoems,
+    @Default(0) int totalVerses,
+    @Default(0) int totalPoets,
+    @Default(0) int totalCouplets,
+    @Default(0) int totalTags,
+    @Default(0) int totalCategories,
+
+    // Per-type "has more" flags — show/hide "Load More"
+    @Default(false) bool hasMorePoems,
+    @Default(false) bool hasMoreVerses,
+    @Default(false) bool hasMorePoets,
+    @Default(false) bool hasMoreCouplets,
+    @Default(false) bool hasMoreTags,
+    @Default(false) bool hasMoreCategories,
+
+    // Pagination echo
+    @Default(0) int currentPage,
+    @Default(10) int pageSize,
   }) = _UnifiedSearchResponse;
 
   factory UnifiedSearchResponse.fromJson(Map<String, dynamic> json) =>

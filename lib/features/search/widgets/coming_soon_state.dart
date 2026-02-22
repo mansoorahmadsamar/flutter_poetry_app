@@ -63,24 +63,10 @@ class ComingSoonState extends StatelessWidget {
   }
 
   String _getTitle() {
-    switch (segment) {
-      case DiscoverSegment.dictionary:
-        return 'Dictionary Coming Soon';
-      case DiscoverSegment.watch:
-        return 'Watch Coming Soon';
-      default:
-        return 'Coming Soon';
-    }
+    return 'Coming Soon';
   }
 
   String _getDescription() {
-    switch (segment) {
-      case DiscoverSegment.dictionary:
-        return 'Dictionary feature is coming soon';
-      case DiscoverSegment.watch:
-        return 'Watch feature is coming soon';
-      default:
-        return 'This feature is coming soon';
-    }
+    return 'This feature is coming soon';
   }
 }

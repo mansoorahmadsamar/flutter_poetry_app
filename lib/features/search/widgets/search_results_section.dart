@@ -102,10 +102,6 @@ class SearchResultsSection extends ConsumerWidget {
       case DiscoverSegment.categories:
         return _buildCategoriesResults(context, isDark);
 
-      case DiscoverSegment.dictionary:
-      case DiscoverSegment.watch:
-        // Should never reach here as these are handled in SearchTab
-        return const SizedBox.shrink();
     }
   }
 

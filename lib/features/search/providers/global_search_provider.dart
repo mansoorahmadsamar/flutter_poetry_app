@@ -8,6 +8,7 @@ import 'package:flutter_poetry_app/features/search/models/global_search_state.da
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
 import 'package:flutter_poetry_app/features/search/services/search_service.dart';
 import 'package:flutter_poetry_app/features/search/services/search_history_service.dart';
+import 'package:flutter_poetry_app/features/search/utils/app_search_urdu_normalizer.dart';
 import 'package:flutter_poetry_app/features/discover/services/discover_service.dart';
 import 'package:flutter_poetry_app/features/discover/models/discover_bundle_model.dart';
 
@@ -48,6 +49,11 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
   Timer? _debounceTimer;
   CancelToken? _autocompleteCancelToken;
 
+  /// LRU cache for last 5 search results (query → UnifiedSearchResponse)
+  /// Enables instant back-navigation without re-fetching
+  final _resultCache = <String, UnifiedSearchResponse>{};  // insertion-ordered in Dart
+  static const _maxCacheSize = 5;
+
   GlobalSearchNotifier(
     this._searchService,
     this._historyService,
@@ -55,6 +61,25 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
     this._languageCode,
   ) : super(const GlobalSearchState()) {
     _loadInitialData();
+  }
+
+  /// Get cached result for a query, or null if not cached
+  UnifiedSearchResponse? _getCachedResult(String query) {
+    final result = _resultCache[query];
+    if (result != null) {
+      // Move to end (most recently used)
+      _resultCache.remove(query);
+      _resultCache[query] = result;
+    }
+    return result;
+  }
+
+  /// Cache a search result, evicting oldest if at capacity
+  void _cacheResult(String query, UnifiedSearchResponse result) {
+    if (_resultCache.length >= _maxCacheSize) {
+      _resultCache.remove(_resultCache.keys.first);
+    }
+    _resultCache[query] = result;
   }
 
   // ==========================================================================
@@ -193,8 +218,8 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
       return;
     }
 
-    // Debounce autocomplete (400ms sweet spot)
-    _debounceTimer = Timer(const Duration(milliseconds: 400), () {
+    // Debounce autocomplete (300ms — fast enough for perceived responsiveness)
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
       _fetchAutocomplete(trimmedQuery);
     });
   }
@@ -219,8 +244,9 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
     );
 
     try {
+      final normalizedQuery = AppSearchUrduNormalizer.normalize(query);
       final results = await _searchService.getAutocomplete(
-        query: query,
+        query: normalizedQuery,
         lang: _languageCode,
         cancelToken: _autocompleteCancelToken,
       );
@@ -269,8 +295,14 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
 
     if (searchQuery.isEmpty) return;
 
-    // Save to history
+    // Normalize Urdu text (diacritics, letter variants) for consistent matching
+    final normalizedQuery = AppSearchUrduNormalizer.normalize(searchQuery);
+
+    // Save original (un-normalized) query to history for display
     await _historyService.addSearch(searchQuery);
+
+    // Check LRU cache first — show cached result instantly, then refresh
+    final cachedResult = _getCachedResult(normalizedQuery);
 
     // Update state to searching mode
     state = state.copyWith(
@@ -278,18 +310,20 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
       mode: SearchMode.searching,
       isLoadingResults: true,
       autocompleteResults: null, // Hide autocomplete
+      // Show cached result immediately if available (optimistic UI)
+      unifiedResults: cachedResult,
     );
 
     try {
       // Fetch unified search results and related searches in parallel
       final results = await Future.wait([
         _searchService.searchUnified(
-          query: searchQuery,
+          query: normalizedQuery,
           type: 'all',  // Search all content types
           lang: _languageCode,
         ),
         _searchService.getRelatedSearches(
-          query: searchQuery,
+          query: normalizedQuery,
           limit: 5,
         ),
       ]);
@@ -300,10 +334,15 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
       _logger.i('🔍 Setting state with unified results: totalResults=${unifiedResults.totalResults}');
       _logger.i('   Poets: ${unifiedResults.poets.length}, Poems: ${unifiedResults.poems.length}, Couplets: ${unifiedResults.couplets.length}');
 
-      // Update state with results
+      // Cache the result for back-navigation
+      _cacheResult(normalizedQuery, unifiedResults);
+
+      // Update state with results — reset pagination (page 0 just fetched)
       state = state.copyWith(
         mode: SearchMode.results,
         isLoadingResults: false,
+        isLoadingMore: false,
+        nextPage: const {},  // Reset — next loadMore starts at page 1
         unifiedResults: unifiedResults,
         relatedSearches: relatedSearches,
       );
@@ -321,6 +360,146 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
         isLoadingResults: false,
         errorMessage: 'Search failed: ${e.toString()}',
       );
+    }
+  }
+
+  // ==========================================================================
+  // PAGINATION — Load More
+  // ==========================================================================
+
+  /// Load more items for the currently active segment.
+  ///
+  /// Uses `type=poems_only`, `type=verses_only`, etc. and the tracked
+  /// `nextPage` per segment. Appends results to the existing lists.
+  Future<void> loadMore() async {
+    final segment = state.activeSegment;
+    if (segment == DiscoverSegment.all) return; // Preview mode — no pagination
+    if (state.isLoadingMore) return; // Already loading
+
+    final current = state.unifiedResults;
+    if (current == null) return;
+
+    // Check hasMore flag for this segment
+    if (!_hasMoreForSegment(current, segment)) return;
+
+    final page = state.nextPage[segment] ?? 1;
+    final query = state.currentQuery;
+    if (query.isEmpty) return;
+
+    final normalizedQuery = AppSearchUrduNormalizer.normalize(query);
+    final typeParam = _segmentToTypeParam(segment);
+
+    state = state.copyWith(isLoadingMore: true);
+
+    try {
+      final moreResults = await _searchService.loadMore(
+        query: normalizedQuery,
+        type: typeParam,
+        page: page,
+        lang: _languageCode,
+        size: 20,
+      );
+
+      // Merge: append new items to existing lists, update hasMore flags
+      final merged = _mergeResults(current, moreResults, segment);
+
+      // Update next page
+      final updatedNextPage = Map<DiscoverSegment, int>.from(state.nextPage);
+      updatedNextPage[segment] = page + 1;
+
+      state = state.copyWith(
+        unifiedResults: merged,
+        isLoadingMore: false,
+        nextPage: updatedNextPage,
+      );
+
+      // Update LRU cache with merged results
+      _cacheResult(normalizedQuery, merged);
+
+      _logger.i('✅ Loaded page $page for ${segment.name} — appended ${_newItemCount(moreResults, segment)} items');
+    } catch (e) {
+      _logger.e('❌ Failed to load more for ${segment.name}: $e');
+      state = state.copyWith(isLoadingMore: false);
+    }
+  }
+
+  /// Check if there are more items for a segment
+  bool _hasMoreForSegment(UnifiedSearchResponse results, DiscoverSegment segment) {
+    switch (segment) {
+      case DiscoverSegment.poets:
+        return results.hasMorePoets;
+      case DiscoverSegment.poems:
+        return results.hasMorePoems;
+      case DiscoverSegment.verses:
+        return results.hasMoreCouplets;
+      case DiscoverSegment.categories:
+        return results.hasMoreCategories;
+      case DiscoverSegment.all:
+        return false;
+    }
+  }
+
+  /// Map segment to API type parameter
+  String _segmentToTypeParam(DiscoverSegment segment) {
+    switch (segment) {
+      case DiscoverSegment.poets:
+        return 'poets_only';
+      case DiscoverSegment.poems:
+        return 'poems_only';
+      case DiscoverSegment.verses:
+        return 'couplets_only';
+      case DiscoverSegment.categories:
+        return 'categories_only';
+      case DiscoverSegment.all:
+        return 'all';
+    }
+  }
+
+  /// Merge paginated results into existing results
+  UnifiedSearchResponse _mergeResults(
+    UnifiedSearchResponse existing,
+    UnifiedSearchResponse more,
+    DiscoverSegment segment,
+  ) {
+    switch (segment) {
+      case DiscoverSegment.poets:
+        return existing.copyWith(
+          poets: [...existing.poets, ...more.poets],
+          hasMorePoets: more.hasMorePoets,
+        );
+      case DiscoverSegment.poems:
+        return existing.copyWith(
+          poems: [...existing.poems, ...more.poems],
+          hasMorePoems: more.hasMorePoems,
+        );
+      case DiscoverSegment.verses:
+        return existing.copyWith(
+          couplets: [...existing.couplets, ...more.couplets],
+          hasMoreCouplets: more.hasMoreCouplets,
+        );
+      case DiscoverSegment.categories:
+        return existing.copyWith(
+          categories: [...existing.categories, ...more.categories],
+          hasMoreCategories: more.hasMoreCategories,
+        );
+      case DiscoverSegment.all:
+        return existing;
+    }
+  }
+
+  /// Count new items from a paginated response for a segment
+  int _newItemCount(UnifiedSearchResponse results, DiscoverSegment segment) {
+    switch (segment) {
+      case DiscoverSegment.poets:
+        return results.poets.length;
+      case DiscoverSegment.poems:
+        return results.poems.length;
+      case DiscoverSegment.verses:
+        return results.couplets.length;
+      case DiscoverSegment.categories:
+        return results.categories.length;
+      case DiscoverSegment.all:
+        return 0;
     }
   }
 
@@ -369,12 +548,6 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
   /// - [segment]: New active segment
   void setActiveSegment(DiscoverSegment segment) {
     state = state.copyWith(activeSegment: segment);
-
-    // If placeholder segment, don't execute search
-    if (segment == DiscoverSegment.dictionary ||
-        segment == DiscoverSegment.watch) {
-      return;
-    }
 
     // Re-execute search with segment filter if in results mode
     if (state.mode == SearchMode.results) {
@@ -427,6 +600,8 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
       isLoadingAutocomplete: false,
       coupletResults: null,
       isLoadingResults: false,
+      isLoadingMore: false,
+      nextPage: const {},
       relatedSearches: null,
       errorMessage: null,
       // Keep discovery data

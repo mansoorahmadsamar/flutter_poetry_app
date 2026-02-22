@@ -332,6 +332,20 @@ _$UnifiedSearchResponseImpl _$$UnifiedSearchResponseImplFromJson(
                   AutocompleteCategory.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
+      totalPoems: (json['totalPoems'] as num?)?.toInt() ?? 0,
+      totalVerses: (json['totalVerses'] as num?)?.toInt() ?? 0,
+      totalPoets: (json['totalPoets'] as num?)?.toInt() ?? 0,
+      totalCouplets: (json['totalCouplets'] as num?)?.toInt() ?? 0,
+      totalTags: (json['totalTags'] as num?)?.toInt() ?? 0,
+      totalCategories: (json['totalCategories'] as num?)?.toInt() ?? 0,
+      hasMorePoems: json['hasMorePoems'] as bool? ?? false,
+      hasMoreVerses: json['hasMoreVerses'] as bool? ?? false,
+      hasMorePoets: json['hasMorePoets'] as bool? ?? false,
+      hasMoreCouplets: json['hasMoreCouplets'] as bool? ?? false,
+      hasMoreTags: json['hasMoreTags'] as bool? ?? false,
+      hasMoreCategories: json['hasMoreCategories'] as bool? ?? false,
+      currentPage: (json['currentPage'] as num?)?.toInt() ?? 0,
+      pageSize: (json['pageSize'] as num?)?.toInt() ?? 10,
     );
 
 Map<String, dynamic> _$$UnifiedSearchResponseImplToJson(
@@ -350,6 +364,20 @@ Map<String, dynamic> _$$UnifiedSearchResponseImplToJson(
       'couplets': instance.couplets,
       'tags': instance.tags,
       'categories': instance.categories,
+      'totalPoems': instance.totalPoems,
+      'totalVerses': instance.totalVerses,
+      'totalPoets': instance.totalPoets,
+      'totalCouplets': instance.totalCouplets,
+      'totalTags': instance.totalTags,
+      'totalCategories': instance.totalCategories,
+      'hasMorePoems': instance.hasMorePoems,
+      'hasMoreVerses': instance.hasMoreVerses,
+      'hasMorePoets': instance.hasMorePoets,
+      'hasMoreCouplets': instance.hasMoreCouplets,
+      'hasMoreTags': instance.hasMoreTags,
+      'hasMoreCategories': instance.hasMoreCategories,
+      'currentPage': instance.currentPage,
+      'pageSize': instance.pageSize,
     };
 
 _$TrendingSearchImpl _$$TrendingSearchImplFromJson(Map<String, dynamic> json) =>

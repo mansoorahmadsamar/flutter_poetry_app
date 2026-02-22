@@ -927,7 +927,8 @@ Authorization: Bearer <access_token>
   "success": true,
   "message": "User profile retrieved successfully",
   "data": {
-    "id": 1,
+    "id": "6e0b7476-f877-4e0b-b8e6-1bf7de7a2e6c",  // UUID public ID
+    "userId": 2,  // Database ID - use this for X-User-Id header in personalized requests
     "email": "user@example.com",
     "fullName": "John Doe",
     "username": "john_doe",
@@ -937,6 +938,10 @@ Authorization: Bearer <access_token>
   }
 }
 ```
+
+**Important Notes:**
+- `id`: UUID public ID (use for general display/reference)
+- `userId`: Database ID (Long) - **Required for personalized discover requests via X-User-Id header**
 
 ---
 
@@ -6323,92 +6328,242 @@ Soft delete (shows as "[deleted]").
 
 ### 10.1 Unified Search
 
-**Endpoint:** `GET /api/search?q={query}&type={type}&lang={lang}`
+**Endpoint:** `GET /api/search?q={query}&type={type}&lang={lang}&page={page}&size={size}`
 
-**Description:** Search across all content types (poems, verses, poets, categories, tags) with a unified interface. Powered by Elasticsearch with PostgreSQL fallback.
+**Description:** Search across all content types (poems, verses, poets, couplets, categories, tags) with a unified interface. Powered by Elasticsearch with PostgreSQL fallback. Returns paginated results **per content type** with full metadata needed for "load more" and tab counts.
 
 **Query Parameters:**
-- `q` (required) - Search query
-- `type` (optional, default: `all`) - Search type
-  - `all` - Search across all content types
-  - `poems` - Search only poems
-  - `verses` - Search only verses/couplets
-  - `poets` - Search only poets
-  - `categories` - Search only categories
-- `lang` (optional, default: `ur`) - Language code (ur, en, hi)
-- `script` (optional) - Script filter (ARABIC, ROMAN, DEVANAGARI, LATIN)
-- `page` (optional, default: 0) - Page number
-- `size` (optional, default: 10) - Results per page
+
+| Parameter | Required | Default | Description |
+|-----------|----------|---------|-------------|
+| `q` | Yes | — | Search query |
+| `type` | No | `all` | `all`, `poems_only`, `verses_only`, `poets_only`, `couplets_only`, `tags_only`, `categories_only` |
+| `lang` | No | `ur` | Language code: `ur`, `en`, `hi` |
+| `script` | No | auto-detected | Script: `ARABIC`, `ROMAN`, `DEVANAGARI`, `LATIN` |
+| `page` | No | `0` | Page number (0-based) |
+| `size` | No | `10` | Items per page **per content type** |
+
+> **Important:** `page` and `size` apply independently to each content type. A request with `size=10` and `type=all` can return up to 60 items total (10 per type).
 
 **Example Requests:**
 
-**Search All Content:**
 ```bash
-curl "http://localhost:8080/api/search?q=love&type=all&lang=en"
-```
+# Initial search — page 0
+curl "http://localhost:8080/api/search?q=duniya&type=all&lang=ur&page=0&size=10"
 
-**Search Only Poets:**
-```bash
-curl "http://localhost:8080/api/search?q=poetry&type=poets&lang=en"
+# Load more poems — page 1
+curl "http://localhost:8080/api/search?q=duniya&type=poems_only&lang=ur&page=1&size=10"
+
+# Load more verses — page 2
+curl "http://localhost:8080/api/search?q=duniya&type=verses_only&lang=ur&page=2&size=10"
+
+# Search poets only
+curl "http://localhost:8080/api/search?q=غالب&type=poets_only&lang=ur"
 ```
 
 **Success Response (200):**
 ```json
 {
   "success": true,
-  "message": "Found 14 total results (0 poems, 0 verses, 1 poets)",
+  "message": "Found 23 total results (5 poems, 10 verses, 3 poets)",
   "data": {
-    "poems": [],
-    "verses": [],
-    "poets": [
-      {
-        "publicId": "cc44d698-c4e2-4375-839b-f5ddfa05b167",
-        "name": "Mirza Ghalib",
-        "shortBio": "Mirza Asadullah Khan "Ghalib" (1797–1869) was one of the greatest Urdu and Persian poets...",
-        "birthYear": 1797,
-        "deathYear": 1869,
-        "profileImageUrl": "https://d8e5xg2x6e8y1.cloudfront.net/poets/mirza-ghalib/profile/profile.jpeg",
-        "gender": "MALE",
-        "era": "CLASSICAL",
-        "poemCount": 0,
-        "viewCount": 13,
-        "isFeatured": true,
-        "isTrending": true
-      }
-    ],
-    "categories": [
-      {
-        "publicId": "efb77fbf-2937-46a0-97f9-8d9a49ddd575",
-        "name": "Love Poetry",
-        "description": "Poetry expressing romantic and divine love"
-      }
-    ],
-    "tags": [
-      {
-        "publicId": "a71d4649-e948-417f-8532-f2ccf2df80dd",
-        "name": "ashiq",
-        "slug": "ashiq",
-        "color": "#C2185B",
-        "tagType": "GENERAL",
-        "description": "Lover"
-      }
-    ],
-    "couplets": [],
-    "totalResults": 14,
-    "poemCount": 0,
-    "verseCount": 0,
-    "poetCount": 1,
-    "categoryCount": 3,
-    "coupletCount": 0,
-    "tagCount": 10
+    "poems": [ /* up to `size` PoemSummaryResponse objects */ ],
+    "verses": [ /* up to `size` VerseSearchResult objects (deduplicated) */ ],
+    "poets": [ /* up to `size` PoetSummaryResponse objects */ ],
+    "couplets": [ /* up to `size` CoupletDto objects */ ],
+    "tags": [ /* up to `size` TagDto objects */ ],
+    "categories": [ /* up to `size` CategoryDto objects */ ],
+
+    "poemCount": 5,
+    "verseCount": 10,
+    "poetCount": 3,
+    "coupletCount": 5,
+    "tagCount": 0,
+    "categoryCount": 0,
+    "totalResults": 23,
+
+    "totalPoems": 847,
+    "totalVerses": 1243,
+    "totalPoets": 12,
+    "totalCouplets": 98,
+    "totalTags": 0,
+    "totalCategories": 2,
+
+    "hasMorePoems": true,
+    "hasMoreVerses": true,
+    "hasMorePoets": false,
+    "hasMoreCouplets": true,
+    "hasMoreTags": false,
+    "hasMoreCategories": false,
+
+    "currentPage": 0,
+    "pageSize": 10,
+
+    "counts": {
+      "poems": 5,
+      "verses": 10,
+      "poets": 3,
+      "couplets": 5,
+      "tags": 0,
+      "categories": 0,
+      "total": 23,
+      "totalPoems": 847,
+      "totalVerses": 1243,
+      "totalPoets": 12,
+      "totalCouplets": 98,
+      "totalTags": 0,
+      "totalCategories": 2
+    }
   }
 }
 ```
 
+**Response Field Reference:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `poems/verses/poets/...` | Array | Items in the **current page** |
+| `poemCount` / `verseCount` / ... | Integer | Count of items in current page (= array length) |
+| `totalPoems` / `totalVerses` / ... | Long | **Total matching records in DB/ES** — use for tab labels like "Poems (847)" |
+| `hasMorePoems` / `hasMoreVerses` / ... | Boolean | `true` if more pages exist for that type — use to show/hide "Load More" button |
+| `currentPage` | Integer | Current page number (0-based, echoed from request) |
+| `pageSize` | Integer | Page size used (echoed from request) |
+| `totalResults` | Integer | Sum of all items in the **current page** (not the grand total) |
+| `counts` | Object | Structured version of the counts above — convenient for tab UI |
+
+**Pagination Workflow:**
+
+```
+Step 1: Initial search (type=all, page=0, size=10)
+  → Shows first 10 results of each type
+  → Use `totalPoems`, `totalVerses` etc. for tab labels: "Poems (847)"
+  → Use `hasMorePoems`, `hasMoreVerses` etc. to show "Load More" per tab
+
+Step 2: User taps "Load More" on Poems tab
+  → GET /api/search?q=duniya&type=poems_only&page=1&size=10
+  → Append to existing poems list
+
+Step 3: User taps "Load More" again
+  → GET /api/search?q=duniya&type=poems_only&page=2&size=10
+  → Stop when hasMorePoems = false
+```
+
+**Flutter Implementation:**
+
+```dart
+class SearchResult {
+  final List<dynamic> items;
+  final int totalInDb;     // e.g. totalPoems
+  final bool hasMore;      // e.g. hasMorePoems
+  final int currentPage;
+
+  const SearchResult({
+    required this.items,
+    required this.totalInDb,
+    required this.hasMore,
+    required this.currentPage,
+  });
+}
+
+class SearchService {
+  final Dio _dio;
+
+  // Initial search — fetches all content types at once
+  Future<Map<String, dynamic>> searchAll({
+    required String query,
+    String lang = 'ur',
+    int size = 10,
+  }) async {
+    final response = await _dio.get('/api/search', queryParameters: {
+      'q': query,
+      'type': 'all',
+      'lang': lang,
+      'page': 0,
+      'size': size,
+    });
+    return response.data['data'];
+  }
+
+  // Load more for a specific type — call when user taps "Load More"
+  Future<Map<String, dynamic>> loadMore({
+    required String query,
+    required String type,   // 'poems_only', 'verses_only', 'poets_only', etc.
+    required int page,      // increment this each call
+    String lang = 'ur',
+    int size = 10,
+  }) async {
+    final response = await _dio.get('/api/search', queryParameters: {
+      'q': query,
+      'type': type,
+      'lang': lang,
+      'page': page,
+      'size': size,
+    });
+    return response.data['data'];
+  }
+}
+
+// In your search state/provider:
+class SearchState extends ChangeNotifier {
+  List<dynamic> poems = [];
+  int totalPoems = 0;
+  bool hasMorePoems = false;
+  int nextPoemsPage = 1;
+
+  Future<void> initialSearch(String query) async {
+    final data = await searchService.searchAll(query: query);
+
+    poems = List.from(data['poems']);
+    totalPoems = data['totalPoems'] ?? 0;
+    hasMorePoems = data['hasMorePoems'] ?? false;
+    nextPoemsPage = 1;
+    notifyListeners();
+  }
+
+  Future<void> loadMorePoems(String query) async {
+    if (!hasMorePoems) return;
+
+    final data = await searchService.loadMore(
+      query: query,
+      type: 'poems_only',
+      page: nextPoemsPage,
+    );
+
+    poems.addAll(data['poems']);
+    hasMorePoems = data['hasMorePoems'] ?? false;
+    nextPoemsPage++;
+    notifyListeners();
+  }
+}
+
+// Tab label widget:
+Text('Poems (${totalPoems > 0 ? totalPoems : ''})');
+
+// Load More button:
+if (hasMorePoems)
+  ElevatedButton(
+    onPressed: () => state.loadMorePoems(query),
+    child: const Text('Load More Poems'),
+  )
+```
+
+**Type Values Reference:**
+
+| `type` param | Searches |
+|---|---|
+| `all` | All 6 content types simultaneously |
+| `poems_only` | Poems only |
+| `verses_only` | Verses only |
+| `poets_only` | Poets only |
+| `couplets_only` | Couplets only |
+| `tags_only` | Tags only |
+| `categories_only` | Categories only |
+
 **Use Cases:**
-- Main search bar in app
-- Cross-content discovery
-- Universal search results page
+- Main search bar showing all results grouped by type
+- Tabbed search results UI (Poems tab, Poets tab, Verses tab)
+- "Load More" per tab without re-searching other types
+- Tab labels showing total DB count: "Poems (847)"
 
 ---
 
@@ -6416,7 +6571,7 @@ curl "http://localhost:8080/api/search?q=poetry&type=poets&lang=en"
 
 **Endpoint:** `GET /api/search/quick?q={query}&lang={lang}`
 
-**Description:** Simplified search endpoint - searches all content types with default pagination. Shorthand for `/api/search?type=all`.
+**Description:** Simplified search endpoint — searches all content types at page 0, size 10. Shorthand for `/api/search?type=all&page=0&size=10`. Returns the same response format as Unified Search including all pagination metadata.
 
 **Query Parameters:**
 - `q` (required) - Search query
@@ -6428,7 +6583,9 @@ curl "http://localhost:8080/api/search/quick?q=love&lang=en"
 ```
 
 **Success Response (200):**
-Same format as Unified Search (returns all content types)
+Same format as Unified Search — includes `totalPoems`, `hasMorePoems`, `currentPage`, etc.
+
+> Use Quick Search only for initial discovery. For "load more", switch to the full `/api/search` endpoint with explicit `type` and `page` parameters.
 
 ---
 
@@ -6796,7 +6953,7 @@ ListView.builder(
 
 **Headers:**
 - `Authorization` (required) - Bearer token from login
-- `X-User-Id` (optional) - For personalized recommendations
+- `X-User-Id` (optional) - User's database ID for personalized recommendations (get from `/api/auth/me` response's `userId` field)
 
 **Example Request:**
 ```bash
@@ -6856,7 +7013,14 @@ curl -H "Authorization: Bearer eyJhbGci..." \
           },
           "language": "ur",
           "direction": "rtl",
-          "score": null
+          "score": null,
+          "imageUrl": "https://example.com/thumbnails/poem_abc123.jpg",
+          "poetInfo": {
+            "publicId": "poet789",
+            "name": "ناصر کاظمی",
+            "profileImageUrl": "https://example.com/poets/nasir_kazmi.jpg",
+            "era": "MODERN"
+          }
         }
       ],
       "totalCount": 10
@@ -6883,7 +7047,9 @@ curl -H "Authorization: Bearer eyJhbGci..." \
           },
           "language": "ur",
           "direction": "rtl",
-          "score": null
+          "score": null,
+          "imageUrl": "https://example.com/poets/mirza_ghalib.jpg",
+          "poetInfo": null
         }
       ],
       "totalCount": 6
@@ -6943,7 +7109,14 @@ All content items use the same structure:
   } | null,
   language: string,               // ur, en, hi
   direction: "rtl" | "ltr",      // Text direction
-  score: number | null            // Relevance score (search results only)
+  score: number | null,           // Relevance score (search results only)
+  imageUrl: string | null,        // Profile image for poets, thumbnail for poems
+  poetInfo: {                     // Poet information (for poems, verses, couplets)
+    publicId: string,
+    name: string | null,
+    profileImageUrl: string | null,
+    era: string | null            // CLASSICAL, MODERN, CONTEMPORARY, etc.
+  } | null
 }
 ```
 
