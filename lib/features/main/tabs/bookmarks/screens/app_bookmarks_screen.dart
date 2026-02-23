@@ -753,10 +753,10 @@ class _AppBookmarksScreenState extends ConsumerState<AppBookmarksScreen> {
               background: Container(
                 alignment: Alignment.centerLeft,
                 padding: const EdgeInsets.only(left: 24),
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
                 decoration: BoxDecoration(
                   color: const Color(0xFF1F6F5E),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Row(
                   children: [
@@ -777,10 +777,10 @@ class _AppBookmarksScreenState extends ConsumerState<AppBookmarksScreen> {
               secondaryBackground: Container(
                 alignment: Alignment.centerRight,
                 padding: const EdgeInsets.only(right: 24),
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
                 decoration: BoxDecoration(
                   color: const Color(0xFFC75B5B),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -898,7 +898,7 @@ class _AppBookmarksScreenState extends ConsumerState<AppBookmarksScreen> {
   }
 }
 
-/// Skeleton loading card
+/// Skeleton loading card — matches the 3-tier editorial card layout.
 class _SkeletonCard extends StatelessWidget {
   final bool isDark;
   const _SkeletonCard({required this.isDark});
@@ -906,39 +906,81 @@ class _SkeletonCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final baseColor = isDark ? const Color(0xFF2C2C2C) : AppColors.shimmerBase;
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFFFFBF7),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF242424) : const Color(0xFFF6F3EC),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.05)
+                : Colors.black.withValues(alpha: 0.04),
+            width: 1,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Line 1: Title placeholder (two lines)
+            Container(
+              width: double.infinity,
+              height: 16,
+              decoration: BoxDecoration(
+                color: baseColor,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Container(
+              width: 180,
+              height: 16,
+              decoration: BoxDecoration(
+                color: baseColor,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+
+            // Line 2: Poet + genre placeholder
+            const SizedBox(height: 10),
+            Row(
               children: [
                 Container(
-                  width: double.infinity,
-                  height: 14,
-                  decoration: BoxDecoration(
-                    color: baseColor,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Container(
-                  width: 140,
-                  height: 14,
-                  decoration: BoxDecoration(
-                    color: baseColor,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Container(
                   width: 100,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: baseColor,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  width: 40,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: baseColor,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ],
+            ),
+
+            // Line 3: Lang badge + time placeholder
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                Container(
+                  width: 28,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    color: baseColor,
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  width: 20,
                   height: 10,
                   decoration: BoxDecoration(
                     color: baseColor,
@@ -947,30 +989,8 @@ class _SkeletonCard extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-          const SizedBox(width: 16),
-          Column(
-            children: [
-              Container(
-                width: 24,
-                height: 12,
-                decoration: BoxDecoration(
-                  color: baseColor,
-                  borderRadius: BorderRadius.circular(3),
-                ),
-              ),
-              const SizedBox(height: 6),
-              Container(
-                width: 14,
-                height: 14,
-                decoration: BoxDecoration(
-                  color: baseColor,
-                  borderRadius: BorderRadius.circular(3),
-                ),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

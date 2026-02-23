@@ -5,14 +5,14 @@ import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/features/main/tabs/bookmarks/models/unified_bookmark_model.dart';
 import 'package:flutter_poetry_app/features/search/utils/highlighted_text.dart';
 
-/// Dense list-item card for the bookmarks feed.
+/// Editorial-style bookmark card with clear 3-tier visual hierarchy:
 ///
-/// Layout:
-///   Line 1: Title (2 lines max) — language-adaptive font
-///   Line 2: Poet name + optional subtle genre pill + time
-///   Trailing: Language pill + chevron
+///   Line 1: Poetry text — largest, darkest, primary focus
+///   Line 2: Poet name + genre pill — medium, softer
+///   Line 3: Language badge + time — smallest, most subtle
 ///
-/// No per-row type icon. No per-row bookmark icon.
+/// Layered surface design with soft border (no shadow).
+/// Full-card tap with scale 0.98 + ripple. No standalone chevron.
 /// Swipe actions handled by parent Dismissible.
 class AppBookmarkCompactCard extends StatefulWidget {
   final UnifiedBookmark bookmark;
@@ -57,79 +57,82 @@ class _AppBookmarkCompactCardState extends State<AppBookmarkCompactCard> {
         },
         child: AnimatedScale(
           scale: _isPressed ? 0.98 : 1.0,
-          duration: const Duration(milliseconds: 100),
+          duration: const Duration(milliseconds: 120),
           curve: Curves.easeOut,
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: widget.onTap,
-              borderRadius: BorderRadius.circular(10),
-              splashColor: AppColors.primary.withValues(alpha: 0.08),
-              highlightColor: AppColors.primary.withValues(alpha: 0.04),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: widget.isSelected
-                      ? (widget.isDark
-                          ? AppColors.primary.withValues(alpha: 0.15)
-                          : AppColors.primary.withValues(alpha: 0.05))
-                      : (widget.isDark
-                          ? const Color(0xFF1E1E1E)
-                          : const Color(0xFFFFFBF7)),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: widget.isSelected
-                        ? AppColors.primary.withValues(alpha: 0.3)
-                        : (widget.isDark
-                            ? Colors.white.withValues(alpha: 0.04)
-                            : Colors.black.withValues(alpha: 0.03)),
-                    width: 0.5,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
+            child: Material(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(16),
+              child: InkWell(
+                onTap: widget.onTap,
+                borderRadius: BorderRadius.circular(16),
+                splashColor: AppColors.primary.withValues(alpha: 0.06),
+                highlightColor: AppColors.primary.withValues(alpha: 0.03),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                    vertical: 16,
                   ),
-                ),
-                child: Row(
-                  children: [
-                    // Selection checkbox
-                    if (widget.isSelecting) ...[
-                      AnimatedScale(
-                        scale: widget.isSelecting ? 1.0 : 0.0,
-                        duration: const Duration(milliseconds: 200),
-                        curve: Curves.easeOutBack,
-                        child: SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: Checkbox(
-                            value: widget.isSelected,
-                            onChanged: (_) => widget.onTap(),
-                            activeColor: AppColors.primary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            side: BorderSide(
-                              color: widget.isDark
-                                  ? Colors.white.withValues(alpha: 0.3)
-                                  : Colors.black.withValues(alpha: 0.2),
+                  decoration: BoxDecoration(
+                    color: widget.isSelected
+                        ? (widget.isDark
+                            ? AppColors.primary.withValues(alpha: 0.12)
+                            : AppColors.primary.withValues(alpha: 0.05))
+                        : (widget.isDark
+                            ? const Color(0xFF242424)
+                            : const Color(0xFFF6F3EC)),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: widget.isSelected
+                          ? AppColors.primary.withValues(alpha: 0.3)
+                          : (widget.isDark
+                              ? Colors.white.withValues(alpha: 0.05)
+                              : Colors.black.withValues(alpha: 0.04)),
+                      width: 1,
+                    ),
+                  ),
+                  child: IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Selection checkbox
+                        if (widget.isSelecting) ...[
+                          AnimatedScale(
+                            scale: widget.isSelecting ? 1.0 : 0.0,
+                            duration: const Duration(milliseconds: 200),
+                            curve: Curves.easeOutBack,
+                            child: SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: Checkbox(
+                                value: widget.isSelected,
+                                onChanged: (_) => widget.onTap(),
+                                activeColor: AppColors.primary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                side: BorderSide(
+                                  color: widget.isDark
+                                      ? Colors.white.withValues(alpha: 0.3)
+                                      : Colors.black.withValues(alpha: 0.2),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                    ],
+                          const SizedBox(width: 12),
+                        ],
 
-                    // Content — title + metadata row
-                    Expanded(child: _buildContent()),
+                        // Content
+                        Expanded(child: _buildContent()),
 
-                    // Chevron
-                    const SizedBox(width: 4),
-                    Icon(
-                      Icons.chevron_right,
-                      size: 16,
-                      color: widget.isDark
-                          ? Colors.white.withValues(alpha: 0.2)
-                          : Colors.black.withValues(alpha: 0.15),
+                        // Trailing: lang badge (top) + date (bottom)
+                        const SizedBox(width: 12),
+                        _buildTrailing(),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -144,14 +147,37 @@ class _AppBookmarkCompactCardState extends State<AppBookmarkCompactCard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Line 1: Title (2 lines max)
+        // Line 1: Poetry text — primary focus
         _buildTitle(),
-        const SizedBox(height: 4),
-        // Line 2: Poet + optional genre pill + time
-        _buildSubtitle(),
+
+        // Line 2: Poet + genre
+        const SizedBox(height: 10),
+        _buildPoetRow(),
       ],
     );
   }
+
+  Widget _buildTrailing() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        _LangBadge(lang: widget.bookmark.languageCode, isDark: widget.isDark),
+        Text(
+          _formatDate(widget.bookmark.bookmarkedAt),
+          style: GoogleFonts.roboto(
+            fontSize: 10,
+            fontWeight: FontWeight.w500,
+            color: widget.isDark
+                ? Colors.white.withValues(alpha: 0.25)
+                : const Color(0xFF888888),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ──── Line 1: Poetry Text ────
 
   Widget _buildTitle() {
     final title = _getTitleText();
@@ -182,7 +208,7 @@ class _AppBookmarkCompactCardState extends State<AppBookmarkCompactCard> {
       case 'COUPLET':
         final v1 = widget.bookmark.coupletVerse1 ?? '';
         final v2 = widget.bookmark.coupletVerse2 ?? '';
-        if (v2.isNotEmpty) return '$v1 · $v2';
+        if (v2.isNotEmpty) return '$v1\n$v2';
         return v1;
       case 'IMAGE':
         return widget.bookmark.templateName ?? 'Image Poetry';
@@ -191,15 +217,14 @@ class _AppBookmarkCompactCardState extends State<AppBookmarkCompactCard> {
     }
   }
 
-  Widget _buildSubtitle() {
+  // ──── Line 2: Poet + Genre ────
+
+  Widget _buildPoetRow() {
     final poet = widget.bookmark.poetName;
     final genre = widget.bookmark.contentSubTypeUrdu;
-    final timeAgo = _formatTimeAgo(widget.bookmark.bookmarkedAt);
-    final lang = widget.bookmark.languageCode;
 
     return Row(
       children: [
-        // Poet name — language-appropriate font, prominent
         if (poet != null && poet.isNotEmpty) ...[
           Flexible(
             child: widget.searchQuery != null && widget.searchQuery!.isNotEmpty
@@ -218,15 +243,14 @@ class _AppBookmarkCompactCardState extends State<AppBookmarkCompactCard> {
                   ),
           ),
         ],
-        // Genre pill — subtle inline
         if (genre != null) ...[
-          const SizedBox(width: 6),
+          const SizedBox(width: 8),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
               color: widget.isDark
                   ? AppColors.primary.withValues(alpha: 0.08)
-                  : AppColors.primary.withValues(alpha: 0.05),
+                  : AppColors.primary.withValues(alpha: 0.04),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
@@ -235,85 +259,74 @@ class _AppBookmarkCompactCardState extends State<AppBookmarkCompactCard> {
                 fontSize: 10,
                 fontWeight: FontWeight.w500,
                 color: widget.isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondaryLight,
+                    ? AppColors.textDisabledDark
+                    : AppColors.textSecondaryLight.withValues(alpha: 0.7),
               ),
             ),
           ),
         ],
-        const Spacer(),
-        // Lang pill + time — compact trailing metadata
-        _LangPill(lang: lang, isDark: widget.isDark),
-        const SizedBox(width: 6),
-        Text(
-          timeAgo,
-          style: GoogleFonts.roboto(
-            fontSize: 10,
-            fontWeight: FontWeight.w400,
-            color: widget.isDark
-                ? AppColors.textDisabledDark
-                : AppColors.textDisabledLight,
-          ),
-        ),
       ],
     );
   }
 
-  /// Returns a language-appropriate title TextStyle.
+  // ──── Typography System ────
+
+  /// Line 1: Poetry text — largest, darkest, primary focus.
   TextStyle _titleStyle() {
     final lang = widget.bookmark.languageCode;
     final color = widget.isDark
-        ? const Color(0xFFE8E6E3)
-        : AppColors.textPrimaryLight;
+        ? const Color(0xFFEDEBE8)
+        : const Color(0xFF1A1A1A);
 
     if (lang == 'ur') {
       return GoogleFonts.notoNastaliqUrdu(
-        fontSize: 15,
-        fontWeight: FontWeight.w600,
-        height: 1.7,
+        fontSize: 18,
+        fontWeight: FontWeight.w500,
+        height: 1.9,
+        letterSpacing: -0.2,
         color: color,
       );
     } else if (lang == 'hi') {
       return GoogleFonts.notoSansDevanagari(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
         height: 1.5,
         color: color,
       );
     } else {
       return GoogleFonts.roboto(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        height: 1.4,
+        fontSize: 15,
+        fontWeight: FontWeight.w500,
+        height: 1.45,
         color: color,
       );
     }
   }
 
-  /// Language-appropriate poet name style — prominent, not generic Roboto.
+  /// Line 2: Poet name — medium size, softer color.
   TextStyle _poetStyle() {
     final lang = widget.bookmark.languageCode;
     final color = widget.isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondaryLight;
+        ? Colors.white.withValues(alpha: 0.5)
+        : const Color(0xFF555555);
 
     if (lang == 'ur') {
       return GoogleFonts.notoNastaliqUrdu(
         fontSize: 13,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w500,
         height: 1.6,
         color: color,
       );
     } else if (lang == 'hi') {
       return GoogleFonts.notoSansDevanagari(
-        fontSize: 12,
+        fontSize: 13,
         fontWeight: FontWeight.w500,
         height: 1.4,
         color: color,
       );
     } else {
       return GoogleFonts.roboto(
-        fontSize: 12,
+        fontSize: 13,
         fontWeight: FontWeight.w500,
         height: 1.3,
         color: color,
@@ -321,47 +334,97 @@ class _AppBookmarkCompactCardState extends State<AppBookmarkCompactCard> {
     }
   }
 
-  String _formatTimeAgo(DateTime date) {
-    final diff = DateTime.now().difference(date);
-    if (diff.inMinutes < 1) return 'now';
-    if (diff.inMinutes < 60) return '${diff.inMinutes}m';
-    if (diff.inHours < 24) return '${diff.inHours}h';
-    if (diff.inDays < 7) return '${diff.inDays}d';
-    if (diff.inDays < 30) return '${(diff.inDays / 7).floor()}w';
-    if (diff.inDays < 365) return '${(diff.inDays / 30).floor()}mo';
-    return '${(diff.inDays / 365).floor()}y';
+  String _formatDate(DateTime date) {
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
+    final hour = date.hour % 12 == 0 ? 12 : date.hour % 12;
+    final minute = date.minute.toString().padLeft(2, '0');
+    final period = date.hour < 12 ? 'AM' : 'PM';
+    if (date.year == DateTime.now().year) {
+      return '${months[date.month - 1]} ${date.day}, $hour:$minute $period';
+    }
+    return '${months[date.month - 1]} ${date.day}, ${date.year}, $hour:$minute $period';
   }
 }
 
-/// Compact language pill (border-only, e.g. "UR", "EN", "HI").
-class _LangPill extends StatelessWidget {
+/// Elegant language badge — capsule shape with language-tinted background.
+///
+/// UR → soft sage   |  HI → soft peach  |  EN → soft blue-grey
+class _LangBadge extends StatelessWidget {
   final String lang;
   final bool isDark;
 
-  const _LangPill({required this.lang, required this.isDark});
+  const _LangBadge({required this.lang, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(3),
-        border: Border.all(
-          color: isDark
-              ? AppColors.primary.withValues(alpha: 0.25)
-              : AppColors.primary.withValues(alpha: 0.2),
-          width: 0.5,
-        ),
+        color: _badgeColor(),
+        borderRadius: BorderRadius.circular(30),
       ),
       child: Text(
         lang.toUpperCase(),
         style: GoogleFonts.roboto(
-          fontSize: 9,
+          fontSize: 10,
           fontWeight: FontWeight.w600,
           letterSpacing: 0.5,
-          color: AppColors.primary.withValues(alpha: 0.6),
+          color: _textColor(),
         ),
       ),
     );
+  }
+
+  Color _badgeColor() {
+    if (isDark) {
+      switch (lang.toLowerCase()) {
+        case 'ur':
+          return const Color(0xFF2A3D32); // dark sage
+        case 'hi':
+          return const Color(0xFF3D2E2A); // dark peach
+        case 'en':
+          return const Color(0xFF2A3340); // dark blue-grey
+        default:
+          return const Color(0xFF2C2C2C);
+      }
+    }
+    switch (lang.toLowerCase()) {
+      case 'ur':
+        return const Color(0xFFE8EFEA); // soft sage
+      case 'hi':
+        return const Color(0xFFF0E8E4); // soft peach
+      case 'en':
+        return const Color(0xFFE4E9EF); // soft blue-grey
+      default:
+        return const Color(0xFFECECEC);
+    }
+  }
+
+  Color _textColor() {
+    if (isDark) {
+      switch (lang.toLowerCase()) {
+        case 'ur':
+          return const Color(0xFF8BB09A);
+        case 'hi':
+          return const Color(0xFFB08E82);
+        case 'en':
+          return const Color(0xFF8295AB);
+        default:
+          return const Color(0xFF999999);
+      }
+    }
+    switch (lang.toLowerCase()) {
+      case 'ur':
+        return const Color(0xFF4A7A5C);
+      case 'hi':
+        return const Color(0xFF8A5E4A);
+      case 'en':
+        return const Color(0xFF4A6580);
+      default:
+        return const Color(0xFF666666);
+    }
   }
 }
