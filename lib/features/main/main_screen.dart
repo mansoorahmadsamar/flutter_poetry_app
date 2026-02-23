@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/design_system/app_colors.dart';
 import 'tabs/feed_tab.dart';
-import 'tabs/bookmarks_tab.dart';
+import 'tabs/bookmarks/screens/app_bookmarks_screen.dart';
 import 'tabs/poets_tab.dart';
 import 'tabs/profile_tab.dart';
 import '../discover/screens/discover_screen.dart';
@@ -50,7 +50,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       label: 'Bookmarks',
       icon: Icons.bookmark_border,
       activeIcon: Icons.bookmark,
-      screen: BookmarksTab(),
+      screen: AppBookmarksScreen(),
     ),
     const TabConfig(
       label: 'Poets',

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:flutter_poetry_app/core/network/dio_client.dart';
@@ -31,6 +32,7 @@ class UnifiedBookmarksNotifier
     extends StateNotifier<AsyncValue<UnifiedBookmarksResponse>> {
   final UnifiedBookmarkService _service;
   BookmarkFilters _currentFilters;
+  bool _isLoadingMore = false;
 
   UnifiedBookmarksNotifier({
     required UnifiedBookmarkService service,
@@ -43,34 +45,41 @@ class UnifiedBookmarksNotifier
 
   /// Fetch bookmarks from API
   Future<void> fetchBookmarks({bool isLoadMore = false}) async {
+    if (isLoadMore && _isLoadingMore) return;
+    _isLoadingMore = isLoadMore;
+
     if (!isLoadMore) {
       state = const AsyncValue.loading();
     }
 
-    _logger.d('🚀 Starting fetchBookmarks - isLoadMore: $isLoadMore, filters: $_currentFilters');
-
     try {
       UnifiedBookmarksResponse bookmarksResponse;
+
+      _logger.d('Fetching bookmarks with filters: type=${_currentFilters.type}, '
+          'lang=${_currentFilters.language}, page=${_currentFilters.page}, '
+          'search=${_currentFilters.searchQuery}');
 
       // Determine which service method to use based on filters
       if (_currentFilters.searchQuery != null &&
           _currentFilters.searchQuery!.isNotEmpty) {
-        // Use search endpoint
         bookmarksResponse = await _service.searchBookmarks(
           query: _currentFilters.searchQuery!,
           page: _currentFilters.page,
           size: _currentFilters.size,
           type: _currentFilters.type != 'ALL' ? _currentFilters.type : null,
-          lang: _currentFilters.language != 'ALL' ? _currentFilters.language : null,
+          lang: _currentFilters.language != 'ALL'
+              ? _currentFilters.language
+              : null,
         );
       } else {
-        // Use type-specific endpoints
         switch (_currentFilters.type) {
           case 'POEM':
             bookmarksResponse = await _service.getPoemBookmarks(
               page: _currentFilters.page,
               size: _currentFilters.size,
-              lang: _currentFilters.language != 'ALL' ? _currentFilters.language : null,
+              lang: _currentFilters.language != 'ALL'
+                  ? _currentFilters.language
+                  : null,
               sortBy: _currentFilters.sortBy,
               sortDir: _currentFilters.sortDir,
             );
@@ -79,7 +88,9 @@ class UnifiedBookmarksNotifier
             bookmarksResponse = await _service.getCoupletBookmarks(
               page: _currentFilters.page,
               size: _currentFilters.size,
-              lang: _currentFilters.language != 'ALL' ? _currentFilters.language : null,
+              lang: _currentFilters.language != 'ALL'
+                  ? _currentFilters.language
+                  : null,
               sortBy: _currentFilters.sortBy,
               sortDir: _currentFilters.sortDir,
             );
@@ -88,7 +99,9 @@ class UnifiedBookmarksNotifier
             bookmarksResponse = await _service.getImageBookmarks(
               page: _currentFilters.page,
               size: _currentFilters.size,
-              lang: _currentFilters.language != 'ALL' ? _currentFilters.language : null,
+              lang: _currentFilters.language != 'ALL'
+                  ? _currentFilters.language
+                  : null,
               sortBy: _currentFilters.sortBy,
               sortDir: _currentFilters.sortDir,
             );
@@ -98,31 +111,35 @@ class UnifiedBookmarksNotifier
             bookmarksResponse = await _service.getRecentBookmarks(
               page: _currentFilters.page,
               size: _currentFilters.size,
-              lang: _currentFilters.language != 'ALL' ? _currentFilters.language : null,
+              lang: _currentFilters.language != 'ALL'
+                  ? _currentFilters.language
+                  : null,
             );
         }
       }
 
-      _logger.i('✅ Unified bookmarks loaded - Type: ${_currentFilters.type}, Lang: ${_currentFilters.language}, Page: ${_currentFilters.page}');
+      _logger.d('Got ${bookmarksResponse.content.length} bookmarks '
+          '(total: ${bookmarksResponse.totalElements}, last: ${bookmarksResponse.last})');
 
-      // If loading more, append to existing data
       if (isLoadMore && state.hasValue) {
         final currentData = state.value!;
         final updatedContent = [
           ...currentData.content,
           ...bookmarksResponse.content,
         ];
-
-        final updatedResponse = bookmarksResponse.copyWith(
-          content: updatedContent,
+        state = AsyncValue.data(
+          bookmarksResponse.copyWith(content: updatedContent),
         );
-
-        state = AsyncValue.data(updatedResponse);
       } else {
         state = AsyncValue.data(bookmarksResponse);
       }
     } catch (e, stackTrace) {
-      state = AsyncValue.error(e, stackTrace);
+      if (!isLoadMore) {
+        state = AsyncValue.error(e, stackTrace);
+      }
+      _logger.e('Error fetching bookmarks', error: e);
+    } finally {
+      _isLoadingMore = false;
     }
   }
 
@@ -141,7 +158,7 @@ class UnifiedBookmarksNotifier
 
   /// Update filters and refresh
   Future<void> updateFilters(BookmarkFilters newFilters) async {
-    _currentFilters = newFilters.copyWith(page: 0); // Reset to first page
+    _currentFilters = newFilters.copyWith(page: 0);
     await fetchBookmarks();
   }
 
@@ -151,24 +168,89 @@ class UnifiedBookmarksNotifier
     await fetchBookmarks();
   }
 
-  /// Get current filters
+  /// Remove a bookmark locally (optimistic update)
+  void removeBookmarkLocally(String bookmarkId) {
+    if (state.hasValue) {
+      final currentData = state.value!;
+      final updatedContent = currentData.content
+          .where((b) => b.bookmarkId != bookmarkId)
+          .toList();
+      state = AsyncValue.data(
+        currentData.copyWith(
+          content: updatedContent,
+          totalElements: currentData.totalElements - 1,
+        ),
+      );
+    }
+  }
+
+  /// Re-add a bookmark locally (undo delete)
+  void addBookmarkLocally(UnifiedBookmark bookmark, int index) {
+    if (state.hasValue) {
+      final currentData = state.value!;
+      final updatedContent = List<UnifiedBookmark>.from(currentData.content);
+      if (index <= updatedContent.length) {
+        updatedContent.insert(index, bookmark);
+      } else {
+        updatedContent.add(bookmark);
+      }
+      state = AsyncValue.data(
+        currentData.copyWith(
+          content: updatedContent,
+          totalElements: currentData.totalElements + 1,
+        ),
+      );
+    }
+  }
+
+  /// Update notes on a bookmark locally
+  void updateNotesLocally(String bookmarkId, String? notes) {
+    if (state.hasValue) {
+      final currentData = state.value!;
+      final updatedContent = currentData.content.map((b) {
+        if (b.bookmarkId == bookmarkId) {
+          return UnifiedBookmark(
+            bookmarkId: b.bookmarkId,
+            type: b.type,
+            contentId: b.contentId,
+            languageCode: b.languageCode,
+            bookmarkedAt: b.bookmarkedAt,
+            notes: notes,
+            poetName: b.poetName,
+            poetId: b.poetId,
+            poetProfileImageUrl: b.poetProfileImageUrl,
+            contentSubType: b.contentSubType,
+            contentSubTypeUrdu: b.contentSubTypeUrdu,
+            poemTitle: b.poemTitle,
+            coupletVerse1: b.coupletVerse1,
+            coupletVerse2: b.coupletVerse2,
+            coupletPoemTitle: b.coupletPoemTitle,
+            coupletPoemPublicId: b.coupletPoemPublicId,
+            imageUrl: b.imageUrl,
+            thumbnailUrl: b.thumbnailUrl,
+            templateName: b.templateName,
+            likeCount: b.likeCount,
+            bookmarkCount: b.bookmarkCount,
+            shareCount: b.shareCount,
+          );
+        }
+        return b;
+      }).toList();
+      state = AsyncValue.data(
+        currentData.copyWith(content: updatedContent),
+      );
+    }
+  }
+
   BookmarkFilters get currentFilters => _currentFilters;
 }
 
 // ============= BOOKMARK STATISTICS PROVIDER =============
 
-/// Provider for bookmark statistics
-final bookmarkStatsProvider = FutureProvider.autoDispose<BookmarkStats>((ref) async {
+final bookmarkStatsProvider =
+    FutureProvider.autoDispose<BookmarkStats>((ref) async {
   final service = ref.watch(unifiedBookmarkServiceProvider);
-
-  try {
-    final stats = await service.getBookmarkStats();
-    _logger.i('✅ Bookmark stats loaded - Total: ${stats.totalBookmarks}');
-    return stats;
-  } catch (e) {
-    _logger.e('❌ Error loading bookmark stats: $e');
-    rethrow;
-  }
+  return await service.getBookmarkStats();
 });
 
 // ============= BOOKMARK ACTION PROVIDERS =============
@@ -181,20 +263,28 @@ final removeBookmarkProvider = Provider.autoDispose((ref) {
     required String bookmarkId,
     required String type,
   }) async {
-    try {
-      await service.removeBookmark(
-        bookmarkId: bookmarkId,
-        type: type,
-      );
+    await service.removeBookmark(
+      bookmarkId: bookmarkId,
+      type: type,
+    );
+    ref.invalidate(unifiedBookmarksProvider);
+    ref.invalidate(bookmarkStatsProvider);
+  };
+});
 
-      _logger.i('✅ Bookmark removed - Type: $type, ID: $bookmarkId');
+/// Provider for updating bookmark notes
+final updateBookmarkNotesProvider = Provider.autoDispose((ref) {
+  final service = ref.watch(unifiedBookmarkServiceProvider);
 
-      // Invalidate all bookmark providers to refresh
-      ref.invalidate(unifiedBookmarksProvider);
-      ref.invalidate(bookmarkStatsProvider);
-    } catch (e) {
-      _logger.e('❌ Error removing bookmark: $e');
-      rethrow;
-    }
+  return ({
+    required String typePath,
+    required String bookmarkId,
+    required String? notes,
+  }) async {
+    await service.updateBookmarkNotes(
+      typePath: typePath,
+      bookmarkId: bookmarkId,
+      notes: notes,
+    );
   };
 });

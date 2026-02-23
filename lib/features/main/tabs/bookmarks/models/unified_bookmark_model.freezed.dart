@@ -21,10 +21,18 @@ mixin _$UnifiedBookmark {
   String get contentId => throw _privateConstructorUsedError;
   String get languageCode => throw _privateConstructorUsedError;
   DateTime get bookmarkedAt => throw _privateConstructorUsedError;
-  String? get notes => throw _privateConstructorUsedError; // POEM fields
-  String? get poemTitle => throw _privateConstructorUsedError;
+  String? get notes =>
+      throw _privateConstructorUsedError; // POEM + COUPLET shared fields
   String? get poetName => throw _privateConstructorUsedError;
-  String? get poetId => throw _privateConstructorUsedError; // COUPLET fields
+  String? get poetId => throw _privateConstructorUsedError;
+  String? get poetProfileImageUrl =>
+      throw _privateConstructorUsedError; // 36x36 poet avatar thumbnail
+  String? get contentSubType =>
+      throw _privateConstructorUsedError; // e.g. "GHAZAL", "NAZM"
+  String? get contentSubTypeUrdu =>
+      throw _privateConstructorUsedError; // e.g. "غزل", "نظم"
+// POEM fields
+  String? get poemTitle => throw _privateConstructorUsedError; // COUPLET fields
   @JsonKey(name: 'coupletFirstVerse')
   String? get coupletVerse1 => throw _privateConstructorUsedError;
   @JsonKey(name: 'coupletSecondVerse')
@@ -37,7 +45,7 @@ mixin _$UnifiedBookmark {
   String? get imageUrl => throw _privateConstructorUsedError;
   String? get thumbnailUrl => throw _privateConstructorUsedError;
   String? get templateName =>
-      throw _privateConstructorUsedError; // Common metrics
+      throw _privateConstructorUsedError; // Engagement metrics
   int get likeCount => throw _privateConstructorUsedError;
   int? get bookmarkCount => throw _privateConstructorUsedError;
   int get shareCount => throw _privateConstructorUsedError;
@@ -60,9 +68,12 @@ abstract class $UnifiedBookmarkCopyWith<$Res> {
       String languageCode,
       DateTime bookmarkedAt,
       String? notes,
-      String? poemTitle,
       String? poetName,
       String? poetId,
+      String? poetProfileImageUrl,
+      String? contentSubType,
+      String? contentSubTypeUrdu,
+      String? poemTitle,
       @JsonKey(name: 'coupletFirstVerse') String? coupletVerse1,
       @JsonKey(name: 'coupletSecondVerse') String? coupletVerse2,
       @JsonKey(name: 'parentPoemTitle') String? coupletPoemTitle,
@@ -94,9 +105,12 @@ class _$UnifiedBookmarkCopyWithImpl<$Res, $Val extends UnifiedBookmark>
     Object? languageCode = null,
     Object? bookmarkedAt = null,
     Object? notes = freezed,
-    Object? poemTitle = freezed,
     Object? poetName = freezed,
     Object? poetId = freezed,
+    Object? poetProfileImageUrl = freezed,
+    Object? contentSubType = freezed,
+    Object? contentSubTypeUrdu = freezed,
+    Object? poemTitle = freezed,
     Object? coupletVerse1 = freezed,
     Object? coupletVerse2 = freezed,
     Object? coupletPoemTitle = freezed,
@@ -133,10 +147,6 @@ class _$UnifiedBookmarkCopyWithImpl<$Res, $Val extends UnifiedBookmark>
           ? _value.notes
           : notes // ignore: cast_nullable_to_non_nullable
               as String?,
-      poemTitle: freezed == poemTitle
-          ? _value.poemTitle
-          : poemTitle // ignore: cast_nullable_to_non_nullable
-              as String?,
       poetName: freezed == poetName
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
@@ -144,6 +154,22 @@ class _$UnifiedBookmarkCopyWithImpl<$Res, $Val extends UnifiedBookmark>
       poetId: freezed == poetId
           ? _value.poetId
           : poetId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetProfileImageUrl: freezed == poetProfileImageUrl
+          ? _value.poetProfileImageUrl
+          : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      contentSubType: freezed == contentSubType
+          ? _value.contentSubType
+          : contentSubType // ignore: cast_nullable_to_non_nullable
+              as String?,
+      contentSubTypeUrdu: freezed == contentSubTypeUrdu
+          ? _value.contentSubTypeUrdu
+          : contentSubTypeUrdu // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poemTitle: freezed == poemTitle
+          ? _value.poemTitle
+          : poemTitle // ignore: cast_nullable_to_non_nullable
               as String?,
       coupletVerse1: freezed == coupletVerse1
           ? _value.coupletVerse1
@@ -204,9 +230,12 @@ abstract class _$$UnifiedBookmarkImplCopyWith<$Res>
       String languageCode,
       DateTime bookmarkedAt,
       String? notes,
-      String? poemTitle,
       String? poetName,
       String? poetId,
+      String? poetProfileImageUrl,
+      String? contentSubType,
+      String? contentSubTypeUrdu,
+      String? poemTitle,
       @JsonKey(name: 'coupletFirstVerse') String? coupletVerse1,
       @JsonKey(name: 'coupletSecondVerse') String? coupletVerse2,
       @JsonKey(name: 'parentPoemTitle') String? coupletPoemTitle,
@@ -236,9 +265,12 @@ class __$$UnifiedBookmarkImplCopyWithImpl<$Res>
     Object? languageCode = null,
     Object? bookmarkedAt = null,
     Object? notes = freezed,
-    Object? poemTitle = freezed,
     Object? poetName = freezed,
     Object? poetId = freezed,
+    Object? poetProfileImageUrl = freezed,
+    Object? contentSubType = freezed,
+    Object? contentSubTypeUrdu = freezed,
+    Object? poemTitle = freezed,
     Object? coupletVerse1 = freezed,
     Object? coupletVerse2 = freezed,
     Object? coupletPoemTitle = freezed,
@@ -275,10 +307,6 @@ class __$$UnifiedBookmarkImplCopyWithImpl<$Res>
           ? _value.notes
           : notes // ignore: cast_nullable_to_non_nullable
               as String?,
-      poemTitle: freezed == poemTitle
-          ? _value.poemTitle
-          : poemTitle // ignore: cast_nullable_to_non_nullable
-              as String?,
       poetName: freezed == poetName
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
@@ -286,6 +314,22 @@ class __$$UnifiedBookmarkImplCopyWithImpl<$Res>
       poetId: freezed == poetId
           ? _value.poetId
           : poetId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetProfileImageUrl: freezed == poetProfileImageUrl
+          ? _value.poetProfileImageUrl
+          : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      contentSubType: freezed == contentSubType
+          ? _value.contentSubType
+          : contentSubType // ignore: cast_nullable_to_non_nullable
+              as String?,
+      contentSubTypeUrdu: freezed == contentSubTypeUrdu
+          ? _value.contentSubTypeUrdu
+          : contentSubTypeUrdu // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poemTitle: freezed == poemTitle
+          ? _value.poemTitle
+          : poemTitle // ignore: cast_nullable_to_non_nullable
               as String?,
       coupletVerse1: freezed == coupletVerse1
           ? _value.coupletVerse1
@@ -341,9 +385,12 @@ class _$UnifiedBookmarkImpl extends _UnifiedBookmark {
       required this.languageCode,
       required this.bookmarkedAt,
       this.notes,
-      this.poemTitle,
       this.poetName,
       this.poetId,
+      this.poetProfileImageUrl,
+      this.contentSubType,
+      this.contentSubTypeUrdu,
+      this.poemTitle,
       @JsonKey(name: 'coupletFirstVerse') this.coupletVerse1,
       @JsonKey(name: 'coupletSecondVerse') this.coupletVerse2,
       @JsonKey(name: 'parentPoemTitle') this.coupletPoemTitle,
@@ -369,13 +416,23 @@ class _$UnifiedBookmarkImpl extends _UnifiedBookmark {
   final DateTime bookmarkedAt;
   @override
   final String? notes;
-// POEM fields
-  @override
-  final String? poemTitle;
+// POEM + COUPLET shared fields
   @override
   final String? poetName;
   @override
   final String? poetId;
+  @override
+  final String? poetProfileImageUrl;
+// 36x36 poet avatar thumbnail
+  @override
+  final String? contentSubType;
+// e.g. "GHAZAL", "NAZM"
+  @override
+  final String? contentSubTypeUrdu;
+// e.g. "غزل", "نظم"
+// POEM fields
+  @override
+  final String? poemTitle;
 // COUPLET fields
   @override
   @JsonKey(name: 'coupletFirstVerse')
@@ -396,7 +453,7 @@ class _$UnifiedBookmarkImpl extends _UnifiedBookmark {
   final String? thumbnailUrl;
   @override
   final String? templateName;
-// Common metrics
+// Engagement metrics
   @override
   @JsonKey()
   final int likeCount;
@@ -408,7 +465,7 @@ class _$UnifiedBookmarkImpl extends _UnifiedBookmark {
 
   @override
   String toString() {
-    return 'UnifiedBookmark(bookmarkId: $bookmarkId, type: $type, contentId: $contentId, languageCode: $languageCode, bookmarkedAt: $bookmarkedAt, notes: $notes, poemTitle: $poemTitle, poetName: $poetName, poetId: $poetId, coupletVerse1: $coupletVerse1, coupletVerse2: $coupletVerse2, coupletPoemTitle: $coupletPoemTitle, coupletPoemPublicId: $coupletPoemPublicId, imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, templateName: $templateName, likeCount: $likeCount, bookmarkCount: $bookmarkCount, shareCount: $shareCount)';
+    return 'UnifiedBookmark(bookmarkId: $bookmarkId, type: $type, contentId: $contentId, languageCode: $languageCode, bookmarkedAt: $bookmarkedAt, notes: $notes, poetName: $poetName, poetId: $poetId, poetProfileImageUrl: $poetProfileImageUrl, contentSubType: $contentSubType, contentSubTypeUrdu: $contentSubTypeUrdu, poemTitle: $poemTitle, coupletVerse1: $coupletVerse1, coupletVerse2: $coupletVerse2, coupletPoemTitle: $coupletPoemTitle, coupletPoemPublicId: $coupletPoemPublicId, imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, templateName: $templateName, likeCount: $likeCount, bookmarkCount: $bookmarkCount, shareCount: $shareCount)';
   }
 
   @override
@@ -426,11 +483,17 @@ class _$UnifiedBookmarkImpl extends _UnifiedBookmark {
             (identical(other.bookmarkedAt, bookmarkedAt) ||
                 other.bookmarkedAt == bookmarkedAt) &&
             (identical(other.notes, notes) || other.notes == notes) &&
-            (identical(other.poemTitle, poemTitle) ||
-                other.poemTitle == poemTitle) &&
             (identical(other.poetName, poetName) ||
                 other.poetName == poetName) &&
             (identical(other.poetId, poetId) || other.poetId == poetId) &&
+            (identical(other.poetProfileImageUrl, poetProfileImageUrl) ||
+                other.poetProfileImageUrl == poetProfileImageUrl) &&
+            (identical(other.contentSubType, contentSubType) ||
+                other.contentSubType == contentSubType) &&
+            (identical(other.contentSubTypeUrdu, contentSubTypeUrdu) ||
+                other.contentSubTypeUrdu == contentSubTypeUrdu) &&
+            (identical(other.poemTitle, poemTitle) ||
+                other.poemTitle == poemTitle) &&
             (identical(other.coupletVerse1, coupletVerse1) ||
                 other.coupletVerse1 == coupletVerse1) &&
             (identical(other.coupletVerse2, coupletVerse2) ||
@@ -462,9 +525,12 @@ class _$UnifiedBookmarkImpl extends _UnifiedBookmark {
         languageCode,
         bookmarkedAt,
         notes,
-        poemTitle,
         poetName,
         poetId,
+        poetProfileImageUrl,
+        contentSubType,
+        contentSubTypeUrdu,
+        poemTitle,
         coupletVerse1,
         coupletVerse2,
         coupletPoemTitle,
@@ -493,9 +559,12 @@ abstract class _UnifiedBookmark extends UnifiedBookmark {
       required final String languageCode,
       required final DateTime bookmarkedAt,
       final String? notes,
-      final String? poemTitle,
       final String? poetName,
       final String? poetId,
+      final String? poetProfileImageUrl,
+      final String? contentSubType,
+      final String? contentSubTypeUrdu,
+      final String? poemTitle,
       @JsonKey(name: 'coupletFirstVerse') final String? coupletVerse1,
       @JsonKey(name: 'coupletSecondVerse') final String? coupletVerse2,
       @JsonKey(name: 'parentPoemTitle') final String? coupletPoemTitle,
@@ -520,12 +589,19 @@ abstract class _UnifiedBookmark extends UnifiedBookmark {
   DateTime get bookmarkedAt;
   @override
   String? get notes;
-  @override // POEM fields
-  String? get poemTitle;
-  @override
+  @override // POEM + COUPLET shared fields
   String? get poetName;
   @override
   String? get poetId;
+  @override
+  String? get poetProfileImageUrl;
+  @override // 36x36 poet avatar thumbnail
+  String? get contentSubType;
+  @override // e.g. "GHAZAL", "NAZM"
+  String? get contentSubTypeUrdu;
+  @override // e.g. "غزل", "نظم"
+// POEM fields
+  String? get poemTitle;
   @override // COUPLET fields
   @JsonKey(name: 'coupletFirstVerse')
   String? get coupletVerse1;
@@ -544,7 +620,7 @@ abstract class _UnifiedBookmark extends UnifiedBookmark {
   String? get thumbnailUrl;
   @override
   String? get templateName;
-  @override // Common metrics
+  @override // Engagement metrics
   int get likeCount;
   @override
   int? get bookmarkCount;
@@ -737,9 +813,9 @@ class _$UnifiedBookmarksResponseImpl implements _UnifiedBookmarksResponse {
       required this.totalPages,
       required this.number,
       required this.size,
-      required this.first,
-      required this.last,
-      required this.empty})
+      this.first = true,
+      this.last = true,
+      this.empty = false})
       : _content = content;
 
   final List<UnifiedBookmark> _content;
@@ -759,10 +835,13 @@ class _$UnifiedBookmarksResponseImpl implements _UnifiedBookmarksResponse {
   @override
   final int size;
   @override
+  @JsonKey()
   final bool first;
   @override
+  @JsonKey()
   final bool last;
   @override
+  @JsonKey()
   final bool empty;
 
   @override
@@ -814,9 +893,9 @@ abstract class _UnifiedBookmarksResponse implements UnifiedBookmarksResponse {
       required final int totalPages,
       required final int number,
       required final int size,
-      required final bool first,
-      required final bool last,
-      required final bool empty}) = _$UnifiedBookmarksResponseImpl;
+      final bool first,
+      final bool last,
+      final bool empty}) = _$UnifiedBookmarksResponseImpl;
 
   @override
   List<UnifiedBookmark> get content;
@@ -848,7 +927,8 @@ mixin _$BookmarkFilters {
   String? get searchQuery => throw _privateConstructorUsedError;
   int get page => throw _privateConstructorUsedError;
   int get size => throw _privateConstructorUsedError;
-  String get sortBy => throw _privateConstructorUsedError;
+  String get sortBy =>
+      throw _privateConstructorUsedError; // bookmarkedAt, likeCount, shareCount
   String get sortDir => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -1027,6 +1107,7 @@ class _$BookmarkFiltersImpl implements _BookmarkFilters {
   @override
   @JsonKey()
   final String sortBy;
+// bookmarkedAt, likeCount, shareCount
   @override
   @JsonKey()
   final String sortDir;
@@ -1086,7 +1167,7 @@ abstract class _BookmarkFilters implements BookmarkFilters {
   int get size;
   @override
   String get sortBy;
-  @override
+  @override // bookmarkedAt, likeCount, shareCount
   String get sortDir;
   @override
   @JsonKey(ignore: true)
@@ -1094,21 +1175,16 @@ abstract class _BookmarkFilters implements BookmarkFilters {
       throw _privateConstructorUsedError;
 }
 
-BookmarkStats _$BookmarkStatsFromJson(Map<String, dynamic> json) {
-  return _BookmarkStats.fromJson(json);
-}
-
 /// @nodoc
 mixin _$BookmarkStats {
   int get totalBookmarks => throw _privateConstructorUsedError;
-  int get poemCount => throw _privateConstructorUsedError;
-  int get coupletCount => throw _privateConstructorUsedError;
-  int get imageCount => throw _privateConstructorUsedError;
-  int get urduCount => throw _privateConstructorUsedError;
-  int get englishCount => throw _privateConstructorUsedError;
-  int get hindiCount => throw _privateConstructorUsedError;
+  int get poemBookmarks => throw _privateConstructorUsedError;
+  int get coupletBookmarks => throw _privateConstructorUsedError;
+  int get imageBookmarks => throw _privateConstructorUsedError;
+  Map<String, int> get byLanguage => throw _privateConstructorUsedError;
+  List<TopPoet> get topPoets => throw _privateConstructorUsedError;
+  int get recentBookmarks => throw _privateConstructorUsedError;
 
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
   $BookmarkStatsCopyWith<BookmarkStats> get copyWith =>
       throw _privateConstructorUsedError;
@@ -1122,12 +1198,12 @@ abstract class $BookmarkStatsCopyWith<$Res> {
   @useResult
   $Res call(
       {int totalBookmarks,
-      int poemCount,
-      int coupletCount,
-      int imageCount,
-      int urduCount,
-      int englishCount,
-      int hindiCount});
+      int poemBookmarks,
+      int coupletBookmarks,
+      int imageBookmarks,
+      Map<String, int> byLanguage,
+      List<TopPoet> topPoets,
+      int recentBookmarks});
 }
 
 /// @nodoc
@@ -1144,41 +1220,41 @@ class _$BookmarkStatsCopyWithImpl<$Res, $Val extends BookmarkStats>
   @override
   $Res call({
     Object? totalBookmarks = null,
-    Object? poemCount = null,
-    Object? coupletCount = null,
-    Object? imageCount = null,
-    Object? urduCount = null,
-    Object? englishCount = null,
-    Object? hindiCount = null,
+    Object? poemBookmarks = null,
+    Object? coupletBookmarks = null,
+    Object? imageBookmarks = null,
+    Object? byLanguage = null,
+    Object? topPoets = null,
+    Object? recentBookmarks = null,
   }) {
     return _then(_value.copyWith(
       totalBookmarks: null == totalBookmarks
           ? _value.totalBookmarks
           : totalBookmarks // ignore: cast_nullable_to_non_nullable
               as int,
-      poemCount: null == poemCount
-          ? _value.poemCount
-          : poemCount // ignore: cast_nullable_to_non_nullable
+      poemBookmarks: null == poemBookmarks
+          ? _value.poemBookmarks
+          : poemBookmarks // ignore: cast_nullable_to_non_nullable
               as int,
-      coupletCount: null == coupletCount
-          ? _value.coupletCount
-          : coupletCount // ignore: cast_nullable_to_non_nullable
+      coupletBookmarks: null == coupletBookmarks
+          ? _value.coupletBookmarks
+          : coupletBookmarks // ignore: cast_nullable_to_non_nullable
               as int,
-      imageCount: null == imageCount
-          ? _value.imageCount
-          : imageCount // ignore: cast_nullable_to_non_nullable
+      imageBookmarks: null == imageBookmarks
+          ? _value.imageBookmarks
+          : imageBookmarks // ignore: cast_nullable_to_non_nullable
               as int,
-      urduCount: null == urduCount
-          ? _value.urduCount
-          : urduCount // ignore: cast_nullable_to_non_nullable
-              as int,
-      englishCount: null == englishCount
-          ? _value.englishCount
-          : englishCount // ignore: cast_nullable_to_non_nullable
-              as int,
-      hindiCount: null == hindiCount
-          ? _value.hindiCount
-          : hindiCount // ignore: cast_nullable_to_non_nullable
+      byLanguage: null == byLanguage
+          ? _value.byLanguage
+          : byLanguage // ignore: cast_nullable_to_non_nullable
+              as Map<String, int>,
+      topPoets: null == topPoets
+          ? _value.topPoets
+          : topPoets // ignore: cast_nullable_to_non_nullable
+              as List<TopPoet>,
+      recentBookmarks: null == recentBookmarks
+          ? _value.recentBookmarks
+          : recentBookmarks // ignore: cast_nullable_to_non_nullable
               as int,
     ) as $Val);
   }
@@ -1194,12 +1270,12 @@ abstract class _$$BookmarkStatsImplCopyWith<$Res>
   @useResult
   $Res call(
       {int totalBookmarks,
-      int poemCount,
-      int coupletCount,
-      int imageCount,
-      int urduCount,
-      int englishCount,
-      int hindiCount});
+      int poemBookmarks,
+      int coupletBookmarks,
+      int imageBookmarks,
+      Map<String, int> byLanguage,
+      List<TopPoet> topPoets,
+      int recentBookmarks});
 }
 
 /// @nodoc
@@ -1214,86 +1290,97 @@ class __$$BookmarkStatsImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? totalBookmarks = null,
-    Object? poemCount = null,
-    Object? coupletCount = null,
-    Object? imageCount = null,
-    Object? urduCount = null,
-    Object? englishCount = null,
-    Object? hindiCount = null,
+    Object? poemBookmarks = null,
+    Object? coupletBookmarks = null,
+    Object? imageBookmarks = null,
+    Object? byLanguage = null,
+    Object? topPoets = null,
+    Object? recentBookmarks = null,
   }) {
     return _then(_$BookmarkStatsImpl(
       totalBookmarks: null == totalBookmarks
           ? _value.totalBookmarks
           : totalBookmarks // ignore: cast_nullable_to_non_nullable
               as int,
-      poemCount: null == poemCount
-          ? _value.poemCount
-          : poemCount // ignore: cast_nullable_to_non_nullable
+      poemBookmarks: null == poemBookmarks
+          ? _value.poemBookmarks
+          : poemBookmarks // ignore: cast_nullable_to_non_nullable
               as int,
-      coupletCount: null == coupletCount
-          ? _value.coupletCount
-          : coupletCount // ignore: cast_nullable_to_non_nullable
+      coupletBookmarks: null == coupletBookmarks
+          ? _value.coupletBookmarks
+          : coupletBookmarks // ignore: cast_nullable_to_non_nullable
               as int,
-      imageCount: null == imageCount
-          ? _value.imageCount
-          : imageCount // ignore: cast_nullable_to_non_nullable
+      imageBookmarks: null == imageBookmarks
+          ? _value.imageBookmarks
+          : imageBookmarks // ignore: cast_nullable_to_non_nullable
               as int,
-      urduCount: null == urduCount
-          ? _value.urduCount
-          : urduCount // ignore: cast_nullable_to_non_nullable
-              as int,
-      englishCount: null == englishCount
-          ? _value.englishCount
-          : englishCount // ignore: cast_nullable_to_non_nullable
-              as int,
-      hindiCount: null == hindiCount
-          ? _value.hindiCount
-          : hindiCount // ignore: cast_nullable_to_non_nullable
+      byLanguage: null == byLanguage
+          ? _value._byLanguage
+          : byLanguage // ignore: cast_nullable_to_non_nullable
+              as Map<String, int>,
+      topPoets: null == topPoets
+          ? _value._topPoets
+          : topPoets // ignore: cast_nullable_to_non_nullable
+              as List<TopPoet>,
+      recentBookmarks: null == recentBookmarks
+          ? _value.recentBookmarks
+          : recentBookmarks // ignore: cast_nullable_to_non_nullable
               as int,
     ));
   }
 }
 
 /// @nodoc
-@JsonSerializable()
+
 class _$BookmarkStatsImpl implements _BookmarkStats {
   const _$BookmarkStatsImpl(
       {this.totalBookmarks = 0,
-      this.poemCount = 0,
-      this.coupletCount = 0,
-      this.imageCount = 0,
-      this.urduCount = 0,
-      this.englishCount = 0,
-      this.hindiCount = 0});
-
-  factory _$BookmarkStatsImpl.fromJson(Map<String, dynamic> json) =>
-      _$$BookmarkStatsImplFromJson(json);
+      this.poemBookmarks = 0,
+      this.coupletBookmarks = 0,
+      this.imageBookmarks = 0,
+      final Map<String, int> byLanguage = const {},
+      final List<TopPoet> topPoets = const [],
+      this.recentBookmarks = 0})
+      : _byLanguage = byLanguage,
+        _topPoets = topPoets;
 
   @override
   @JsonKey()
   final int totalBookmarks;
   @override
   @JsonKey()
-  final int poemCount;
+  final int poemBookmarks;
   @override
   @JsonKey()
-  final int coupletCount;
+  final int coupletBookmarks;
   @override
   @JsonKey()
-  final int imageCount;
+  final int imageBookmarks;
+  final Map<String, int> _byLanguage;
   @override
   @JsonKey()
-  final int urduCount;
+  Map<String, int> get byLanguage {
+    if (_byLanguage is EqualUnmodifiableMapView) return _byLanguage;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_byLanguage);
+  }
+
+  final List<TopPoet> _topPoets;
   @override
   @JsonKey()
-  final int englishCount;
+  List<TopPoet> get topPoets {
+    if (_topPoets is EqualUnmodifiableListView) return _topPoets;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_topPoets);
+  }
+
   @override
   @JsonKey()
-  final int hindiCount;
+  final int recentBookmarks;
 
   @override
   String toString() {
-    return 'BookmarkStats(totalBookmarks: $totalBookmarks, poemCount: $poemCount, coupletCount: $coupletCount, imageCount: $imageCount, urduCount: $urduCount, englishCount: $englishCount, hindiCount: $hindiCount)';
+    return 'BookmarkStats(totalBookmarks: $totalBookmarks, poemBookmarks: $poemBookmarks, coupletBookmarks: $coupletBookmarks, imageBookmarks: $imageBookmarks, byLanguage: $byLanguage, topPoets: $topPoets, recentBookmarks: $recentBookmarks)';
   }
 
   @override
@@ -1303,68 +1390,234 @@ class _$BookmarkStatsImpl implements _BookmarkStats {
             other is _$BookmarkStatsImpl &&
             (identical(other.totalBookmarks, totalBookmarks) ||
                 other.totalBookmarks == totalBookmarks) &&
-            (identical(other.poemCount, poemCount) ||
-                other.poemCount == poemCount) &&
-            (identical(other.coupletCount, coupletCount) ||
-                other.coupletCount == coupletCount) &&
-            (identical(other.imageCount, imageCount) ||
-                other.imageCount == imageCount) &&
-            (identical(other.urduCount, urduCount) ||
-                other.urduCount == urduCount) &&
-            (identical(other.englishCount, englishCount) ||
-                other.englishCount == englishCount) &&
-            (identical(other.hindiCount, hindiCount) ||
-                other.hindiCount == hindiCount));
+            (identical(other.poemBookmarks, poemBookmarks) ||
+                other.poemBookmarks == poemBookmarks) &&
+            (identical(other.coupletBookmarks, coupletBookmarks) ||
+                other.coupletBookmarks == coupletBookmarks) &&
+            (identical(other.imageBookmarks, imageBookmarks) ||
+                other.imageBookmarks == imageBookmarks) &&
+            const DeepCollectionEquality()
+                .equals(other._byLanguage, _byLanguage) &&
+            const DeepCollectionEquality().equals(other._topPoets, _topPoets) &&
+            (identical(other.recentBookmarks, recentBookmarks) ||
+                other.recentBookmarks == recentBookmarks));
   }
 
-  @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, totalBookmarks, poemCount,
-      coupletCount, imageCount, urduCount, englishCount, hindiCount);
+  int get hashCode => Object.hash(
+      runtimeType,
+      totalBookmarks,
+      poemBookmarks,
+      coupletBookmarks,
+      imageBookmarks,
+      const DeepCollectionEquality().hash(_byLanguage),
+      const DeepCollectionEquality().hash(_topPoets),
+      recentBookmarks);
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$BookmarkStatsImplCopyWith<_$BookmarkStatsImpl> get copyWith =>
       __$$BookmarkStatsImplCopyWithImpl<_$BookmarkStatsImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$BookmarkStatsImplToJson(
-      this,
-    );
-  }
 }
 
 abstract class _BookmarkStats implements BookmarkStats {
   const factory _BookmarkStats(
       {final int totalBookmarks,
-      final int poemCount,
-      final int coupletCount,
-      final int imageCount,
-      final int urduCount,
-      final int englishCount,
-      final int hindiCount}) = _$BookmarkStatsImpl;
-
-  factory _BookmarkStats.fromJson(Map<String, dynamic> json) =
-      _$BookmarkStatsImpl.fromJson;
+      final int poemBookmarks,
+      final int coupletBookmarks,
+      final int imageBookmarks,
+      final Map<String, int> byLanguage,
+      final List<TopPoet> topPoets,
+      final int recentBookmarks}) = _$BookmarkStatsImpl;
 
   @override
   int get totalBookmarks;
   @override
-  int get poemCount;
+  int get poemBookmarks;
   @override
-  int get coupletCount;
+  int get coupletBookmarks;
   @override
-  int get imageCount;
+  int get imageBookmarks;
   @override
-  int get urduCount;
+  Map<String, int> get byLanguage;
   @override
-  int get englishCount;
+  List<TopPoet> get topPoets;
   @override
-  int get hindiCount;
+  int get recentBookmarks;
   @override
   @JsonKey(ignore: true)
   _$$BookmarkStatsImplCopyWith<_$BookmarkStatsImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+TopPoet _$TopPoetFromJson(Map<String, dynamic> json) {
+  return _TopPoet.fromJson(json);
+}
+
+/// @nodoc
+mixin _$TopPoet {
+  String get poetId => throw _privateConstructorUsedError;
+  String get poetName => throw _privateConstructorUsedError;
+  int get bookmarkCount => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $TopPoetCopyWith<TopPoet> get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $TopPoetCopyWith<$Res> {
+  factory $TopPoetCopyWith(TopPoet value, $Res Function(TopPoet) then) =
+      _$TopPoetCopyWithImpl<$Res, TopPoet>;
+  @useResult
+  $Res call({String poetId, String poetName, int bookmarkCount});
+}
+
+/// @nodoc
+class _$TopPoetCopyWithImpl<$Res, $Val extends TopPoet>
+    implements $TopPoetCopyWith<$Res> {
+  _$TopPoetCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? poetId = null,
+    Object? poetName = null,
+    Object? bookmarkCount = null,
+  }) {
+    return _then(_value.copyWith(
+      poetId: null == poetId
+          ? _value.poetId
+          : poetId // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetName: null == poetName
+          ? _value.poetName
+          : poetName // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookmarkCount: null == bookmarkCount
+          ? _value.bookmarkCount
+          : bookmarkCount // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$TopPoetImplCopyWith<$Res> implements $TopPoetCopyWith<$Res> {
+  factory _$$TopPoetImplCopyWith(
+          _$TopPoetImpl value, $Res Function(_$TopPoetImpl) then) =
+      __$$TopPoetImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String poetId, String poetName, int bookmarkCount});
+}
+
+/// @nodoc
+class __$$TopPoetImplCopyWithImpl<$Res>
+    extends _$TopPoetCopyWithImpl<$Res, _$TopPoetImpl>
+    implements _$$TopPoetImplCopyWith<$Res> {
+  __$$TopPoetImplCopyWithImpl(
+      _$TopPoetImpl _value, $Res Function(_$TopPoetImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? poetId = null,
+    Object? poetName = null,
+    Object? bookmarkCount = null,
+  }) {
+    return _then(_$TopPoetImpl(
+      poetId: null == poetId
+          ? _value.poetId
+          : poetId // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetName: null == poetName
+          ? _value.poetName
+          : poetName // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookmarkCount: null == bookmarkCount
+          ? _value.bookmarkCount
+          : bookmarkCount // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$TopPoetImpl implements _TopPoet {
+  const _$TopPoetImpl(
+      {required this.poetId, required this.poetName, this.bookmarkCount = 0});
+
+  factory _$TopPoetImpl.fromJson(Map<String, dynamic> json) =>
+      _$$TopPoetImplFromJson(json);
+
+  @override
+  final String poetId;
+  @override
+  final String poetName;
+  @override
+  @JsonKey()
+  final int bookmarkCount;
+
+  @override
+  String toString() {
+    return 'TopPoet(poetId: $poetId, poetName: $poetName, bookmarkCount: $bookmarkCount)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$TopPoetImpl &&
+            (identical(other.poetId, poetId) || other.poetId == poetId) &&
+            (identical(other.poetName, poetName) ||
+                other.poetName == poetName) &&
+            (identical(other.bookmarkCount, bookmarkCount) ||
+                other.bookmarkCount == bookmarkCount));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, poetId, poetName, bookmarkCount);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$TopPoetImplCopyWith<_$TopPoetImpl> get copyWith =>
+      __$$TopPoetImplCopyWithImpl<_$TopPoetImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$TopPoetImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _TopPoet implements TopPoet {
+  const factory _TopPoet(
+      {required final String poetId,
+      required final String poetName,
+      final int bookmarkCount}) = _$TopPoetImpl;
+
+  factory _TopPoet.fromJson(Map<String, dynamic> json) = _$TopPoetImpl.fromJson;
+
+  @override
+  String get poetId;
+  @override
+  String get poetName;
+  @override
+  int get bookmarkCount;
+  @override
+  @JsonKey(ignore: true)
+  _$$TopPoetImplCopyWith<_$TopPoetImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

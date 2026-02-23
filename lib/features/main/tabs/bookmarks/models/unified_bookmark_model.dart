@@ -3,7 +3,10 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'unified_bookmark_model.freezed.dart';
 part 'unified_bookmark_model.g.dart';
 
-/// Unified bookmark model for all content types
+/// Unified bookmark model for all content types (POEM, COUPLET, IMAGE).
+///
+/// Backend now omits null fields entirely — no more "-" placeholders.
+/// Fields absent from JSON are equivalent to null in Dart.
 @freezed
 class UnifiedBookmark with _$UnifiedBookmark {
   const UnifiedBookmark._();
@@ -16,10 +19,15 @@ class UnifiedBookmark with _$UnifiedBookmark {
     required DateTime bookmarkedAt,
     String? notes,
 
-    // POEM fields
-    String? poemTitle,
+    // POEM + COUPLET shared fields
     String? poetName,
     String? poetId,
+    String? poetProfileImageUrl, // 36x36 poet avatar thumbnail
+    String? contentSubType, // e.g. "GHAZAL", "NAZM"
+    String? contentSubTypeUrdu, // e.g. "غزل", "نظم"
+
+    // POEM fields
+    String? poemTitle,
 
     // COUPLET fields
     @JsonKey(name: 'coupletFirstVerse') String? coupletVerse1,
@@ -32,14 +40,15 @@ class UnifiedBookmark with _$UnifiedBookmark {
     String? thumbnailUrl,
     String? templateName,
 
-    // Common metrics
+    // Engagement metrics
     @Default(0) int likeCount,
     int? bookmarkCount,
     @Default(0) int shareCount,
   }) = _UnifiedBookmark;
 
   factory UnifiedBookmark.fromJson(Map<String, dynamic> json) {
-    // Helper to convert "-" strings to null
+    // Backend now returns null-omitted fields — standard parsing works.
+    // Keep cleanString only as a safety net for any legacy responses.
     String? cleanString(dynamic value) {
       if (value == null || value == '-' || value == '') return null;
       return value.toString();
@@ -55,9 +64,12 @@ class UnifiedBookmark with _$UnifiedBookmark {
             ? DateTime.parse(json['bookmarkedAt'] as String)
             : DateTime.now(),
         notes: cleanString(json['notes']),
-        poemTitle: cleanString(json['poemTitle']),
         poetName: cleanString(json['poetName']),
         poetId: cleanString(json['poetId']),
+        poetProfileImageUrl: cleanString(json['poetProfileImageUrl']),
+        contentSubType: cleanString(json['contentSubType']),
+        contentSubTypeUrdu: cleanString(json['contentSubTypeUrdu']),
+        poemTitle: cleanString(json['poemTitle']),
         coupletVerse1: cleanString(json['coupletFirstVerse']),
         coupletVerse2: cleanString(json['coupletSecondVerse']),
         coupletPoemTitle: cleanString(json['parentPoemTitle']),
@@ -76,17 +88,55 @@ class UnifiedBookmark with _$UnifiedBookmark {
     }
   }
 
-  /// Helper to get language display name
+  /// Language display name
   String get languageName {
     switch (languageCode.toLowerCase()) {
       case 'ur':
-        return 'Urdu';
+        return 'اردو';
       case 'en':
         return 'English';
       case 'hi':
-        return 'Hindi';
+        return 'हिंदी';
       default:
         return languageCode.toUpperCase();
+    }
+  }
+
+  /// Whether this bookmark's content is Urdu
+  bool get isUrdu => languageCode == 'ur';
+
+  /// Type label for chips (use contentSubTypeUrdu for Urdu-first display)
+  String get typeLabel {
+    if (contentSubTypeUrdu != null) return contentSubTypeUrdu!;
+    switch (type.toUpperCase()) {
+      case 'POEM':
+        return 'غزل';
+      case 'COUPLET':
+        return 'شعر';
+      case 'IMAGE':
+        return 'تصویر';
+      default:
+        return type;
+    }
+  }
+
+  /// Type label in English
+  String get typeLabelEn {
+    if (contentSubType != null) return contentSubType!;
+    return type;
+  }
+
+  /// API type path segment for PATCH/DELETE endpoints
+  String get apiTypePath {
+    switch (type.toUpperCase()) {
+      case 'POEM':
+        return 'poems';
+      case 'COUPLET':
+        return 'couplets';
+      case 'IMAGE':
+        return 'images';
+      default:
+        return type.toLowerCase();
     }
   }
 }
@@ -100,26 +150,25 @@ class UnifiedBookmarksResponse with _$UnifiedBookmarksResponse {
     required int totalPages,
     required int number,
     required int size,
-    required bool first,
-    required bool last,
-    required bool empty,
+    @Default(true) bool first,
+    @Default(true) bool last,
+    @Default(false) bool empty,
   }) = _UnifiedBookmarksResponse;
 
   factory UnifiedBookmarksResponse.fromJson(Map<String, dynamic> json) {
-    // Parse content array manually using our custom UnifiedBookmark.fromJson
     final contentList = (json['content'] as List<dynamic>)
         .map((item) => UnifiedBookmark.fromJson(item as Map<String, dynamic>))
         .toList();
 
     return UnifiedBookmarksResponse(
       content: contentList,
-      totalElements: json['totalElements'] as int,
-      totalPages: json['totalPages'] as int,
-      number: json['number'] as int,
-      size: json['size'] as int,
-      first: json['first'] as bool,
-      last: json['last'] as bool,
-      empty: json['empty'] as bool,
+      totalElements: (json['totalElements'] as num?)?.toInt() ?? 0,
+      totalPages: (json['totalPages'] as num?)?.toInt() ?? 0,
+      number: (json['number'] as num?)?.toInt() ?? 0,
+      size: (json['size'] as num?)?.toInt() ?? 20,
+      first: json['first'] as bool? ?? true,
+      last: json['last'] as bool? ?? true,
+      empty: json['empty'] as bool? ?? false,
     );
   }
 }
@@ -133,24 +182,50 @@ class BookmarkFilters with _$BookmarkFilters {
     String? searchQuery,
     @Default(0) int page,
     @Default(20) int size,
-    @Default('bookmarkedAt') String sortBy,
+    @Default('bookmarkedAt') String sortBy, // bookmarkedAt, likeCount, shareCount
     @Default('desc') String sortDir,
   }) = _BookmarkFilters;
 }
 
-/// Bookmark statistics
+/// Bookmark statistics with language breakdown
 @freezed
 class BookmarkStats with _$BookmarkStats {
   const factory BookmarkStats({
     @Default(0) int totalBookmarks,
-    @Default(0) int poemCount,
-    @Default(0) int coupletCount,
-    @Default(0) int imageCount,
-    @Default(0) int urduCount,
-    @Default(0) int englishCount,
-    @Default(0) int hindiCount,
+    @Default(0) int poemBookmarks,
+    @Default(0) int coupletBookmarks,
+    @Default(0) int imageBookmarks,
+    @Default({}) Map<String, int> byLanguage,
+    @Default([]) List<TopPoet> topPoets,
+    @Default(0) int recentBookmarks,
   }) = _BookmarkStats;
 
-  factory BookmarkStats.fromJson(Map<String, dynamic> json) =>
-      _$BookmarkStatsFromJson(json);
+  factory BookmarkStats.fromJson(Map<String, dynamic> json) {
+    return BookmarkStats(
+      totalBookmarks: (json['totalBookmarks'] as num?)?.toInt() ?? 0,
+      poemBookmarks: (json['poemBookmarks'] as num?)?.toInt() ?? 0,
+      coupletBookmarks: (json['coupletBookmarks'] as num?)?.toInt() ?? 0,
+      imageBookmarks: (json['imageBookmarks'] as num?)?.toInt() ?? 0,
+      byLanguage: Map<String, int>.from(
+        (json['byLanguage'] as Map? ?? {}),
+      ),
+      topPoets: (json['topPoets'] as List? ?? [])
+          .map((e) => TopPoet.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      recentBookmarks: (json['recentBookmarks'] as num?)?.toInt() ?? 0,
+    );
+  }
+}
+
+/// Top poet in bookmark stats
+@freezed
+class TopPoet with _$TopPoet {
+  const factory TopPoet({
+    required String poetId,
+    required String poetName,
+    @Default(0) int bookmarkCount,
+  }) = _TopPoet;
+
+  factory TopPoet.fromJson(Map<String, dynamic> json) =>
+      _$TopPoetFromJson(json);
 }
