@@ -26,21 +26,32 @@ class PoetsListScreen extends ConsumerStatefulWidget {
   ConsumerState<PoetsListScreen> createState() => _PoetsListScreenState();
 }
 
-class _PoetsListScreenState extends ConsumerState<PoetsListScreen> {
+class _PoetsListScreenState extends ConsumerState<PoetsListScreen>
+    with SingleTickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _allPoetsKey = GlobalKey();
   PoetsFilterType _activeGridFilter = PoetsFilterType.all;
+  late final AnimationController _searchPulseController;
+  late final Animation<double> _searchPulseAnimation;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    _searchPulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1800),
+    )..repeat(reverse: true);
+    _searchPulseAnimation = Tween<double>(begin: 0.85, end: 1.0).animate(
+      CurvedAnimation(parent: _searchPulseController, curve: Curves.easeInOut),
+    );
   }
 
   @override
   void dispose() {
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
+    _searchPulseController.dispose();
     super.dispose();
   }
 
@@ -92,7 +103,7 @@ class _PoetsListScreenState extends ConsumerState<PoetsListScreen> {
 
     return Scaffold(
       backgroundColor:
-          isDark ? AppColors.backgroundDark : const Color(0xFFF7F5F1),
+          isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
       body: RefreshIndicator(
         onRefresh: _onRefresh,
         color: AppColors.primary,
@@ -243,13 +254,48 @@ class _PoetsListScreenState extends ConsumerState<PoetsListScreen> {
         ),
       ),
       actions: [
-        IconButton(
-          icon: const Icon(Icons.search, size: 22),
-          onPressed: () => context.push('/main/poets-search'),
-          tooltip: 'Search poets',
-          splashRadius: 20,
+        AnimatedBuilder(
+          animation: _searchPulseAnimation,
+          builder: (context, child) {
+            return Transform.scale(
+              scale: _searchPulseAnimation.value,
+              child: child,
+            );
+          },
+          child: GestureDetector(
+            onTap: () {
+              HapticFeedback.lightImpact();
+              context.push('/main/poets-search');
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.25),
+                  width: 0.5,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.search, size: 16, color: Colors.white),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Search',
+                    style: GoogleFonts.roboto(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: 12),
       ],
     );
   }
