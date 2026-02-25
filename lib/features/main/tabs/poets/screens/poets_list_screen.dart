@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/poets_pagination_provider.dart';
+import '../providers/poets_discovery_provider.dart';
 import '../widgets/poet_card.dart';
+import '../widgets/poets_horizontal_section.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 
-/// Premium poets listing screen — editorial, calm, literary aesthetic.
+/// Poets discovery feed screen.
 ///
 /// Layout:
-///   [1] Deep muted app bar (#12372A) — refined, shorter
-///   [2] Elegant underline-style filter tabs
-///   [3] 3-column grid of elevated poet cards
-///   [4] Infinite scroll with skeleton loading
+///   [1] Deep muted app bar (#12372A)
+///   [2] Horizontal discovery sections (Trending, Featured, Top Read, etc.)
+///   [3] "All Poets" header with active filter chip
+///   [4] 3-column masonry grid with infinite scroll
 ///
-/// Background: warm beige (#F5F1E8 light / #1A1A1A dark)
+/// Background: warm beige (#F7F5F1 light / #1A1A1A dark)
 class PoetsListScreen extends ConsumerStatefulWidget {
   const PoetsListScreen({super.key});
 
@@ -25,7 +28,8 @@ class PoetsListScreen extends ConsumerStatefulWidget {
 
 class _PoetsListScreenState extends ConsumerState<PoetsListScreen> {
   final ScrollController _scrollController = ScrollController();
-  PoetsFilterType _selectedFilter = PoetsFilterType.all;
+  final GlobalKey _allPoetsKey = GlobalKey();
+  PoetsFilterType _activeGridFilter = PoetsFilterType.all;
 
   @override
   void initState() {
@@ -48,28 +52,47 @@ class _PoetsListScreenState extends ConsumerState<PoetsListScreen> {
   }
 
   Future<void> _onRefresh() async {
-    await ref.read(poetsPaginationProvider.notifier).refresh();
+    await Future.wait([
+      ref.read(poetsDiscoveryProvider.notifier).refresh(),
+      ref.read(poetsPaginationProvider.notifier).refresh(),
+    ]);
   }
 
-  void _onFilterChanged(PoetsFilterType filter) {
+  void _onSeeAll(PoetsFilterType filter) {
     HapticFeedback.selectionClick();
-    if (_selectedFilter == filter) {
-      setState(() => _selectedFilter = PoetsFilterType.all);
-      ref.read(poetsPaginationProvider.notifier).setFilter(PoetsFilterType.all);
-    } else {
-      setState(() => _selectedFilter = filter);
-      ref.read(poetsPaginationProvider.notifier).setFilter(filter);
-    }
+    setState(() => _activeGridFilter = filter);
+    ref.read(poetsPaginationProvider.notifier).setFilter(filter);
+
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (_allPoetsKey.currentContext != null) {
+        Scrollable.ensureVisible(
+          _allPoetsKey.currentContext!,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeOutCubic,
+        );
+      }
+    });
+  }
+
+  void _onClearFilter() {
+    HapticFeedback.selectionClick();
+    setState(() => _activeGridFilter = PoetsFilterType.all);
+    ref.read(poetsPaginationProvider.notifier).setFilter(PoetsFilterType.all);
+  }
+
+  void _onPoetTap(String publicId) {
+    context.push('/main/poets/$publicId');
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final discoveryState = ref.watch(poetsDiscoveryProvider);
     final paginationState = ref.watch(poetsPaginationProvider);
 
     return Scaffold(
       backgroundColor:
-          isDark ? AppColors.backgroundDark : const Color(0xFFF5F1E8),
+          isDark ? AppColors.backgroundDark : const Color(0xFFF7F5F1),
       body: RefreshIndicator(
         onRefresh: _onRefresh,
         color: AppColors.primary,
@@ -79,26 +102,123 @@ class _PoetsListScreenState extends ConsumerState<PoetsListScreen> {
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             _buildAppBar(isDark),
-            _buildFilterTabs(isDark),
-            _buildPoetsList(isDark, paginationState),
+
+            // ── Discovery sections ──
+            ..._buildDiscoverySections(discoveryState),
+
+            // ── "All Poets" header ──
+            SliverToBoxAdapter(
+              key: _allPoetsKey,
+              child: _buildAllPoetsHeader(isDark),
+            ),
+
+            // ── Masonry grid ──
+            _buildPoetsGrid(isDark, paginationState),
             if (paginationState.isLoadingMore)
-              SliverToBoxAdapter(
-                child: _buildLoadingMore(),
-              ),
+              SliverToBoxAdapter(child: _buildLoadingMore()),
             if (!paginationState.hasMore &&
                 paginationState.poets.isNotEmpty &&
                 !paginationState.isLoading)
-              SliverToBoxAdapter(
-                child: _buildEndOfList(isDark),
-              ),
-            // Bottom padding
-            const SliverToBoxAdapter(
-              child: SizedBox(height: 32),
-            ),
+              SliverToBoxAdapter(child: _buildEndOfList(isDark)),
+            const SliverToBoxAdapter(child: SizedBox(height: 32)),
           ],
         ),
       ),
     );
+  }
+
+  // ──── Discovery Sections ────
+
+  List<Widget> _buildDiscoverySections(PoetsDiscoveryState state) {
+    if (state.status == PoetsDiscoveryStatus.loading ||
+        state.status == PoetsDiscoveryStatus.initial) {
+      // Show 3 skeleton sections while loading
+      return List.generate(
+        3,
+        (_) => SliverToBoxAdapter(
+          child: PoetsHorizontalSection(
+            title: '',
+            icon: Icons.circle,
+            poets: null,
+            onPoetTap: (_) {},
+          ),
+        ),
+      );
+    }
+
+    if (state.status == PoetsDiscoveryStatus.error) {
+      // On error, skip sections — the grid below still works independently
+      return [];
+    }
+
+    return [
+      SliverToBoxAdapter(
+        child: PoetsHorizontalSection(
+          title: 'Trending Poets',
+          icon: Icons.whatshot_rounded,
+          iconColor: Colors.orange,
+          poets: state.trending.poets,
+          totalCount: state.trending.totalCount,
+          onSeeAll: () => _onSeeAll(PoetsFilterType.trending),
+          onPoetTap: (p) => _onPoetTap(p.publicId),
+        ),
+      ),
+      SliverToBoxAdapter(
+        child: PoetsHorizontalSection(
+          title: 'Featured Poets',
+          icon: Icons.stars_rounded,
+          iconColor: AppColors.secondary,
+          poets: state.featured.poets,
+          totalCount: state.featured.totalCount,
+          onSeeAll: () => _onSeeAll(PoetsFilterType.featured),
+          onPoetTap: (p) => _onPoetTap(p.publicId),
+        ),
+      ),
+      SliverToBoxAdapter(
+        child: PoetsHorizontalSection(
+          title: 'Most Read Poets',
+          icon: Icons.visibility_rounded,
+          iconColor: AppColors.info,
+          poets: state.topRead.poets,
+          totalCount: state.topRead.totalCount,
+          onSeeAll: () => _onSeeAll(PoetsFilterType.topByViews),
+          onPoetTap: (p) => _onPoetTap(p.publicId),
+        ),
+      ),
+      SliverToBoxAdapter(
+        child: PoetsHorizontalSection(
+          title: 'Classical Poets',
+          icon: Icons.auto_stories_rounded,
+          iconColor: AppColors.primary,
+          poets: state.classical.poets,
+          totalCount: state.classical.totalCount,
+          onSeeAll: () => _onSeeAll(PoetsFilterType.classical),
+          onPoetTap: (p) => _onPoetTap(p.publicId),
+        ),
+      ),
+      SliverToBoxAdapter(
+        child: PoetsHorizontalSection(
+          title: 'Modern Poets',
+          icon: Icons.brush_rounded,
+          iconColor: AppColors.urduTextAccent,
+          poets: state.modern.poets,
+          totalCount: state.modern.totalCount,
+          onSeeAll: () => _onSeeAll(PoetsFilterType.modern),
+          onPoetTap: (p) => _onPoetTap(p.publicId),
+        ),
+      ),
+      SliverToBoxAdapter(
+        child: PoetsHorizontalSection(
+          title: 'Women Poets',
+          icon: Icons.female_rounded,
+          iconColor: AppColors.error,
+          poets: state.women.poets,
+          totalCount: state.women.totalCount,
+          onSeeAll: () => _onSeeAll(PoetsFilterType.women),
+          onPoetTap: (p) => _onPoetTap(p.publicId),
+        ),
+      ),
+    ];
   }
 
   // ──── App Bar ────
@@ -134,124 +254,109 @@ class _PoetsListScreenState extends ConsumerState<PoetsListScreen> {
     );
   }
 
-  // ──── Filter Tabs ────
+  // ──── All Poets Header ────
 
-  Widget _buildFilterTabs(bool isDark) {
-    final filters = [
-      ('All', PoetsFilterType.all),
-      ('Trending', PoetsFilterType.trending),
-      ('Featured', PoetsFilterType.featured),
-      ('Top', PoetsFilterType.topByViews),
-      ('Classical', PoetsFilterType.classical),
-      ('Modern', PoetsFilterType.modern),
-      ('Women', PoetsFilterType.women),
-    ];
-
-    return SliverToBoxAdapter(
-      child: Container(
-        color: isDark ? AppColors.backgroundDark : const Color(0xFFF5F1E8),
-        padding: const EdgeInsets.only(top: 12, bottom: 4),
-        child: SizedBox(
-          height: 36,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: filters.length,
-            itemBuilder: (context, index) {
-              final (label, filter) = filters[index];
-              final isSelected = _selectedFilter == filter;
-
-              return Padding(
-                padding: EdgeInsets.only(
-                  right: index < filters.length - 1 ? 6 : 0,
-                ),
-                child: GestureDetector(
-                  onTap: () => _onFilterChanged(filter),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    curve: Curves.easeInOut,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 7,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? AppColors.primary
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: isSelected
-                            ? AppColors.primary
-                            : (isDark
-                                ? Colors.white.withValues(alpha: 0.12)
-                                : AppColors.primary.withValues(alpha: 0.2)),
-                        width: 1,
-                      ),
-                    ),
-                    child: Text(
-                      label,
-                      style: GoogleFonts.roboto(
-                        fontSize: 12,
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.w500,
-                        color: isSelected
-                            ? Colors.white
-                            : (isDark
-                                ? Colors.white.withValues(alpha: 0.6)
-                                : AppColors.primary.withValues(alpha: 0.7)),
-                        letterSpacing: 0.2,
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            },
+  Widget _buildAllPoetsHeader(bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+      child: Row(
+        children: [
+          Icon(
+            Icons.people_rounded,
+            size: 20,
+            color: isDark
+                ? AppColors.textSecondaryDark
+                : AppColors.textSecondaryLight,
           ),
+          const SizedBox(width: 8),
+          Text(
+            'All Poets',
+            style: GoogleFonts.roboto(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: isDark
+                  ? AppColors.textPrimaryDark
+                  : AppColors.textPrimaryLight,
+            ),
+          ),
+          if (_activeGridFilter != PoetsFilterType.all) ...[
+            const SizedBox(width: 8),
+            _buildActiveFilterChip(),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActiveFilterChip() {
+    final label = switch (_activeGridFilter) {
+      PoetsFilterType.trending => 'Trending',
+      PoetsFilterType.featured => 'Featured',
+      PoetsFilterType.topByViews => 'Most Read',
+      PoetsFilterType.classical => 'Classical',
+      PoetsFilterType.modern => 'Modern',
+      PoetsFilterType.women => 'Women',
+      PoetsFilterType.all => 'All',
+    };
+
+    return GestureDetector(
+      onTap: _onClearFilter,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: AppColors.primary,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.roboto(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(width: 4),
+            const Icon(Icons.close, size: 12, color: Colors.white),
+          ],
         ),
       ),
     );
   }
 
-  // ──── Poets Grid ────
+  // ──── Masonry Grid ────
 
-  Widget _buildPoetsList(bool isDark, PoetsPaginationState state) {
-    // Initial loading
+  Widget _buildPoetsGrid(bool isDark, PoetsPaginationState state) {
     if (state.isLoading && state.poets.isEmpty) {
       return _buildSkeletonGrid(isDark);
     }
 
-    // Error
     if (state.error != null && state.poets.isEmpty) {
       return SliverToBoxAdapter(child: _buildErrorState(isDark));
     }
 
-    // Empty
     if (state.poets.isEmpty) {
       return SliverToBoxAdapter(child: _buildEmptyState(isDark));
     }
 
-    // Grid
     return SliverPadding(
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-      sliver: SliverGrid(
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final poet = state.poets[index];
-            return RepaintBoundary(
-              child: PoetCard(
-                poet: poet,
-                onTap: () => context.push('/main/poets/${poet.publicId}'),
-              ),
-            );
-          },
-          childCount: state.poets.length,
-        ),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          childAspectRatio: 0.58,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-        ),
+      padding: const EdgeInsets.fromLTRB(8, 10, 8, 0),
+      sliver: SliverMasonryGrid.count(
+        crossAxisCount: 3,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 8,
+        childCount: state.poets.length,
+        itemBuilder: (context, index) {
+          final poet = state.poets[index];
+          return RepaintBoundary(
+            child: PoetCard(
+              poet: poet,
+              onTap: () => _onPoetTap(poet.publicId),
+            ),
+          );
+        },
       ),
     );
   }
@@ -263,73 +368,88 @@ class _PoetsListScreenState extends ConsumerState<PoetsListScreen> {
         isDark ? const Color(0xFF2C2C2C) : AppColors.shimmerBase;
 
     return SliverPadding(
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-      sliver: SliverGrid(
-        delegate: SliverChildBuilderDelegate(
-          (_, __) => Container(
+      padding: const EdgeInsets.fromLTRB(8, 10, 8, 0),
+      sliver: SliverMasonryGrid.count(
+        crossAxisCount: 3,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 8,
+        childCount: 6,
+        itemBuilder: (_, index) {
+          return Container(
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF242424) : Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              color: isDark ? const Color(0xFF262626) : const Color(0xFFFCFAF6),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark ? const Color(0xFF3A3A3A) : const Color(0xFFEFE6DA),
+              ),
             ),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Image placeholder
-                Container(
-                  height: 90,
-                  decoration: BoxDecoration(
-                    color: baseColor,
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(16),
+                AspectRatio(
+                  aspectRatio: 1.0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: baseColor,
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(12),
+                      ),
                     ),
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(8),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Circle avatar placeholder
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: baseColor,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      // Name placeholder
                       Container(
                         width: 60,
-                        height: 12,
+                        height: 10,
                         decoration: BoxDecoration(
                           color: baseColor,
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(3),
                         ),
                       ),
-                      const SizedBox(height: 6),
-                      // Date placeholder
+                      const SizedBox(height: 4),
                       Container(
                         width: 40,
                         height: 8,
                         decoration: BoxDecoration(
                           color: baseColor,
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(3),
                         ),
+                      ),
+                      const SizedBox(height: 6),
+                      Container(height: 0.5, color: baseColor),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          Container(
+                            width: 24,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: baseColor,
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            width: 24,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: baseColor,
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
               ],
             ),
-          ),
-          childCount: 9,
-        ),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          childAspectRatio: 0.58,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-        ),
+          );
+        },
       ),
     );
   }

@@ -223,16 +223,17 @@ A single, consolidated API that provides access to all bookmark types (poems, co
   - [8.2.4 Download Book](#824-download-book)
 - [8.3 Use Cases & Workflows](#83-use-cases-workflows)
 
-### 8.5 Unified Bookmark API (Phase 3) ⭐ NEW
+### 8.5 Unified Bookmark API (Phase 3) ⭐ UPDATED
 - [8.5.1 Overview - Unified Bookmarks](#851-overview-unified-bookmarks)
-- [8.5.2 Get Recent Bookmarks](#852-get-recent-bookmarks)
-- [8.5.3 Get Poem Bookmarks](#853-get-poem-bookmarks)
-- [8.5.4 Get Couplet Bookmarks](#854-get-couplet-bookmarks)
-- [8.5.5 Get Image Bookmarks](#855-get-image-bookmarks)
-- [8.5.6 Search Bookmarks](#856-search-bookmarks)
-- [8.5.7 Get Bookmark Statistics](#857-get-bookmark-statistics)
-- [8.5.8 Response Format](#858-response-format)
-- [8.5.9 Use Cases & Examples](#859-use-cases-examples)
+- [8.5.2 UnifiedBookmarkResponse — Field Reference](#852-unifiedbookmarkresponse--complete-field-reference)
+- [8.5.3 Get Recent Bookmarks (All Types)](#853-get-recent-bookmarks-all-types)
+- [8.5.4 Get Poem Bookmarks](#854-get-poem-bookmarks)
+- [8.5.5 Get Couplet Bookmarks](#855-get-couplet-bookmarks)
+- [8.5.6 Get Image Bookmarks](#856-get-image-bookmarks)
+- [8.5.7 Update Bookmark Notes ⭐ NEW](#857-update-bookmark-notes--new)
+- [8.5.8 Search Bookmarks](#858-search-bookmarks)
+- [8.5.9 Get Bookmark Statistics](#859-get-bookmark-statistics)
+- [8.5.10 Flutter Implementation Guide](#8510-flutter-implementation-guide)
 
 ### 9. Comments System
 - [9.1 Overview](#91-overview-comments)
@@ -5768,38 +5769,90 @@ Returns CloudFront URL or redirects to external link.
 
 ---
 
-## 8.5 Unified Bookmark API (Phase 3) ⭐ NEW
+## 8.5 Unified Bookmark API (Phase 3) ⭐ UPDATED
 
 ### 8.5.1 Overview - Unified Bookmarks
 
-The Unified Bookmark API provides a single, consolidated interface for accessing bookmarks across all content types (poems, couplets, generated images). Instead of calling separate endpoints for each type, you can now fetch all bookmarks in one call.
+The Unified Bookmark API provides a single, consolidated interface for accessing bookmarks across all content types (poems, couplets, generated images).
 
-**Key Benefits:**
+**Key Features:**
 - **Single Interface**: One API for all bookmark types
-- **Mixed Content Feed**: See all bookmarked content together, sorted by recency
-- **Type Filtering**: Easily filter by specific content type when needed
-- **Cross-Content Search**: Search across all bookmarks with one query
-- **Comprehensive Stats**: Get aggregated statistics across all bookmark types
+- **Mixed Content Feed**: All bookmarked content together, sorted by recency
+- **Type Filtering**: Filter by specific content type
+- **Sorting**: Sort poem/couplet lists by `likeCount` or `shareCount`
+- **Poet Avatars**: `poetProfileImageUrl` for 36×36 poet thumbnails on cards
+- **Content Sub-type Labels**: `contentSubType` / `contentSubTypeUrdu` badge text (e.g., "GHAZAL" / "غزل")
+- **Bookmark Notes**: Add/update/clear personal notes on any bookmark
+- **Cross-Content Search**: Search across all bookmarks in one call
+- **Comprehensive Stats**: Aggregated stats with per-language breakdown
 
 **Base Path:** `/api/bookmarks`
 
-**All Endpoints Require Authentication**
+**All Endpoints Require Authentication (Bearer token)**
+
+> **Null Field Behavior:** Fields that do not apply to a bookmark type, or have no value, are **omitted from the JSON response entirely**. Never send a placeholder like `"-"`. Check for field presence (or null-safety in Dart) rather than checking for `-`.
 
 ---
 
-### 8.5.2 Get Recent Bookmarks
+### 8.5.2 UnifiedBookmarkResponse — Complete Field Reference
 
-**Endpoint:** `GET /api/bookmarks/recent?page=0&size=20&lang=ur`
+All list/search endpoints return a `Page<UnifiedBookmarkResponse>`. The table below describes every field. Fields marked "omitted when null" are absent from the JSON when they have no value.
+
+| Field | Type | Present for | Notes |
+|-------|------|-------------|-------|
+| `type` | String | All | `"POEM"`, `"COUPLET"`, or `"IMAGE"` |
+| `bookmarkId` | String | All | Public ID of the bookmark (use in PATCH notes endpoint) |
+| `contentId` | String | All | Public ID of the bookmarked content item |
+| `languageCode` | String | All | `"ur"`, `"en"`, `"hi"` |
+| `bookmarkedAt` | ISO 8601 | All | When the user bookmarked this item |
+| `notes` | String | All | User's personal note — **omitted when null/empty** |
+| `poetName` | String | POEM, COUPLET | Poet display name — omitted when null |
+| `poetId` | String | POEM, COUPLET | Poet's public ID — omitted when null |
+| `poetProfileImageUrl` | String | POEM, COUPLET | URL for poet's 36×36 avatar thumbnail — **omitted when null** |
+| `contentSubType` | String | POEM, COUPLET | English sub-type enum name, e.g. `"GHAZAL"`, `"NAZM"` — omitted when null |
+| `contentSubTypeUrdu` | String | POEM, COUPLET | Urdu display label, e.g. `"غزل"`, `"نظم"` — omitted when null |
+| `poemTitle` | String | POEM | Poem title — omitted when null |
+| `coupletFirstVerse` | String | COUPLET | First verse text — omitted when null |
+| `coupletSecondVerse` | String | COUPLET | Second verse text — omitted when null |
+| `parentPoemTitle` | String | COUPLET | Title of the poem containing this couplet — omitted when null |
+| `parentPoemId` | String | COUPLET | Public ID of the parent poem — omitted when null |
+| `imageUrl` | String | IMAGE | Full-size generated image URL |
+| `thumbnailUrl` | String | IMAGE | Thumbnail URL |
+| `templateName` | String | IMAGE | Name of the design template — **omitted when null** (custom/no template) |
+| `likeCount` | Integer | All | Total likes on the content item |
+| `bookmarkCount` | Integer | COUPLET, IMAGE | Total times bookmarked — omitted when null |
+| `shareCount` | Integer | POEM, COUPLET | Total shares — omitted when null |
+
+**Content Sub-type Values (`contentSubType`):**
+
+| contentSubType | contentSubTypeUrdu |
+|----------------|--------------------|
+| `GHAZAL` | `غزل` |
+| `NAZM` | `نظم` |
+| `QASIDA` | `قصیدہ` |
+| `RUBAI` | `رباعی` |
+| `MARSIYA` | `مرثیہ` |
+| `MASNAVI` | `مثنوی` |
+| `HAMD` | `حمد` |
+| `NAAT` | `نعت` |
+| `SHER` | `شعر` |
+
+---
+
+### 8.5.3 Get Recent Bookmarks (All Types)
+
+**Endpoint:** `GET /api/bookmarks/recent`
 
 **Description:**
-Get recent bookmarks across ALL content types (poems, couplets, images) in a single mixed feed, sorted by most recently bookmarked.
+Mixed feed across ALL content types (poems, couplets, images), sorted by most recently bookmarked.
 
 **Query Parameters:**
-- `page` (optional, default: 0) - Page number
-- `size` (optional, default: 20) - Page size
-- `lang` (optional) - Filter by language code (ur, en, hi). If omitted, returns bookmarks in all languages.
 
-**Authentication:** Required (Bearer token)
+| Parameter | Required | Default | Description |
+|-----------|----------|---------|-------------|
+| `page` | No | `0` | Page number (0-based) |
+| `size` | No | `20` | Items per page |
+| `lang` | No | — | Filter by language code (`ur`, `en`, `hi`). Omit for all languages. |
 
 **Example:** `GET /api/bookmarks/recent?page=0&size=20`
 
@@ -5816,13 +5869,15 @@ Get recent bookmarks across ALL content types (poems, couplets, images) in a sin
         "contentId": "couplet_xyz789",
         "languageCode": "ur",
         "bookmarkedAt": "2026-01-01T14:30:00Z",
-        "notes": null,
+        "poetName": "Mirza Ghalib",
+        "poetId": "poet_ghalib",
+        "poetProfileImageUrl": "https://cdn.poetry.com/poets/ghalib_thumb.jpg",
+        "contentSubType": "GHAZAL",
+        "contentSubTypeUrdu": "غزل",
         "coupletFirstVerse": "محبت میں نہیں ہے فرق جینے اور مرنے کا",
         "coupletSecondVerse": "اسی کو دیکھ کر جیتے ہیں جس کافر پہ دم نکلے",
         "parentPoemTitle": "دیوان غالب",
         "parentPoemId": "poem_abc123",
-        "poetName": "Mirza Ghalib",
-        "poetId": "poet_ghalib",
         "likeCount": 145,
         "bookmarkCount": 89,
         "shareCount": 34
@@ -5831,14 +5886,16 @@ Get recent bookmarks across ALL content types (poems, couplets, images) in a sin
         "type": "POEM",
         "bookmarkId": "bkmk_def456",
         "contentId": "poem_pqr567",
-        "languageCode": "en",
+        "languageCode": "ur",
         "bookmarkedAt": "2026-01-01T12:15:00Z",
-        "notes": null,
-        "poemTitle": "Shikwa",
+        "notes": "My favourite Iqbal poem",
         "poetName": "Allama Iqbal",
         "poetId": "poet_iqbal",
+        "poetProfileImageUrl": "https://cdn.poetry.com/poets/iqbal_thumb.jpg",
+        "contentSubType": "NAZM",
+        "contentSubTypeUrdu": "نظم",
+        "poemTitle": "شکوہ",
         "likeCount": 892,
-        "bookmarkCount": null,
         "shareCount": 234
       },
       {
@@ -5847,10 +5904,10 @@ Get recent bookmarks across ALL content types (poems, couplets, images) in a sin
         "contentId": "img_uvw890",
         "languageCode": "ur",
         "bookmarkedAt": "2026-01-01T10:00:00Z",
-        "notes": null,
         "imageUrl": "https://cdn.poetry.com/generated/img_uvw890.jpg",
         "thumbnailUrl": "https://cdn.poetry.com/generated/thumbs/img_uvw890.jpg",
         "templateName": "Floral Elegance",
+        "likeCount": 5,
         "bookmarkCount": 23
       }
     ],
@@ -5862,26 +5919,37 @@ Get recent bookmarks across ALL content types (poems, couplets, images) in a sin
 }
 ```
 
-**Use Case:**
-Display a unified bookmark screen showing all types of bookmarked content in chronological order.
+> **Note:** The `notes` field appears only when the user has saved a note. The `poetProfileImageUrl` appears only when a photo exists for the poet. The `templateName` appears only when the image was created from a named template. Fields absent from JSON are equivalent to `null` in Dart.
 
 ---
 
-### 8.5.3 Get Poem Bookmarks
+### 8.5.4 Get Poem Bookmarks
 
-**Endpoint:** `GET /api/bookmarks/poems?page=0&size=20&lang=ur`
+**Endpoint:** `GET /api/bookmarks/poems`
 
 **Description:**
-Get ONLY poem bookmarks (filtered view). Useful for dedicated poem bookmark screens.
+POEM bookmarks only. Supports `sortBy` for custom ordering.
 
 **Query Parameters:**
-- `page` (optional, default: 0) - Page number
-- `size` (optional, default: 20) - Page size
-- `lang` (optional) - Filter by language code
 
-**Authentication:** Required
+| Parameter | Required | Default | Description |
+|-----------|----------|---------|-------------|
+| `page` | No | `0` | Page number |
+| `size` | No | `20` | Items per page |
+| `lang` | No | — | Language filter |
+| `sortBy` | No | `bookmarkedAt` | Sort order: `bookmarkedAt` \| `likeCount` \| `shareCount` |
 
-**Example:** `GET /api/bookmarks/poems?lang=ur`
+**Examples:**
+```bash
+# Default (most recently bookmarked first)
+GET /api/bookmarks/poems?lang=ur
+
+# Most liked poems first
+GET /api/bookmarks/poems?sortBy=likeCount
+
+# Most shared poems first
+GET /api/bookmarks/poems?sortBy=shareCount&lang=ur
+```
 
 **Success Response (200):**
 ```json
@@ -5896,35 +5964,41 @@ Get ONLY poem bookmarks (filtered view). Useful for dedicated poem bookmark scre
         "contentId": "poem_pqr567",
         "languageCode": "ur",
         "bookmarkedAt": "2026-01-01T12:15:00Z",
-        "poemTitle": "شکوہ",
         "poetName": "Allama Iqbal",
         "poetId": "poet_iqbal",
+        "poetProfileImageUrl": "https://cdn.poetry.com/poets/iqbal_thumb.jpg",
+        "contentSubType": "NAZM",
+        "contentSubTypeUrdu": "نظم",
+        "poemTitle": "شکوہ",
         "likeCount": 892,
-        "bookmarkCount": null,
         "shareCount": 234
       }
     ],
     "totalElements": 15,
-    "totalPages": 1
+    "totalPages": 1,
+    "number": 0,
+    "size": 20
   }
 }
 ```
 
 ---
 
-### 8.5.4 Get Couplet Bookmarks
+### 8.5.5 Get Couplet Bookmarks
 
-**Endpoint:** `GET /api/bookmarks/couplets?page=0&size=20&lang=ur`
+**Endpoint:** `GET /api/bookmarks/couplets`
 
 **Description:**
-Get ONLY couplet bookmarks (filtered view). Useful for dedicated couplet bookmark screens.
+COUPLET bookmarks only. Supports `sortBy` for custom ordering.
 
 **Query Parameters:**
-- `page` (optional, default: 0)
-- `size` (optional, default: 20)
-- `lang` (optional) - Filter by language code
 
-**Authentication:** Required
+| Parameter | Required | Default | Description |
+|-----------|----------|---------|-------------|
+| `page` | No | `0` | Page number |
+| `size` | No | `20` | Items per page |
+| `lang` | No | — | Language filter |
+| `sortBy` | No | `bookmarkedAt` | Sort order: `bookmarkedAt` \| `likeCount` \| `shareCount` |
 
 **Success Response (200):**
 ```json
@@ -5939,38 +6013,45 @@ Get ONLY couplet bookmarks (filtered view). Useful for dedicated couplet bookmar
         "contentId": "couplet_xyz789",
         "languageCode": "ur",
         "bookmarkedAt": "2026-01-01T14:30:00Z",
+        "poetName": "Mirza Ghalib",
+        "poetId": "poet_ghalib",
+        "poetProfileImageUrl": "https://cdn.poetry.com/poets/ghalib_thumb.jpg",
+        "contentSubType": "GHAZAL",
+        "contentSubTypeUrdu": "غزل",
         "coupletFirstVerse": "محبت میں نہیں ہے فرق جینے اور مرنے کا",
         "coupletSecondVerse": "اسی کو دیکھ کر جیتے ہیں جس کافر پہ دم نکلے",
         "parentPoemTitle": "دیوان غالب",
         "parentPoemId": "poem_abc123",
-        "poetName": "Mirza Ghalib",
-        "poetId": "poet_ghalib",
         "likeCount": 145,
         "bookmarkCount": 89,
         "shareCount": 34
       }
     ],
     "totalElements": 20,
-    "totalPages": 1
+    "totalPages": 1,
+    "number": 0,
+    "size": 20
   }
 }
 ```
 
 ---
 
-### 8.5.5 Get Image Bookmarks
+### 8.5.6 Get Image Bookmarks
 
-**Endpoint:** `GET /api/bookmarks/images?page=0&size=20&lang=ur`
+**Endpoint:** `GET /api/bookmarks/images`
 
 **Description:**
-Get ONLY generated poetry image bookmarks (filtered view).
+Generated poetry image bookmarks only. Supports `sortBy` for custom ordering.
 
 **Query Parameters:**
-- `page` (optional, default: 0)
-- `size` (optional, default: 20)
-- `lang` (optional) - Filter by language code
 
-**Authentication:** Required
+| Parameter | Required | Default | Description |
+|-----------|----------|---------|-------------|
+| `page` | No | `0` | Page number |
+| `size` | No | `20` | Items per page |
+| `lang` | No | — | Language filter |
+| `sortBy` | No | `bookmarkedAt` | Sort order: `bookmarkedAt` \| `likeCount` \| `shareCount` |
 
 **Success Response (200):**
 ```json
@@ -5988,34 +6069,127 @@ Get ONLY generated poetry image bookmarks (filtered view).
         "imageUrl": "https://cdn.poetry.com/generated/img_uvw890.jpg",
         "thumbnailUrl": "https://cdn.poetry.com/generated/thumbs/img_uvw890.jpg",
         "templateName": "Floral Elegance",
+        "likeCount": 5,
         "bookmarkCount": 23
+      },
+      {
+        "type": "IMAGE",
+        "bookmarkId": "bkmk_jkl012",
+        "contentId": "img_rst345",
+        "languageCode": "ur",
+        "bookmarkedAt": "2026-01-02T09:00:00Z",
+        "imageUrl": "https://cdn.poetry.com/generated/img_rst345.jpg",
+        "thumbnailUrl": "https://cdn.poetry.com/generated/thumbs/img_rst345.jpg",
+        "likeCount": 2,
+        "bookmarkCount": 7
       }
     ],
     "totalElements": 10,
-    "totalPages": 1
+    "totalPages": 1,
+    "number": 0,
+    "size": 20
   }
 }
 ```
 
+> **Note:** `templateName` is absent when the image was generated without a named template (custom composition). Do not show a template label if this field is missing.
+
 ---
 
-### 8.5.6 Search Bookmarks
+### 8.5.7 Update Bookmark Notes ⭐ NEW
 
-**Endpoint:** `GET /api/bookmarks/search?query=محبت&page=0&size=20&lang=ur`
+**Endpoint:** `PATCH /api/bookmarks/{type}/{bookmarkId}/notes`
 
 **Description:**
-Search across ALL bookmarked content (poems, couplets, images) with a single query. Searches in:
+Add, update, or clear the personal note on any bookmark. The `notes` field is user-only — it is never shared.
+
+**Path Parameters:**
+
+| Parameter | Required | Values |
+|-----------|----------|--------|
+| `type` | Yes | `poems` \| `couplets` \| `images` |
+| `bookmarkId` | Yes | The `bookmarkId` string from the list response |
+
+**Request Body:**
+```json
+{
+  "notes": "This reminds me of my grandmother"
+}
+```
+
+- `notes` (string, optional): Max 200 characters. Send `null` or `""` (empty string) to **clear** existing notes.
+
+**Examples:**
+```bash
+# Add a note to a poem bookmark
+PATCH /api/bookmarks/poems/bkmk_def456/notes
+{ "notes": "My favourite Iqbal poem" }
+
+# Add a note to a couplet bookmark
+PATCH /api/bookmarks/couplets/bkmk_abc123/notes
+{ "notes": "Perfect for morning reflection" }
+
+# Clear notes from an image bookmark
+PATCH /api/bookmarks/images/bkmk_ghi789/notes
+{ "notes": null }
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Bookmark notes updated successfully",
+  "data": {
+    "bookmarkId": "bkmk_def456",
+    "notes": "My favourite Iqbal poem",
+    "updatedAt": "2026-02-01T10:30:00Z"
+  }
+}
+```
+
+When notes are cleared (set to null/empty), `notes` is omitted from the response:
+```json
+{
+  "success": true,
+  "message": "Bookmark notes updated successfully",
+  "data": {
+    "bookmarkId": "bkmk_def456",
+    "updatedAt": "2026-02-01T10:35:00Z"
+  }
+}
+```
+
+**Error Responses:**
+
+| Status | Condition |
+|--------|-----------|
+| 400 | Invalid `type` path param (not poems/couplets/images) |
+| 400 | Bookmark not found for given `bookmarkId` |
+| 400 | Notes exceed 200 characters |
+| 401 | Not authenticated |
+| 403 | Bookmark belongs to a different user |
+| 500 | Server error |
+
+---
+
+### 8.5.8 Search Bookmarks
+
+**Endpoint:** `GET /api/bookmarks/search`
+
+**Description:**
+Search across ALL bookmarked content (poems, couplets, images) in one call. Searches:
 - Poem titles and poet names
 - Couplet verse text and parent poem titles
-- Image template names and notes
+- Image template names and bookmark notes
 
 **Query Parameters:**
-- `query` (required) - Search term (minimum 2 characters)
-- `page` (optional, default: 0)
-- `size` (optional, default: 20)
-- `lang` (optional) - Filter results by language code
 
-**Authentication:** Required
+| Parameter | Required | Default | Description |
+|-----------|----------|---------|-------------|
+| `query` | Yes | — | Search term (minimum 2 characters) |
+| `page` | No | `0` | Page number |
+| `size` | No | `20` | Items per page |
+| `lang` | No | — | Filter by language code |
 
 **Example:** `GET /api/bookmarks/search?query=دل&page=0`
 
@@ -6028,26 +6202,45 @@ Search across ALL bookmarked content (poems, couplets, images) with a single que
     "content": [
       {
         "type": "COUPLET",
+        "bookmarkId": "bkmk_abc123",
+        "contentId": "couplet_xyz789",
+        "languageCode": "ur",
+        "bookmarkedAt": "2026-01-01T14:30:00Z",
+        "poetName": "Mirza Ghalib",
+        "poetId": "poet_ghalib",
+        "poetProfileImageUrl": "https://cdn.poetry.com/poets/ghalib_thumb.jpg",
+        "contentSubType": "GHAZAL",
+        "contentSubTypeUrdu": "غزل",
         "coupletFirstVerse": "دل کو تو آرام ہے فریاد کا موقع ہے",
         "coupletSecondVerse": "یہ دونوں باتیں تھیں اب کچھ کہنے کو باقی ہے",
         "parentPoemTitle": "دیوان غالب",
-        "poetName": "Mirza Ghalib",
-        "bookmarkedAt": "2026-01-01T14:30:00Z"
+        "likeCount": 145,
+        "shareCount": 34
       },
       {
         "type": "POEM",
-        "poemTitle": "دل کی ویرانی کا کیا مذکور ہے",
+        "bookmarkId": "bkmk_def456",
+        "contentId": "poem_pqr567",
+        "languageCode": "ur",
+        "bookmarkedAt": "2026-01-01T12:00:00Z",
         "poetName": "Mir Taqi Mir",
-        "bookmarkedAt": "2026-01-01T12:00:00Z"
+        "poetId": "poet_mir",
+        "contentSubType": "GHAZAL",
+        "contentSubTypeUrdu": "غزل",
+        "poemTitle": "دل کی ویرانی کا کیا مذکور ہے",
+        "likeCount": 220,
+        "shareCount": 60
       }
     ],
     "totalElements": 8,
-    "totalPages": 1
+    "totalPages": 1,
+    "number": 0,
+    "size": 20
   }
 }
 ```
 
-**Error Response (400) - Query too short:**
+**Error Response (400) — Query too short:**
 ```json
 {
   "success": false,
@@ -6057,16 +6250,14 @@ Search across ALL bookmarked content (poems, couplets, images) with a single que
 
 ---
 
-### 8.5.7 Get Bookmark Statistics
+### 8.5.9 Get Bookmark Statistics
 
 **Endpoint:** `GET /api/bookmarks/stats`
 
 **Description:**
-Get comprehensive statistics about user's bookmarks across all types.
+Aggregated statistics about user's bookmarks across all types.
 
 **Authentication:** Required
-
-**Example:** `GET /api/bookmarks/stats`
 
 **Success Response (200):**
 ```json
@@ -6078,7 +6269,7 @@ Get comprehensive statistics about user's bookmarks across all types.
     "poemBookmarks": 15,
     "coupletBookmarks": 20,
     "imageBookmarks": 10,
-    "bookmarksByLanguage": {
+    "byLanguage": {
       "ur": 30,
       "en": 12,
       "hi": 3
@@ -6106,184 +6297,283 @@ Get comprehensive statistics about user's bookmarks across all types.
 ```
 
 **Response Fields:**
-- `totalBookmarks` - Total count across all types
-- `poemBookmarks` - Count of poem bookmarks
-- `coupletBookmarks` - Count of couplet bookmarks
-- `imageBookmarks` - Count of image bookmarks
-- `bookmarksByLanguage` - Breakdown by language code
-- `topPoets` - Top 5 poets by bookmark count (poems + couplets combined)
-- `recentBookmarks` - Bookmarks added in last 7 days
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `totalBookmarks` | Integer | Total count across all types |
+| `poemBookmarks` | Integer | Poem bookmark count |
+| `coupletBookmarks` | Integer | Couplet bookmark count |
+| `imageBookmarks` | Integer | Image bookmark count |
+| `byLanguage` | Map\<String, Long\> | Breakdown by language code key |
+| `topPoets` | Array | Top 5 poets by combined poem+couplet bookmarks |
+| `recentBookmarks` | Integer | Bookmarks added in last 7 days |
+
+> **Breaking change from previous version:** The language breakdown field was renamed from `bookmarksByLanguage` to `byLanguage`. Update any existing references.
 
 ---
 
-### 8.5.8 Response Format
+### 8.5.10 Flutter Implementation Guide
 
-**Unified Bookmark Response Structure:**
-
-All endpoints return bookmarks with the following structure:
-
-```json
-{
-  "type": "POEM | COUPLET | IMAGE",
-  "bookmarkId": "string",
-  "contentId": "string",
-  "languageCode": "string",
-  "bookmarkedAt": "ISO 8601 timestamp",
-  "notes": "string (optional)",
-
-  // Type-specific fields (only present for relevant type)
-
-  // POEM fields:
-  "poemTitle": "string",
-  "poetName": "string",
-  "poetId": "string",
-
-  // COUPLET fields:
-  "coupletFirstVerse": "string",
-  "coupletSecondVerse": "string",
-  "parentPoemTitle": "string",
-  "parentPoemId": "string",
-  "poetName": "string",
-  "poetId": "string",
-
-  // IMAGE fields:
-  "imageUrl": "string",
-  "thumbnailUrl": "string",
-  "templateName": "string",
-
-  // Common engagement metrics
-  "likeCount": integer,
-  "bookmarkCount": integer (nullable),
-  "shareCount": integer
-}
-```
-
-**Type-Specific Rendering:**
-
-Use the `type` field to determine how to render each bookmark:
+#### Model Class
 
 ```dart
-switch (bookmark.type) {
-  case 'POEM':
-    return PoemBookmarkCard(
-      title: bookmark.poemTitle,
-      poet: bookmark.poetName,
-      // ...
+class UnifiedBookmark {
+  final String type;           // "POEM" | "COUPLET" | "IMAGE"
+  final String bookmarkId;
+  final String contentId;
+  final String languageCode;
+  final DateTime bookmarkedAt;
+  final String? notes;
+
+  // POEM + COUPLET
+  final String? poetName;
+  final String? poetId;
+  final String? poetProfileImageUrl;  // Use for 36x36 poet avatar
+  final String? contentSubType;       // e.g. "GHAZAL"
+  final String? contentSubTypeUrdu;   // e.g. "غزل"
+
+  // POEM only
+  final String? poemTitle;
+
+  // COUPLET only
+  final String? coupletFirstVerse;
+  final String? coupletSecondVerse;
+  final String? parentPoemTitle;
+  final String? parentPoemId;
+
+  // IMAGE only
+  final String? imageUrl;
+  final String? thumbnailUrl;
+  final String? templateName;   // null when custom — don't show template label
+
+  // Engagement
+  final int likeCount;
+  final int? bookmarkCount;
+  final int? shareCount;
+
+  const UnifiedBookmark({
+    required this.type,
+    required this.bookmarkId,
+    required this.contentId,
+    required this.languageCode,
+    required this.bookmarkedAt,
+    required this.likeCount,
+    this.notes,
+    this.poetName,
+    this.poetId,
+    this.poetProfileImageUrl,
+    this.contentSubType,
+    this.contentSubTypeUrdu,
+    this.poemTitle,
+    this.coupletFirstVerse,
+    this.coupletSecondVerse,
+    this.parentPoemTitle,
+    this.parentPoemId,
+    this.imageUrl,
+    this.thumbnailUrl,
+    this.templateName,
+    this.bookmarkCount,
+    this.shareCount,
+  });
+
+  factory UnifiedBookmark.fromJson(Map<String, dynamic> json) {
+    return UnifiedBookmark(
+      type: json['type'] as String,
+      bookmarkId: json['bookmarkId'] as String,
+      contentId: json['contentId'] as String,
+      languageCode: json['languageCode'] as String,
+      bookmarkedAt: DateTime.parse(json['bookmarkedAt'] as String),
+      likeCount: (json['likeCount'] as int?) ?? 0,
+      notes: json['notes'] as String?,
+      poetName: json['poetName'] as String?,
+      poetId: json['poetId'] as String?,
+      poetProfileImageUrl: json['poetProfileImageUrl'] as String?,
+      contentSubType: json['contentSubType'] as String?,
+      contentSubTypeUrdu: json['contentSubTypeUrdu'] as String?,
+      poemTitle: json['poemTitle'] as String?,
+      coupletFirstVerse: json['coupletFirstVerse'] as String?,
+      coupletSecondVerse: json['coupletSecondVerse'] as String?,
+      parentPoemTitle: json['parentPoemTitle'] as String?,
+      parentPoemId: json['parentPoemId'] as String?,
+      imageUrl: json['imageUrl'] as String?,
+      thumbnailUrl: json['thumbnailUrl'] as String?,
+      templateName: json['templateName'] as String?,
+      bookmarkCount: json['bookmarkCount'] as int?,
+      shareCount: json['shareCount'] as int?,
     );
-  case 'COUPLET':
-    return CoupletBookmarkCard(
-      verse1: bookmark.coupletFirstVerse,
-      verse2: bookmark.coupletSecondVerse,
-      // ...
-    );
-  case 'IMAGE':
-    return ImageBookmarkCard(
-      imageUrl: bookmark.imageUrl,
-      thumbnail: bookmark.thumbnailUrl,
-      // ...
-    );
-}
-```
-
----
-
-### 8.5.9 Use Cases & Examples
-
-#### Use Case 1: Unified Bookmark Screen
-
-Show all bookmarks in one feed (Instagram/Twitter style):
-
-```dart
-// Fetch mixed feed
-final response = await http.get(
-  '/api/bookmarks/recent?page=0&size=20'
-);
-
-// Render different card types based on bookmark.type
-ListView.builder(
-  itemBuilder: (context, index) {
-    final bookmark = bookmarks[index];
-    switch (bookmark.type) {
-      case 'POEM':
-        return PoemBookmarkCard(bookmark);
-      case 'COUPLET':
-        return CoupletBookmarkCard(bookmark);
-      case 'IMAGE':
-        return ImageBookmarkCard(bookmark);
-    }
   }
-)
+}
 ```
 
-#### Use Case 2: Dedicated Bookmark Tabs
+#### Use Case 1: Unified Bookmark Screen with Type-Based Rendering
 
-Create tabbed interface with dedicated screens per type:
+```dart
+Widget buildBookmarkCard(UnifiedBookmark bookmark) {
+  switch (bookmark.type) {
+    case 'POEM':
+      return PoemBookmarkCard(
+        title: bookmark.poemTitle,
+        poetName: bookmark.poetName,
+        poetAvatar: bookmark.poetProfileImageUrl,   // nullable — show placeholder if null
+        subTypeBadge: bookmark.contentSubTypeUrdu,  // e.g. "غزل"
+        notes: bookmark.notes,
+        likeCount: bookmark.likeCount,
+      );
+    case 'COUPLET':
+      return CoupletBookmarkCard(
+        verse1: bookmark.coupletFirstVerse,
+        verse2: bookmark.coupletSecondVerse,
+        poemTitle: bookmark.parentPoemTitle,
+        poetName: bookmark.poetName,
+        poetAvatar: bookmark.poetProfileImageUrl,
+        subTypeBadge: bookmark.contentSubTypeUrdu,
+        notes: bookmark.notes,
+      );
+    case 'IMAGE':
+      return ImageBookmarkCard(
+        imageUrl: bookmark.imageUrl!,
+        thumbnail: bookmark.thumbnailUrl,
+        // Only show template label when it's not null/custom
+        templateLabel: bookmark.templateName,
+        notes: bookmark.notes,
+      );
+    default:
+      return const SizedBox.shrink();
+  }
+}
+```
+
+#### Use Case 2: Dedicated Tabs with Sort
 
 ```
 Bookmarks Screen
-├── Tab 1: All (mixed feed) → /api/bookmarks/recent
-├── Tab 2: Poems → /api/bookmarks/poems
-├── Tab 3: Couplets → /api/bookmarks/couplets
-└── Tab 4: Images → /api/bookmarks/images
+├── Tab "All"      → GET /api/bookmarks/recent
+├── Tab "Poems"    → GET /api/bookmarks/poems?sortBy=bookmarkedAt
+├── Tab "Couplets" → GET /api/bookmarks/couplets?sortBy=bookmarkedAt
+└── Tab "Images"   → GET /api/bookmarks/images
 ```
 
-#### Use Case 3: Language-Specific Bookmark Screen
+```dart
+// Sort dropdown inside Poems tab
+DropdownButton<String>(
+  value: _sortBy,
+  items: const [
+    DropdownMenuItem(value: 'bookmarkedAt', child: Text('Recently Added')),
+    DropdownMenuItem(value: 'likeCount',    child: Text('Most Liked')),
+    DropdownMenuItem(value: 'shareCount',   child: Text('Most Shared')),
+  ],
+  onChanged: (value) {
+    setState(() => _sortBy = value!);
+    _loadPoemBookmarks();
+  },
+);
 
-Show only Urdu bookmarks:
+Future<void> _loadPoemBookmarks() async {
+  final response = await apiClient.get(
+    '/api/bookmarks/poems?sortBy=$_sortBy&page=$_page&size=20',
+  );
+  // ...
+}
+```
+
+#### Use Case 3: Add / Update / Clear Bookmark Notes
 
 ```dart
-final response = await http.get(
-  '/api/bookmarks/recent?lang=ur'
+Future<void> saveBookmarkNote({
+  required String type,        // "poems" | "couplets" | "images"
+  required String bookmarkId,
+  required String? notes,      // null to clear
+}) async {
+  final response = await apiClient.patch(
+    '/api/bookmarks/$type/$bookmarkId/notes',
+    body: jsonEncode({'notes': notes}),
+    headers: {'Content-Type': 'application/json'},
+  );
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body)['data'];
+    // data.notes may be absent if notes were cleared
+    final savedNote = data['notes'] as String?;
+    // update local state
+  } else if (response.statusCode == 400) {
+    showError('Notes too long (max 200 characters)');
+  } else if (response.statusCode == 403) {
+    showError('Cannot update another user\'s bookmark');
+  }
+}
+
+// Add note
+await saveBookmarkNote(
+  type: 'poems',
+  bookmarkId: bookmark.bookmarkId,
+  notes: 'My favourite Iqbal poem',
+);
+
+// Clear note
+await saveBookmarkNote(
+  type: 'poems',
+  bookmarkId: bookmark.bookmarkId,
+  notes: null,
 );
 ```
 
-Show only English bookmarks:
+#### Use Case 4: Bookmark Statistics Dashboard
 
 ```dart
-final response = await http.get(
-  '/api/bookmarks/recent?lang=en'
-);
+// BookmarkStats model
+class BookmarkStats {
+  final int totalBookmarks;
+  final int poemBookmarks;
+  final int coupletBookmarks;
+  final int imageBookmarks;
+  final Map<String, int> byLanguage;  // renamed from bookmarksByLanguage
+  final List<TopPoet> topPoets;
+  final int recentBookmarks;
+
+  factory BookmarkStats.fromJson(Map<String, dynamic> json) {
+    return BookmarkStats(
+      totalBookmarks: json['totalBookmarks'] as int,
+      poemBookmarks: json['poemBookmarks'] as int,
+      coupletBookmarks: json['coupletBookmarks'] as int,
+      imageBookmarks: json['imageBookmarks'] as int,
+      byLanguage: Map<String, int>.from(
+        (json['byLanguage'] as Map? ?? {}),  // key: byLanguage (not bookmarksByLanguage)
+      ),
+      topPoets: (json['topPoets'] as List? ?? [])
+          .map((e) => TopPoet.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      recentBookmarks: json['recentBookmarks'] as int? ?? 0,
+    );
+  }
+}
 ```
 
-#### Use Case 4: Search Across All Bookmarks
-
-Implement global bookmark search:
+#### Use Case 5: Language Filter
 
 ```dart
-final response = await http.get(
-  '/api/bookmarks/search?query=${searchQuery}'
-);
+// Show only Urdu bookmarks
+final response = await apiClient.get('/api/bookmarks/recent?lang=ur');
 
-// Results include poems, couplets, and images that match
-// Highlight matching terms in UI
-```
+// Show only English bookmarks
+final response = await apiClient.get('/api/bookmarks/recent?lang=en');
 
-#### Use Case 5: Bookmark Dashboard with Stats
-
-Show user their bookmark statistics:
-
-```dart
-final stats = await http.get('/api/bookmarks/stats');
-
-// Display:
-// - Total bookmark count
-// - Breakdown by type (pie chart)
-// - Breakdown by language (bar chart)
-// - Top poets (list)
-// - Recent activity (last 7 days)
+// Language counts from stats (for filter chip badges)
+final stats = await apiClient.get('/api/bookmarks/stats');
+final urduCount = stats.byLanguage['ur'] ?? 0;
 ```
 
 ---
 
-**Comparison: Legacy vs Unified API**
+**Summary of Changes vs. Previous Version**
 
-| Feature | Legacy Approach | Unified API (Phase 3) |
-|---------|----------------|----------------------|
-| Get all bookmarks | 3 API calls | 1 API call |
-| Search bookmarks | 3 separate searches | 1 unified search |
-| Mixed content feed | Manual merging | Built-in |
-| Statistics | Calculate client-side | Server-provided |
-| Code complexity | High (multiple endpoints) | Low (single interface) |
+| Change | Details |
+|--------|---------|
+| New fields | `poetProfileImageUrl`, `contentSubType`, `contentSubTypeUrdu` on POEM/COUPLET |
+| Null behavior | All optional fields **omitted from JSON** when null — no more `"-"` placeholders |
+| `templateName` | Now `null` (absent) when no template — was `"Custom"` before |
+| Stats key rename | `bookmarksByLanguage` → `byLanguage` (**breaking change**) |
+| New `sortBy` param | Added to `/poems`, `/couplets`, `/images` — values: `bookmarkedAt` \| `likeCount` \| `shareCount` |
+| New endpoint | `PATCH /api/bookmarks/{type}/{bookmarkId}/notes` — add/update/clear personal notes |
 
 ---
 

@@ -1,25 +1,137 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/poet_model.dart';
-import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
-import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
-import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 
-/// Masterpiece poet card — manuscript-feel surface with gold halo portrait.
+/// Detect if text contains Urdu/Arabic script characters.
+bool _isUrduText(String text) {
+  return RegExp(r'[\u0600-\u06FF]').hasMatch(text);
+}
+
+const String _urduFontFamily = 'Jameel Noori Nastaleeq';
+
+// ─────────────────────────────────────────────────────────────
+// Design tokens — centralised for easy tweaking
+// ─────────────────────────────────────────────────────────────
+class _CardTokens {
+  _CardTokens._();
+
+  // Surface
+  static const Color surfaceLight = Color(0xFFFCFAF6);
+  static const Color surfaceDark = Color(0xFF262626);
+  static const Color borderLight = Color(0xFFEFE6DA);
+  static const Color borderDark = Color(0xFF3A3A3A);
+  static const Color placeholderLight = Color(0xFFF2EFE8);
+  static const Color placeholderDark = Color(0xFF333333);
+
+  // Shadows (dual)
+  static List<BoxShadow> cardShadow(bool isDark) => isDark
+      ? [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ]
+      : [
+          // Ambient
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+          // Lift
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 3,
+            offset: const Offset(0, 1),
+          ),
+        ];
+
+  static List<BoxShadow> cardShadowPressed(bool isDark) => isDark
+      ? [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 5,
+            offset: const Offset(0, 2),
+          ),
+        ]
+      : [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ];
+
+  // Radius
+  static const double radius = 12.0;
+
+  // Accent
+  static const Color accent = Color(0xFF1F6F5B);
+
+  // Chip
+  static Color chipBg(bool isDark) =>
+      isDark ? Colors.black.withValues(alpha: 0.55) : Colors.white.withValues(alpha: 0.92);
+  static Color chipBorder(bool isDark) =>
+      isDark ? Colors.white.withValues(alpha: 0.12) : const Color(0xFFE0D8CC);
+  static Color chipText(bool isDark) =>
+      isDark ? const Color(0xFFE0DCD5) : const Color(0xFF4A4540);
+}
+
+// ─────────────────────────────────────────────────────────────
+// Small stat widget (poem count / view count)
+// ─────────────────────────────────────────────────────────────
+class _MiniStat extends StatelessWidget {
+  final IconData icon;
+  final String value;
+  final bool isDark;
+  final String? semanticLabel;
+
+  const _MiniStat({
+    required this.icon,
+    required this.value,
+    required this.isDark,
+    this.semanticLabel,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: semanticLabel,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 10, color: isDark ? Colors.grey[400] : Colors.grey[600]),
+          const SizedBox(width: 2),
+          Text(
+            value,
+            style: GoogleFonts.roboto(
+              fontSize: 9,
+              fontWeight: FontWeight.w700,
+              color: isDark ? Colors.grey[300] : const Color(0xFF1A1A1A),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// PoetCard — premium grid card
+// ─────────────────────────────────────────────────────────────
+
+/// Premium poet card for 3-column grid.
 ///
-/// Layout (top to bottom):
-///   [1] Gold-ringed circular portrait (40r) with halo effect
-///   [2] Urdu-primary poet name — Nastaliq, bold, deep green
-///   [3] English sub-name — uppercase, letter-spaced, low emphasis
-///   [4] Life dates — subtle, muted
-///   [5] Rich info row — stats in a tinted container
+/// Image area with gradient readability overlay, era chip,
+/// featured badge, country flag.  Content area with name + verified
+/// badge, life dates, divider, stats + optional trending pill.
 ///
-/// Surface: Paper cream (#FDFCF8) with soft shadow (20px blur).
-/// Micro-interaction: scale 0.95 + haptic on tap.
-class PoetCard extends ConsumerStatefulWidget {
+/// RTL-safe: uses [EdgeInsetsDirectional] and [CrossAxisAlignment.start].
+/// Name auto-detects Urdu text and switches to Nastaliq font + RTL.
+class PoetCard extends StatefulWidget {
   final PoetModel poet;
   final VoidCallback onTap;
 
@@ -30,17 +142,16 @@ class PoetCard extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<PoetCard> createState() => _PoetCardState();
+  State<PoetCard> createState() => _PoetCardState();
 }
 
-class _PoetCardState extends ConsumerState<PoetCard> {
+class _PoetCardState extends State<PoetCard> {
   bool _isPressed = false;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final lang = ref.watch(selectedLanguageProvider);
-    final isUrdu = lang == 'ur';
+    final nameIsUrdu = _isUrduText(widget.poet.name);
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
@@ -51,255 +162,359 @@ class _PoetCardState extends ConsumerState<PoetCard> {
       },
       onTapCancel: () => setState(() => _isPressed = false),
       child: AnimatedScale(
-        scale: _isPressed ? 0.95 : 1.0,
-        duration: const Duration(milliseconds: 120),
+        scale: _isPressed ? 0.98 : 1.0,
+        duration: const Duration(milliseconds: 140),
         curve: Curves.easeOut,
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 140),
           decoration: BoxDecoration(
-            color: isDark
-                ? const Color(0xFF242424)
-                : const Color(0xFFFDFCF8), // Paper cream
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: isDark
-                    ? Colors.black.withValues(alpha: 0.3)
-                    : Colors.black.withValues(alpha: 0.05),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
+            color: isDark ? _CardTokens.surfaceDark : _CardTokens.surfaceLight,
+            borderRadius: BorderRadius.circular(_CardTokens.radius),
+            border: Border.all(
+              color: isDark ? _CardTokens.borderDark : _CardTokens.borderLight,
+            ),
+            boxShadow: _isPressed
+                ? _CardTokens.cardShadowPressed(isDark)
+                : _CardTokens.cardShadow(isDark),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ── Image section ──
+              _ImageSection(poet: widget.poet, isDark: isDark),
+
+              // ── Content section ──
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(8, 7, 8, 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Name + verified
+                    _NameRow(poet: widget.poet, isDark: isDark, isUrdu: nameIsUrdu),
+                    const SizedBox(height: 2),
+
+                    // Years
+                    Text(
+                      _formatDates(widget.poet),
+                      style: GoogleFonts.roboto(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? Colors.white54 : Colors.black54,
+                        height: 1.3,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+
+                    // Divider
+                    Container(
+                      height: 0.5,
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.08)
+                          : const Color(0xFFE8E2D8),
+                    ),
+                    const SizedBox(height: 5),
+
+                    // Stats row + trending
+                    _StatsRow(poet: widget.poet, isDark: isDark),
+                  ],
+                ),
               ),
             ],
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(8, 14, 8, 10),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Gold halo portrait
-                  _buildPortrait(isDark),
-                  const SizedBox(height: 10),
+        ),
+      ),
+    );
+  }
 
-                  // Urdu-primary name
-                  _buildName(isDark, isUrdu),
-                  const SizedBox(height: 2),
+  static String _formatDates(PoetModel p) {
+    if (p.birthYear == 0) return '—';
+    final death = (p.deathYear > 0) ? '${p.deathYear}' : (p.isActive ? 'Present' : '—');
+    return '${p.birthYear} – $death';
+  }
+}
 
-                  // Life dates (low emphasis)
-                  _buildDates(isDark),
+// ─────────────────────────────────────────────────────────────
+// Image section (Stack: image, gradient, era, featured, flag)
+// ─────────────────────────────────────────────────────────────
+class _ImageSection extends StatelessWidget {
+  final PoetModel poet;
+  final bool isDark;
 
-                  const Spacer(),
+  const _ImageSection({required this.poet, required this.isDark});
 
-                  // Rich info row
-                  _buildInfoRow(isDark),
-                ],
+  @override
+  Widget build(BuildContext context) {
+    final hasImage = poet.profileImageUrl != null && poet.profileImageUrl!.isNotEmpty && poet.profileImageUrl != '-';
+
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(_CardTokens.radius)),
+      child: AspectRatio(
+        aspectRatio: 1.0, // Square image for compact 3-column grid
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Image
+            if (hasImage)
+              Hero(
+                tag: 'poet_image_${poet.publicId}',
+                child: CachedNetworkImage(
+                  imageUrl: poet.profileImageUrl!,
+                  fit: BoxFit.cover,
+                  memCacheWidth: 280,
+                  maxWidthDiskCache: 280,
+                  fadeInDuration: const Duration(milliseconds: 200),
+                  placeholder: (_, __) => _placeholder(),
+                  errorWidget: (_, __, ___) => _placeholder(),
+                ),
+              )
+            else
+              _placeholder(),
+
+            // Top gradient overlay for badge readability
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.center,
+                    colors: [
+                      Colors.black.withValues(alpha: 0.22),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
-      ),
-    );
-  }
 
-  // ──── Gold Halo Portrait ────
+            // Era chip — top-start
+            if (poet.era != null)
+              PositionedDirectional(
+                top: 5,
+                start: 5,
+                child: _Chip(label: _eraLabel(poet.era!), isDark: isDark),
+              ),
 
-  Widget _buildPortrait(bool isDark) {
-    final hasImage = widget.poet.profileImageUrl != null &&
-        widget.poet.profileImageUrl!.isNotEmpty;
-
-    return Container(
-      padding: const EdgeInsets.all(2.5),
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: isDark
-              ? const Color(0xFFD4AF37).withValues(alpha: 0.4)
-              : const Color(0xFFD4AF37), // Gold halo
-          width: 1.5,
-        ),
-      ),
-      child: CircleAvatar(
-        radius: 32,
-        backgroundColor: isDark
-            ? const Color(0xFF333333)
-            : const Color(0xFFF0EDE6),
-        child: ClipOval(
-          child: hasImage
-              ? CachedNetworkImage(
-                  imageUrl: widget.poet.profileImageUrl!,
-                  width: 64,
-                  height: 64,
-                  fit: BoxFit.cover,
-                  memCacheWidth: 200,
-                  maxHeightDiskCache: 300,
-                  maxWidthDiskCache: 300,
-                  placeholder: (_, __) => Icon(
-                    Icons.person_outline,
-                    size: 24,
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.15)
-                        : AppColors.primary.withValues(alpha: 0.12),
+            // Featured badge — top-end
+            if (poet.isFeatured)
+              PositionedDirectional(
+                top: 5,
+                end: 5,
+                child: Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: _CardTokens.chipBg(isDark),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: _CardTokens.chipBorder(isDark), width: 0.5),
                   ),
-                  errorWidget: (_, __, ___) => _buildInitial(isDark),
-                )
-              : _buildInitial(isDark),
+                  child: const Center(
+                    child: Text('⭐', style: TextStyle(fontSize: 10)),
+                  ),
+                ),
+              ),
+
+            // Country flag — bottom-end
+            if (poet.countryFlag != null && poet.countryFlag != '-' && poet.countryFlag!.isNotEmpty)
+              PositionedDirectional(
+                bottom: 5,
+                end: 5,
+                child: Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    color: _CardTokens.chipBg(isDark),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: _CardTokens.chipBorder(isDark), width: 0.5),
+                  ),
+                  child: Text(
+                    poet.countryFlag!,
+                    style: const TextStyle(fontSize: 11),
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildInitial(bool isDark) {
+  Widget _placeholder() {
     return Container(
-      width: 64,
-      height: 64,
-      color: isDark ? const Color(0xFF333333) : const Color(0xFFF0EDE6),
+      color: isDark ? _CardTokens.placeholderDark : _CardTokens.placeholderLight,
       child: Center(
-        child: Text(
-          widget.poet.name.isNotEmpty ? widget.poet.name[0].toUpperCase() : '?',
-          style: GoogleFonts.roboto(
-            fontSize: 22,
-            fontWeight: FontWeight.w300,
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.25)
-                : AppColors.primary.withValues(alpha: 0.25),
-          ),
+        child: Icon(
+          Icons.person_outline_rounded,
+          size: 24,
+          color: isDark ? Colors.white.withValues(alpha: 0.12) : Colors.grey.withValues(alpha: 0.25),
         ),
       ),
     );
   }
 
-  // ──── Name (Urdu primary) ────
-
-  Widget _buildName(bool isDark, bool isUrdu) {
-    return Text(
-      widget.poet.name,
-      maxLines: 2,
-      overflow: TextOverflow.ellipsis,
-      textAlign: TextAlign.center,
-      style: isUrdu
-          ? AppTypography.urduPoetNameStyle.copyWith(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              height: 1.7,
-              color: isDark
-                  ? const Color(0xFFEDEBE8)
-                  : const Color(0xFF1B4332), // Deep green
-            )
-          : GoogleFonts.roboto(
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              height: 1.3,
-              letterSpacing: 0.1,
-              color: isDark
-                  ? const Color(0xFFEDEBE8)
-                  : const Color(0xFF1B4332),
-            ),
-    );
-  }
-
-  // ──── Dates ────
-
-  Widget _buildDates(bool isDark) {
-    if (widget.poet.birthYear == 0) return const SizedBox.shrink();
-
-    String dates;
-    if (widget.poet.deathYear > 0) {
-      dates = '${widget.poet.birthYear} – ${widget.poet.deathYear}';
-    } else {
-      dates = 'b. ${widget.poet.birthYear}';
+  static String _eraLabel(String raw) {
+    switch (raw) {
+      case 'CLASSICAL':
+        return 'Classical';
+      case 'MODERN':
+        return 'Modern';
+      case 'CONTEMPORARY':
+        return 'Contemporary';
+      case 'EMERGING':
+        return 'Emerging';
+      default:
+        return raw;
     }
-
-    return Text(
-      dates,
-      style: GoogleFonts.roboto(
-        fontSize: 9,
-        fontWeight: FontWeight.w400,
-        letterSpacing: 0.3,
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.3)
-            : Colors.grey.withValues(alpha: 0.6),
-      ),
-    );
   }
+}
 
-  // ──── Rich Info Row ────
+// ─────────────────────────────────────────────────────────────
+// Small reusable chip for image overlay
+// ─────────────────────────────────────────────────────────────
+class _Chip extends StatelessWidget {
+  final String label;
+  final bool isDark;
 
-  Widget _buildInfoRow(bool isDark) {
+  const _Chip({required this.label, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
       decoration: BoxDecoration(
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.05)
-            : const Color(0xFFF5F2EC),
-        borderRadius: BorderRadius.circular(10),
+        color: _CardTokens.chipBg(isDark),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: _CardTokens.chipBorder(isDark), width: 0.5),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildStat(
-            Icons.edit_note,
-            '${widget.poet.poemCount}',
-            isDark,
-          ),
-          if (widget.poet.viewCount > 0)
-            _buildStat(
-              Icons.visibility_outlined,
-              _formatCount(widget.poet.viewCount),
-              isDark,
-            ),
-          if (widget.poet.era != null)
-            _buildStat(
-              Icons.history_edu,
-              _eraShortLabel(),
-              isDark,
-            ),
-        ],
+      child: Text(
+        label,
+        style: GoogleFonts.roboto(
+          fontSize: 7,
+          fontWeight: FontWeight.w700,
+          color: _CardTokens.chipText(isDark),
+          letterSpacing: 0.2,
+        ),
       ),
     );
   }
+}
 
-  Widget _buildStat(IconData icon, String value, bool isDark) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
+// ─────────────────────────────────────────────────────────────
+// Name row (name text + verified badge)
+// ─────────────────────────────────────────────────────────────
+class _NameRow extends StatelessWidget {
+  final PoetModel poet;
+  final bool isDark;
+  final bool isUrdu;
+
+  const _NameRow({required this.poet, required this.isDark, this.isUrdu = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
       children: [
-        Icon(
-          icon,
-          size: 13,
-          color: isDark
-              ? const Color(0xFF8BB09A)
-              : const Color(0xFF1B4332),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          value,
-          style: GoogleFonts.roboto(
-            fontSize: 8,
-            fontWeight: FontWeight.w600,
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.5)
-                : const Color(0xFF3A3A3A),
+        Expanded(
+          child: Text(
+            poet.name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textDirection: isUrdu ? TextDirection.rtl : TextDirection.ltr,
+            style: isUrdu
+                ? TextStyle(
+                    fontFamily: _urduFontFamily,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
+                    color: isDark ? const Color(0xFFF0ECE6) : const Color(0xFF1A1A1A),
+                    height: 1.6,
+                  )
+                : GoogleFonts.roboto(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    color: isDark ? const Color(0xFFF0ECE6) : const Color(0xFF1A1A1A),
+                    height: 1.25,
+                  ),
           ),
         ),
+        if (poet.isVerified) ...[
+          const SizedBox(width: 3),
+          Semantics(
+            label: 'Verified poet',
+            child: Container(
+              width: 14,
+              height: 14,
+              decoration: const BoxDecoration(
+                color: _CardTokens.accent,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.check, size: 8, color: Colors.white),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Stats row (poems, views, optional trending pill)
+// ─────────────────────────────────────────────────────────────
+class _StatsRow extends StatelessWidget {
+  final PoetModel poet;
+  final bool isDark;
+
+  const _StatsRow({required this.poet, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        _MiniStat(
+          icon: Icons.menu_book_rounded,
+          value: _fmt(poet.poemCount),
+          isDark: isDark,
+          semanticLabel: '${poet.poemCount} poems',
+        ),
+        const SizedBox(width: 8),
+        _MiniStat(
+          icon: Icons.visibility_outlined,
+          value: _fmt(poet.viewCount),
+          isDark: isDark,
+          semanticLabel: '${poet.viewCount} views',
+        ),
+        const Spacer(),
+        if (poet.isTrending)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+            decoration: BoxDecoration(
+              color: isDark
+                  ? Colors.orange.withValues(alpha: 0.15)
+                  : Colors.orange.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(
+                color: Colors.orange.withValues(alpha: 0.3),
+                width: 0.5,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.whatshot_rounded, size: 8, color: Colors.orange[700]),
+                const SizedBox(width: 2),
+                Text(
+                  'Trending',
+                  style: GoogleFonts.roboto(
+                    fontSize: 7,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.orange[800],
+                  ),
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }
 
-  String _eraShortLabel() {
-    switch (widget.poet.era) {
-      case 'CLASSICAL':
-        return 'Classic';
-      case 'MODERN':
-        return 'Modern';
-      case 'CONTEMPORARY':
-        return 'Contemp.';
-      case 'EMERGING':
-        return 'Emerging';
-      default:
-        return widget.poet.era ?? '';
-    }
-  }
-
-  String _formatCount(int n) {
+  static String _fmt(int n) {
     if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(1)}M';
     if (n >= 1000) return '${(n / 1000).toStringAsFixed(1)}K';
     return n.toString();

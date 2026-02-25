@@ -16,8 +16,10 @@ class PoetModel with _$PoetModel {
     String? era, // CLASSICAL, MODERN, CONTEMPORARY, EMERGING
     @Default(0) int poemCount,
     @Default(0) int viewCount,
+    @Default(0) int followerCount,
     @JsonKey(name: 'isFeatured') @Default(false) bool isFeatured,
     @JsonKey(name: 'isTrending') @Default(false) bool isTrending,
+    @JsonKey(name: 'isVerified') @Default(false) bool isVerified,
     @JsonKey(name: 'birthPlace') String? birthPlace,
     String? country,
     @JsonKey(name: 'countryFlag') String? countryFlag,

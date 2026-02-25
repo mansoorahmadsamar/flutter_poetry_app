@@ -34,10 +34,13 @@ mixin _$PoetModel {
       throw _privateConstructorUsedError; // CLASSICAL, MODERN, CONTEMPORARY, EMERGING
   int get poemCount => throw _privateConstructorUsedError;
   int get viewCount => throw _privateConstructorUsedError;
+  int get followerCount => throw _privateConstructorUsedError;
   @JsonKey(name: 'isFeatured')
   bool get isFeatured => throw _privateConstructorUsedError;
   @JsonKey(name: 'isTrending')
   bool get isTrending => throw _privateConstructorUsedError;
+  @JsonKey(name: 'isVerified')
+  bool get isVerified => throw _privateConstructorUsedError;
   @JsonKey(name: 'birthPlace')
   String? get birthPlace => throw _privateConstructorUsedError;
   String? get country => throw _privateConstructorUsedError;
@@ -72,8 +75,10 @@ abstract class $PoetModelCopyWith<$Res> {
       String? era,
       int poemCount,
       int viewCount,
+      int followerCount,
       @JsonKey(name: 'isFeatured') bool isFeatured,
       @JsonKey(name: 'isTrending') bool isTrending,
+      @JsonKey(name: 'isVerified') bool isVerified,
       @JsonKey(name: 'birthPlace') String? birthPlace,
       String? country,
       @JsonKey(name: 'countryFlag') String? countryFlag,
@@ -105,8 +110,10 @@ class _$PoetModelCopyWithImpl<$Res, $Val extends PoetModel>
     Object? era = freezed,
     Object? poemCount = null,
     Object? viewCount = null,
+    Object? followerCount = null,
     Object? isFeatured = null,
     Object? isTrending = null,
+    Object? isVerified = null,
     Object? birthPlace = freezed,
     Object? country = freezed,
     Object? countryFlag = freezed,
@@ -155,6 +162,10 @@ class _$PoetModelCopyWithImpl<$Res, $Val extends PoetModel>
           ? _value.viewCount
           : viewCount // ignore: cast_nullable_to_non_nullable
               as int,
+      followerCount: null == followerCount
+          ? _value.followerCount
+          : followerCount // ignore: cast_nullable_to_non_nullable
+              as int,
       isFeatured: null == isFeatured
           ? _value.isFeatured
           : isFeatured // ignore: cast_nullable_to_non_nullable
@@ -162,6 +173,10 @@ class _$PoetModelCopyWithImpl<$Res, $Val extends PoetModel>
       isTrending: null == isTrending
           ? _value.isTrending
           : isTrending // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isVerified: null == isVerified
+          ? _value.isVerified
+          : isVerified // ignore: cast_nullable_to_non_nullable
               as bool,
       birthPlace: freezed == birthPlace
           ? _value.birthPlace
@@ -210,8 +225,10 @@ abstract class _$$PoetModelImplCopyWith<$Res>
       String? era,
       int poemCount,
       int viewCount,
+      int followerCount,
       @JsonKey(name: 'isFeatured') bool isFeatured,
       @JsonKey(name: 'isTrending') bool isTrending,
+      @JsonKey(name: 'isVerified') bool isVerified,
       @JsonKey(name: 'birthPlace') String? birthPlace,
       String? country,
       @JsonKey(name: 'countryFlag') String? countryFlag,
@@ -241,8 +258,10 @@ class __$$PoetModelImplCopyWithImpl<$Res>
     Object? era = freezed,
     Object? poemCount = null,
     Object? viewCount = null,
+    Object? followerCount = null,
     Object? isFeatured = null,
     Object? isTrending = null,
+    Object? isVerified = null,
     Object? birthPlace = freezed,
     Object? country = freezed,
     Object? countryFlag = freezed,
@@ -291,6 +310,10 @@ class __$$PoetModelImplCopyWithImpl<$Res>
           ? _value.viewCount
           : viewCount // ignore: cast_nullable_to_non_nullable
               as int,
+      followerCount: null == followerCount
+          ? _value.followerCount
+          : followerCount // ignore: cast_nullable_to_non_nullable
+              as int,
       isFeatured: null == isFeatured
           ? _value.isFeatured
           : isFeatured // ignore: cast_nullable_to_non_nullable
@@ -298,6 +321,10 @@ class __$$PoetModelImplCopyWithImpl<$Res>
       isTrending: null == isTrending
           ? _value.isTrending
           : isTrending // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isVerified: null == isVerified
+          ? _value.isVerified
+          : isVerified // ignore: cast_nullable_to_non_nullable
               as bool,
       birthPlace: freezed == birthPlace
           ? _value.birthPlace
@@ -341,8 +368,10 @@ class _$PoetModelImpl implements _PoetModel {
       this.era,
       this.poemCount = 0,
       this.viewCount = 0,
+      this.followerCount = 0,
       @JsonKey(name: 'isFeatured') this.isFeatured = false,
       @JsonKey(name: 'isTrending') this.isTrending = false,
+      @JsonKey(name: 'isVerified') this.isVerified = false,
       @JsonKey(name: 'birthPlace') this.birthPlace,
       this.country,
       @JsonKey(name: 'countryFlag') this.countryFlag,
@@ -382,11 +411,17 @@ class _$PoetModelImpl implements _PoetModel {
   @JsonKey()
   final int viewCount;
   @override
+  @JsonKey()
+  final int followerCount;
+  @override
   @JsonKey(name: 'isFeatured')
   final bool isFeatured;
   @override
   @JsonKey(name: 'isTrending')
   final bool isTrending;
+  @override
+  @JsonKey(name: 'isVerified')
+  final bool isVerified;
   @override
   @JsonKey(name: 'birthPlace')
   final String? birthPlace;
@@ -413,7 +448,7 @@ class _$PoetModelImpl implements _PoetModel {
 
   @override
   String toString() {
-    return 'PoetModel(publicId: $publicId, name: $name, shortBio: $shortBio, birthYear: $birthYear, deathYear: $deathYear, profileImageUrl: $profileImageUrl, gender: $gender, era: $era, poemCount: $poemCount, viewCount: $viewCount, isFeatured: $isFeatured, isTrending: $isTrending, birthPlace: $birthPlace, country: $country, countryFlag: $countryFlag, countryFlagUrl: $countryFlagUrl, topTags: $topTags, isActive: $isActive)';
+    return 'PoetModel(publicId: $publicId, name: $name, shortBio: $shortBio, birthYear: $birthYear, deathYear: $deathYear, profileImageUrl: $profileImageUrl, gender: $gender, era: $era, poemCount: $poemCount, viewCount: $viewCount, followerCount: $followerCount, isFeatured: $isFeatured, isTrending: $isTrending, isVerified: $isVerified, birthPlace: $birthPlace, country: $country, countryFlag: $countryFlag, countryFlagUrl: $countryFlagUrl, topTags: $topTags, isActive: $isActive)';
   }
 
   @override
@@ -438,10 +473,14 @@ class _$PoetModelImpl implements _PoetModel {
                 other.poemCount == poemCount) &&
             (identical(other.viewCount, viewCount) ||
                 other.viewCount == viewCount) &&
+            (identical(other.followerCount, followerCount) ||
+                other.followerCount == followerCount) &&
             (identical(other.isFeatured, isFeatured) ||
                 other.isFeatured == isFeatured) &&
             (identical(other.isTrending, isTrending) ||
                 other.isTrending == isTrending) &&
+            (identical(other.isVerified, isVerified) ||
+                other.isVerified == isVerified) &&
             (identical(other.birthPlace, birthPlace) ||
                 other.birthPlace == birthPlace) &&
             (identical(other.country, country) || other.country == country) &&
@@ -456,26 +495,29 @@ class _$PoetModelImpl implements _PoetModel {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      publicId,
-      name,
-      shortBio,
-      birthYear,
-      deathYear,
-      profileImageUrl,
-      gender,
-      era,
-      poemCount,
-      viewCount,
-      isFeatured,
-      isTrending,
-      birthPlace,
-      country,
-      countryFlag,
-      countryFlagUrl,
-      const DeepCollectionEquality().hash(_topTags),
-      isActive);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        publicId,
+        name,
+        shortBio,
+        birthYear,
+        deathYear,
+        profileImageUrl,
+        gender,
+        era,
+        poemCount,
+        viewCount,
+        followerCount,
+        isFeatured,
+        isTrending,
+        isVerified,
+        birthPlace,
+        country,
+        countryFlag,
+        countryFlagUrl,
+        const DeepCollectionEquality().hash(_topTags),
+        isActive
+      ]);
 
   @JsonKey(ignore: true)
   @override
@@ -503,8 +545,10 @@ abstract class _PoetModel implements PoetModel {
       final String? era,
       final int poemCount,
       final int viewCount,
+      final int followerCount,
       @JsonKey(name: 'isFeatured') final bool isFeatured,
       @JsonKey(name: 'isTrending') final bool isTrending,
+      @JsonKey(name: 'isVerified') final bool isVerified,
       @JsonKey(name: 'birthPlace') final String? birthPlace,
       final String? country,
       @JsonKey(name: 'countryFlag') final String? countryFlag,
@@ -538,11 +582,16 @@ abstract class _PoetModel implements PoetModel {
   @override
   int get viewCount;
   @override
+  int get followerCount;
+  @override
   @JsonKey(name: 'isFeatured')
   bool get isFeatured;
   @override
   @JsonKey(name: 'isTrending')
   bool get isTrending;
+  @override
+  @JsonKey(name: 'isVerified')
+  bool get isVerified;
   @override
   @JsonKey(name: 'birthPlace')
   String? get birthPlace;

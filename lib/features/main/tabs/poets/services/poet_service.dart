@@ -515,6 +515,122 @@ class PoetService {
     }
   }
 
+  // ============= FOLLOW SYSTEM =============
+
+  /// Follow a poet: POST /api/poets/{publicId}/follow
+  Future<({bool following, int followerCount})> followPoet({
+    required String publicId,
+  }) async {
+    try {
+      final response = await _dio.post('$_baseEndpoint/$publicId/follow');
+
+      final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+        response.data,
+        (json) => json as Map<String, dynamic>,
+      );
+
+      if (apiResponse.success && apiResponse.data != null) {
+        _logger.i('✅ Followed poet: $publicId');
+        return (
+          following: apiResponse.data!['following'] as bool? ?? true,
+          followerCount: apiResponse.data!['followerCount'] as int? ?? 0,
+        );
+      } else {
+        throw Exception(apiResponse.message ?? 'Failed to follow poet');
+      }
+    } on DioException catch (e) {
+      _logger.e('❌ Error following poet: ${e.message}');
+      rethrow;
+    }
+  }
+
+  /// Unfollow a poet: DELETE /api/poets/{publicId}/follow
+  Future<({bool following, int followerCount})> unfollowPoet({
+    required String publicId,
+  }) async {
+    try {
+      final response = await _dio.delete('$_baseEndpoint/$publicId/follow');
+
+      final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+        response.data,
+        (json) => json as Map<String, dynamic>,
+      );
+
+      if (apiResponse.success && apiResponse.data != null) {
+        _logger.i('✅ Unfollowed poet: $publicId');
+        return (
+          following: apiResponse.data!['following'] as bool? ?? false,
+          followerCount: apiResponse.data!['followerCount'] as int? ?? 0,
+        );
+      } else {
+        throw Exception(apiResponse.message ?? 'Failed to unfollow poet');
+      }
+    } on DioException catch (e) {
+      _logger.e('❌ Error unfollowing poet: ${e.message}');
+      rethrow;
+    }
+  }
+
+  /// Check follow status: GET /api/poets/{publicId}/is-following
+  Future<({bool isFollowing, String? followedAt})> isFollowingPoet({
+    required String publicId,
+  }) async {
+    try {
+      final response = await _dio.get('$_baseEndpoint/$publicId/is-following');
+
+      final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+        response.data,
+        (json) => json as Map<String, dynamic>,
+      );
+
+      if (apiResponse.success && apiResponse.data != null) {
+        return (
+          isFollowing: apiResponse.data!['isFollowing'] as bool? ?? false,
+          followedAt: apiResponse.data!['followedAt'] as String?,
+        );
+      } else {
+        throw Exception(apiResponse.message ?? 'Failed to check follow status');
+      }
+    } on DioException catch (e) {
+      _logger.e('❌ Error checking follow status: ${e.message}');
+      rethrow;
+    }
+  }
+
+  /// Get list of poets the user is following: GET /api/users/me/following
+  Future<PaginatedResponse<PoetModel>> getFollowingPoets({
+    int page = 0,
+    int size = 20,
+  }) async {
+    try {
+      final response = await _dio.get(
+        '/api/users/me/following',
+        queryParameters: {
+          'page': page,
+          'size': size,
+        },
+      );
+
+      final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+        response.data,
+        (json) => json as Map<String, dynamic>,
+      );
+
+      if (apiResponse.success && apiResponse.data != null) {
+        _logger.i('✅ Following list fetched - Page: $page');
+        return PaginatedResponse<PoetModel>.fromJson(
+          apiResponse.data!,
+          (json) => PoetModel.fromJson(json as Map<String, dynamic>? ?? {}),
+        );
+      } else {
+        throw Exception(apiResponse.message ?? 'Failed to fetch following list');
+      }
+    } on DioException catch (e) {
+      _logger.e('❌ Error fetching following list: ${e.message}');
+      rethrow;
+    }
+  }
+
   /// Get poems by poet with optional poetry type filtering
   Future<PaginatedResponse<PoemModel>> getPoemsByPoet({
     required String poetPublicId,

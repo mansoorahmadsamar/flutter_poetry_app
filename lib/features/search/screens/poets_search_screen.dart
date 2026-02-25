@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/features/search/providers/search_providers.dart';
+import 'package:flutter_poetry_app/features/main/tabs/poets/providers/poet_search_pagination_provider.dart';
 import 'package:flutter_poetry_app/features/search/widgets/search_results_grid.dart';
 import 'package:flutter_poetry_app/features/search/widgets/recent_searches_list.dart';
 import 'package:flutter_poetry_app/features/search/widgets/search_suggestions_section.dart';
@@ -27,7 +28,7 @@ class _PoetsSearchScreenState extends ConsumerState<PoetsSearchScreen> {
     super.initState();
     // Clear any previous search results and reset to empty state
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(searchPaginationProvider.notifier).reset();
+      ref.read(poetSearchPaginationProvider.notifier).reset();
       _focusNode.requestFocus();
     });
   }
@@ -51,14 +52,14 @@ class _PoetsSearchScreenState extends ConsumerState<PoetsSearchScreen> {
 
     // If empty, reset search
     if (value.trim().isEmpty) {
-      ref.read(searchPaginationProvider.notifier).reset();
+      ref.read(poetSearchPaginationProvider.notifier).reset();
       return;
     }
 
     // Debounce the search
     _debounceTimer = Timer(const Duration(milliseconds: 500), () {
       if (value.trim().length >= 2) {
-        ref.read(searchPaginationProvider.notifier).search(value.trim());
+        ref.read(poetSearchPaginationProvider.notifier).search(value.trim());
       }
       setState(() {
         _isSearching = false;
@@ -71,7 +72,7 @@ class _PoetsSearchScreenState extends ConsumerState<PoetsSearchScreen> {
     _debounceTimer?.cancel();
 
     if (value.trim().length >= 2) {
-      ref.read(searchPaginationProvider.notifier).search(value.trim());
+      ref.read(poetSearchPaginationProvider.notifier).search(value.trim());
       setState(() {
         _isSearching = false;
       });
@@ -80,7 +81,7 @@ class _PoetsSearchScreenState extends ConsumerState<PoetsSearchScreen> {
 
   void _clearSearch() {
     _searchController.clear();
-    ref.read(searchPaginationProvider.notifier).reset();
+    ref.read(poetSearchPaginationProvider.notifier).reset();
     setState(() {
       _isSearching = false;
     });
@@ -89,35 +90,18 @@ class _PoetsSearchScreenState extends ConsumerState<PoetsSearchScreen> {
 
   void _onRecentSearchTapped(String query) {
     _searchController.text = query;
-    ref.read(searchPaginationProvider.notifier).search(query);
+    ref.read(poetSearchPaginationProvider.notifier).search(query);
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final searchState = ref.watch(searchPaginationProvider);
+    final searchState = ref.watch(poetSearchPaginationProvider);
     final query = _searchController.text.trim();
 
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // DEBUG: Screen identifier
-          SliverToBoxAdapter(
-            child: Container(
-              color: Colors.blue,
-              padding: const EdgeInsets.all(8),
-              child: const Text(
-                '👥 POETS SEARCH SCREEN 👥',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-
           // Search App Bar
           _buildSearchAppBar(context, isDark),
 
@@ -127,11 +111,11 @@ class _PoetsSearchScreenState extends ConsumerState<PoetsSearchScreen> {
               onFiltersChanged: () {
                 // Re-search with new filters or browse if no query
                 if (query.isNotEmpty && query.length >= 2) {
-                  ref.read(searchPaginationProvider.notifier).search(query);
+                  ref.read(poetSearchPaginationProvider.notifier).search(query);
                 } else {
                   final filters = ref.read(searchFiltersProvider);
                   if (filters.hasActiveFilters) {
-                    ref.read(searchPaginationProvider.notifier).browseByFilters();
+                    ref.read(poetSearchPaginationProvider.notifier).browseByFilters();
                   }
                 }
               },
@@ -370,7 +354,7 @@ class _PoetsSearchScreenState extends ConsumerState<PoetsSearchScreen> {
                 onPressed: () {
                   final query = _searchController.text.trim();
                   if (query.length >= 2) {
-                    ref.read(searchPaginationProvider.notifier).search(query);
+                    ref.read(poetSearchPaginationProvider.notifier).search(query);
                   }
                 },
                 icon: const Icon(Icons.refresh),
@@ -571,11 +555,11 @@ class _PoetsSearchScreenState extends ConsumerState<PoetsSearchScreen> {
 
                         // If there's a query, search with filters
                         if (query.length >= 2) {
-                          ref.read(searchPaginationProvider.notifier).search(query);
+                          ref.read(poetSearchPaginationProvider.notifier).search(query);
                         }
                         // If no query but filters are active, browse by filters
                         else if (filters.hasActiveFilters) {
-                          ref.read(searchPaginationProvider.notifier).browseByFilters();
+                          ref.read(poetSearchPaginationProvider.notifier).browseByFilters();
                         }
                       },
                       style: ElevatedButton.styleFrom(
