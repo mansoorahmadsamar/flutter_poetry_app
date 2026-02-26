@@ -281,8 +281,10 @@ class _UnifiedBookmarksScreenState
         }
         break;
       case 'IMAGE':
-        // TODO: Navigate to image poetry detail when available
-        context.push('/main/image-poetry/${bookmark.contentId}');
+        context.push(
+          '/image-poetry/${bookmark.contentId}',
+          extra: {'imageUrl': bookmark.imageUrl ?? bookmark.thumbnailUrl},
+        );
         break;
     }
   }

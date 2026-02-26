@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../providers/poet_providers.dart';
+import '../models/poet_image_model.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
+import 'image_fullscreen_viewer.dart';
 
 class PoetGalleryTab extends ConsumerWidget {
   final String publicId;
@@ -36,14 +38,16 @@ class PoetGalleryTab extends ConsumerWidget {
           itemBuilder: (context, index) {
             final image = images[index];
             return GestureDetector(
-              onTap: () => _showImageFullscreen(context, image.imageUrl),
+              onTap: () => _showImageFullscreen(context, images, index),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
                     CachedNetworkImage(
-                      imageUrl: image.thumbnailUrl ?? image.imageUrl,
+                      imageUrl: (image.thumbnailUrl != null && image.thumbnailUrl!.isNotEmpty && image.thumbnailUrl != '-')
+                          ? image.thumbnailUrl!
+                          : image.imageUrl,
                       fit: BoxFit.cover,
                       placeholder: (context, url) => Container(
                         color: isDark ? Colors.grey[800] : Colors.grey[300],
@@ -116,20 +120,17 @@ class PoetGalleryTab extends ConsumerWidget {
     );
   }
 
-  void _showImageFullscreen(BuildContext context, String imageUrl) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        child: GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: CachedNetworkImage(
-            imageUrl: imageUrl,
-            fit: BoxFit.contain,
-            placeholder: (context, url) =>
-                Center(child: CircularProgressIndicator()),
-            errorWidget: (context, url, error) =>
-                Center(child: Icon(Icons.error)),
-          ),
+  void _showImageFullscreen(
+    BuildContext context,
+    List<PoetImageModel> images,
+    int initialIndex,
+  ) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ImageFullscreenViewer(
+          images: images,
+          initialIndex: initialIndex,
         ),
       ),
     );

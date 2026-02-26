@@ -401,44 +401,58 @@ class _ImageBookmarkCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image thumbnail
-            if (bookmark.thumbnailUrl != null || bookmark.imageUrl != null)
-              ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(10),
-                  topRight: Radius.circular(10),
-                ),
-                child: AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: CachedNetworkImage(
-                    imageUrl: bookmark.thumbnailUrl ?? bookmark.imageUrl!,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.03)
-                          : Colors.black.withValues(alpha: 0.02),
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          strokeWidth: 1.5,
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
+              ),
+              child: AspectRatio(
+                aspectRatio: 16 / 9,
+                child: (bookmark.thumbnailUrl != null || bookmark.imageUrl != null)
+                    ? CachedNetworkImage(
+                        imageUrl: bookmark.thumbnailUrl ?? bookmark.imageUrl!,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Container(
                           color: isDark
-                              ? Colors.white.withValues(alpha: 0.2)
-                              : Colors.black.withValues(alpha: 0.15),
+                              ? Colors.white.withValues(alpha: 0.03)
+                              : Colors.black.withValues(alpha: 0.02),
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 1.5,
+                              color: isDark
+                                  ? Colors.white.withValues(alpha: 0.2)
+                                  : Colors.black.withValues(alpha: 0.15),
+                            ),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.03)
+                              : Colors.black.withValues(alpha: 0.02),
+                          child: Icon(
+                            Icons.image_not_supported_outlined,
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.2)
+                                : Colors.black.withValues(alpha: 0.15),
+                          ),
+                        ),
+                      )
+                    : Container(
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.03)
+                            : Colors.black.withValues(alpha: 0.02),
+                        child: Center(
+                          child: Icon(
+                            Icons.image_outlined,
+                            size: 40,
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.15)
+                                : Colors.black.withValues(alpha: 0.1),
+                          ),
                         ),
                       ),
-                    ),
-                    errorWidget: (context, url, error) => Container(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.03)
-                          : Colors.black.withValues(alpha: 0.02),
-                      child: Icon(
-                        Icons.image_not_supported_outlined,
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.2)
-                            : Colors.black.withValues(alpha: 0.15),
-                      ),
-                    ),
-                  ),
-                ),
               ),
+            ),
 
             // Content
             Padding(

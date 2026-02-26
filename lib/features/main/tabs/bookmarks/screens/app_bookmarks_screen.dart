@@ -168,7 +168,10 @@ class _AppBookmarksScreenState extends ConsumerState<AppBookmarksScreen> {
         break;
       case 'IMAGE':
         if (bookmark.contentId.isNotEmpty) {
-          context.push('/image-poetry/${bookmark.contentId}');
+          context.push(
+            '/image-poetry/${bookmark.contentId}',
+            extra: {'imageUrl': bookmark.imageUrl ?? bookmark.thumbnailUrl},
+          );
         }
         break;
     }

@@ -106,4 +106,47 @@ class ImageBookmarkActionNotifier extends StateNotifier<AsyncValue<void>> {
       return false;
     }
   }
+
+  /// Toggle like for an image
+  /// Returns true if liked, false if unliked
+  Future<bool> toggleLike(String imageId) async {
+    try {
+      final service = ref.read(imageCollectionServiceProvider);
+      final isLiked = await service.toggleLike(imageId);
+      _logger.i('✅ Image like toggled: $imageId - isLiked: $isLiked');
+      return isLiked;
+    } catch (e) {
+      _logger.e('❌ Error toggling image like: $e');
+      rethrow;
+    }
+  }
+
+  /// Record a share event for an image
+  Future<void> recordShare(String imageId) async {
+    try {
+      final service = ref.read(imageCollectionServiceProvider);
+      await service.recordShare(imageId);
+      _logger.i('✅ Image share recorded: $imageId');
+    } catch (e) {
+      _logger.e('❌ Error recording image share: $e');
+      // Don't rethrow — share tracking failure shouldn't block the user
+    }
+  }
+
+  /// Get full engagement status for an image in one call
+  Future<Map<String, dynamic>> getImageStatus(String imageId) async {
+    try {
+      final service = ref.read(imageCollectionServiceProvider);
+      return await service.getImageStatus(imageId);
+    } catch (e) {
+      _logger.e('❌ Error getting image status: $e');
+      return {
+        'isLiked': false,
+        'isBookmarked': false,
+        'likeCount': 0,
+        'bookmarkCount': 0,
+        'shareCount': 0,
+      };
+    }
+  }
 }

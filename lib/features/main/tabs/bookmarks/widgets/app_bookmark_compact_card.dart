@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/features/main/tabs/bookmarks/models/unified_bookmark_model.dart';
@@ -117,6 +118,42 @@ class _AppBookmarkCompactCardState extends State<AppBookmarkCompactCard> {
                                   color: widget.isDark
                                       ? Colors.white.withValues(alpha: 0.3)
                                       : Colors.black.withValues(alpha: 0.2),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                        ],
+
+                        // Image thumbnail for IMAGE bookmarks
+                        if (widget.bookmark.type.toUpperCase() == 'IMAGE' &&
+                            (widget.bookmark.thumbnailUrl != null ||
+                                widget.bookmark.imageUrl != null)) ...[
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: SizedBox(
+                              width: 56,
+                              height: 56,
+                              child: CachedNetworkImage(
+                                imageUrl: widget.bookmark.thumbnailUrl ??
+                                    widget.bookmark.imageUrl!,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => Container(
+                                  color: widget.isDark
+                                      ? Colors.white.withValues(alpha: 0.05)
+                                      : Colors.black.withValues(alpha: 0.04),
+                                ),
+                                errorWidget: (context, url, error) => Container(
+                                  color: widget.isDark
+                                      ? Colors.white.withValues(alpha: 0.05)
+                                      : Colors.black.withValues(alpha: 0.04),
+                                  child: Icon(
+                                    Icons.image_outlined,
+                                    size: 20,
+                                    color: widget.isDark
+                                        ? Colors.white.withValues(alpha: 0.2)
+                                        : Colors.black.withValues(alpha: 0.15),
+                                  ),
                                 ),
                               ),
                             ),
