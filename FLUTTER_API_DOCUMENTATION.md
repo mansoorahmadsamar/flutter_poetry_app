@@ -1,7 +1,7 @@
 # Poetry Backend API - Flutter Mobile App Documentation
 
-**Version:** 1.1.0
-**Last Updated:** January 28, 2026
+**Version:** 1.2.0
+**Last Updated:** February 27, 2026
 **Base URL (Production):** `https://api.poetry.com`
 **Base URL (Development):** `https://dev-api.poetry.com`
 **Base URL (Local):** `http://localhost:8080`
@@ -9,6 +9,21 @@
 ---
 
 ## Recent Updates (December 2025 - February 2026)
+
+### App Content (About App, Privacy Policy, etc.) ⭐ NEW (February 2026)
+
+**What's New:**
+- ✅ **List content pages**: `GET /api/app-content?lang=en` — all active content for a language (for Flutter settings screen)
+- ✅ **Single page by key**: `GET /api/app-content/{contentKey}?lang=en` — load e.g. `PRIVACY_POLICY` on demand
+- ✅ **No auth required** — public endpoints, call without a token
+- ✅ **Multilingual** — same keys available in `en`, `ur`, `hi` etc., controlled by `?lang=` param
+- ✅ **Admin-managed** — content updated via admin portal without a code deployment
+
+**Standard content keys**: `ABOUT_APP`, `PRIVACY_POLICY`, `TERMS_OF_SERVICE`, `CONTACT_US`, `FAQ`
+
+**See Section 16 for full documentation.**
+
+---
 
 ### Poet Gallery Image Engagement ⭐ NEW (February 2026)
 
@@ -321,6 +336,13 @@ A single, consolidated API that provides access to all bookmark types (poems, co
 - [15.2 Content Discovery Flow](#152-content-discovery-flow)
 - [15.3 Image Poetry Creation Flow](#153-image-poetry-creation-flow)
 - [15.4 Sharing & Social Flow](#154-sharing-social-flow)
+
+### 16. App Content (Settings Pages) ⭐ NEW
+- [16.1 Overview](#161-overview-app-content)
+- [16.2 Get All Active Content](#162-get-all-active-content)
+- [16.3 Get Single Page by Key](#163-get-single-page-by-key)
+- [16.4 AppContentResponse — Field Reference](#164-appcontentresponse--field-reference)
+- [16.5 Flutter Implementation Guide](#165-flutter-implementation-guide)
 
 ### Appendix
 - [A. Flutter Code Examples](#appendix-a-flutter-code-examples)
@@ -8987,13 +9009,252 @@ class Couplet {
 
 ---
 
+---
+
+## 16. App Content (Settings Pages) ⭐ NEW
+
+### 16.1 Overview — App Content
+
+Static content pages (About App, Privacy Policy, Terms of Service, FAQ, Contact Us) displayed in the app settings screen. Content is managed by admins via the admin portal — no app update needed when content changes.
+
+**Key Design Points:**
+- **No authentication required** — public endpoints, no `Authorization` header needed
+- **Language-aware** — pass `?lang=ur` to get Urdu content, `?lang=en` for English
+- **Ordered** — results are sorted by `displayOrder` ascending (admin controls the order)
+- **Standard content keys**: `ABOUT_APP`, `PRIVACY_POLICY`, `TERMS_OF_SERVICE`, `CONTACT_US`, `FAQ`
+
+---
+
+### 16.2 Get All Active Content
+
+Returns all active content entries for a language. Use this on the **settings screen** to build the list of tappable items (About, Privacy Policy, etc.).
+
+**Endpoint**: `GET /api/app-content?lang=en`
+
+**Authentication Required**: No
+
+**Query Parameters**:
+- `lang` (optional, default: `"en"`): Language code — `en`, `ur`, `hi`
+
+**Example**: `GET /api/app-content?lang=ur`
+
+**Success Response (200)**:
+```json
+{
+  "success": true,
+  "message": "App content retrieved successfully",
+  "data": [
+    {
+      "publicId": "abc-123",
+      "contentKey": "ABOUT_APP",
+      "title": "ہمارے بارے میں",
+      "content": "جہانِ سخن ایک شاعری پلیٹ فارم ہے...",
+      "languageCode": "ur",
+      "isActive": true,
+      "displayOrder": 1,
+      "updatedAt": "2026-02-27T10:00:00"
+    },
+    {
+      "publicId": "def-456",
+      "contentKey": "PRIVACY_POLICY",
+      "title": "رازداری کی پالیسی",
+      "content": "...",
+      "languageCode": "ur",
+      "isActive": true,
+      "displayOrder": 2,
+      "updatedAt": "2026-02-27T10:00:00"
+    }
+  ]
+}
+```
+
+**Notes**:
+- Only entries with `isActive = true` and `isDeleted = false` are returned
+- Sorted by `displayOrder` ascending
+- Returns an empty list `[]` if no content exists for the requested language (handle gracefully)
+
+---
+
+### 16.3 Get Single Page by Key
+
+Load the full content of a single page when the user taps an item (e.g. tap "Privacy Policy" → load full text).
+
+**Endpoint**: `GET /api/app-content/{contentKey}?lang=en`
+
+**Authentication Required**: No
+
+**Path Parameters**:
+- `contentKey`: One of `ABOUT_APP`, `PRIVACY_POLICY`, `TERMS_OF_SERVICE`, `CONTACT_US`, `FAQ` (case-insensitive)
+
+**Query Parameters**:
+- `lang` (optional, default: `"en"`): Language code
+
+**Example**: `GET /api/app-content/PRIVACY_POLICY?lang=en`
+
+**Success Response (200)**:
+```json
+{
+  "success": true,
+  "message": "App content retrieved successfully",
+  "data": {
+    "publicId": "def-456",
+    "contentKey": "PRIVACY_POLICY",
+    "title": "Privacy Policy",
+    "content": "Your privacy is important to us. This Privacy Policy explains how Jahane Sukhan collects, uses, and protects your information...",
+    "languageCode": "en",
+    "isActive": true,
+    "displayOrder": 2,
+    "updatedAt": "2026-02-27T10:00:00"
+  }
+}
+```
+
+**Error (404) — key not found or inactive**:
+```json
+{
+  "success": false,
+  "message": "Content not found for key: PRIVACY_POLICY",
+  "data": null
+}
+```
+
+**Notes**:
+- Returns 404 if no active, non-deleted entry exists for the given key + language
+- Fall back to English (`?lang=en`) if the requested language is not available
+
+---
+
+### 16.4 AppContentResponse — Field Reference
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `publicId` | String | Unique identifier for the entry |
+| `contentKey` | String | Logical key (e.g. `PRIVACY_POLICY`) |
+| `title` | String | Display title shown in settings list and page header |
+| `content` | String | Full body text — may contain markdown or plain text |
+| `languageCode` | String | Language of this entry (`en`, `ur`, `hi`) |
+| `isActive` | Boolean | Always `true` in public API responses |
+| `displayOrder` | Integer | Sort order (lower = first); may be `null` |
+| `updatedAt` | LocalDateTime | Last modified timestamp (use for cache invalidation) |
+
+---
+
+### 16.5 Flutter Implementation Guide
+
+#### Settings List Screen
+
+```dart
+// Fetch all content pages for current app language
+Future<List<AppContentItem>> fetchAppContent(String lang) async {
+  final response = await http.get(
+    Uri.parse('$baseUrl/api/app-content?lang=$lang'),
+    // No Authorization header needed
+  );
+
+  final body = jsonDecode(response.body);
+  if (body['success'] == true) {
+    return (body['data'] as List)
+        .map((item) => AppContentItem.fromJson(item))
+        .toList();
+  }
+  return []; // Return empty list on failure — do not crash
+}
+```
+
+#### Content Detail Screen (on tap)
+
+```dart
+Future<AppContentItem?> fetchContentByKey(String key, String lang) async {
+  final response = await http.get(
+    Uri.parse('$baseUrl/api/app-content/$key?lang=$lang'),
+  );
+
+  final body = jsonDecode(response.body);
+  if (body['success'] == true) {
+    return AppContentItem.fromJson(body['data']);
+  }
+  return null; // Handle null gracefully (show error or fallback)
+}
+```
+
+#### AppContentItem Model
+
+```dart
+class AppContentItem {
+  final String publicId;
+  final String contentKey;
+  final String title;
+  final String content;
+  final String languageCode;
+  final int? displayOrder;
+  final String updatedAt;
+
+  AppContentItem({
+    required this.publicId,
+    required this.contentKey,
+    required this.title,
+    required this.content,
+    required this.languageCode,
+    this.displayOrder,
+    required this.updatedAt,
+  });
+
+  factory AppContentItem.fromJson(Map<String, dynamic> json) {
+    return AppContentItem(
+      publicId: json['publicId'],
+      contentKey: json['contentKey'],
+      title: json['title'],
+      content: json['content'],
+      languageCode: json['languageCode'],
+      displayOrder: json['displayOrder'],
+      updatedAt: json['updatedAt'],
+    );
+  }
+}
+```
+
+#### Language Fallback Strategy
+
+```dart
+Future<AppContentItem?> fetchWithFallback(String key, String lang) async {
+  // Try requested language first
+  var item = await fetchContentByKey(key, lang);
+
+  // Fall back to English if not found
+  if (item == null && lang != 'en') {
+    item = await fetchContentByKey(key, 'en');
+  }
+
+  return item;
+}
+```
+
+#### Rendering Markdown Content
+
+The `content` field may contain markdown. Use a markdown rendering widget:
+
+```dart
+// pubspec.yaml: flutter_markdown: ^0.6.0
+import 'package:flutter_markdown/flutter_markdown.dart';
+
+Scaffold(
+  appBar: AppBar(title: Text(item.title)),
+  body: Markdown(
+    data: item.content,
+    styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)),
+  ),
+);
+```
+
+---
+
 ## Support & Feedback
 
 For issues or questions:
 - GitHub: https://github.com/your-repo/issues
 - Email: support@poetry.com
 
-**Documentation Version:** 1.1.0
-**Last Updated:** January 28, 2026
+**Documentation Version:** 1.2.0
+**Last Updated:** February 27, 2026
 
 ---
