@@ -10,6 +10,18 @@
 
 ## Recent Updates (December 2025 - February 2026)
 
+### Poet Gallery Image Engagement ⭐ NEW (February 2026)
+
+**What's New:**
+- ✅ **Like / Unlike**: `POST /api/poetry-images/{imageId}/like` — toggle like on poet gallery images
+- ✅ **Share Tracking**: `POST /api/poetry-images/{imageId}/share` — record share events, returns updated count
+- ✅ **Status Check**: `GET /api/poetry-images/{imageId}/status` — single call for all engagement state (isLiked, isBookmarked, counts)
+- ✅ **Unified Bookmark**: `POST /api/poetry-images/{imageId}/bookmark` — now works for both `PoetImage` (gallery) and `GeneratedPoetryImage` publicIds
+
+**See Sections 7.5.10–7.5.12 for full documentation.**
+
+---
+
 ### Discover Functionality Enhancement ⭐ NEW (February 2026)
 
 **What's New:**
@@ -213,6 +225,9 @@ A single, consolidated API that provides access to all bookmark types (poems, co
   - [7.5.7 Toggle Image Bookmark (NEW)](#757-toggle-image-bookmark-new)
   - [7.5.8 Get Bookmarked Images (NEW)](#758-get-bookmarked-images-new)
   - [7.5.9 Check Image Bookmark Status (NEW)](#759-check-image-bookmark-status-new)
+  - [7.5.10 Like / Unlike Poet Gallery Image (NEW)](#7510-like--unlike-poet-gallery-image-new)
+  - [7.5.11 Share Poet Gallery Image (NEW)](#7511-share-poet-gallery-image-new)
+  - [7.5.12 Get Poet Gallery Image Status (NEW)](#7512-get-poet-gallery-image-status-new)
 
 ### 8. Book Management
 - [8.1 Overview](#81-overview-books)
@@ -5629,10 +5644,10 @@ This section covers both traditional collections (save/favorite) and the new boo
 **Authentication Required:** Yes
 
 **Description:**
-Bookmark or unbookmark a generated poetry image (toggles). Similar to poem and couplet bookmarks, this preserves the language context in which the user bookmarked the image. This is separate from the collection/favorite system and is used for quick access to bookmarked images.
+Bookmark or unbookmark a poetry image (toggles). Works for **both** generated poetry images (`GeneratedPoetryImage`) and poet gallery images (`PoetImage`). The backend automatically detects the image type from the publicId. Similar to poem and couplet bookmarks, this preserves the language context in which the user bookmarked the image.
 
 **Path Parameters:**
-- `imageId` (required): Public ID of the generated poetry image
+- `imageId` (required): Public ID of the generated poetry image OR poet gallery image
 
 **Query Parameters:**
 - `lang` (optional, default: "ur"): Language code when bookmarking (ur, en, hi, etc.). This is stored with the bookmark so the image can be displayed with the correct language context later.
@@ -5644,7 +5659,7 @@ Bookmark or unbookmark a generated poetry image (toggles). Similar to poem and c
 {
   "success": true,
   "message": "Image bookmarked successfully",
-  "data": true
+  "data": { "isBookmarked": true }
 }
 ```
 
@@ -5653,11 +5668,11 @@ Bookmark or unbookmark a generated poetry image (toggles). Similar to poem and c
 {
   "success": true,
   "message": "Bookmark removed successfully",
-  "data": false
+  "data": { "isBookmarked": false }
 }
 ```
 
-**Note:** Creates engagement activity record for personalization and analytics.
+**Note:** Creates engagement activity record for personalization and analytics. The `bookmarkCount` on the image is updated automatically.
 
 ---
 
@@ -5710,10 +5725,10 @@ Retrieve user's bookmarked images with optional language filtering. Bookmarks ar
 **Authentication Required:** Optional (returns false if not authenticated)
 
 **Description:**
-Check if a specific image is bookmarked by the current user. Useful for displaying bookmark button state in the UI.
+Check if a specific image is bookmarked by the current user. Works for both generated poetry images and poet gallery images.
 
 **Path Parameters:**
-- `imageId` (required): Public ID of the generated poetry image
+- `imageId` (required): Public ID of the generated poetry image OR poet gallery image
 
 **Example:** `GET /api/poetry-images/img_xyz789/is-bookmarked`
 
@@ -5727,6 +5742,122 @@ Check if a specific image is bookmarked by the current user. Useful for displayi
 ```
 
 **Note:** If user is not authenticated, returns `false` instead of 401 error.
+
+---
+
+#### 7.5.10 Like / Unlike Poet Gallery Image (NEW)
+
+**Endpoint:** `POST /api/poetry-images/{imageId}/like`
+
+**Authentication Required:** Yes
+
+**Description:**
+Toggle like/unlike on a poet gallery image (`PoetImage`). Each call flips the state — if not liked, it likes; if already liked, it unlikes. The `likeCount` on the image is updated automatically.
+
+**Path Parameters:**
+- `imageId` (required): Public ID of the poet gallery image
+
+**Example:** `POST /api/poetry-images/img_gallery_abc/like`
+
+**Success Response (200) - Liked:**
+```json
+{
+  "success": true,
+  "message": "Image liked successfully",
+  "data": { "isLiked": true }
+}
+```
+
+**Success Response (200) - Unliked:**
+```json
+{
+  "success": true,
+  "message": "Like removed successfully",
+  "data": { "isLiked": false }
+}
+```
+
+---
+
+#### 7.5.11 Share Poet Gallery Image (NEW)
+
+**Endpoint:** `POST /api/poetry-images/{imageId}/share`
+
+**Authentication Required:** No (optional — tracks userId if authenticated)
+
+**Description:**
+Record a share event for a poet gallery image. Call this after the native share sheet is dismissed (whether or not the user actually shared). Increments the `shareCount` and tracks engagement for analytics.
+
+**Path Parameters:**
+- `imageId` (required): Public ID of the poet gallery image
+
+**Example:** `POST /api/poetry-images/img_gallery_abc/share`
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Share recorded",
+  "data": { "shareCount": 42 }
+}
+```
+
+---
+
+#### 7.5.12 Get Poet Gallery Image Status (NEW)
+
+**Endpoint:** `GET /api/poetry-images/{imageId}/status`
+
+**Authentication Required:** No (optional — `isLiked`/`isBookmarked` are false if not authenticated)
+
+**Description:**
+Get the full engagement status for a poet gallery image in a single call. Useful for initializing the UI state when opening the gallery viewer without making three separate calls.
+
+**Path Parameters:**
+- `imageId` (required): Public ID of the poet gallery image
+
+**Example:** `GET /api/poetry-images/img_gallery_abc/status`
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Status retrieved",
+  "data": {
+    "isLiked": true,
+    "isBookmarked": false,
+    "likeCount": 127,
+    "bookmarkCount": 34,
+    "shareCount": 42
+  }
+}
+```
+
+**Flutter Usage Pattern:**
+```dart
+// On gallery page open — fetch status once
+final status = await api.getPoetImageStatus(imagePublicId);
+setState(() {
+  _isLiked = status['isLiked'];
+  _isBookmarked = status['isBookmarked'];
+  _likeCount = status['likeCount'];
+});
+
+// On like button tap
+final result = await api.togglePoetImageLike(imagePublicId);
+setState(() {
+  _isLiked = result['isLiked'];
+});
+
+// On bookmark tap
+final result = await api.togglePoetImageBookmark(imagePublicId);
+setState(() {
+  _isBookmarked = result['isBookmarked'];
+});
+
+// After share sheet is dismissed
+await api.recordPoetImageShare(imagePublicId);
+```
 
 ---
 

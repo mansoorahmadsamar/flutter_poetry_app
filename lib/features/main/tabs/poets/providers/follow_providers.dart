@@ -30,8 +30,7 @@ class FollowToggleNotifier extends StateNotifier<AsyncValue<bool>> {
   FollowToggleNotifier({
     required this.publicId,
     required this.ref,
-    required bool initialValue,
-  }) : super(AsyncValue.data(initialValue));
+  }) : super(const AsyncValue.loading());
 
   /// Set the initial follow status (called when isFollowingProvider resolves)
   void setInitial(bool isFollowing) {
@@ -80,7 +79,6 @@ final followToggleProvider = StateNotifierProvider.autoDispose
     final notifier = FollowToggleNotifier(
       publicId: publicId,
       ref: ref,
-      initialValue: false,
     );
 
     // Listen to the isFollowingProvider to set initial value

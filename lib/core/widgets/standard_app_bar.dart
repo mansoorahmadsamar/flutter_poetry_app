@@ -23,6 +23,8 @@ class StandardAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: AppColors.primary,
       foregroundColor: Colors.white,
+      iconTheme: const IconThemeData(color: Colors.white),
+      actionsIconTheme: const IconThemeData(color: Colors.white),
       title: Text(
         title,
         style: const TextStyle(
@@ -71,6 +73,8 @@ class StandardSliverAppBar extends StatelessWidget {
     return SliverAppBar(
       backgroundColor: AppColors.primary,
       foregroundColor: Colors.white,
+      iconTheme: const IconThemeData(color: Colors.white),
+      actionsIconTheme: const IconThemeData(color: Colors.white),
       title: Text(
         title,
         style: const TextStyle(

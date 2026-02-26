@@ -55,9 +55,10 @@ class FollowButton extends ConsumerWidget {
     required bool isDark,
     bool isLoading = false,
   }) {
-    final verticalPad = compact ? 6.0 : 10.0;
-    final horizontalPad = compact ? 16.0 : 24.0;
-    final fontSize = compact ? 12.0 : 14.0;
+    final verticalPad = compact ? 7.0 : 10.0;
+    final horizontalPad = compact ? 14.0 : 24.0;
+    final fontSize = compact ? 12.5 : 14.0;
+    final iconSize = compact ? 15.0 : 18.0;
 
     return GestureDetector(
       onTap: isLoading
@@ -75,22 +76,22 @@ class FollowButton extends ConsumerWidget {
         ),
         decoration: BoxDecoration(
           color: isFollowing
-              ? (isDark
-                  ? AppColors.primary.withValues(alpha: 0.2)
-                  : AppColors.primary.withValues(alpha: 0.1))
+              ? Colors.transparent
               : AppColors.primary,
-          borderRadius: BorderRadius.circular(20),
-          border: isFollowing
-              ? Border.all(
-                  color: AppColors.primary.withValues(alpha: 0.4),
-                  width: 1,
-                )
-              : null,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isFollowing
+                ? (isDark
+                    ? Colors.white.withValues(alpha: 0.2)
+                    : Colors.black.withValues(alpha: 0.15))
+                : AppColors.primary,
+            width: 1.5,
+          ),
         ),
         child: isLoading
             ? SizedBox(
-                width: compact ? 14 : 16,
-                height: compact ? 14 : 16,
+                width: iconSize,
+                height: iconSize,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
                   valueColor: AlwaysStoppedAnimation<Color>(
@@ -98,16 +99,33 @@ class FollowButton extends ConsumerWidget {
                   ),
                 ),
               )
-            : Text(
-                isFollowing ? 'Following' : 'Follow',
-                style: GoogleFonts.roboto(
-                  fontSize: fontSize,
-                  fontWeight: FontWeight.w600,
-                  color: isFollowing
-                      ? AppColors.primary
-                      : Colors.white,
-                  letterSpacing: 0.3,
-                ),
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    isFollowing ? Icons.check_rounded : Icons.person_add_outlined,
+                    size: iconSize,
+                    color: isFollowing
+                        ? (isDark
+                            ? Colors.white.withValues(alpha: 0.6)
+                            : Colors.black.withValues(alpha: 0.5))
+                        : Colors.white,
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    isFollowing ? 'Following' : 'Follow',
+                    style: GoogleFonts.roboto(
+                      fontSize: fontSize,
+                      fontWeight: FontWeight.w600,
+                      color: isFollowing
+                          ? (isDark
+                              ? Colors.white.withValues(alpha: 0.6)
+                              : Colors.black.withValues(alpha: 0.5))
+                          : Colors.white,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ],
               ),
       ),
     );

@@ -8,6 +8,7 @@ import '../widgets/poet_gallery_tab.dart';
 import '../widgets/poet_books_tab.dart';
 import '../widgets/poet_videos_tab.dart';
 import '../widgets/poet_poetry_tab.dart';
+import '../widgets/follow_button.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
@@ -73,13 +74,13 @@ class _PoetDetailScreenState extends ConsumerState<PoetDetailScreen>
               title: poet.name,
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.share),
+                  icon: const Icon(Icons.share, color: Colors.white),
                   onPressed: () {
                     // Share functionality
                   },
                 ),
                 IconButton(
-                  icon: const Icon(Icons.more_vert),
+                  icon: const Icon(Icons.more_vert, color: Colors.white),
                   onPressed: () {
                     // More options
                   },
@@ -272,42 +273,54 @@ class _PoetDetailScreenState extends ConsumerState<PoetDetailScreen>
           ),
           const SizedBox(height: AppSpacing.md),
 
-          // Poet Name with Verified Badge
+          // Poet Name with Verified Badge + Follow (right-aligned)
           Row(
             children: [
               Flexible(
-                child: LocalizedText(
-                  poetProfile.name,
-                  style: isUrdu
-                      ? AppTypography.urduPoetNameStyle.copyWith(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w700,
-                          height: 1.8,
-                          color: isDark ? AppColors.textPrimaryDark : AppColors.primary,
-                        )
-                      : GoogleFonts.roboto(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w700,
-                          height: 1.3,
-                          color: isDark ? AppColors.textPrimaryDark : AppColors.primary,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: LocalizedText(
+                        poetProfile.name,
+                        style: isUrdu
+                            ? AppTypography.urduPoetNameStyle.copyWith(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w700,
+                                height: 1.8,
+                                color: isDark ? AppColors.textPrimaryDark : AppColors.primary,
+                              )
+                            : GoogleFonts.roboto(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w700,
+                                height: 1.3,
+                                color: isDark ? AppColors.textPrimaryDark : AppColors.primary,
+                              ),
+                      ),
+                    ),
+                    if (poetProfile.isVerified) ...[
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          color: AppColors.secondary,
+                          shape: BoxShape.circle,
                         ),
+                        child: const Icon(
+                          Icons.check,
+                          size: 14,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
-              if (poetProfile.isVerified) ...[
-                const SizedBox(width: 6),
-                Container(
-                  padding: const EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                    color: AppColors.secondary,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.check,
-                    size: 14,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
+              const SizedBox(width: 10),
+              FollowButton(
+                publicId: poetProfile.publicId,
+                compact: true,
+              ),
             ],
           ),
           const SizedBox(height: AppSpacing.xs),
