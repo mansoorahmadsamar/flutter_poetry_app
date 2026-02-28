@@ -1,0 +1,109 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'feed_content_data.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+_$CoupletContentDataImpl _$$CoupletContentDataImplFromJson(
+        Map<String, dynamic> json) =>
+    _$CoupletContentDataImpl(
+      versesTextArabic: json['versesTextArabic'] as String?,
+      versesTextRoman: json['versesTextRoman'] as String?,
+      poetPublicId: json['poetPublicId'] as String?,
+      poetProfileImageUrl: json['poetProfileImageUrl'] as String?,
+      poetName: json['poetName'] as String?,
+      poemPublicId: json['poemPublicId'] as String?,
+      likeCount: (json['likeCount'] as num?)?.toInt() ?? 0,
+      shareCount: (json['shareCount'] as num?)?.toInt() ?? 0,
+      bookmarkCount: (json['bookmarkCount'] as num?)?.toInt() ?? 0,
+    );
+
+Map<String, dynamic> _$$CoupletContentDataImplToJson(
+        _$CoupletContentDataImpl instance) =>
+    <String, dynamic>{
+      'versesTextArabic': instance.versesTextArabic,
+      'versesTextRoman': instance.versesTextRoman,
+      'poetPublicId': instance.poetPublicId,
+      'poetProfileImageUrl': instance.poetProfileImageUrl,
+      'poetName': instance.poetName,
+      'poemPublicId': instance.poemPublicId,
+      'likeCount': instance.likeCount,
+      'shareCount': instance.shareCount,
+      'bookmarkCount': instance.bookmarkCount,
+    };
+
+_$PoemContentDataImpl _$$PoemContentDataImplFromJson(
+        Map<String, dynamic> json) =>
+    _$PoemContentDataImpl(
+      title: json['title'] as String?,
+      excerpt: json['excerpt'] as String?,
+      poetPublicId: json['poetPublicId'] as String?,
+      poetProfileImageUrl: json['poetProfileImageUrl'] as String?,
+      poetName: json['poetName'] as String?,
+      poetryType: json['poetryType'] as String?,
+      likeCount: (json['likeCount'] as num?)?.toInt() ?? 0,
+      viewCount: (json['viewCount'] as num?)?.toInt() ?? 0,
+      thumbnailUrl: json['thumbnailUrl'] as String?,
+    );
+
+Map<String, dynamic> _$$PoemContentDataImplToJson(
+        _$PoemContentDataImpl instance) =>
+    <String, dynamic>{
+      'title': instance.title,
+      'excerpt': instance.excerpt,
+      'poetPublicId': instance.poetPublicId,
+      'poetProfileImageUrl': instance.poetProfileImageUrl,
+      'poetName': instance.poetName,
+      'poetryType': instance.poetryType,
+      'likeCount': instance.likeCount,
+      'viewCount': instance.viewCount,
+      'thumbnailUrl': instance.thumbnailUrl,
+    };
+
+_$PoetSpotlightContentDataImpl _$$PoetSpotlightContentDataImplFromJson(
+        Map<String, dynamic> json) =>
+    _$PoetSpotlightContentDataImpl(
+      poetName: json['poetName'] as String?,
+      bio: json['bio'] as String?,
+      poetPublicId: json['poetPublicId'] as String,
+      profileImageUrl: json['profileImageUrl'] as String?,
+      poemCount: (json['poemCount'] as num?)?.toInt() ?? 0,
+      followerCount: (json['followerCount'] as num?)?.toInt() ?? 0,
+      viewCount: (json['viewCount'] as num?)?.toInt() ?? 0,
+    );
+
+Map<String, dynamic> _$$PoetSpotlightContentDataImplToJson(
+        _$PoetSpotlightContentDataImpl instance) =>
+    <String, dynamic>{
+      'poetName': instance.poetName,
+      'bio': instance.bio,
+      'poetPublicId': instance.poetPublicId,
+      'profileImageUrl': instance.profileImageUrl,
+      'poemCount': instance.poemCount,
+      'followerCount': instance.followerCount,
+      'viewCount': instance.viewCount,
+    };
+
+_$PoetImageContentDataImpl _$$PoetImageContentDataImplFromJson(
+        Map<String, dynamic> json) =>
+    _$PoetImageContentDataImpl(
+      imageUrl: json['imageUrl'] as String?,
+      thumbnailUrl: json['thumbnailUrl'] as String?,
+      contentText: json['contentText'] as String?,
+      likeCount: (json['likeCount'] as num?)?.toInt() ?? 0,
+      shareCount: (json['shareCount'] as num?)?.toInt() ?? 0,
+      poetPublicId: json['poetPublicId'] as String?,
+    );
+
+Map<String, dynamic> _$$PoetImageContentDataImplToJson(
+        _$PoetImageContentDataImpl instance) =>
+    <String, dynamic>{
+      'imageUrl': instance.imageUrl,
+      'thumbnailUrl': instance.thumbnailUrl,
+      'contentText': instance.contentText,
+      'likeCount': instance.likeCount,
+      'shareCount': instance.shareCount,
+      'poetPublicId': instance.poetPublicId,
+    };

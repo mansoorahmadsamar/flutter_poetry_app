@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/design_system/app_colors.dart';
-import 'tabs/feed_tab.dart';
+import '../feed/screens/feed_screen.dart';
 import 'tabs/bookmarks/screens/app_bookmarks_screen.dart';
 import 'tabs/poets_tab.dart';
 import 'tabs/profile_tab.dart';
@@ -32,13 +32,14 @@ class MainScreen extends ConsumerStatefulWidget {
 
 class _MainScreenState extends ConsumerState<MainScreen> {
   int _currentIndex = 0;
+  final _feedScreenKey = GlobalKey<FeedScreenState>();
 
-  static final List<TabConfig> _tabs = [
-    const TabConfig(
+  late final List<TabConfig> _tabs = [
+    TabConfig(
       label: 'Feed',
       icon: Icons.home_outlined,
       activeIcon: Icons.home,
-      screen: FeedTab(),
+      screen: FeedScreen(key: _feedScreenKey),
     ),
     TabConfig(
       label: 'Discover',
@@ -77,7 +78,12 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+        onTap: (index) {
+          if (index == _currentIndex && index == 0) {
+            _feedScreenKey.currentState?.scrollToTop();
+          }
+          setState(() => _currentIndex = index);
+        },
         type: BottomNavigationBarType.fixed,
         backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
         selectedItemColor: AppColors.primary,

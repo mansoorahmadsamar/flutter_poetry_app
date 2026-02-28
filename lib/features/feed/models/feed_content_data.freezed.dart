@@ -1,0 +1,1186 @@
+// coverage:ignore-file
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
+
+part of 'feed_content_data.dart';
+
+// **************************************************************************
+// FreezedGenerator
+// **************************************************************************
+
+T _$identity<T>(T value) => value;
+
+final _privateConstructorUsedError = UnsupportedError(
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+
+CoupletContentData _$CoupletContentDataFromJson(Map<String, dynamic> json) {
+  return _CoupletContentData.fromJson(json);
+}
+
+/// @nodoc
+mixin _$CoupletContentData {
+  String? get versesTextArabic => throw _privateConstructorUsedError;
+  String? get versesTextRoman => throw _privateConstructorUsedError;
+  String? get poetPublicId => throw _privateConstructorUsedError;
+  String? get poetProfileImageUrl => throw _privateConstructorUsedError;
+  String? get poetName => throw _privateConstructorUsedError;
+  String? get poemPublicId => throw _privateConstructorUsedError;
+  int get likeCount => throw _privateConstructorUsedError;
+  int get shareCount => throw _privateConstructorUsedError;
+  int get bookmarkCount => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $CoupletContentDataCopyWith<CoupletContentData> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $CoupletContentDataCopyWith<$Res> {
+  factory $CoupletContentDataCopyWith(
+          CoupletContentData value, $Res Function(CoupletContentData) then) =
+      _$CoupletContentDataCopyWithImpl<$Res, CoupletContentData>;
+  @useResult
+  $Res call(
+      {String? versesTextArabic,
+      String? versesTextRoman,
+      String? poetPublicId,
+      String? poetProfileImageUrl,
+      String? poetName,
+      String? poemPublicId,
+      int likeCount,
+      int shareCount,
+      int bookmarkCount});
+}
+
+/// @nodoc
+class _$CoupletContentDataCopyWithImpl<$Res, $Val extends CoupletContentData>
+    implements $CoupletContentDataCopyWith<$Res> {
+  _$CoupletContentDataCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? versesTextArabic = freezed,
+    Object? versesTextRoman = freezed,
+    Object? poetPublicId = freezed,
+    Object? poetProfileImageUrl = freezed,
+    Object? poetName = freezed,
+    Object? poemPublicId = freezed,
+    Object? likeCount = null,
+    Object? shareCount = null,
+    Object? bookmarkCount = null,
+  }) {
+    return _then(_value.copyWith(
+      versesTextArabic: freezed == versesTextArabic
+          ? _value.versesTextArabic
+          : versesTextArabic // ignore: cast_nullable_to_non_nullable
+              as String?,
+      versesTextRoman: freezed == versesTextRoman
+          ? _value.versesTextRoman
+          : versesTextRoman // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetPublicId: freezed == poetPublicId
+          ? _value.poetPublicId
+          : poetPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetProfileImageUrl: freezed == poetProfileImageUrl
+          ? _value.poetProfileImageUrl
+          : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetName: freezed == poetName
+          ? _value.poetName
+          : poetName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poemPublicId: freezed == poemPublicId
+          ? _value.poemPublicId
+          : poemPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      likeCount: null == likeCount
+          ? _value.likeCount
+          : likeCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      shareCount: null == shareCount
+          ? _value.shareCount
+          : shareCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      bookmarkCount: null == bookmarkCount
+          ? _value.bookmarkCount
+          : bookmarkCount // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$CoupletContentDataImplCopyWith<$Res>
+    implements $CoupletContentDataCopyWith<$Res> {
+  factory _$$CoupletContentDataImplCopyWith(_$CoupletContentDataImpl value,
+          $Res Function(_$CoupletContentDataImpl) then) =
+      __$$CoupletContentDataImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String? versesTextArabic,
+      String? versesTextRoman,
+      String? poetPublicId,
+      String? poetProfileImageUrl,
+      String? poetName,
+      String? poemPublicId,
+      int likeCount,
+      int shareCount,
+      int bookmarkCount});
+}
+
+/// @nodoc
+class __$$CoupletContentDataImplCopyWithImpl<$Res>
+    extends _$CoupletContentDataCopyWithImpl<$Res, _$CoupletContentDataImpl>
+    implements _$$CoupletContentDataImplCopyWith<$Res> {
+  __$$CoupletContentDataImplCopyWithImpl(_$CoupletContentDataImpl _value,
+      $Res Function(_$CoupletContentDataImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? versesTextArabic = freezed,
+    Object? versesTextRoman = freezed,
+    Object? poetPublicId = freezed,
+    Object? poetProfileImageUrl = freezed,
+    Object? poetName = freezed,
+    Object? poemPublicId = freezed,
+    Object? likeCount = null,
+    Object? shareCount = null,
+    Object? bookmarkCount = null,
+  }) {
+    return _then(_$CoupletContentDataImpl(
+      versesTextArabic: freezed == versesTextArabic
+          ? _value.versesTextArabic
+          : versesTextArabic // ignore: cast_nullable_to_non_nullable
+              as String?,
+      versesTextRoman: freezed == versesTextRoman
+          ? _value.versesTextRoman
+          : versesTextRoman // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetPublicId: freezed == poetPublicId
+          ? _value.poetPublicId
+          : poetPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetProfileImageUrl: freezed == poetProfileImageUrl
+          ? _value.poetProfileImageUrl
+          : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetName: freezed == poetName
+          ? _value.poetName
+          : poetName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poemPublicId: freezed == poemPublicId
+          ? _value.poemPublicId
+          : poemPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      likeCount: null == likeCount
+          ? _value.likeCount
+          : likeCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      shareCount: null == shareCount
+          ? _value.shareCount
+          : shareCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      bookmarkCount: null == bookmarkCount
+          ? _value.bookmarkCount
+          : bookmarkCount // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$CoupletContentDataImpl implements _CoupletContentData {
+  const _$CoupletContentDataImpl(
+      {this.versesTextArabic,
+      this.versesTextRoman,
+      this.poetPublicId,
+      this.poetProfileImageUrl,
+      this.poetName,
+      this.poemPublicId,
+      this.likeCount = 0,
+      this.shareCount = 0,
+      this.bookmarkCount = 0});
+
+  factory _$CoupletContentDataImpl.fromJson(Map<String, dynamic> json) =>
+      _$$CoupletContentDataImplFromJson(json);
+
+  @override
+  final String? versesTextArabic;
+  @override
+  final String? versesTextRoman;
+  @override
+  final String? poetPublicId;
+  @override
+  final String? poetProfileImageUrl;
+  @override
+  final String? poetName;
+  @override
+  final String? poemPublicId;
+  @override
+  @JsonKey()
+  final int likeCount;
+  @override
+  @JsonKey()
+  final int shareCount;
+  @override
+  @JsonKey()
+  final int bookmarkCount;
+
+  @override
+  String toString() {
+    return 'CoupletContentData(versesTextArabic: $versesTextArabic, versesTextRoman: $versesTextRoman, poetPublicId: $poetPublicId, poetProfileImageUrl: $poetProfileImageUrl, poetName: $poetName, poemPublicId: $poemPublicId, likeCount: $likeCount, shareCount: $shareCount, bookmarkCount: $bookmarkCount)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$CoupletContentDataImpl &&
+            (identical(other.versesTextArabic, versesTextArabic) ||
+                other.versesTextArabic == versesTextArabic) &&
+            (identical(other.versesTextRoman, versesTextRoman) ||
+                other.versesTextRoman == versesTextRoman) &&
+            (identical(other.poetPublicId, poetPublicId) ||
+                other.poetPublicId == poetPublicId) &&
+            (identical(other.poetProfileImageUrl, poetProfileImageUrl) ||
+                other.poetProfileImageUrl == poetProfileImageUrl) &&
+            (identical(other.poetName, poetName) ||
+                other.poetName == poetName) &&
+            (identical(other.poemPublicId, poemPublicId) ||
+                other.poemPublicId == poemPublicId) &&
+            (identical(other.likeCount, likeCount) ||
+                other.likeCount == likeCount) &&
+            (identical(other.shareCount, shareCount) ||
+                other.shareCount == shareCount) &&
+            (identical(other.bookmarkCount, bookmarkCount) ||
+                other.bookmarkCount == bookmarkCount));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      versesTextArabic,
+      versesTextRoman,
+      poetPublicId,
+      poetProfileImageUrl,
+      poetName,
+      poemPublicId,
+      likeCount,
+      shareCount,
+      bookmarkCount);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$CoupletContentDataImplCopyWith<_$CoupletContentDataImpl> get copyWith =>
+      __$$CoupletContentDataImplCopyWithImpl<_$CoupletContentDataImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$CoupletContentDataImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _CoupletContentData implements CoupletContentData {
+  const factory _CoupletContentData(
+      {final String? versesTextArabic,
+      final String? versesTextRoman,
+      final String? poetPublicId,
+      final String? poetProfileImageUrl,
+      final String? poetName,
+      final String? poemPublicId,
+      final int likeCount,
+      final int shareCount,
+      final int bookmarkCount}) = _$CoupletContentDataImpl;
+
+  factory _CoupletContentData.fromJson(Map<String, dynamic> json) =
+      _$CoupletContentDataImpl.fromJson;
+
+  @override
+  String? get versesTextArabic;
+  @override
+  String? get versesTextRoman;
+  @override
+  String? get poetPublicId;
+  @override
+  String? get poetProfileImageUrl;
+  @override
+  String? get poetName;
+  @override
+  String? get poemPublicId;
+  @override
+  int get likeCount;
+  @override
+  int get shareCount;
+  @override
+  int get bookmarkCount;
+  @override
+  @JsonKey(ignore: true)
+  _$$CoupletContentDataImplCopyWith<_$CoupletContentDataImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+PoemContentData _$PoemContentDataFromJson(Map<String, dynamic> json) {
+  return _PoemContentData.fromJson(json);
+}
+
+/// @nodoc
+mixin _$PoemContentData {
+  String? get title => throw _privateConstructorUsedError;
+  String? get excerpt => throw _privateConstructorUsedError;
+  String? get poetPublicId => throw _privateConstructorUsedError;
+  String? get poetProfileImageUrl => throw _privateConstructorUsedError;
+  String? get poetName => throw _privateConstructorUsedError;
+  String? get poetryType => throw _privateConstructorUsedError;
+  int get likeCount => throw _privateConstructorUsedError;
+  int get viewCount => throw _privateConstructorUsedError;
+  String? get thumbnailUrl => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $PoemContentDataCopyWith<PoemContentData> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $PoemContentDataCopyWith<$Res> {
+  factory $PoemContentDataCopyWith(
+          PoemContentData value, $Res Function(PoemContentData) then) =
+      _$PoemContentDataCopyWithImpl<$Res, PoemContentData>;
+  @useResult
+  $Res call(
+      {String? title,
+      String? excerpt,
+      String? poetPublicId,
+      String? poetProfileImageUrl,
+      String? poetName,
+      String? poetryType,
+      int likeCount,
+      int viewCount,
+      String? thumbnailUrl});
+}
+
+/// @nodoc
+class _$PoemContentDataCopyWithImpl<$Res, $Val extends PoemContentData>
+    implements $PoemContentDataCopyWith<$Res> {
+  _$PoemContentDataCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? title = freezed,
+    Object? excerpt = freezed,
+    Object? poetPublicId = freezed,
+    Object? poetProfileImageUrl = freezed,
+    Object? poetName = freezed,
+    Object? poetryType = freezed,
+    Object? likeCount = null,
+    Object? viewCount = null,
+    Object? thumbnailUrl = freezed,
+  }) {
+    return _then(_value.copyWith(
+      title: freezed == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String?,
+      excerpt: freezed == excerpt
+          ? _value.excerpt
+          : excerpt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetPublicId: freezed == poetPublicId
+          ? _value.poetPublicId
+          : poetPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetProfileImageUrl: freezed == poetProfileImageUrl
+          ? _value.poetProfileImageUrl
+          : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetName: freezed == poetName
+          ? _value.poetName
+          : poetName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetryType: freezed == poetryType
+          ? _value.poetryType
+          : poetryType // ignore: cast_nullable_to_non_nullable
+              as String?,
+      likeCount: null == likeCount
+          ? _value.likeCount
+          : likeCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      viewCount: null == viewCount
+          ? _value.viewCount
+          : viewCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      thumbnailUrl: freezed == thumbnailUrl
+          ? _value.thumbnailUrl
+          : thumbnailUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$PoemContentDataImplCopyWith<$Res>
+    implements $PoemContentDataCopyWith<$Res> {
+  factory _$$PoemContentDataImplCopyWith(_$PoemContentDataImpl value,
+          $Res Function(_$PoemContentDataImpl) then) =
+      __$$PoemContentDataImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String? title,
+      String? excerpt,
+      String? poetPublicId,
+      String? poetProfileImageUrl,
+      String? poetName,
+      String? poetryType,
+      int likeCount,
+      int viewCount,
+      String? thumbnailUrl});
+}
+
+/// @nodoc
+class __$$PoemContentDataImplCopyWithImpl<$Res>
+    extends _$PoemContentDataCopyWithImpl<$Res, _$PoemContentDataImpl>
+    implements _$$PoemContentDataImplCopyWith<$Res> {
+  __$$PoemContentDataImplCopyWithImpl(
+      _$PoemContentDataImpl _value, $Res Function(_$PoemContentDataImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? title = freezed,
+    Object? excerpt = freezed,
+    Object? poetPublicId = freezed,
+    Object? poetProfileImageUrl = freezed,
+    Object? poetName = freezed,
+    Object? poetryType = freezed,
+    Object? likeCount = null,
+    Object? viewCount = null,
+    Object? thumbnailUrl = freezed,
+  }) {
+    return _then(_$PoemContentDataImpl(
+      title: freezed == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String?,
+      excerpt: freezed == excerpt
+          ? _value.excerpt
+          : excerpt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetPublicId: freezed == poetPublicId
+          ? _value.poetPublicId
+          : poetPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetProfileImageUrl: freezed == poetProfileImageUrl
+          ? _value.poetProfileImageUrl
+          : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetName: freezed == poetName
+          ? _value.poetName
+          : poetName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetryType: freezed == poetryType
+          ? _value.poetryType
+          : poetryType // ignore: cast_nullable_to_non_nullable
+              as String?,
+      likeCount: null == likeCount
+          ? _value.likeCount
+          : likeCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      viewCount: null == viewCount
+          ? _value.viewCount
+          : viewCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      thumbnailUrl: freezed == thumbnailUrl
+          ? _value.thumbnailUrl
+          : thumbnailUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$PoemContentDataImpl implements _PoemContentData {
+  const _$PoemContentDataImpl(
+      {this.title,
+      this.excerpt,
+      this.poetPublicId,
+      this.poetProfileImageUrl,
+      this.poetName,
+      this.poetryType,
+      this.likeCount = 0,
+      this.viewCount = 0,
+      this.thumbnailUrl});
+
+  factory _$PoemContentDataImpl.fromJson(Map<String, dynamic> json) =>
+      _$$PoemContentDataImplFromJson(json);
+
+  @override
+  final String? title;
+  @override
+  final String? excerpt;
+  @override
+  final String? poetPublicId;
+  @override
+  final String? poetProfileImageUrl;
+  @override
+  final String? poetName;
+  @override
+  final String? poetryType;
+  @override
+  @JsonKey()
+  final int likeCount;
+  @override
+  @JsonKey()
+  final int viewCount;
+  @override
+  final String? thumbnailUrl;
+
+  @override
+  String toString() {
+    return 'PoemContentData(title: $title, excerpt: $excerpt, poetPublicId: $poetPublicId, poetProfileImageUrl: $poetProfileImageUrl, poetName: $poetName, poetryType: $poetryType, likeCount: $likeCount, viewCount: $viewCount, thumbnailUrl: $thumbnailUrl)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$PoemContentDataImpl &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.excerpt, excerpt) || other.excerpt == excerpt) &&
+            (identical(other.poetPublicId, poetPublicId) ||
+                other.poetPublicId == poetPublicId) &&
+            (identical(other.poetProfileImageUrl, poetProfileImageUrl) ||
+                other.poetProfileImageUrl == poetProfileImageUrl) &&
+            (identical(other.poetName, poetName) ||
+                other.poetName == poetName) &&
+            (identical(other.poetryType, poetryType) ||
+                other.poetryType == poetryType) &&
+            (identical(other.likeCount, likeCount) ||
+                other.likeCount == likeCount) &&
+            (identical(other.viewCount, viewCount) ||
+                other.viewCount == viewCount) &&
+            (identical(other.thumbnailUrl, thumbnailUrl) ||
+                other.thumbnailUrl == thumbnailUrl));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      title,
+      excerpt,
+      poetPublicId,
+      poetProfileImageUrl,
+      poetName,
+      poetryType,
+      likeCount,
+      viewCount,
+      thumbnailUrl);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$PoemContentDataImplCopyWith<_$PoemContentDataImpl> get copyWith =>
+      __$$PoemContentDataImplCopyWithImpl<_$PoemContentDataImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$PoemContentDataImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _PoemContentData implements PoemContentData {
+  const factory _PoemContentData(
+      {final String? title,
+      final String? excerpt,
+      final String? poetPublicId,
+      final String? poetProfileImageUrl,
+      final String? poetName,
+      final String? poetryType,
+      final int likeCount,
+      final int viewCount,
+      final String? thumbnailUrl}) = _$PoemContentDataImpl;
+
+  factory _PoemContentData.fromJson(Map<String, dynamic> json) =
+      _$PoemContentDataImpl.fromJson;
+
+  @override
+  String? get title;
+  @override
+  String? get excerpt;
+  @override
+  String? get poetPublicId;
+  @override
+  String? get poetProfileImageUrl;
+  @override
+  String? get poetName;
+  @override
+  String? get poetryType;
+  @override
+  int get likeCount;
+  @override
+  int get viewCount;
+  @override
+  String? get thumbnailUrl;
+  @override
+  @JsonKey(ignore: true)
+  _$$PoemContentDataImplCopyWith<_$PoemContentDataImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+PoetSpotlightContentData _$PoetSpotlightContentDataFromJson(
+    Map<String, dynamic> json) {
+  return _PoetSpotlightContentData.fromJson(json);
+}
+
+/// @nodoc
+mixin _$PoetSpotlightContentData {
+  String? get poetName => throw _privateConstructorUsedError;
+  String? get bio => throw _privateConstructorUsedError;
+  String get poetPublicId => throw _privateConstructorUsedError;
+  String? get profileImageUrl => throw _privateConstructorUsedError;
+  int get poemCount => throw _privateConstructorUsedError;
+  int get followerCount => throw _privateConstructorUsedError;
+  int get viewCount => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $PoetSpotlightContentDataCopyWith<PoetSpotlightContentData> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $PoetSpotlightContentDataCopyWith<$Res> {
+  factory $PoetSpotlightContentDataCopyWith(PoetSpotlightContentData value,
+          $Res Function(PoetSpotlightContentData) then) =
+      _$PoetSpotlightContentDataCopyWithImpl<$Res, PoetSpotlightContentData>;
+  @useResult
+  $Res call(
+      {String? poetName,
+      String? bio,
+      String poetPublicId,
+      String? profileImageUrl,
+      int poemCount,
+      int followerCount,
+      int viewCount});
+}
+
+/// @nodoc
+class _$PoetSpotlightContentDataCopyWithImpl<$Res,
+        $Val extends PoetSpotlightContentData>
+    implements $PoetSpotlightContentDataCopyWith<$Res> {
+  _$PoetSpotlightContentDataCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? poetName = freezed,
+    Object? bio = freezed,
+    Object? poetPublicId = null,
+    Object? profileImageUrl = freezed,
+    Object? poemCount = null,
+    Object? followerCount = null,
+    Object? viewCount = null,
+  }) {
+    return _then(_value.copyWith(
+      poetName: freezed == poetName
+          ? _value.poetName
+          : poetName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      bio: freezed == bio
+          ? _value.bio
+          : bio // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetPublicId: null == poetPublicId
+          ? _value.poetPublicId
+          : poetPublicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      profileImageUrl: freezed == profileImageUrl
+          ? _value.profileImageUrl
+          : profileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poemCount: null == poemCount
+          ? _value.poemCount
+          : poemCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      followerCount: null == followerCount
+          ? _value.followerCount
+          : followerCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      viewCount: null == viewCount
+          ? _value.viewCount
+          : viewCount // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$PoetSpotlightContentDataImplCopyWith<$Res>
+    implements $PoetSpotlightContentDataCopyWith<$Res> {
+  factory _$$PoetSpotlightContentDataImplCopyWith(
+          _$PoetSpotlightContentDataImpl value,
+          $Res Function(_$PoetSpotlightContentDataImpl) then) =
+      __$$PoetSpotlightContentDataImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String? poetName,
+      String? bio,
+      String poetPublicId,
+      String? profileImageUrl,
+      int poemCount,
+      int followerCount,
+      int viewCount});
+}
+
+/// @nodoc
+class __$$PoetSpotlightContentDataImplCopyWithImpl<$Res>
+    extends _$PoetSpotlightContentDataCopyWithImpl<$Res,
+        _$PoetSpotlightContentDataImpl>
+    implements _$$PoetSpotlightContentDataImplCopyWith<$Res> {
+  __$$PoetSpotlightContentDataImplCopyWithImpl(
+      _$PoetSpotlightContentDataImpl _value,
+      $Res Function(_$PoetSpotlightContentDataImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? poetName = freezed,
+    Object? bio = freezed,
+    Object? poetPublicId = null,
+    Object? profileImageUrl = freezed,
+    Object? poemCount = null,
+    Object? followerCount = null,
+    Object? viewCount = null,
+  }) {
+    return _then(_$PoetSpotlightContentDataImpl(
+      poetName: freezed == poetName
+          ? _value.poetName
+          : poetName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      bio: freezed == bio
+          ? _value.bio
+          : bio // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetPublicId: null == poetPublicId
+          ? _value.poetPublicId
+          : poetPublicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      profileImageUrl: freezed == profileImageUrl
+          ? _value.profileImageUrl
+          : profileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poemCount: null == poemCount
+          ? _value.poemCount
+          : poemCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      followerCount: null == followerCount
+          ? _value.followerCount
+          : followerCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      viewCount: null == viewCount
+          ? _value.viewCount
+          : viewCount // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$PoetSpotlightContentDataImpl implements _PoetSpotlightContentData {
+  const _$PoetSpotlightContentDataImpl(
+      {this.poetName,
+      this.bio,
+      required this.poetPublicId,
+      this.profileImageUrl,
+      this.poemCount = 0,
+      this.followerCount = 0,
+      this.viewCount = 0});
+
+  factory _$PoetSpotlightContentDataImpl.fromJson(Map<String, dynamic> json) =>
+      _$$PoetSpotlightContentDataImplFromJson(json);
+
+  @override
+  final String? poetName;
+  @override
+  final String? bio;
+  @override
+  final String poetPublicId;
+  @override
+  final String? profileImageUrl;
+  @override
+  @JsonKey()
+  final int poemCount;
+  @override
+  @JsonKey()
+  final int followerCount;
+  @override
+  @JsonKey()
+  final int viewCount;
+
+  @override
+  String toString() {
+    return 'PoetSpotlightContentData(poetName: $poetName, bio: $bio, poetPublicId: $poetPublicId, profileImageUrl: $profileImageUrl, poemCount: $poemCount, followerCount: $followerCount, viewCount: $viewCount)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$PoetSpotlightContentDataImpl &&
+            (identical(other.poetName, poetName) ||
+                other.poetName == poetName) &&
+            (identical(other.bio, bio) || other.bio == bio) &&
+            (identical(other.poetPublicId, poetPublicId) ||
+                other.poetPublicId == poetPublicId) &&
+            (identical(other.profileImageUrl, profileImageUrl) ||
+                other.profileImageUrl == profileImageUrl) &&
+            (identical(other.poemCount, poemCount) ||
+                other.poemCount == poemCount) &&
+            (identical(other.followerCount, followerCount) ||
+                other.followerCount == followerCount) &&
+            (identical(other.viewCount, viewCount) ||
+                other.viewCount == viewCount));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, poetName, bio, poetPublicId,
+      profileImageUrl, poemCount, followerCount, viewCount);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$PoetSpotlightContentDataImplCopyWith<_$PoetSpotlightContentDataImpl>
+      get copyWith => __$$PoetSpotlightContentDataImplCopyWithImpl<
+          _$PoetSpotlightContentDataImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$PoetSpotlightContentDataImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _PoetSpotlightContentData implements PoetSpotlightContentData {
+  const factory _PoetSpotlightContentData(
+      {final String? poetName,
+      final String? bio,
+      required final String poetPublicId,
+      final String? profileImageUrl,
+      final int poemCount,
+      final int followerCount,
+      final int viewCount}) = _$PoetSpotlightContentDataImpl;
+
+  factory _PoetSpotlightContentData.fromJson(Map<String, dynamic> json) =
+      _$PoetSpotlightContentDataImpl.fromJson;
+
+  @override
+  String? get poetName;
+  @override
+  String? get bio;
+  @override
+  String get poetPublicId;
+  @override
+  String? get profileImageUrl;
+  @override
+  int get poemCount;
+  @override
+  int get followerCount;
+  @override
+  int get viewCount;
+  @override
+  @JsonKey(ignore: true)
+  _$$PoetSpotlightContentDataImplCopyWith<_$PoetSpotlightContentDataImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+PoetImageContentData _$PoetImageContentDataFromJson(Map<String, dynamic> json) {
+  return _PoetImageContentData.fromJson(json);
+}
+
+/// @nodoc
+mixin _$PoetImageContentData {
+  String? get imageUrl => throw _privateConstructorUsedError;
+  String? get thumbnailUrl => throw _privateConstructorUsedError;
+  String? get contentText => throw _privateConstructorUsedError;
+  int get likeCount => throw _privateConstructorUsedError;
+  int get shareCount => throw _privateConstructorUsedError;
+  String? get poetPublicId => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $PoetImageContentDataCopyWith<PoetImageContentData> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $PoetImageContentDataCopyWith<$Res> {
+  factory $PoetImageContentDataCopyWith(PoetImageContentData value,
+          $Res Function(PoetImageContentData) then) =
+      _$PoetImageContentDataCopyWithImpl<$Res, PoetImageContentData>;
+  @useResult
+  $Res call(
+      {String? imageUrl,
+      String? thumbnailUrl,
+      String? contentText,
+      int likeCount,
+      int shareCount,
+      String? poetPublicId});
+}
+
+/// @nodoc
+class _$PoetImageContentDataCopyWithImpl<$Res,
+        $Val extends PoetImageContentData>
+    implements $PoetImageContentDataCopyWith<$Res> {
+  _$PoetImageContentDataCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? imageUrl = freezed,
+    Object? thumbnailUrl = freezed,
+    Object? contentText = freezed,
+    Object? likeCount = null,
+    Object? shareCount = null,
+    Object? poetPublicId = freezed,
+  }) {
+    return _then(_value.copyWith(
+      imageUrl: freezed == imageUrl
+          ? _value.imageUrl
+          : imageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      thumbnailUrl: freezed == thumbnailUrl
+          ? _value.thumbnailUrl
+          : thumbnailUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      contentText: freezed == contentText
+          ? _value.contentText
+          : contentText // ignore: cast_nullable_to_non_nullable
+              as String?,
+      likeCount: null == likeCount
+          ? _value.likeCount
+          : likeCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      shareCount: null == shareCount
+          ? _value.shareCount
+          : shareCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      poetPublicId: freezed == poetPublicId
+          ? _value.poetPublicId
+          : poetPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$PoetImageContentDataImplCopyWith<$Res>
+    implements $PoetImageContentDataCopyWith<$Res> {
+  factory _$$PoetImageContentDataImplCopyWith(_$PoetImageContentDataImpl value,
+          $Res Function(_$PoetImageContentDataImpl) then) =
+      __$$PoetImageContentDataImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String? imageUrl,
+      String? thumbnailUrl,
+      String? contentText,
+      int likeCount,
+      int shareCount,
+      String? poetPublicId});
+}
+
+/// @nodoc
+class __$$PoetImageContentDataImplCopyWithImpl<$Res>
+    extends _$PoetImageContentDataCopyWithImpl<$Res, _$PoetImageContentDataImpl>
+    implements _$$PoetImageContentDataImplCopyWith<$Res> {
+  __$$PoetImageContentDataImplCopyWithImpl(_$PoetImageContentDataImpl _value,
+      $Res Function(_$PoetImageContentDataImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? imageUrl = freezed,
+    Object? thumbnailUrl = freezed,
+    Object? contentText = freezed,
+    Object? likeCount = null,
+    Object? shareCount = null,
+    Object? poetPublicId = freezed,
+  }) {
+    return _then(_$PoetImageContentDataImpl(
+      imageUrl: freezed == imageUrl
+          ? _value.imageUrl
+          : imageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      thumbnailUrl: freezed == thumbnailUrl
+          ? _value.thumbnailUrl
+          : thumbnailUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      contentText: freezed == contentText
+          ? _value.contentText
+          : contentText // ignore: cast_nullable_to_non_nullable
+              as String?,
+      likeCount: null == likeCount
+          ? _value.likeCount
+          : likeCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      shareCount: null == shareCount
+          ? _value.shareCount
+          : shareCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      poetPublicId: freezed == poetPublicId
+          ? _value.poetPublicId
+          : poetPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$PoetImageContentDataImpl implements _PoetImageContentData {
+  const _$PoetImageContentDataImpl(
+      {this.imageUrl,
+      this.thumbnailUrl,
+      this.contentText,
+      this.likeCount = 0,
+      this.shareCount = 0,
+      this.poetPublicId});
+
+  factory _$PoetImageContentDataImpl.fromJson(Map<String, dynamic> json) =>
+      _$$PoetImageContentDataImplFromJson(json);
+
+  @override
+  final String? imageUrl;
+  @override
+  final String? thumbnailUrl;
+  @override
+  final String? contentText;
+  @override
+  @JsonKey()
+  final int likeCount;
+  @override
+  @JsonKey()
+  final int shareCount;
+  @override
+  final String? poetPublicId;
+
+  @override
+  String toString() {
+    return 'PoetImageContentData(imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, contentText: $contentText, likeCount: $likeCount, shareCount: $shareCount, poetPublicId: $poetPublicId)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$PoetImageContentDataImpl &&
+            (identical(other.imageUrl, imageUrl) ||
+                other.imageUrl == imageUrl) &&
+            (identical(other.thumbnailUrl, thumbnailUrl) ||
+                other.thumbnailUrl == thumbnailUrl) &&
+            (identical(other.contentText, contentText) ||
+                other.contentText == contentText) &&
+            (identical(other.likeCount, likeCount) ||
+                other.likeCount == likeCount) &&
+            (identical(other.shareCount, shareCount) ||
+                other.shareCount == shareCount) &&
+            (identical(other.poetPublicId, poetPublicId) ||
+                other.poetPublicId == poetPublicId));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, imageUrl, thumbnailUrl,
+      contentText, likeCount, shareCount, poetPublicId);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$PoetImageContentDataImplCopyWith<_$PoetImageContentDataImpl>
+      get copyWith =>
+          __$$PoetImageContentDataImplCopyWithImpl<_$PoetImageContentDataImpl>(
+              this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$PoetImageContentDataImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _PoetImageContentData implements PoetImageContentData {
+  const factory _PoetImageContentData(
+      {final String? imageUrl,
+      final String? thumbnailUrl,
+      final String? contentText,
+      final int likeCount,
+      final int shareCount,
+      final String? poetPublicId}) = _$PoetImageContentDataImpl;
+
+  factory _PoetImageContentData.fromJson(Map<String, dynamic> json) =
+      _$PoetImageContentDataImpl.fromJson;
+
+  @override
+  String? get imageUrl;
+  @override
+  String? get thumbnailUrl;
+  @override
+  String? get contentText;
+  @override
+  int get likeCount;
+  @override
+  int get shareCount;
+  @override
+  String? get poetPublicId;
+  @override
+  @JsonKey(ignore: true)
+  _$$PoetImageContentDataImplCopyWith<_$PoetImageContentDataImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}
