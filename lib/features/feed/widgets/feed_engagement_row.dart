@@ -32,7 +32,7 @@ class FeedEngagementRow extends StatelessWidget {
       children: [
         _EngagementButton(
           icon: isLiked ? Icons.favorite : Icons.favorite_border,
-          color: isLiked ? Colors.red : null,
+          color: isLiked ? AppColors.error : null,
           count: likeCount,
           onTap: onLike,
         ),
@@ -85,13 +85,14 @@ class _EngagementButton extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 20, color: color ?? defaultColor),
+            Icon(icon, size: AppSpacing.iconSm, color: color ?? defaultColor),
             if (count > 0) ...[
-              const SizedBox(width: 4),
+              const SizedBox(width: AppSpacing.xs),
               Text(
                 _formatCount(count),
                 style: TextStyle(
                   fontSize: 12,
+                  fontWeight: FontWeight.w500,
                   color: color ?? defaultColor,
                 ),
               ),

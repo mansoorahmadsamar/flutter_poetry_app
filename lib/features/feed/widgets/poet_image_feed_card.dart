@@ -25,6 +25,7 @@ class PoetImageFeedCard extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final itemKey = '${item.type}:${item.publicId}';
     final overlay = ref.watch(feedEngagementProvider)[itemKey];
+    final textTheme = Theme.of(context).textTheme;
 
     return Card(
       margin: const EdgeInsets.symmetric(
@@ -33,7 +34,7 @@ class PoetImageFeedCard extends ConsumerWidget {
       ),
       elevation: AppSpacing.elevationSm,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
       ),
       color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
       clipBehavior: Clip.antiAlias,
@@ -54,16 +55,15 @@ class PoetImageFeedCard extends ConsumerWidget {
                 children: [
                   Icon(
                     Icons.photo_library_outlined,
-                    size: 16,
+                    size: AppSpacing.iconXs,
                     color: isDark
                         ? AppColors.textSecondaryDark
                         : AppColors.textSecondaryLight,
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: AppSpacing.xs),
                   Text(
                     'Gallery',
-                    style: TextStyle(
-                      fontSize: 12,
+                    style: textTheme.labelMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: isDark
                           ? AppColors.textSecondaryDark
@@ -90,7 +90,7 @@ class PoetImageFeedCard extends ConsumerWidget {
                   color: isDark ? AppColors.borderDark : AppColors.shimmerBase,
                   child: Icon(
                     Icons.broken_image_outlined,
-                    size: 40,
+                    size: AppSpacing.iconXl,
                     color: isDark
                         ? AppColors.textSecondaryDark
                         : AppColors.textSecondaryLight,
@@ -161,6 +161,7 @@ class PoetImageFeedCard extends ConsumerWidget {
       ...ref.read(feedEngagementProvider),
       itemKey: newOverlay,
     };
+    ref.read(feedProvider.notifier).trackAction(item, 'like');
   }
 
   void _onShare(WidgetRef ref) {

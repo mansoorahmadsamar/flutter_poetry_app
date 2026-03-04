@@ -49,7 +49,7 @@ class _CoupletShimmerCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,7 +64,7 @@ class _CoupletShimmerCard extends StatelessWidget {
                 height: 14,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
                 ),
               ),
               const Spacer(),
@@ -86,7 +86,7 @@ class _CoupletShimmerCard extends StatelessWidget {
               height: 14,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
               ),
             ),
           ),
@@ -97,7 +97,7 @@ class _CoupletShimmerCard extends StatelessWidget {
               height: 14,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
               ),
             ),
           ),
@@ -108,7 +108,7 @@ class _CoupletShimmerCard extends StatelessWidget {
               height: 14,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
               ),
             ),
           ),
@@ -130,18 +130,18 @@ class _PoemShimmerCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Thumbnail placeholder
           Container(
-            height: 140,
+            height: 160,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.vertical(
-                top: Radius.circular(AppSpacing.radiusMd),
+                top: Radius.circular(AppSpacing.radiusLg),
               ),
             ),
           ),
@@ -161,7 +161,7 @@ class _PoemShimmerCard extends StatelessWidget {
                       height: 14,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
                       ),
                     ),
                   ],
@@ -173,7 +173,7 @@ class _PoemShimmerCard extends StatelessWidget {
                   height: 16,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
@@ -183,16 +183,16 @@ class _PoemShimmerCard extends StatelessWidget {
                   height: 12,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: AppSpacing.xs),
                 Container(
                   width: 260,
                   height: 12,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
@@ -216,7 +216,7 @@ class _SpotlightShimmerCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -253,7 +253,7 @@ class _SpotlightShimmerCard extends StatelessWidget {
                       height: 16,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.sm),
@@ -262,16 +262,16 @@ class _SpotlightShimmerCard extends StatelessWidget {
                       height: 12,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: AppSpacing.xs),
                     Container(
                       width: 160,
                       height: 12,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -280,7 +280,7 @@ class _SpotlightShimmerCard extends StatelessWidget {
                       height: 32,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                       ),
                     ),
                   ],
@@ -300,7 +300,7 @@ class _SpotlightShimmerCard extends StatelessWidget {
                   height: 14,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
                   ),
                 ),
               ),
@@ -321,7 +321,7 @@ class _ImageShimmerCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -338,7 +338,7 @@ class _ImageShimmerCard extends StatelessWidget {
               height: 14,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
               ),
             ),
           ),
@@ -376,13 +376,13 @@ class _ShimmerEngagementRow extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppSpacing.xs),
               Container(
                 width: 24,
                 height: 12,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
                 ),
               ),
             ],

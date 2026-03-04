@@ -6,6 +6,7 @@ import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
+import 'package:flutter_poetry_app/core/widgets/localized_text.dart';
 import '../models/feed_content_data.dart';
 import '../models/feed_item.dart';
 import '../providers/feed_engagement_provider.dart';
@@ -37,22 +38,21 @@ class CoupletFeedCard extends ConsumerWidget {
       ),
       elevation: AppSpacing.elevationSm,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
       ),
       color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
       child: InkWell(
         onTap: () => _onTap(context, ref),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header: poet avatar + name + reason badge
               _buildHeader(context, isDark),
               const SizedBox(height: AppSpacing.md),
 
-              // Body: verses
+              // Urdu verses
               if (data.versesTextArabic != null)
                 Center(
                   child: Text(
@@ -67,13 +67,13 @@ class CoupletFeedCard extends ConsumerWidget {
                   ),
                 ),
 
+              // Roman transliteration (non-Urdu mode only)
               if (data.versesTextRoman != null && !isUrdu) ...[
                 const SizedBox(height: AppSpacing.sm),
                 Center(
                   child: Text(
                     data.versesTextRoman!,
-                    style: TextStyle(
-                      fontSize: 14,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: isDark
                           ? AppColors.textSecondaryDark
                           : AppColors.textSecondaryLight,
@@ -91,7 +91,6 @@ class CoupletFeedCard extends ConsumerWidget {
               ),
               const SizedBox(height: AppSpacing.sm),
 
-              // Footer: engagement row
               FeedEngagementRow(
                 likeCount:
                     data.likeCount + (overlay?.likeCountDelta ?? 0),
@@ -130,36 +129,53 @@ class CoupletFeedCard extends ConsumerWidget {
         ),
         const SizedBox(width: AppSpacing.sm),
 
-        // Poet name
+        // Poet name + era
         Expanded(
-          child: Text(
-            data.poetName ?? '',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: isDark
-                  ? AppColors.textPrimaryDark
-                  : AppColors.textPrimaryLight,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              LocalizedText(
+                data.poetName ?? '',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: isDark
+                      ? AppColors.textPrimaryDark
+                      : AppColors.textPrimaryLight,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.start,
+              ),
+              if (_formatEra(data.poetBirthYear, data.poetDeathYear) != null)
+                Text(
+                  _formatEra(data.poetBirthYear, data.poetDeathYear)!,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: isDark
+                        ? AppColors.textSecondaryDark
+                        : AppColors.textSecondaryLight,
+                  ),
+                ),
+            ],
           ),
         ),
 
         // Reason badge
         if (item.reason.isNotEmpty)
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.xs,
+            ),
             decoration: BoxDecoration(
-              color: _reasonColor(item.reason).withValues(alpha: 0.12),
+              color: _reasonColor(item.reason, isDark).withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
             ),
             child: Text(
               _reasonLabel(item.reason),
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-                color: _reasonColor(item.reason),
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: _reasonColor(item.reason, isDark),
               ),
             ),
           ),
@@ -171,10 +187,13 @@ class CoupletFeedCard extends ConsumerWidget {
     return Container(
       width: 36,
       height: 36,
-      color: isDark ? AppColors.borderDark : AppColors.borderLight,
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.borderDark : AppColors.shimmerBase,
+        shape: BoxShape.circle,
+      ),
       child: Icon(
         Icons.person_outline,
-        size: 20,
+        size: AppSpacing.iconSm,
         color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
       ),
     );
@@ -197,7 +216,7 @@ class CoupletFeedCard extends ConsumerWidget {
       ...ref.read(feedEngagementProvider),
       itemKey: newOverlay,
     };
-    ref.read(feedProvider.notifier).trackAction(item, 'bookmark');
+    ref.read(feedProvider.notifier).trackAction(item, 'like');
   }
 
   void _onBookmark(
@@ -219,13 +238,19 @@ class CoupletFeedCard extends ConsumerWidget {
     ref.read(feedProvider.notifier).trackAction(item, 'share');
   }
 
-  Color _reasonColor(String reason) {
+  String? _formatEra(int? birthYear, int? deathYear) {
+    if (birthYear == null || birthYear == 0) return null;
+    if (deathYear == null || deathYear == 0) return '$birthYear';
+    return '$birthYear \u2013 $deathYear';
+  }
+
+  Color _reasonColor(String reason, bool isDark) {
     return switch (reason) {
-      'TRENDING' => Colors.orange,
+      'TRENDING' => AppColors.secondary,
       'PERSONALIZED' => AppColors.primary,
       'DISCOVERY' => AppColors.info,
-      'CURATED' => AppColors.secondary,
-      _ => AppColors.textSecondaryLight,
+      'CURATED' => AppColors.secondaryDark,
+      _ => isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
     };
   }
 

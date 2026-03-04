@@ -105,12 +105,11 @@ class FeedScreenState extends ConsumerState<FeedScreen>
               SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
-                    // Feed items
                     if (index < state.items.length) {
                       return FeedItemBuilder(item: state.items[index]);
                     }
 
-                    // Footer (index == items.length)
+                    // Footer
                     if (state.isLoadingMore) {
                       return const _LoadingMore();
                     }
@@ -150,6 +149,8 @@ class _ErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
@@ -158,7 +159,7 @@ class _ErrorView extends StatelessWidget {
           children: [
             Icon(
               Icons.cloud_off_outlined,
-              size: 56,
+              size: AppSpacing.xxxl,
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondaryLight,
@@ -166,8 +167,7 @@ class _ErrorView extends StatelessWidget {
             const SizedBox(height: AppSpacing.md),
             Text(
               'Could not load feed',
-              style: TextStyle(
-                fontSize: 17,
+              style: textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: isDark
                     ? AppColors.textPrimaryDark
@@ -177,8 +177,7 @@ class _ErrorView extends StatelessWidget {
             const SizedBox(height: AppSpacing.sm),
             Text(
               'Check your connection and try again.',
-              style: TextStyle(
-                fontSize: 14,
+              style: textTheme.bodyMedium?.copyWith(
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondaryLight,
@@ -214,8 +213,8 @@ class _LoadingMore extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
       child: Center(
         child: SizedBox(
-          width: 24,
-          height: 24,
+          width: AppSpacing.iconMd,
+          height: AppSpacing.iconMd,
           child: CircularProgressIndicator(
             strokeWidth: 2.5,
             valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
@@ -239,14 +238,15 @@ class _InlineRetry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
         children: [
           Text(
             'Failed to load more',
-            style: TextStyle(
-              fontSize: 13,
+            style: textTheme.bodySmall?.copyWith(
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondaryLight,
@@ -255,7 +255,7 @@ class _InlineRetry extends StatelessWidget {
           const SizedBox(height: AppSpacing.sm),
           TextButton.icon(
             onPressed: onRetry,
-            icon: const Icon(Icons.refresh, size: 18),
+            icon: Icon(Icons.refresh, size: AppSpacing.iconSm),
             label: const Text('Tap to retry'),
             style: TextButton.styleFrom(
               foregroundColor: AppColors.primary,
@@ -279,8 +279,7 @@ class _EndOfFeed extends StatelessWidget {
       child: Center(
         child: Text(
           'You\'re all caught up!',
-          style: TextStyle(
-            fontSize: 13,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
             color: isDark
                 ? AppColors.textSecondaryDark
                 : AppColors.textSecondaryLight,

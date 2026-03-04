@@ -24,6 +24,8 @@ mixin _$CoupletContentData {
   String? get versesTextRoman => throw _privateConstructorUsedError;
   String? get poetPublicId => throw _privateConstructorUsedError;
   String? get poetProfileImageUrl => throw _privateConstructorUsedError;
+  int? get poetBirthYear => throw _privateConstructorUsedError;
+  int? get poetDeathYear => throw _privateConstructorUsedError;
   String? get poetName => throw _privateConstructorUsedError;
   String? get poemPublicId => throw _privateConstructorUsedError;
   int get likeCount => throw _privateConstructorUsedError;
@@ -47,6 +49,8 @@ abstract class $CoupletContentDataCopyWith<$Res> {
       String? versesTextRoman,
       String? poetPublicId,
       String? poetProfileImageUrl,
+      int? poetBirthYear,
+      int? poetDeathYear,
       String? poetName,
       String? poemPublicId,
       int likeCount,
@@ -71,6 +75,8 @@ class _$CoupletContentDataCopyWithImpl<$Res, $Val extends CoupletContentData>
     Object? versesTextRoman = freezed,
     Object? poetPublicId = freezed,
     Object? poetProfileImageUrl = freezed,
+    Object? poetBirthYear = freezed,
+    Object? poetDeathYear = freezed,
     Object? poetName = freezed,
     Object? poemPublicId = freezed,
     Object? likeCount = null,
@@ -94,6 +100,14 @@ class _$CoupletContentDataCopyWithImpl<$Res, $Val extends CoupletContentData>
           ? _value.poetProfileImageUrl
           : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      poetBirthYear: freezed == poetBirthYear
+          ? _value.poetBirthYear
+          : poetBirthYear // ignore: cast_nullable_to_non_nullable
+              as int?,
+      poetDeathYear: freezed == poetDeathYear
+          ? _value.poetDeathYear
+          : poetDeathYear // ignore: cast_nullable_to_non_nullable
+              as int?,
       poetName: freezed == poetName
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
@@ -131,6 +145,8 @@ abstract class _$$CoupletContentDataImplCopyWith<$Res>
       String? versesTextRoman,
       String? poetPublicId,
       String? poetProfileImageUrl,
+      int? poetBirthYear,
+      int? poetDeathYear,
       String? poetName,
       String? poemPublicId,
       int likeCount,
@@ -153,6 +169,8 @@ class __$$CoupletContentDataImplCopyWithImpl<$Res>
     Object? versesTextRoman = freezed,
     Object? poetPublicId = freezed,
     Object? poetProfileImageUrl = freezed,
+    Object? poetBirthYear = freezed,
+    Object? poetDeathYear = freezed,
     Object? poetName = freezed,
     Object? poemPublicId = freezed,
     Object? likeCount = null,
@@ -176,6 +194,14 @@ class __$$CoupletContentDataImplCopyWithImpl<$Res>
           ? _value.poetProfileImageUrl
           : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      poetBirthYear: freezed == poetBirthYear
+          ? _value.poetBirthYear
+          : poetBirthYear // ignore: cast_nullable_to_non_nullable
+              as int?,
+      poetDeathYear: freezed == poetDeathYear
+          ? _value.poetDeathYear
+          : poetDeathYear // ignore: cast_nullable_to_non_nullable
+              as int?,
       poetName: freezed == poetName
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
@@ -208,6 +234,8 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
       this.versesTextRoman,
       this.poetPublicId,
       this.poetProfileImageUrl,
+      this.poetBirthYear,
+      this.poetDeathYear,
       this.poetName,
       this.poemPublicId,
       this.likeCount = 0,
@@ -226,6 +254,10 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
   @override
   final String? poetProfileImageUrl;
   @override
+  final int? poetBirthYear;
+  @override
+  final int? poetDeathYear;
+  @override
   final String? poetName;
   @override
   final String? poemPublicId;
@@ -241,7 +273,7 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
 
   @override
   String toString() {
-    return 'CoupletContentData(versesTextArabic: $versesTextArabic, versesTextRoman: $versesTextRoman, poetPublicId: $poetPublicId, poetProfileImageUrl: $poetProfileImageUrl, poetName: $poetName, poemPublicId: $poemPublicId, likeCount: $likeCount, shareCount: $shareCount, bookmarkCount: $bookmarkCount)';
+    return 'CoupletContentData(versesTextArabic: $versesTextArabic, versesTextRoman: $versesTextRoman, poetPublicId: $poetPublicId, poetProfileImageUrl: $poetProfileImageUrl, poetBirthYear: $poetBirthYear, poetDeathYear: $poetDeathYear, poetName: $poetName, poemPublicId: $poemPublicId, likeCount: $likeCount, shareCount: $shareCount, bookmarkCount: $bookmarkCount)';
   }
 
   @override
@@ -257,6 +289,10 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
                 other.poetPublicId == poetPublicId) &&
             (identical(other.poetProfileImageUrl, poetProfileImageUrl) ||
                 other.poetProfileImageUrl == poetProfileImageUrl) &&
+            (identical(other.poetBirthYear, poetBirthYear) ||
+                other.poetBirthYear == poetBirthYear) &&
+            (identical(other.poetDeathYear, poetDeathYear) ||
+                other.poetDeathYear == poetDeathYear) &&
             (identical(other.poetName, poetName) ||
                 other.poetName == poetName) &&
             (identical(other.poemPublicId, poemPublicId) ||
@@ -277,6 +313,8 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
       versesTextRoman,
       poetPublicId,
       poetProfileImageUrl,
+      poetBirthYear,
+      poetDeathYear,
       poetName,
       poemPublicId,
       likeCount,
@@ -304,6 +342,8 @@ abstract class _CoupletContentData implements CoupletContentData {
       final String? versesTextRoman,
       final String? poetPublicId,
       final String? poetProfileImageUrl,
+      final int? poetBirthYear,
+      final int? poetDeathYear,
       final String? poetName,
       final String? poemPublicId,
       final int likeCount,
@@ -321,6 +361,10 @@ abstract class _CoupletContentData implements CoupletContentData {
   String? get poetPublicId;
   @override
   String? get poetProfileImageUrl;
+  @override
+  int? get poetBirthYear;
+  @override
+  int? get poetDeathYear;
   @override
   String? get poetName;
   @override
@@ -347,6 +391,8 @@ mixin _$PoemContentData {
   String? get excerpt => throw _privateConstructorUsedError;
   String? get poetPublicId => throw _privateConstructorUsedError;
   String? get poetProfileImageUrl => throw _privateConstructorUsedError;
+  int? get poetBirthYear => throw _privateConstructorUsedError;
+  int? get poetDeathYear => throw _privateConstructorUsedError;
   String? get poetName => throw _privateConstructorUsedError;
   String? get poetryType => throw _privateConstructorUsedError;
   int get likeCount => throw _privateConstructorUsedError;
@@ -370,6 +416,8 @@ abstract class $PoemContentDataCopyWith<$Res> {
       String? excerpt,
       String? poetPublicId,
       String? poetProfileImageUrl,
+      int? poetBirthYear,
+      int? poetDeathYear,
       String? poetName,
       String? poetryType,
       int likeCount,
@@ -394,6 +442,8 @@ class _$PoemContentDataCopyWithImpl<$Res, $Val extends PoemContentData>
     Object? excerpt = freezed,
     Object? poetPublicId = freezed,
     Object? poetProfileImageUrl = freezed,
+    Object? poetBirthYear = freezed,
+    Object? poetDeathYear = freezed,
     Object? poetName = freezed,
     Object? poetryType = freezed,
     Object? likeCount = null,
@@ -417,6 +467,14 @@ class _$PoemContentDataCopyWithImpl<$Res, $Val extends PoemContentData>
           ? _value.poetProfileImageUrl
           : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      poetBirthYear: freezed == poetBirthYear
+          ? _value.poetBirthYear
+          : poetBirthYear // ignore: cast_nullable_to_non_nullable
+              as int?,
+      poetDeathYear: freezed == poetDeathYear
+          ? _value.poetDeathYear
+          : poetDeathYear // ignore: cast_nullable_to_non_nullable
+              as int?,
       poetName: freezed == poetName
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
@@ -454,6 +512,8 @@ abstract class _$$PoemContentDataImplCopyWith<$Res>
       String? excerpt,
       String? poetPublicId,
       String? poetProfileImageUrl,
+      int? poetBirthYear,
+      int? poetDeathYear,
       String? poetName,
       String? poetryType,
       int likeCount,
@@ -476,6 +536,8 @@ class __$$PoemContentDataImplCopyWithImpl<$Res>
     Object? excerpt = freezed,
     Object? poetPublicId = freezed,
     Object? poetProfileImageUrl = freezed,
+    Object? poetBirthYear = freezed,
+    Object? poetDeathYear = freezed,
     Object? poetName = freezed,
     Object? poetryType = freezed,
     Object? likeCount = null,
@@ -499,6 +561,14 @@ class __$$PoemContentDataImplCopyWithImpl<$Res>
           ? _value.poetProfileImageUrl
           : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      poetBirthYear: freezed == poetBirthYear
+          ? _value.poetBirthYear
+          : poetBirthYear // ignore: cast_nullable_to_non_nullable
+              as int?,
+      poetDeathYear: freezed == poetDeathYear
+          ? _value.poetDeathYear
+          : poetDeathYear // ignore: cast_nullable_to_non_nullable
+              as int?,
       poetName: freezed == poetName
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
@@ -531,6 +601,8 @@ class _$PoemContentDataImpl implements _PoemContentData {
       this.excerpt,
       this.poetPublicId,
       this.poetProfileImageUrl,
+      this.poetBirthYear,
+      this.poetDeathYear,
       this.poetName,
       this.poetryType,
       this.likeCount = 0,
@@ -549,6 +621,10 @@ class _$PoemContentDataImpl implements _PoemContentData {
   @override
   final String? poetProfileImageUrl;
   @override
+  final int? poetBirthYear;
+  @override
+  final int? poetDeathYear;
+  @override
   final String? poetName;
   @override
   final String? poetryType;
@@ -563,7 +639,7 @@ class _$PoemContentDataImpl implements _PoemContentData {
 
   @override
   String toString() {
-    return 'PoemContentData(title: $title, excerpt: $excerpt, poetPublicId: $poetPublicId, poetProfileImageUrl: $poetProfileImageUrl, poetName: $poetName, poetryType: $poetryType, likeCount: $likeCount, viewCount: $viewCount, thumbnailUrl: $thumbnailUrl)';
+    return 'PoemContentData(title: $title, excerpt: $excerpt, poetPublicId: $poetPublicId, poetProfileImageUrl: $poetProfileImageUrl, poetBirthYear: $poetBirthYear, poetDeathYear: $poetDeathYear, poetName: $poetName, poetryType: $poetryType, likeCount: $likeCount, viewCount: $viewCount, thumbnailUrl: $thumbnailUrl)';
   }
 
   @override
@@ -577,6 +653,10 @@ class _$PoemContentDataImpl implements _PoemContentData {
                 other.poetPublicId == poetPublicId) &&
             (identical(other.poetProfileImageUrl, poetProfileImageUrl) ||
                 other.poetProfileImageUrl == poetProfileImageUrl) &&
+            (identical(other.poetBirthYear, poetBirthYear) ||
+                other.poetBirthYear == poetBirthYear) &&
+            (identical(other.poetDeathYear, poetDeathYear) ||
+                other.poetDeathYear == poetDeathYear) &&
             (identical(other.poetName, poetName) ||
                 other.poetName == poetName) &&
             (identical(other.poetryType, poetryType) ||
@@ -597,6 +677,8 @@ class _$PoemContentDataImpl implements _PoemContentData {
       excerpt,
       poetPublicId,
       poetProfileImageUrl,
+      poetBirthYear,
+      poetDeathYear,
       poetName,
       poetryType,
       likeCount,
@@ -624,6 +706,8 @@ abstract class _PoemContentData implements PoemContentData {
       final String? excerpt,
       final String? poetPublicId,
       final String? poetProfileImageUrl,
+      final int? poetBirthYear,
+      final int? poetDeathYear,
       final String? poetName,
       final String? poetryType,
       final int likeCount,
@@ -641,6 +725,10 @@ abstract class _PoemContentData implements PoemContentData {
   String? get poetPublicId;
   @override
   String? get poetProfileImageUrl;
+  @override
+  int? get poetBirthYear;
+  @override
+  int? get poetDeathYear;
   @override
   String? get poetName;
   @override
@@ -668,6 +756,8 @@ mixin _$PoetSpotlightContentData {
   String? get bio => throw _privateConstructorUsedError;
   String get poetPublicId => throw _privateConstructorUsedError;
   String? get profileImageUrl => throw _privateConstructorUsedError;
+  int? get birthYear => throw _privateConstructorUsedError;
+  int? get deathYear => throw _privateConstructorUsedError;
   int get poemCount => throw _privateConstructorUsedError;
   int get followerCount => throw _privateConstructorUsedError;
   int get viewCount => throw _privateConstructorUsedError;
@@ -689,6 +779,8 @@ abstract class $PoetSpotlightContentDataCopyWith<$Res> {
       String? bio,
       String poetPublicId,
       String? profileImageUrl,
+      int? birthYear,
+      int? deathYear,
       int poemCount,
       int followerCount,
       int viewCount});
@@ -712,6 +804,8 @@ class _$PoetSpotlightContentDataCopyWithImpl<$Res,
     Object? bio = freezed,
     Object? poetPublicId = null,
     Object? profileImageUrl = freezed,
+    Object? birthYear = freezed,
+    Object? deathYear = freezed,
     Object? poemCount = null,
     Object? followerCount = null,
     Object? viewCount = null,
@@ -733,6 +827,14 @@ class _$PoetSpotlightContentDataCopyWithImpl<$Res,
           ? _value.profileImageUrl
           : profileImageUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      birthYear: freezed == birthYear
+          ? _value.birthYear
+          : birthYear // ignore: cast_nullable_to_non_nullable
+              as int?,
+      deathYear: freezed == deathYear
+          ? _value.deathYear
+          : deathYear // ignore: cast_nullable_to_non_nullable
+              as int?,
       poemCount: null == poemCount
           ? _value.poemCount
           : poemCount // ignore: cast_nullable_to_non_nullable
@@ -763,6 +865,8 @@ abstract class _$$PoetSpotlightContentDataImplCopyWith<$Res>
       String? bio,
       String poetPublicId,
       String? profileImageUrl,
+      int? birthYear,
+      int? deathYear,
       int poemCount,
       int followerCount,
       int viewCount});
@@ -785,6 +889,8 @@ class __$$PoetSpotlightContentDataImplCopyWithImpl<$Res>
     Object? bio = freezed,
     Object? poetPublicId = null,
     Object? profileImageUrl = freezed,
+    Object? birthYear = freezed,
+    Object? deathYear = freezed,
     Object? poemCount = null,
     Object? followerCount = null,
     Object? viewCount = null,
@@ -806,6 +912,14 @@ class __$$PoetSpotlightContentDataImplCopyWithImpl<$Res>
           ? _value.profileImageUrl
           : profileImageUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      birthYear: freezed == birthYear
+          ? _value.birthYear
+          : birthYear // ignore: cast_nullable_to_non_nullable
+              as int?,
+      deathYear: freezed == deathYear
+          ? _value.deathYear
+          : deathYear // ignore: cast_nullable_to_non_nullable
+              as int?,
       poemCount: null == poemCount
           ? _value.poemCount
           : poemCount // ignore: cast_nullable_to_non_nullable
@@ -830,6 +944,8 @@ class _$PoetSpotlightContentDataImpl implements _PoetSpotlightContentData {
       this.bio,
       required this.poetPublicId,
       this.profileImageUrl,
+      this.birthYear,
+      this.deathYear,
       this.poemCount = 0,
       this.followerCount = 0,
       this.viewCount = 0});
@@ -846,6 +962,10 @@ class _$PoetSpotlightContentDataImpl implements _PoetSpotlightContentData {
   @override
   final String? profileImageUrl;
   @override
+  final int? birthYear;
+  @override
+  final int? deathYear;
+  @override
   @JsonKey()
   final int poemCount;
   @override
@@ -857,7 +977,7 @@ class _$PoetSpotlightContentDataImpl implements _PoetSpotlightContentData {
 
   @override
   String toString() {
-    return 'PoetSpotlightContentData(poetName: $poetName, bio: $bio, poetPublicId: $poetPublicId, profileImageUrl: $profileImageUrl, poemCount: $poemCount, followerCount: $followerCount, viewCount: $viewCount)';
+    return 'PoetSpotlightContentData(poetName: $poetName, bio: $bio, poetPublicId: $poetPublicId, profileImageUrl: $profileImageUrl, birthYear: $birthYear, deathYear: $deathYear, poemCount: $poemCount, followerCount: $followerCount, viewCount: $viewCount)';
   }
 
   @override
@@ -872,6 +992,10 @@ class _$PoetSpotlightContentDataImpl implements _PoetSpotlightContentData {
                 other.poetPublicId == poetPublicId) &&
             (identical(other.profileImageUrl, profileImageUrl) ||
                 other.profileImageUrl == profileImageUrl) &&
+            (identical(other.birthYear, birthYear) ||
+                other.birthYear == birthYear) &&
+            (identical(other.deathYear, deathYear) ||
+                other.deathYear == deathYear) &&
             (identical(other.poemCount, poemCount) ||
                 other.poemCount == poemCount) &&
             (identical(other.followerCount, followerCount) ||
@@ -882,8 +1006,17 @@ class _$PoetSpotlightContentDataImpl implements _PoetSpotlightContentData {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, poetName, bio, poetPublicId,
-      profileImageUrl, poemCount, followerCount, viewCount);
+  int get hashCode => Object.hash(
+      runtimeType,
+      poetName,
+      bio,
+      poetPublicId,
+      profileImageUrl,
+      birthYear,
+      deathYear,
+      poemCount,
+      followerCount,
+      viewCount);
 
   @JsonKey(ignore: true)
   @override
@@ -906,6 +1039,8 @@ abstract class _PoetSpotlightContentData implements PoetSpotlightContentData {
       final String? bio,
       required final String poetPublicId,
       final String? profileImageUrl,
+      final int? birthYear,
+      final int? deathYear,
       final int poemCount,
       final int followerCount,
       final int viewCount}) = _$PoetSpotlightContentDataImpl;
@@ -921,6 +1056,10 @@ abstract class _PoetSpotlightContentData implements PoetSpotlightContentData {
   String get poetPublicId;
   @override
   String? get profileImageUrl;
+  @override
+  int? get birthYear;
+  @override
+  int? get deathYear;
   @override
   int get poemCount;
   @override

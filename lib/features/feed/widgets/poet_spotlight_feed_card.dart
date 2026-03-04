@@ -23,6 +23,8 @@ class PoetSpotlightFeedCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textTheme = Theme.of(context).textTheme;
+
     return Card(
       margin: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
@@ -30,12 +32,12 @@ class PoetSpotlightFeedCard extends ConsumerWidget {
       ),
       elevation: AppSpacing.elevationSm,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
       ),
       color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
       child: InkWell(
         onTap: () => _onTap(context, ref),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Column(
@@ -43,15 +45,17 @@ class PoetSpotlightFeedCard extends ConsumerWidget {
             children: [
               // Discover badge
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: AppSpacing.xs,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.info.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
                 ),
                 child: Text(
                   'Discover',
-                  style: TextStyle(
-                    fontSize: 11,
+                  style: textTheme.labelSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: AppColors.info,
                   ),
@@ -90,8 +94,7 @@ class PoetSpotlightFeedCard extends ConsumerWidget {
                         // Poet name
                         LocalizedText(
                           data.poetName ?? '',
-                          style: TextStyle(
-                            fontSize: 18,
+                          style: textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: isDark
                                 ? AppColors.textPrimaryDark
@@ -100,18 +103,25 @@ class PoetSpotlightFeedCard extends ConsumerWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
+                        if (_formatEra(data.birthYear, data.deathYear) != null)
+                          Text(
+                            _formatEra(data.birthYear, data.deathYear)!,
+                            style: textTheme.bodySmall?.copyWith(
+                              color: isDark
+                                  ? AppColors.textSecondaryDark
+                                  : AppColors.textSecondaryLight,
+                            ),
+                          ),
                         const SizedBox(height: AppSpacing.xs),
 
                         // Bio
                         if (data.bio != null)
                           LocalizedText(
                             data.bio!,
-                            style: TextStyle(
-                              fontSize: 13,
+                            style: textTheme.bodySmall?.copyWith(
                               color: isDark
                                   ? AppColors.textSecondaryDark
                                   : AppColors.textSecondaryLight,
-                              height: 1.4,
                             ),
                             maxLines: 3,
                             overflow: TextOverflow.ellipsis,
@@ -159,6 +169,12 @@ class PoetSpotlightFeedCard extends ConsumerWidget {
     );
   }
 
+  String? _formatEra(int? birthYear, int? deathYear) {
+    if (birthYear == null || birthYear == 0) return null;
+    if (deathYear == null || deathYear == 0) return '$birthYear';
+    return '$birthYear \u2013 $deathYear';
+  }
+
   Widget _imagePlaceholder(bool isDark) {
     return Container(
       width: 80,
@@ -169,7 +185,7 @@ class PoetSpotlightFeedCard extends ConsumerWidget {
       ),
       child: Icon(
         Icons.person_outline,
-        size: 36,
+        size: AppSpacing.iconLg,
         color: isDark
             ? AppColors.textSecondaryDark
             : AppColors.textSecondaryLight,
@@ -207,9 +223,14 @@ class _StatChip extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 16, color: color),
-        const SizedBox(width: 4),
-        Text(label, style: TextStyle(fontSize: 12, color: color)),
+        Icon(icon, size: AppSpacing.iconXs, color: color),
+        const SizedBox(width: AppSpacing.xs),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: color,
+          ),
+        ),
       ],
     );
   }
