@@ -4,6 +4,7 @@ import '../models/user_model.dart';
 import '../network/dto/api_response.dart';
 import '../network/dio_client.dart';
 import '../auth/auth_provider.dart';
+import '../storage/secure_storage.dart';
 
 final _logger = Logger();
 
@@ -42,21 +43,35 @@ final userProfileProvider =
       );
 
       if (apiResponse.success && apiResponse.data != null) {
+        final user = apiResponse.data!;
         _logger.i('✅ Successfully parsed user profile');
-        _logger.i('   Full Name: ${apiResponse.data!.fullName}');
-        _logger.i('   Email: ${apiResponse.data!.email}');
-        _logger.i('   Provider: ${apiResponse.data!.provider}');
-        _logger.i('   Status: ${apiResponse.data!.isActive ? 'Active' : 'Inactive'}');
+        _logger.i('   Full Name: ${user.fullName}');
+        _logger.i('   Email: ${user.email}');
+        _logger.i('   Provider: ${user.provider}');
+        _logger.i('   Status: ${user.isActive ? 'Active' : 'Inactive'}');
+
+        // Ensure numeric userId is stored for X-User-Id header (backfill for existing sessions)
+        final rawData = response.data!['data'] as Map<String, dynamic>?;
+        final numericUserId = rawData?['userId']?.toString();
+        if (numericUserId != null && numericUserId.isNotEmpty) {
+          final secureStorage = ref.read(secureStorageProvider);
+          final storedUserId = await secureStorage.getUserId();
+          if (storedUserId == null || storedUserId.isEmpty || storedUserId.contains('-')) {
+            await secureStorage.saveUserId(numericUserId);
+            _logger.i('   User ID backfilled: $numericUserId');
+          }
+        }
+
         _logger.i('═══════════════════════════════════════════════════════');
         _logger.i('');
 
-        return apiResponse.data!;
+        return user;
       }
 
       _logger.e('❌ API returned success=false');
       _logger.e('   Message: ${apiResponse.message}');
       throw Exception(
-          apiResponse.message ?? 'Unable to parse user profile');
+          apiResponse.message);
     }
 
     _logger.e('❌ Unexpected status code: ${response.statusCode}');

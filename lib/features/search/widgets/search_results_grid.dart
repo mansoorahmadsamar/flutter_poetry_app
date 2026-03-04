@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/widgets/poet_card.dart';
-import 'package:flutter_poetry_app/features/search/providers/search_pagination_provider.dart';
+import 'package:flutter_poetry_app/features/main/tabs/poets/providers/poet_search_pagination_provider.dart';
 
 class SearchResultsGrid extends ConsumerStatefulWidget {
   const SearchResultsGrid({super.key});
@@ -32,13 +32,13 @@ class _SearchResultsGridState extends ConsumerState<SearchResultsGrid> {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent * 0.8) {
       // Load more when 80% scrolled
-      ref.read(searchPaginationProvider.notifier).loadMore();
+      ref.read(poetSearchPaginationProvider.notifier).loadMore();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final searchState = ref.watch(searchPaginationProvider);
+    final searchState = ref.watch(poetSearchPaginationProvider);
 
     return SliverPadding(
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -60,10 +60,10 @@ class _SearchResultsGridState extends ConsumerState<SearchResultsGrid> {
           // Results grid
           SliverGrid(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.65,
-              crossAxisSpacing: AppSpacing.md,
-              mainAxisSpacing: AppSpacing.md,
+              crossAxisCount: 3,
+              childAspectRatio: 0.52,
+              crossAxisSpacing: AppSpacing.sm,
+              mainAxisSpacing: AppSpacing.sm,
             ),
             delegate: SliverChildBuilderDelegate(
               (context, index) {

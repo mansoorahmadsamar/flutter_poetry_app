@@ -49,17 +49,6 @@ class PoetOverviewTab extends ConsumerWidget {
             SizedBox(height: AppSpacing.lg),
           ],
 
-          // Key Information Section
-          Text(
-            'Key Information',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
-          SizedBox(height: AppSpacing.md),
-          _buildInfoGrid(context, isDark),
-          SizedBox(height: AppSpacing.lg),
-
           // Facts Section
           if (poet.facts != null && poet.facts!.isNotEmpty) ...[
             Text(
@@ -101,90 +90,6 @@ class PoetOverviewTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildInfoGrid(BuildContext context, bool isDark) {
-    return GridView.count(
-      crossAxisCount: 2,
-      childAspectRatio: 1.2,
-      mainAxisSpacing: AppSpacing.md,
-      crossAxisSpacing: AppSpacing.md,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      children: [
-        _buildInfoCard(
-          context,
-          'Birth Year',
-          poet.birthYear.toString(),
-          isDark,
-        ),
-        _buildInfoCard(
-          context,
-          'Death Year',
-          poet.deathYear?.toString() ?? 'Active',
-          isDark,
-        ),
-        _buildInfoCard(
-          context,
-          'Birth Place',
-          poet.birthPlace ?? 'Unknown',
-          isDark,
-        ),
-        _buildInfoCard(
-          context,
-          'Country',
-          poet.country ?? 'Unknown',
-          isDark,
-        ),
-        _buildInfoCard(
-          context,
-          'Total Poems',
-          poet.poemCount.toString(),
-          isDark,
-        ),
-        _buildInfoCard(
-          context,
-          'Followers',
-          _formatNumber(poet.followerCount),
-          isDark,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildInfoCard(
-    BuildContext context,
-    String label,
-    String value,
-    bool isDark,
-  ) {
-    return Container(
-      padding: EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: isDark ? Colors.grey[800] : Colors.grey[100],
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            label,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: isDark ? Colors.grey[400] : Colors.grey[600],
-                ),
-          ),
-          SizedBox(height: 4),
-          Text(
-            value,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ),
-    );
-  }
-
   List<Widget> _buildFacts(BuildContext context, bool isDark, bool isUrdu) {
     return poet.facts!
         .map((fact) => Padding(
@@ -209,14 +114,5 @@ class PoetOverviewTab extends ConsumerWidget {
               ),
             ))
         .toList();
-  }
-
-  String _formatNumber(int number) {
-    if (number >= 1000000) {
-      return '${(number / 1000000).toStringAsFixed(1)}M';
-    } else if (number >= 1000) {
-      return '${(number / 1000).toStringAsFixed(1)}K';
-    }
-    return number.toString();
   }
 }

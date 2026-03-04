@@ -9,10 +9,10 @@ class ImageTemplateModel with _$ImageTemplateModel {
     required String publicId,
     required String name,
     String? description,
-    required String category, // NATURE, MINIMAL, ARTISTIC, TRADITIONAL
-    required String backgroundImageUrl,
+    @Default('') String category, // NATURE, MINIMAL, ARTISTIC, TRADITIONAL
+    @Default('') String backgroundImageUrl,
     String? thumbnailUrl,
-    required Map<String, dynamic> layoutConfig,
+    @Default({}) Map<String, dynamic> layoutConfig,
     @Default(false) bool isPremium,
     @Default(true) bool isActive,
     @Default(0) int displayOrder,

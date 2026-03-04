@@ -1,0 +1,4589 @@
+// coverage:ignore-file
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
+
+part of 'search_models.dart';
+
+// **************************************************************************
+// FreezedGenerator
+// **************************************************************************
+
+T _$identity<T>(T value) => value;
+
+final _privateConstructorUsedError = UnsupportedError(
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+
+AutocompleteResponse _$AutocompleteResponseFromJson(Map<String, dynamic> json) {
+  return _AutocompleteResponse.fromJson(json);
+}
+
+/// @nodoc
+mixin _$AutocompleteResponse {
+  List<AutocompletePoet> get poets => throw _privateConstructorUsedError;
+  List<AutocompletePoem> get poems => throw _privateConstructorUsedError;
+  List<AutocompleteTag> get tags => throw _privateConstructorUsedError;
+  List<AutocompleteCategory> get categories =>
+      throw _privateConstructorUsedError;
+  int get totalCount => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $AutocompleteResponseCopyWith<AutocompleteResponse> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $AutocompleteResponseCopyWith<$Res> {
+  factory $AutocompleteResponseCopyWith(AutocompleteResponse value,
+          $Res Function(AutocompleteResponse) then) =
+      _$AutocompleteResponseCopyWithImpl<$Res, AutocompleteResponse>;
+  @useResult
+  $Res call(
+      {List<AutocompletePoet> poets,
+      List<AutocompletePoem> poems,
+      List<AutocompleteTag> tags,
+      List<AutocompleteCategory> categories,
+      int totalCount});
+}
+
+/// @nodoc
+class _$AutocompleteResponseCopyWithImpl<$Res,
+        $Val extends AutocompleteResponse>
+    implements $AutocompleteResponseCopyWith<$Res> {
+  _$AutocompleteResponseCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? poets = null,
+    Object? poems = null,
+    Object? tags = null,
+    Object? categories = null,
+    Object? totalCount = null,
+  }) {
+    return _then(_value.copyWith(
+      poets: null == poets
+          ? _value.poets
+          : poets // ignore: cast_nullable_to_non_nullable
+              as List<AutocompletePoet>,
+      poems: null == poems
+          ? _value.poems
+          : poems // ignore: cast_nullable_to_non_nullable
+              as List<AutocompletePoem>,
+      tags: null == tags
+          ? _value.tags
+          : tags // ignore: cast_nullable_to_non_nullable
+              as List<AutocompleteTag>,
+      categories: null == categories
+          ? _value.categories
+          : categories // ignore: cast_nullable_to_non_nullable
+              as List<AutocompleteCategory>,
+      totalCount: null == totalCount
+          ? _value.totalCount
+          : totalCount // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$AutocompleteResponseImplCopyWith<$Res>
+    implements $AutocompleteResponseCopyWith<$Res> {
+  factory _$$AutocompleteResponseImplCopyWith(_$AutocompleteResponseImpl value,
+          $Res Function(_$AutocompleteResponseImpl) then) =
+      __$$AutocompleteResponseImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {List<AutocompletePoet> poets,
+      List<AutocompletePoem> poems,
+      List<AutocompleteTag> tags,
+      List<AutocompleteCategory> categories,
+      int totalCount});
+}
+
+/// @nodoc
+class __$$AutocompleteResponseImplCopyWithImpl<$Res>
+    extends _$AutocompleteResponseCopyWithImpl<$Res, _$AutocompleteResponseImpl>
+    implements _$$AutocompleteResponseImplCopyWith<$Res> {
+  __$$AutocompleteResponseImplCopyWithImpl(_$AutocompleteResponseImpl _value,
+      $Res Function(_$AutocompleteResponseImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? poets = null,
+    Object? poems = null,
+    Object? tags = null,
+    Object? categories = null,
+    Object? totalCount = null,
+  }) {
+    return _then(_$AutocompleteResponseImpl(
+      poets: null == poets
+          ? _value._poets
+          : poets // ignore: cast_nullable_to_non_nullable
+              as List<AutocompletePoet>,
+      poems: null == poems
+          ? _value._poems
+          : poems // ignore: cast_nullable_to_non_nullable
+              as List<AutocompletePoem>,
+      tags: null == tags
+          ? _value._tags
+          : tags // ignore: cast_nullable_to_non_nullable
+              as List<AutocompleteTag>,
+      categories: null == categories
+          ? _value._categories
+          : categories // ignore: cast_nullable_to_non_nullable
+              as List<AutocompleteCategory>,
+      totalCount: null == totalCount
+          ? _value.totalCount
+          : totalCount // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$AutocompleteResponseImpl implements _AutocompleteResponse {
+  const _$AutocompleteResponseImpl(
+      {final List<AutocompletePoet> poets = const [],
+      final List<AutocompletePoem> poems = const [],
+      final List<AutocompleteTag> tags = const [],
+      final List<AutocompleteCategory> categories = const [],
+      this.totalCount = 0})
+      : _poets = poets,
+        _poems = poems,
+        _tags = tags,
+        _categories = categories;
+
+  factory _$AutocompleteResponseImpl.fromJson(Map<String, dynamic> json) =>
+      _$$AutocompleteResponseImplFromJson(json);
+
+  final List<AutocompletePoet> _poets;
+  @override
+  @JsonKey()
+  List<AutocompletePoet> get poets {
+    if (_poets is EqualUnmodifiableListView) return _poets;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_poets);
+  }
+
+  final List<AutocompletePoem> _poems;
+  @override
+  @JsonKey()
+  List<AutocompletePoem> get poems {
+    if (_poems is EqualUnmodifiableListView) return _poems;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_poems);
+  }
+
+  final List<AutocompleteTag> _tags;
+  @override
+  @JsonKey()
+  List<AutocompleteTag> get tags {
+    if (_tags is EqualUnmodifiableListView) return _tags;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_tags);
+  }
+
+  final List<AutocompleteCategory> _categories;
+  @override
+  @JsonKey()
+  List<AutocompleteCategory> get categories {
+    if (_categories is EqualUnmodifiableListView) return _categories;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_categories);
+  }
+
+  @override
+  @JsonKey()
+  final int totalCount;
+
+  @override
+  String toString() {
+    return 'AutocompleteResponse(poets: $poets, poems: $poems, tags: $tags, categories: $categories, totalCount: $totalCount)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$AutocompleteResponseImpl &&
+            const DeepCollectionEquality().equals(other._poets, _poets) &&
+            const DeepCollectionEquality().equals(other._poems, _poems) &&
+            const DeepCollectionEquality().equals(other._tags, _tags) &&
+            const DeepCollectionEquality()
+                .equals(other._categories, _categories) &&
+            (identical(other.totalCount, totalCount) ||
+                other.totalCount == totalCount));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(_poets),
+      const DeepCollectionEquality().hash(_poems),
+      const DeepCollectionEquality().hash(_tags),
+      const DeepCollectionEquality().hash(_categories),
+      totalCount);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$AutocompleteResponseImplCopyWith<_$AutocompleteResponseImpl>
+      get copyWith =>
+          __$$AutocompleteResponseImplCopyWithImpl<_$AutocompleteResponseImpl>(
+              this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$AutocompleteResponseImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _AutocompleteResponse implements AutocompleteResponse {
+  const factory _AutocompleteResponse(
+      {final List<AutocompletePoet> poets,
+      final List<AutocompletePoem> poems,
+      final List<AutocompleteTag> tags,
+      final List<AutocompleteCategory> categories,
+      final int totalCount}) = _$AutocompleteResponseImpl;
+
+  factory _AutocompleteResponse.fromJson(Map<String, dynamic> json) =
+      _$AutocompleteResponseImpl.fromJson;
+
+  @override
+  List<AutocompletePoet> get poets;
+  @override
+  List<AutocompletePoem> get poems;
+  @override
+  List<AutocompleteTag> get tags;
+  @override
+  List<AutocompleteCategory> get categories;
+  @override
+  int get totalCount;
+  @override
+  @JsonKey(ignore: true)
+  _$$AutocompleteResponseImplCopyWith<_$AutocompleteResponseImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+AutocompletePoet _$AutocompletePoetFromJson(Map<String, dynamic> json) {
+  return _AutocompletePoet.fromJson(json);
+}
+
+/// @nodoc
+mixin _$AutocompletePoet {
+  String get publicId => throw _privateConstructorUsedError;
+  String get name => throw _privateConstructorUsedError;
+  String? get profileImageUrl => throw _privateConstructorUsedError;
+  String? get era => throw _privateConstructorUsedError;
+  double get score => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $AutocompletePoetCopyWith<AutocompletePoet> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $AutocompletePoetCopyWith<$Res> {
+  factory $AutocompletePoetCopyWith(
+          AutocompletePoet value, $Res Function(AutocompletePoet) then) =
+      _$AutocompletePoetCopyWithImpl<$Res, AutocompletePoet>;
+  @useResult
+  $Res call(
+      {String publicId,
+      String name,
+      String? profileImageUrl,
+      String? era,
+      double score});
+}
+
+/// @nodoc
+class _$AutocompletePoetCopyWithImpl<$Res, $Val extends AutocompletePoet>
+    implements $AutocompletePoetCopyWith<$Res> {
+  _$AutocompletePoetCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? publicId = null,
+    Object? name = null,
+    Object? profileImageUrl = freezed,
+    Object? era = freezed,
+    Object? score = null,
+  }) {
+    return _then(_value.copyWith(
+      publicId: null == publicId
+          ? _value.publicId
+          : publicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      profileImageUrl: freezed == profileImageUrl
+          ? _value.profileImageUrl
+          : profileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      era: freezed == era
+          ? _value.era
+          : era // ignore: cast_nullable_to_non_nullable
+              as String?,
+      score: null == score
+          ? _value.score
+          : score // ignore: cast_nullable_to_non_nullable
+              as double,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$AutocompletePoetImplCopyWith<$Res>
+    implements $AutocompletePoetCopyWith<$Res> {
+  factory _$$AutocompletePoetImplCopyWith(_$AutocompletePoetImpl value,
+          $Res Function(_$AutocompletePoetImpl) then) =
+      __$$AutocompletePoetImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String publicId,
+      String name,
+      String? profileImageUrl,
+      String? era,
+      double score});
+}
+
+/// @nodoc
+class __$$AutocompletePoetImplCopyWithImpl<$Res>
+    extends _$AutocompletePoetCopyWithImpl<$Res, _$AutocompletePoetImpl>
+    implements _$$AutocompletePoetImplCopyWith<$Res> {
+  __$$AutocompletePoetImplCopyWithImpl(_$AutocompletePoetImpl _value,
+      $Res Function(_$AutocompletePoetImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? publicId = null,
+    Object? name = null,
+    Object? profileImageUrl = freezed,
+    Object? era = freezed,
+    Object? score = null,
+  }) {
+    return _then(_$AutocompletePoetImpl(
+      publicId: null == publicId
+          ? _value.publicId
+          : publicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      profileImageUrl: freezed == profileImageUrl
+          ? _value.profileImageUrl
+          : profileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      era: freezed == era
+          ? _value.era
+          : era // ignore: cast_nullable_to_non_nullable
+              as String?,
+      score: null == score
+          ? _value.score
+          : score // ignore: cast_nullable_to_non_nullable
+              as double,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$AutocompletePoetImpl implements _AutocompletePoet {
+  const _$AutocompletePoetImpl(
+      {required this.publicId,
+      required this.name,
+      this.profileImageUrl,
+      this.era,
+      this.score = 0.0});
+
+  factory _$AutocompletePoetImpl.fromJson(Map<String, dynamic> json) =>
+      _$$AutocompletePoetImplFromJson(json);
+
+  @override
+  final String publicId;
+  @override
+  final String name;
+  @override
+  final String? profileImageUrl;
+  @override
+  final String? era;
+  @override
+  @JsonKey()
+  final double score;
+
+  @override
+  String toString() {
+    return 'AutocompletePoet(publicId: $publicId, name: $name, profileImageUrl: $profileImageUrl, era: $era, score: $score)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$AutocompletePoetImpl &&
+            (identical(other.publicId, publicId) ||
+                other.publicId == publicId) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.profileImageUrl, profileImageUrl) ||
+                other.profileImageUrl == profileImageUrl) &&
+            (identical(other.era, era) || other.era == era) &&
+            (identical(other.score, score) || other.score == score));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, publicId, name, profileImageUrl, era, score);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$AutocompletePoetImplCopyWith<_$AutocompletePoetImpl> get copyWith =>
+      __$$AutocompletePoetImplCopyWithImpl<_$AutocompletePoetImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$AutocompletePoetImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _AutocompletePoet implements AutocompletePoet {
+  const factory _AutocompletePoet(
+      {required final String publicId,
+      required final String name,
+      final String? profileImageUrl,
+      final String? era,
+      final double score}) = _$AutocompletePoetImpl;
+
+  factory _AutocompletePoet.fromJson(Map<String, dynamic> json) =
+      _$AutocompletePoetImpl.fromJson;
+
+  @override
+  String get publicId;
+  @override
+  String get name;
+  @override
+  String? get profileImageUrl;
+  @override
+  String? get era;
+  @override
+  double get score;
+  @override
+  @JsonKey(ignore: true)
+  _$$AutocompletePoetImplCopyWith<_$AutocompletePoetImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+AutocompletePoem _$AutocompletePoemFromJson(Map<String, dynamic> json) {
+  return _AutocompletePoem.fromJson(json);
+}
+
+/// @nodoc
+mixin _$AutocompletePoem {
+  String get publicId => throw _privateConstructorUsedError;
+  String get title => throw _privateConstructorUsedError;
+  String get poetName => throw _privateConstructorUsedError;
+  String get poetPublicId => throw _privateConstructorUsedError;
+  String get poetryType => throw _privateConstructorUsedError;
+  double get score => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $AutocompletePoemCopyWith<AutocompletePoem> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $AutocompletePoemCopyWith<$Res> {
+  factory $AutocompletePoemCopyWith(
+          AutocompletePoem value, $Res Function(AutocompletePoem) then) =
+      _$AutocompletePoemCopyWithImpl<$Res, AutocompletePoem>;
+  @useResult
+  $Res call(
+      {String publicId,
+      String title,
+      String poetName,
+      String poetPublicId,
+      String poetryType,
+      double score});
+}
+
+/// @nodoc
+class _$AutocompletePoemCopyWithImpl<$Res, $Val extends AutocompletePoem>
+    implements $AutocompletePoemCopyWith<$Res> {
+  _$AutocompletePoemCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? publicId = null,
+    Object? title = null,
+    Object? poetName = null,
+    Object? poetPublicId = null,
+    Object? poetryType = null,
+    Object? score = null,
+  }) {
+    return _then(_value.copyWith(
+      publicId: null == publicId
+          ? _value.publicId
+          : publicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetName: null == poetName
+          ? _value.poetName
+          : poetName // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetPublicId: null == poetPublicId
+          ? _value.poetPublicId
+          : poetPublicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetryType: null == poetryType
+          ? _value.poetryType
+          : poetryType // ignore: cast_nullable_to_non_nullable
+              as String,
+      score: null == score
+          ? _value.score
+          : score // ignore: cast_nullable_to_non_nullable
+              as double,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$AutocompletePoemImplCopyWith<$Res>
+    implements $AutocompletePoemCopyWith<$Res> {
+  factory _$$AutocompletePoemImplCopyWith(_$AutocompletePoemImpl value,
+          $Res Function(_$AutocompletePoemImpl) then) =
+      __$$AutocompletePoemImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String publicId,
+      String title,
+      String poetName,
+      String poetPublicId,
+      String poetryType,
+      double score});
+}
+
+/// @nodoc
+class __$$AutocompletePoemImplCopyWithImpl<$Res>
+    extends _$AutocompletePoemCopyWithImpl<$Res, _$AutocompletePoemImpl>
+    implements _$$AutocompletePoemImplCopyWith<$Res> {
+  __$$AutocompletePoemImplCopyWithImpl(_$AutocompletePoemImpl _value,
+      $Res Function(_$AutocompletePoemImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? publicId = null,
+    Object? title = null,
+    Object? poetName = null,
+    Object? poetPublicId = null,
+    Object? poetryType = null,
+    Object? score = null,
+  }) {
+    return _then(_$AutocompletePoemImpl(
+      publicId: null == publicId
+          ? _value.publicId
+          : publicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetName: null == poetName
+          ? _value.poetName
+          : poetName // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetPublicId: null == poetPublicId
+          ? _value.poetPublicId
+          : poetPublicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetryType: null == poetryType
+          ? _value.poetryType
+          : poetryType // ignore: cast_nullable_to_non_nullable
+              as String,
+      score: null == score
+          ? _value.score
+          : score // ignore: cast_nullable_to_non_nullable
+              as double,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$AutocompletePoemImpl implements _AutocompletePoem {
+  const _$AutocompletePoemImpl(
+      {required this.publicId,
+      required this.title,
+      required this.poetName,
+      required this.poetPublicId,
+      required this.poetryType,
+      this.score = 0.0});
+
+  factory _$AutocompletePoemImpl.fromJson(Map<String, dynamic> json) =>
+      _$$AutocompletePoemImplFromJson(json);
+
+  @override
+  final String publicId;
+  @override
+  final String title;
+  @override
+  final String poetName;
+  @override
+  final String poetPublicId;
+  @override
+  final String poetryType;
+  @override
+  @JsonKey()
+  final double score;
+
+  @override
+  String toString() {
+    return 'AutocompletePoem(publicId: $publicId, title: $title, poetName: $poetName, poetPublicId: $poetPublicId, poetryType: $poetryType, score: $score)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$AutocompletePoemImpl &&
+            (identical(other.publicId, publicId) ||
+                other.publicId == publicId) &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.poetName, poetName) ||
+                other.poetName == poetName) &&
+            (identical(other.poetPublicId, poetPublicId) ||
+                other.poetPublicId == poetPublicId) &&
+            (identical(other.poetryType, poetryType) ||
+                other.poetryType == poetryType) &&
+            (identical(other.score, score) || other.score == score));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, publicId, title, poetName, poetPublicId, poetryType, score);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$AutocompletePoemImplCopyWith<_$AutocompletePoemImpl> get copyWith =>
+      __$$AutocompletePoemImplCopyWithImpl<_$AutocompletePoemImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$AutocompletePoemImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _AutocompletePoem implements AutocompletePoem {
+  const factory _AutocompletePoem(
+      {required final String publicId,
+      required final String title,
+      required final String poetName,
+      required final String poetPublicId,
+      required final String poetryType,
+      final double score}) = _$AutocompletePoemImpl;
+
+  factory _AutocompletePoem.fromJson(Map<String, dynamic> json) =
+      _$AutocompletePoemImpl.fromJson;
+
+  @override
+  String get publicId;
+  @override
+  String get title;
+  @override
+  String get poetName;
+  @override
+  String get poetPublicId;
+  @override
+  String get poetryType;
+  @override
+  double get score;
+  @override
+  @JsonKey(ignore: true)
+  _$$AutocompletePoemImplCopyWith<_$AutocompletePoemImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+AutocompleteTag _$AutocompleteTagFromJson(Map<String, dynamic> json) {
+  return _AutocompleteTag.fromJson(json);
+}
+
+/// @nodoc
+mixin _$AutocompleteTag {
+  String get publicId => throw _privateConstructorUsedError;
+  String get name => throw _privateConstructorUsedError;
+  String get slug => throw _privateConstructorUsedError;
+  String get tagType => throw _privateConstructorUsedError;
+  double get score => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $AutocompleteTagCopyWith<AutocompleteTag> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $AutocompleteTagCopyWith<$Res> {
+  factory $AutocompleteTagCopyWith(
+          AutocompleteTag value, $Res Function(AutocompleteTag) then) =
+      _$AutocompleteTagCopyWithImpl<$Res, AutocompleteTag>;
+  @useResult
+  $Res call(
+      {String publicId,
+      String name,
+      String slug,
+      String tagType,
+      double score});
+}
+
+/// @nodoc
+class _$AutocompleteTagCopyWithImpl<$Res, $Val extends AutocompleteTag>
+    implements $AutocompleteTagCopyWith<$Res> {
+  _$AutocompleteTagCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? publicId = null,
+    Object? name = null,
+    Object? slug = null,
+    Object? tagType = null,
+    Object? score = null,
+  }) {
+    return _then(_value.copyWith(
+      publicId: null == publicId
+          ? _value.publicId
+          : publicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      slug: null == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String,
+      tagType: null == tagType
+          ? _value.tagType
+          : tagType // ignore: cast_nullable_to_non_nullable
+              as String,
+      score: null == score
+          ? _value.score
+          : score // ignore: cast_nullable_to_non_nullable
+              as double,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$AutocompleteTagImplCopyWith<$Res>
+    implements $AutocompleteTagCopyWith<$Res> {
+  factory _$$AutocompleteTagImplCopyWith(_$AutocompleteTagImpl value,
+          $Res Function(_$AutocompleteTagImpl) then) =
+      __$$AutocompleteTagImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String publicId,
+      String name,
+      String slug,
+      String tagType,
+      double score});
+}
+
+/// @nodoc
+class __$$AutocompleteTagImplCopyWithImpl<$Res>
+    extends _$AutocompleteTagCopyWithImpl<$Res, _$AutocompleteTagImpl>
+    implements _$$AutocompleteTagImplCopyWith<$Res> {
+  __$$AutocompleteTagImplCopyWithImpl(
+      _$AutocompleteTagImpl _value, $Res Function(_$AutocompleteTagImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? publicId = null,
+    Object? name = null,
+    Object? slug = null,
+    Object? tagType = null,
+    Object? score = null,
+  }) {
+    return _then(_$AutocompleteTagImpl(
+      publicId: null == publicId
+          ? _value.publicId
+          : publicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      slug: null == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String,
+      tagType: null == tagType
+          ? _value.tagType
+          : tagType // ignore: cast_nullable_to_non_nullable
+              as String,
+      score: null == score
+          ? _value.score
+          : score // ignore: cast_nullable_to_non_nullable
+              as double,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$AutocompleteTagImpl implements _AutocompleteTag {
+  const _$AutocompleteTagImpl(
+      {required this.publicId,
+      required this.name,
+      required this.slug,
+      required this.tagType,
+      this.score = 0.0});
+
+  factory _$AutocompleteTagImpl.fromJson(Map<String, dynamic> json) =>
+      _$$AutocompleteTagImplFromJson(json);
+
+  @override
+  final String publicId;
+  @override
+  final String name;
+  @override
+  final String slug;
+  @override
+  final String tagType;
+  @override
+  @JsonKey()
+  final double score;
+
+  @override
+  String toString() {
+    return 'AutocompleteTag(publicId: $publicId, name: $name, slug: $slug, tagType: $tagType, score: $score)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$AutocompleteTagImpl &&
+            (identical(other.publicId, publicId) ||
+                other.publicId == publicId) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.slug, slug) || other.slug == slug) &&
+            (identical(other.tagType, tagType) || other.tagType == tagType) &&
+            (identical(other.score, score) || other.score == score));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, publicId, name, slug, tagType, score);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$AutocompleteTagImplCopyWith<_$AutocompleteTagImpl> get copyWith =>
+      __$$AutocompleteTagImplCopyWithImpl<_$AutocompleteTagImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$AutocompleteTagImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _AutocompleteTag implements AutocompleteTag {
+  const factory _AutocompleteTag(
+      {required final String publicId,
+      required final String name,
+      required final String slug,
+      required final String tagType,
+      final double score}) = _$AutocompleteTagImpl;
+
+  factory _AutocompleteTag.fromJson(Map<String, dynamic> json) =
+      _$AutocompleteTagImpl.fromJson;
+
+  @override
+  String get publicId;
+  @override
+  String get name;
+  @override
+  String get slug;
+  @override
+  String get tagType;
+  @override
+  double get score;
+  @override
+  @JsonKey(ignore: true)
+  _$$AutocompleteTagImplCopyWith<_$AutocompleteTagImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+AutocompleteCategory _$AutocompleteCategoryFromJson(Map<String, dynamic> json) {
+  return _AutocompleteCategory.fromJson(json);
+}
+
+/// @nodoc
+mixin _$AutocompleteCategory {
+  String get publicId => throw _privateConstructorUsedError;
+  String get name => throw _privateConstructorUsedError;
+  String? get description => throw _privateConstructorUsedError;
+  String? get iconUrl => throw _privateConstructorUsedError;
+  int get poemCount => throw _privateConstructorUsedError;
+  int get displayOrder => throw _privateConstructorUsedError;
+  bool get isActive => throw _privateConstructorUsedError;
+  String? get parentCategoryPublicId => throw _privateConstructorUsedError;
+  String? get parentCategoryName => throw _privateConstructorUsedError;
+  double get score => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $AutocompleteCategoryCopyWith<AutocompleteCategory> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $AutocompleteCategoryCopyWith<$Res> {
+  factory $AutocompleteCategoryCopyWith(AutocompleteCategory value,
+          $Res Function(AutocompleteCategory) then) =
+      _$AutocompleteCategoryCopyWithImpl<$Res, AutocompleteCategory>;
+  @useResult
+  $Res call(
+      {String publicId,
+      String name,
+      String? description,
+      String? iconUrl,
+      int poemCount,
+      int displayOrder,
+      bool isActive,
+      String? parentCategoryPublicId,
+      String? parentCategoryName,
+      double score});
+}
+
+/// @nodoc
+class _$AutocompleteCategoryCopyWithImpl<$Res,
+        $Val extends AutocompleteCategory>
+    implements $AutocompleteCategoryCopyWith<$Res> {
+  _$AutocompleteCategoryCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? publicId = null,
+    Object? name = null,
+    Object? description = freezed,
+    Object? iconUrl = freezed,
+    Object? poemCount = null,
+    Object? displayOrder = null,
+    Object? isActive = null,
+    Object? parentCategoryPublicId = freezed,
+    Object? parentCategoryName = freezed,
+    Object? score = null,
+  }) {
+    return _then(_value.copyWith(
+      publicId: null == publicId
+          ? _value.publicId
+          : publicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      iconUrl: freezed == iconUrl
+          ? _value.iconUrl
+          : iconUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poemCount: null == poemCount
+          ? _value.poemCount
+          : poemCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      displayOrder: null == displayOrder
+          ? _value.displayOrder
+          : displayOrder // ignore: cast_nullable_to_non_nullable
+              as int,
+      isActive: null == isActive
+          ? _value.isActive
+          : isActive // ignore: cast_nullable_to_non_nullable
+              as bool,
+      parentCategoryPublicId: freezed == parentCategoryPublicId
+          ? _value.parentCategoryPublicId
+          : parentCategoryPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      parentCategoryName: freezed == parentCategoryName
+          ? _value.parentCategoryName
+          : parentCategoryName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      score: null == score
+          ? _value.score
+          : score // ignore: cast_nullable_to_non_nullable
+              as double,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$AutocompleteCategoryImplCopyWith<$Res>
+    implements $AutocompleteCategoryCopyWith<$Res> {
+  factory _$$AutocompleteCategoryImplCopyWith(_$AutocompleteCategoryImpl value,
+          $Res Function(_$AutocompleteCategoryImpl) then) =
+      __$$AutocompleteCategoryImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String publicId,
+      String name,
+      String? description,
+      String? iconUrl,
+      int poemCount,
+      int displayOrder,
+      bool isActive,
+      String? parentCategoryPublicId,
+      String? parentCategoryName,
+      double score});
+}
+
+/// @nodoc
+class __$$AutocompleteCategoryImplCopyWithImpl<$Res>
+    extends _$AutocompleteCategoryCopyWithImpl<$Res, _$AutocompleteCategoryImpl>
+    implements _$$AutocompleteCategoryImplCopyWith<$Res> {
+  __$$AutocompleteCategoryImplCopyWithImpl(_$AutocompleteCategoryImpl _value,
+      $Res Function(_$AutocompleteCategoryImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? publicId = null,
+    Object? name = null,
+    Object? description = freezed,
+    Object? iconUrl = freezed,
+    Object? poemCount = null,
+    Object? displayOrder = null,
+    Object? isActive = null,
+    Object? parentCategoryPublicId = freezed,
+    Object? parentCategoryName = freezed,
+    Object? score = null,
+  }) {
+    return _then(_$AutocompleteCategoryImpl(
+      publicId: null == publicId
+          ? _value.publicId
+          : publicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      iconUrl: freezed == iconUrl
+          ? _value.iconUrl
+          : iconUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poemCount: null == poemCount
+          ? _value.poemCount
+          : poemCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      displayOrder: null == displayOrder
+          ? _value.displayOrder
+          : displayOrder // ignore: cast_nullable_to_non_nullable
+              as int,
+      isActive: null == isActive
+          ? _value.isActive
+          : isActive // ignore: cast_nullable_to_non_nullable
+              as bool,
+      parentCategoryPublicId: freezed == parentCategoryPublicId
+          ? _value.parentCategoryPublicId
+          : parentCategoryPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      parentCategoryName: freezed == parentCategoryName
+          ? _value.parentCategoryName
+          : parentCategoryName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      score: null == score
+          ? _value.score
+          : score // ignore: cast_nullable_to_non_nullable
+              as double,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$AutocompleteCategoryImpl implements _AutocompleteCategory {
+  const _$AutocompleteCategoryImpl(
+      {required this.publicId,
+      required this.name,
+      this.description,
+      this.iconUrl,
+      this.poemCount = 0,
+      this.displayOrder = 0,
+      this.isActive = true,
+      this.parentCategoryPublicId,
+      this.parentCategoryName,
+      this.score = 0.0});
+
+  factory _$AutocompleteCategoryImpl.fromJson(Map<String, dynamic> json) =>
+      _$$AutocompleteCategoryImplFromJson(json);
+
+  @override
+  final String publicId;
+  @override
+  final String name;
+  @override
+  final String? description;
+  @override
+  final String? iconUrl;
+  @override
+  @JsonKey()
+  final int poemCount;
+  @override
+  @JsonKey()
+  final int displayOrder;
+  @override
+  @JsonKey()
+  final bool isActive;
+  @override
+  final String? parentCategoryPublicId;
+  @override
+  final String? parentCategoryName;
+  @override
+  @JsonKey()
+  final double score;
+
+  @override
+  String toString() {
+    return 'AutocompleteCategory(publicId: $publicId, name: $name, description: $description, iconUrl: $iconUrl, poemCount: $poemCount, displayOrder: $displayOrder, isActive: $isActive, parentCategoryPublicId: $parentCategoryPublicId, parentCategoryName: $parentCategoryName, score: $score)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$AutocompleteCategoryImpl &&
+            (identical(other.publicId, publicId) ||
+                other.publicId == publicId) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.iconUrl, iconUrl) || other.iconUrl == iconUrl) &&
+            (identical(other.poemCount, poemCount) ||
+                other.poemCount == poemCount) &&
+            (identical(other.displayOrder, displayOrder) ||
+                other.displayOrder == displayOrder) &&
+            (identical(other.isActive, isActive) ||
+                other.isActive == isActive) &&
+            (identical(other.parentCategoryPublicId, parentCategoryPublicId) ||
+                other.parentCategoryPublicId == parentCategoryPublicId) &&
+            (identical(other.parentCategoryName, parentCategoryName) ||
+                other.parentCategoryName == parentCategoryName) &&
+            (identical(other.score, score) || other.score == score));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      publicId,
+      name,
+      description,
+      iconUrl,
+      poemCount,
+      displayOrder,
+      isActive,
+      parentCategoryPublicId,
+      parentCategoryName,
+      score);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$AutocompleteCategoryImplCopyWith<_$AutocompleteCategoryImpl>
+      get copyWith =>
+          __$$AutocompleteCategoryImplCopyWithImpl<_$AutocompleteCategoryImpl>(
+              this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$AutocompleteCategoryImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _AutocompleteCategory implements AutocompleteCategory {
+  const factory _AutocompleteCategory(
+      {required final String publicId,
+      required final String name,
+      final String? description,
+      final String? iconUrl,
+      final int poemCount,
+      final int displayOrder,
+      final bool isActive,
+      final String? parentCategoryPublicId,
+      final String? parentCategoryName,
+      final double score}) = _$AutocompleteCategoryImpl;
+
+  factory _AutocompleteCategory.fromJson(Map<String, dynamic> json) =
+      _$AutocompleteCategoryImpl.fromJson;
+
+  @override
+  String get publicId;
+  @override
+  String get name;
+  @override
+  String? get description;
+  @override
+  String? get iconUrl;
+  @override
+  int get poemCount;
+  @override
+  int get displayOrder;
+  @override
+  bool get isActive;
+  @override
+  String? get parentCategoryPublicId;
+  @override
+  String? get parentCategoryName;
+  @override
+  double get score;
+  @override
+  @JsonKey(ignore: true)
+  _$$AutocompleteCategoryImplCopyWith<_$AutocompleteCategoryImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+CoupletSearchResult _$CoupletSearchResultFromJson(Map<String, dynamic> json) {
+  return _CoupletSearchResult.fromJson(json);
+}
+
+/// @nodoc
+mixin _$CoupletSearchResult {
+  String get publicId => throw _privateConstructorUsedError;
+  int get coupletNumber => throw _privateConstructorUsedError;
+  String? get coupletType =>
+      throw _privateConstructorUsedError; // Made nullable - unified search doesn't return this
+  String? get coupletTypeName =>
+      throw _privateConstructorUsedError; // Made nullable - API doesn't always include this
+  List<VerseModel> get verses => throw _privateConstructorUsedError;
+  PoemSummary? get poem =>
+      throw _privateConstructorUsedError; // Made nullable - API doesn't always include this
+  PoetSummary? get poet =>
+      throw _privateConstructorUsedError; // Made nullable - API doesn't always include this
+  int get likeCount => throw _privateConstructorUsedError;
+  int get shareCount => throw _privateConstructorUsedError;
+  int get bookmarkCount => throw _privateConstructorUsedError;
+  double get engagementScore => throw _privateConstructorUsedError;
+  bool? get isLiked =>
+      throw _privateConstructorUsedError; // Made nullable - API returns null when not authenticated
+  bool? get isBookmarked =>
+      throw _privateConstructorUsedError; // Made nullable - API returns null when not authenticated
+  DateTime? get createdAt => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $CoupletSearchResultCopyWith<CoupletSearchResult> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $CoupletSearchResultCopyWith<$Res> {
+  factory $CoupletSearchResultCopyWith(
+          CoupletSearchResult value, $Res Function(CoupletSearchResult) then) =
+      _$CoupletSearchResultCopyWithImpl<$Res, CoupletSearchResult>;
+  @useResult
+  $Res call(
+      {String publicId,
+      int coupletNumber,
+      String? coupletType,
+      String? coupletTypeName,
+      List<VerseModel> verses,
+      PoemSummary? poem,
+      PoetSummary? poet,
+      int likeCount,
+      int shareCount,
+      int bookmarkCount,
+      double engagementScore,
+      bool? isLiked,
+      bool? isBookmarked,
+      DateTime? createdAt});
+
+  $PoemSummaryCopyWith<$Res>? get poem;
+  $PoetSummaryCopyWith<$Res>? get poet;
+}
+
+/// @nodoc
+class _$CoupletSearchResultCopyWithImpl<$Res, $Val extends CoupletSearchResult>
+    implements $CoupletSearchResultCopyWith<$Res> {
+  _$CoupletSearchResultCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? publicId = null,
+    Object? coupletNumber = null,
+    Object? coupletType = freezed,
+    Object? coupletTypeName = freezed,
+    Object? verses = null,
+    Object? poem = freezed,
+    Object? poet = freezed,
+    Object? likeCount = null,
+    Object? shareCount = null,
+    Object? bookmarkCount = null,
+    Object? engagementScore = null,
+    Object? isLiked = freezed,
+    Object? isBookmarked = freezed,
+    Object? createdAt = freezed,
+  }) {
+    return _then(_value.copyWith(
+      publicId: null == publicId
+          ? _value.publicId
+          : publicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      coupletNumber: null == coupletNumber
+          ? _value.coupletNumber
+          : coupletNumber // ignore: cast_nullable_to_non_nullable
+              as int,
+      coupletType: freezed == coupletType
+          ? _value.coupletType
+          : coupletType // ignore: cast_nullable_to_non_nullable
+              as String?,
+      coupletTypeName: freezed == coupletTypeName
+          ? _value.coupletTypeName
+          : coupletTypeName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      verses: null == verses
+          ? _value.verses
+          : verses // ignore: cast_nullable_to_non_nullable
+              as List<VerseModel>,
+      poem: freezed == poem
+          ? _value.poem
+          : poem // ignore: cast_nullable_to_non_nullable
+              as PoemSummary?,
+      poet: freezed == poet
+          ? _value.poet
+          : poet // ignore: cast_nullable_to_non_nullable
+              as PoetSummary?,
+      likeCount: null == likeCount
+          ? _value.likeCount
+          : likeCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      shareCount: null == shareCount
+          ? _value.shareCount
+          : shareCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      bookmarkCount: null == bookmarkCount
+          ? _value.bookmarkCount
+          : bookmarkCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      engagementScore: null == engagementScore
+          ? _value.engagementScore
+          : engagementScore // ignore: cast_nullable_to_non_nullable
+              as double,
+      isLiked: freezed == isLiked
+          ? _value.isLiked
+          : isLiked // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      isBookmarked: freezed == isBookmarked
+          ? _value.isBookmarked
+          : isBookmarked // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+    ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $PoemSummaryCopyWith<$Res>? get poem {
+    if (_value.poem == null) {
+      return null;
+    }
+
+    return $PoemSummaryCopyWith<$Res>(_value.poem!, (value) {
+      return _then(_value.copyWith(poem: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $PoetSummaryCopyWith<$Res>? get poet {
+    if (_value.poet == null) {
+      return null;
+    }
+
+    return $PoetSummaryCopyWith<$Res>(_value.poet!, (value) {
+      return _then(_value.copyWith(poet: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$CoupletSearchResultImplCopyWith<$Res>
+    implements $CoupletSearchResultCopyWith<$Res> {
+  factory _$$CoupletSearchResultImplCopyWith(_$CoupletSearchResultImpl value,
+          $Res Function(_$CoupletSearchResultImpl) then) =
+      __$$CoupletSearchResultImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String publicId,
+      int coupletNumber,
+      String? coupletType,
+      String? coupletTypeName,
+      List<VerseModel> verses,
+      PoemSummary? poem,
+      PoetSummary? poet,
+      int likeCount,
+      int shareCount,
+      int bookmarkCount,
+      double engagementScore,
+      bool? isLiked,
+      bool? isBookmarked,
+      DateTime? createdAt});
+
+  @override
+  $PoemSummaryCopyWith<$Res>? get poem;
+  @override
+  $PoetSummaryCopyWith<$Res>? get poet;
+}
+
+/// @nodoc
+class __$$CoupletSearchResultImplCopyWithImpl<$Res>
+    extends _$CoupletSearchResultCopyWithImpl<$Res, _$CoupletSearchResultImpl>
+    implements _$$CoupletSearchResultImplCopyWith<$Res> {
+  __$$CoupletSearchResultImplCopyWithImpl(_$CoupletSearchResultImpl _value,
+      $Res Function(_$CoupletSearchResultImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? publicId = null,
+    Object? coupletNumber = null,
+    Object? coupletType = freezed,
+    Object? coupletTypeName = freezed,
+    Object? verses = null,
+    Object? poem = freezed,
+    Object? poet = freezed,
+    Object? likeCount = null,
+    Object? shareCount = null,
+    Object? bookmarkCount = null,
+    Object? engagementScore = null,
+    Object? isLiked = freezed,
+    Object? isBookmarked = freezed,
+    Object? createdAt = freezed,
+  }) {
+    return _then(_$CoupletSearchResultImpl(
+      publicId: null == publicId
+          ? _value.publicId
+          : publicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      coupletNumber: null == coupletNumber
+          ? _value.coupletNumber
+          : coupletNumber // ignore: cast_nullable_to_non_nullable
+              as int,
+      coupletType: freezed == coupletType
+          ? _value.coupletType
+          : coupletType // ignore: cast_nullable_to_non_nullable
+              as String?,
+      coupletTypeName: freezed == coupletTypeName
+          ? _value.coupletTypeName
+          : coupletTypeName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      verses: null == verses
+          ? _value._verses
+          : verses // ignore: cast_nullable_to_non_nullable
+              as List<VerseModel>,
+      poem: freezed == poem
+          ? _value.poem
+          : poem // ignore: cast_nullable_to_non_nullable
+              as PoemSummary?,
+      poet: freezed == poet
+          ? _value.poet
+          : poet // ignore: cast_nullable_to_non_nullable
+              as PoetSummary?,
+      likeCount: null == likeCount
+          ? _value.likeCount
+          : likeCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      shareCount: null == shareCount
+          ? _value.shareCount
+          : shareCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      bookmarkCount: null == bookmarkCount
+          ? _value.bookmarkCount
+          : bookmarkCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      engagementScore: null == engagementScore
+          ? _value.engagementScore
+          : engagementScore // ignore: cast_nullable_to_non_nullable
+              as double,
+      isLiked: freezed == isLiked
+          ? _value.isLiked
+          : isLiked // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      isBookmarked: freezed == isBookmarked
+          ? _value.isBookmarked
+          : isBookmarked // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$CoupletSearchResultImpl implements _CoupletSearchResult {
+  const _$CoupletSearchResultImpl(
+      {required this.publicId,
+      required this.coupletNumber,
+      this.coupletType,
+      this.coupletTypeName,
+      required final List<VerseModel> verses,
+      this.poem,
+      this.poet,
+      this.likeCount = 0,
+      this.shareCount = 0,
+      this.bookmarkCount = 0,
+      this.engagementScore = 0.0,
+      this.isLiked,
+      this.isBookmarked,
+      this.createdAt})
+      : _verses = verses;
+
+  factory _$CoupletSearchResultImpl.fromJson(Map<String, dynamic> json) =>
+      _$$CoupletSearchResultImplFromJson(json);
+
+  @override
+  final String publicId;
+  @override
+  final int coupletNumber;
+  @override
+  final String? coupletType;
+// Made nullable - unified search doesn't return this
+  @override
+  final String? coupletTypeName;
+// Made nullable - API doesn't always include this
+  final List<VerseModel> _verses;
+// Made nullable - API doesn't always include this
+  @override
+  List<VerseModel> get verses {
+    if (_verses is EqualUnmodifiableListView) return _verses;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_verses);
+  }
+
+  @override
+  final PoemSummary? poem;
+// Made nullable - API doesn't always include this
+  @override
+  final PoetSummary? poet;
+// Made nullable - API doesn't always include this
+  @override
+  @JsonKey()
+  final int likeCount;
+  @override
+  @JsonKey()
+  final int shareCount;
+  @override
+  @JsonKey()
+  final int bookmarkCount;
+  @override
+  @JsonKey()
+  final double engagementScore;
+  @override
+  final bool? isLiked;
+// Made nullable - API returns null when not authenticated
+  @override
+  final bool? isBookmarked;
+// Made nullable - API returns null when not authenticated
+  @override
+  final DateTime? createdAt;
+
+  @override
+  String toString() {
+    return 'CoupletSearchResult(publicId: $publicId, coupletNumber: $coupletNumber, coupletType: $coupletType, coupletTypeName: $coupletTypeName, verses: $verses, poem: $poem, poet: $poet, likeCount: $likeCount, shareCount: $shareCount, bookmarkCount: $bookmarkCount, engagementScore: $engagementScore, isLiked: $isLiked, isBookmarked: $isBookmarked, createdAt: $createdAt)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$CoupletSearchResultImpl &&
+            (identical(other.publicId, publicId) ||
+                other.publicId == publicId) &&
+            (identical(other.coupletNumber, coupletNumber) ||
+                other.coupletNumber == coupletNumber) &&
+            (identical(other.coupletType, coupletType) ||
+                other.coupletType == coupletType) &&
+            (identical(other.coupletTypeName, coupletTypeName) ||
+                other.coupletTypeName == coupletTypeName) &&
+            const DeepCollectionEquality().equals(other._verses, _verses) &&
+            (identical(other.poem, poem) || other.poem == poem) &&
+            (identical(other.poet, poet) || other.poet == poet) &&
+            (identical(other.likeCount, likeCount) ||
+                other.likeCount == likeCount) &&
+            (identical(other.shareCount, shareCount) ||
+                other.shareCount == shareCount) &&
+            (identical(other.bookmarkCount, bookmarkCount) ||
+                other.bookmarkCount == bookmarkCount) &&
+            (identical(other.engagementScore, engagementScore) ||
+                other.engagementScore == engagementScore) &&
+            (identical(other.isLiked, isLiked) || other.isLiked == isLiked) &&
+            (identical(other.isBookmarked, isBookmarked) ||
+                other.isBookmarked == isBookmarked) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      publicId,
+      coupletNumber,
+      coupletType,
+      coupletTypeName,
+      const DeepCollectionEquality().hash(_verses),
+      poem,
+      poet,
+      likeCount,
+      shareCount,
+      bookmarkCount,
+      engagementScore,
+      isLiked,
+      isBookmarked,
+      createdAt);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$CoupletSearchResultImplCopyWith<_$CoupletSearchResultImpl> get copyWith =>
+      __$$CoupletSearchResultImplCopyWithImpl<_$CoupletSearchResultImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$CoupletSearchResultImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _CoupletSearchResult implements CoupletSearchResult {
+  const factory _CoupletSearchResult(
+      {required final String publicId,
+      required final int coupletNumber,
+      final String? coupletType,
+      final String? coupletTypeName,
+      required final List<VerseModel> verses,
+      final PoemSummary? poem,
+      final PoetSummary? poet,
+      final int likeCount,
+      final int shareCount,
+      final int bookmarkCount,
+      final double engagementScore,
+      final bool? isLiked,
+      final bool? isBookmarked,
+      final DateTime? createdAt}) = _$CoupletSearchResultImpl;
+
+  factory _CoupletSearchResult.fromJson(Map<String, dynamic> json) =
+      _$CoupletSearchResultImpl.fromJson;
+
+  @override
+  String get publicId;
+  @override
+  int get coupletNumber;
+  @override
+  String? get coupletType;
+  @override // Made nullable - unified search doesn't return this
+  String? get coupletTypeName;
+  @override // Made nullable - API doesn't always include this
+  List<VerseModel> get verses;
+  @override
+  PoemSummary? get poem;
+  @override // Made nullable - API doesn't always include this
+  PoetSummary? get poet;
+  @override // Made nullable - API doesn't always include this
+  int get likeCount;
+  @override
+  int get shareCount;
+  @override
+  int get bookmarkCount;
+  @override
+  double get engagementScore;
+  @override
+  bool? get isLiked;
+  @override // Made nullable - API returns null when not authenticated
+  bool? get isBookmarked;
+  @override // Made nullable - API returns null when not authenticated
+  DateTime? get createdAt;
+  @override
+  @JsonKey(ignore: true)
+  _$$CoupletSearchResultImplCopyWith<_$CoupletSearchResultImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+VerseSearchResult _$VerseSearchResultFromJson(Map<String, dynamic> json) {
+  return _VerseSearchResult.fromJson(json);
+}
+
+/// @nodoc
+mixin _$VerseSearchResult {
+  VerseModel get verse => throw _privateConstructorUsedError;
+  String get poemPublicId => throw _privateConstructorUsedError;
+  String get poemTitle => throw _privateConstructorUsedError;
+  String get poetryType => throw _privateConstructorUsedError;
+  String? get poetryTypeName => throw _privateConstructorUsedError;
+  String get poetPublicId => throw _privateConstructorUsedError;
+  String get poetName => throw _privateConstructorUsedError;
+  String? get poetProfileImageUrl => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $VerseSearchResultCopyWith<VerseSearchResult> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $VerseSearchResultCopyWith<$Res> {
+  factory $VerseSearchResultCopyWith(
+          VerseSearchResult value, $Res Function(VerseSearchResult) then) =
+      _$VerseSearchResultCopyWithImpl<$Res, VerseSearchResult>;
+  @useResult
+  $Res call(
+      {VerseModel verse,
+      String poemPublicId,
+      String poemTitle,
+      String poetryType,
+      String? poetryTypeName,
+      String poetPublicId,
+      String poetName,
+      String? poetProfileImageUrl});
+
+  $VerseModelCopyWith<$Res> get verse;
+}
+
+/// @nodoc
+class _$VerseSearchResultCopyWithImpl<$Res, $Val extends VerseSearchResult>
+    implements $VerseSearchResultCopyWith<$Res> {
+  _$VerseSearchResultCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? verse = null,
+    Object? poemPublicId = null,
+    Object? poemTitle = null,
+    Object? poetryType = null,
+    Object? poetryTypeName = freezed,
+    Object? poetPublicId = null,
+    Object? poetName = null,
+    Object? poetProfileImageUrl = freezed,
+  }) {
+    return _then(_value.copyWith(
+      verse: null == verse
+          ? _value.verse
+          : verse // ignore: cast_nullable_to_non_nullable
+              as VerseModel,
+      poemPublicId: null == poemPublicId
+          ? _value.poemPublicId
+          : poemPublicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      poemTitle: null == poemTitle
+          ? _value.poemTitle
+          : poemTitle // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetryType: null == poetryType
+          ? _value.poetryType
+          : poetryType // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetryTypeName: freezed == poetryTypeName
+          ? _value.poetryTypeName
+          : poetryTypeName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetPublicId: null == poetPublicId
+          ? _value.poetPublicId
+          : poetPublicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetName: null == poetName
+          ? _value.poetName
+          : poetName // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetProfileImageUrl: freezed == poetProfileImageUrl
+          ? _value.poetProfileImageUrl
+          : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $VerseModelCopyWith<$Res> get verse {
+    return $VerseModelCopyWith<$Res>(_value.verse, (value) {
+      return _then(_value.copyWith(verse: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$VerseSearchResultImplCopyWith<$Res>
+    implements $VerseSearchResultCopyWith<$Res> {
+  factory _$$VerseSearchResultImplCopyWith(_$VerseSearchResultImpl value,
+          $Res Function(_$VerseSearchResultImpl) then) =
+      __$$VerseSearchResultImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {VerseModel verse,
+      String poemPublicId,
+      String poemTitle,
+      String poetryType,
+      String? poetryTypeName,
+      String poetPublicId,
+      String poetName,
+      String? poetProfileImageUrl});
+
+  @override
+  $VerseModelCopyWith<$Res> get verse;
+}
+
+/// @nodoc
+class __$$VerseSearchResultImplCopyWithImpl<$Res>
+    extends _$VerseSearchResultCopyWithImpl<$Res, _$VerseSearchResultImpl>
+    implements _$$VerseSearchResultImplCopyWith<$Res> {
+  __$$VerseSearchResultImplCopyWithImpl(_$VerseSearchResultImpl _value,
+      $Res Function(_$VerseSearchResultImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? verse = null,
+    Object? poemPublicId = null,
+    Object? poemTitle = null,
+    Object? poetryType = null,
+    Object? poetryTypeName = freezed,
+    Object? poetPublicId = null,
+    Object? poetName = null,
+    Object? poetProfileImageUrl = freezed,
+  }) {
+    return _then(_$VerseSearchResultImpl(
+      verse: null == verse
+          ? _value.verse
+          : verse // ignore: cast_nullable_to_non_nullable
+              as VerseModel,
+      poemPublicId: null == poemPublicId
+          ? _value.poemPublicId
+          : poemPublicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      poemTitle: null == poemTitle
+          ? _value.poemTitle
+          : poemTitle // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetryType: null == poetryType
+          ? _value.poetryType
+          : poetryType // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetryTypeName: freezed == poetryTypeName
+          ? _value.poetryTypeName
+          : poetryTypeName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetPublicId: null == poetPublicId
+          ? _value.poetPublicId
+          : poetPublicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetName: null == poetName
+          ? _value.poetName
+          : poetName // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetProfileImageUrl: freezed == poetProfileImageUrl
+          ? _value.poetProfileImageUrl
+          : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$VerseSearchResultImpl implements _VerseSearchResult {
+  const _$VerseSearchResultImpl(
+      {required this.verse,
+      required this.poemPublicId,
+      required this.poemTitle,
+      required this.poetryType,
+      this.poetryTypeName,
+      required this.poetPublicId,
+      required this.poetName,
+      this.poetProfileImageUrl});
+
+  factory _$VerseSearchResultImpl.fromJson(Map<String, dynamic> json) =>
+      _$$VerseSearchResultImplFromJson(json);
+
+  @override
+  final VerseModel verse;
+  @override
+  final String poemPublicId;
+  @override
+  final String poemTitle;
+  @override
+  final String poetryType;
+  @override
+  final String? poetryTypeName;
+  @override
+  final String poetPublicId;
+  @override
+  final String poetName;
+  @override
+  final String? poetProfileImageUrl;
+
+  @override
+  String toString() {
+    return 'VerseSearchResult(verse: $verse, poemPublicId: $poemPublicId, poemTitle: $poemTitle, poetryType: $poetryType, poetryTypeName: $poetryTypeName, poetPublicId: $poetPublicId, poetName: $poetName, poetProfileImageUrl: $poetProfileImageUrl)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$VerseSearchResultImpl &&
+            (identical(other.verse, verse) || other.verse == verse) &&
+            (identical(other.poemPublicId, poemPublicId) ||
+                other.poemPublicId == poemPublicId) &&
+            (identical(other.poemTitle, poemTitle) ||
+                other.poemTitle == poemTitle) &&
+            (identical(other.poetryType, poetryType) ||
+                other.poetryType == poetryType) &&
+            (identical(other.poetryTypeName, poetryTypeName) ||
+                other.poetryTypeName == poetryTypeName) &&
+            (identical(other.poetPublicId, poetPublicId) ||
+                other.poetPublicId == poetPublicId) &&
+            (identical(other.poetName, poetName) ||
+                other.poetName == poetName) &&
+            (identical(other.poetProfileImageUrl, poetProfileImageUrl) ||
+                other.poetProfileImageUrl == poetProfileImageUrl));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, verse, poemPublicId, poemTitle,
+      poetryType, poetryTypeName, poetPublicId, poetName, poetProfileImageUrl);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$VerseSearchResultImplCopyWith<_$VerseSearchResultImpl> get copyWith =>
+      __$$VerseSearchResultImplCopyWithImpl<_$VerseSearchResultImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$VerseSearchResultImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _VerseSearchResult implements VerseSearchResult {
+  const factory _VerseSearchResult(
+      {required final VerseModel verse,
+      required final String poemPublicId,
+      required final String poemTitle,
+      required final String poetryType,
+      final String? poetryTypeName,
+      required final String poetPublicId,
+      required final String poetName,
+      final String? poetProfileImageUrl}) = _$VerseSearchResultImpl;
+
+  factory _VerseSearchResult.fromJson(Map<String, dynamic> json) =
+      _$VerseSearchResultImpl.fromJson;
+
+  @override
+  VerseModel get verse;
+  @override
+  String get poemPublicId;
+  @override
+  String get poemTitle;
+  @override
+  String get poetryType;
+  @override
+  String? get poetryTypeName;
+  @override
+  String get poetPublicId;
+  @override
+  String get poetName;
+  @override
+  String? get poetProfileImageUrl;
+  @override
+  @JsonKey(ignore: true)
+  _$$VerseSearchResultImplCopyWith<_$VerseSearchResultImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+PoemSummary _$PoemSummaryFromJson(Map<String, dynamic> json) {
+  return _PoemSummary.fromJson(json);
+}
+
+/// @nodoc
+mixin _$PoemSummary {
+  String get publicId => throw _privateConstructorUsedError;
+  String get title => throw _privateConstructorUsedError;
+  String get poetName => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $PoemSummaryCopyWith<PoemSummary> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $PoemSummaryCopyWith<$Res> {
+  factory $PoemSummaryCopyWith(
+          PoemSummary value, $Res Function(PoemSummary) then) =
+      _$PoemSummaryCopyWithImpl<$Res, PoemSummary>;
+  @useResult
+  $Res call({String publicId, String title, String poetName});
+}
+
+/// @nodoc
+class _$PoemSummaryCopyWithImpl<$Res, $Val extends PoemSummary>
+    implements $PoemSummaryCopyWith<$Res> {
+  _$PoemSummaryCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? publicId = null,
+    Object? title = null,
+    Object? poetName = null,
+  }) {
+    return _then(_value.copyWith(
+      publicId: null == publicId
+          ? _value.publicId
+          : publicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetName: null == poetName
+          ? _value.poetName
+          : poetName // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$PoemSummaryImplCopyWith<$Res>
+    implements $PoemSummaryCopyWith<$Res> {
+  factory _$$PoemSummaryImplCopyWith(
+          _$PoemSummaryImpl value, $Res Function(_$PoemSummaryImpl) then) =
+      __$$PoemSummaryImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String publicId, String title, String poetName});
+}
+
+/// @nodoc
+class __$$PoemSummaryImplCopyWithImpl<$Res>
+    extends _$PoemSummaryCopyWithImpl<$Res, _$PoemSummaryImpl>
+    implements _$$PoemSummaryImplCopyWith<$Res> {
+  __$$PoemSummaryImplCopyWithImpl(
+      _$PoemSummaryImpl _value, $Res Function(_$PoemSummaryImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? publicId = null,
+    Object? title = null,
+    Object? poetName = null,
+  }) {
+    return _then(_$PoemSummaryImpl(
+      publicId: null == publicId
+          ? _value.publicId
+          : publicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetName: null == poetName
+          ? _value.poetName
+          : poetName // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$PoemSummaryImpl implements _PoemSummary {
+  const _$PoemSummaryImpl(
+      {required this.publicId, required this.title, required this.poetName});
+
+  factory _$PoemSummaryImpl.fromJson(Map<String, dynamic> json) =>
+      _$$PoemSummaryImplFromJson(json);
+
+  @override
+  final String publicId;
+  @override
+  final String title;
+  @override
+  final String poetName;
+
+  @override
+  String toString() {
+    return 'PoemSummary(publicId: $publicId, title: $title, poetName: $poetName)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$PoemSummaryImpl &&
+            (identical(other.publicId, publicId) ||
+                other.publicId == publicId) &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.poetName, poetName) ||
+                other.poetName == poetName));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, publicId, title, poetName);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$PoemSummaryImplCopyWith<_$PoemSummaryImpl> get copyWith =>
+      __$$PoemSummaryImplCopyWithImpl<_$PoemSummaryImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$PoemSummaryImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _PoemSummary implements PoemSummary {
+  const factory _PoemSummary(
+      {required final String publicId,
+      required final String title,
+      required final String poetName}) = _$PoemSummaryImpl;
+
+  factory _PoemSummary.fromJson(Map<String, dynamic> json) =
+      _$PoemSummaryImpl.fromJson;
+
+  @override
+  String get publicId;
+  @override
+  String get title;
+  @override
+  String get poetName;
+  @override
+  @JsonKey(ignore: true)
+  _$$PoemSummaryImplCopyWith<_$PoemSummaryImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+PoetSummary _$PoetSummaryFromJson(Map<String, dynamic> json) {
+  return _PoetSummary.fromJson(json);
+}
+
+/// @nodoc
+mixin _$PoetSummary {
+  String get publicId => throw _privateConstructorUsedError;
+  String get name => throw _privateConstructorUsedError;
+  String? get profileImageUrl => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $PoetSummaryCopyWith<PoetSummary> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $PoetSummaryCopyWith<$Res> {
+  factory $PoetSummaryCopyWith(
+          PoetSummary value, $Res Function(PoetSummary) then) =
+      _$PoetSummaryCopyWithImpl<$Res, PoetSummary>;
+  @useResult
+  $Res call({String publicId, String name, String? profileImageUrl});
+}
+
+/// @nodoc
+class _$PoetSummaryCopyWithImpl<$Res, $Val extends PoetSummary>
+    implements $PoetSummaryCopyWith<$Res> {
+  _$PoetSummaryCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? publicId = null,
+    Object? name = null,
+    Object? profileImageUrl = freezed,
+  }) {
+    return _then(_value.copyWith(
+      publicId: null == publicId
+          ? _value.publicId
+          : publicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      profileImageUrl: freezed == profileImageUrl
+          ? _value.profileImageUrl
+          : profileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$PoetSummaryImplCopyWith<$Res>
+    implements $PoetSummaryCopyWith<$Res> {
+  factory _$$PoetSummaryImplCopyWith(
+          _$PoetSummaryImpl value, $Res Function(_$PoetSummaryImpl) then) =
+      __$$PoetSummaryImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String publicId, String name, String? profileImageUrl});
+}
+
+/// @nodoc
+class __$$PoetSummaryImplCopyWithImpl<$Res>
+    extends _$PoetSummaryCopyWithImpl<$Res, _$PoetSummaryImpl>
+    implements _$$PoetSummaryImplCopyWith<$Res> {
+  __$$PoetSummaryImplCopyWithImpl(
+      _$PoetSummaryImpl _value, $Res Function(_$PoetSummaryImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? publicId = null,
+    Object? name = null,
+    Object? profileImageUrl = freezed,
+  }) {
+    return _then(_$PoetSummaryImpl(
+      publicId: null == publicId
+          ? _value.publicId
+          : publicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      profileImageUrl: freezed == profileImageUrl
+          ? _value.profileImageUrl
+          : profileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$PoetSummaryImpl implements _PoetSummary {
+  const _$PoetSummaryImpl(
+      {required this.publicId, required this.name, this.profileImageUrl});
+
+  factory _$PoetSummaryImpl.fromJson(Map<String, dynamic> json) =>
+      _$$PoetSummaryImplFromJson(json);
+
+  @override
+  final String publicId;
+  @override
+  final String name;
+  @override
+  final String? profileImageUrl;
+
+  @override
+  String toString() {
+    return 'PoetSummary(publicId: $publicId, name: $name, profileImageUrl: $profileImageUrl)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$PoetSummaryImpl &&
+            (identical(other.publicId, publicId) ||
+                other.publicId == publicId) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.profileImageUrl, profileImageUrl) ||
+                other.profileImageUrl == profileImageUrl));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, publicId, name, profileImageUrl);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$PoetSummaryImplCopyWith<_$PoetSummaryImpl> get copyWith =>
+      __$$PoetSummaryImplCopyWithImpl<_$PoetSummaryImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$PoetSummaryImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _PoetSummary implements PoetSummary {
+  const factory _PoetSummary(
+      {required final String publicId,
+      required final String name,
+      final String? profileImageUrl}) = _$PoetSummaryImpl;
+
+  factory _PoetSummary.fromJson(Map<String, dynamic> json) =
+      _$PoetSummaryImpl.fromJson;
+
+  @override
+  String get publicId;
+  @override
+  String get name;
+  @override
+  String? get profileImageUrl;
+  @override
+  @JsonKey(ignore: true)
+  _$$PoetSummaryImplCopyWith<_$PoetSummaryImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+RecommendationResponse _$RecommendationResponseFromJson(
+    Map<String, dynamic> json) {
+  return _RecommendationResponse.fromJson(json);
+}
+
+/// @nodoc
+mixin _$RecommendationResponse {
+  String get type =>
+      throw _privateConstructorUsedError; // PERSONALIZED, SIMILAR, TRENDING, HYBRID
+  List<RecommendationItem> get items => throw _privateConstructorUsedError;
+  int get totalCount => throw _privateConstructorUsedError;
+  String? get message =>
+      throw _privateConstructorUsedError; // Changed from 'algorithm' to match API response
+  bool get isPersonalized =>
+      throw _privateConstructorUsedError; // Added from API response
+  int get count => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $RecommendationResponseCopyWith<RecommendationResponse> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $RecommendationResponseCopyWith<$Res> {
+  factory $RecommendationResponseCopyWith(RecommendationResponse value,
+          $Res Function(RecommendationResponse) then) =
+      _$RecommendationResponseCopyWithImpl<$Res, RecommendationResponse>;
+  @useResult
+  $Res call(
+      {String type,
+      List<RecommendationItem> items,
+      int totalCount,
+      String? message,
+      bool isPersonalized,
+      int count});
+}
+
+/// @nodoc
+class _$RecommendationResponseCopyWithImpl<$Res,
+        $Val extends RecommendationResponse>
+    implements $RecommendationResponseCopyWith<$Res> {
+  _$RecommendationResponseCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? type = null,
+    Object? items = null,
+    Object? totalCount = null,
+    Object? message = freezed,
+    Object? isPersonalized = null,
+    Object? count = null,
+  }) {
+    return _then(_value.copyWith(
+      type: null == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String,
+      items: null == items
+          ? _value.items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<RecommendationItem>,
+      totalCount: null == totalCount
+          ? _value.totalCount
+          : totalCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      message: freezed == message
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isPersonalized: null == isPersonalized
+          ? _value.isPersonalized
+          : isPersonalized // ignore: cast_nullable_to_non_nullable
+              as bool,
+      count: null == count
+          ? _value.count
+          : count // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$RecommendationResponseImplCopyWith<$Res>
+    implements $RecommendationResponseCopyWith<$Res> {
+  factory _$$RecommendationResponseImplCopyWith(
+          _$RecommendationResponseImpl value,
+          $Res Function(_$RecommendationResponseImpl) then) =
+      __$$RecommendationResponseImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String type,
+      List<RecommendationItem> items,
+      int totalCount,
+      String? message,
+      bool isPersonalized,
+      int count});
+}
+
+/// @nodoc
+class __$$RecommendationResponseImplCopyWithImpl<$Res>
+    extends _$RecommendationResponseCopyWithImpl<$Res,
+        _$RecommendationResponseImpl>
+    implements _$$RecommendationResponseImplCopyWith<$Res> {
+  __$$RecommendationResponseImplCopyWithImpl(
+      _$RecommendationResponseImpl _value,
+      $Res Function(_$RecommendationResponseImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? type = null,
+    Object? items = null,
+    Object? totalCount = null,
+    Object? message = freezed,
+    Object? isPersonalized = null,
+    Object? count = null,
+  }) {
+    return _then(_$RecommendationResponseImpl(
+      type: null == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String,
+      items: null == items
+          ? _value._items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<RecommendationItem>,
+      totalCount: null == totalCount
+          ? _value.totalCount
+          : totalCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      message: freezed == message
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isPersonalized: null == isPersonalized
+          ? _value.isPersonalized
+          : isPersonalized // ignore: cast_nullable_to_non_nullable
+              as bool,
+      count: null == count
+          ? _value.count
+          : count // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$RecommendationResponseImpl implements _RecommendationResponse {
+  const _$RecommendationResponseImpl(
+      {required this.type,
+      final List<RecommendationItem> items = const [],
+      this.totalCount = 0,
+      this.message,
+      this.isPersonalized = false,
+      this.count = 0})
+      : _items = items;
+
+  factory _$RecommendationResponseImpl.fromJson(Map<String, dynamic> json) =>
+      _$$RecommendationResponseImplFromJson(json);
+
+  @override
+  final String type;
+// PERSONALIZED, SIMILAR, TRENDING, HYBRID
+  final List<RecommendationItem> _items;
+// PERSONALIZED, SIMILAR, TRENDING, HYBRID
+  @override
+  @JsonKey()
+  List<RecommendationItem> get items {
+    if (_items is EqualUnmodifiableListView) return _items;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_items);
+  }
+
+  @override
+  @JsonKey()
+  final int totalCount;
+  @override
+  final String? message;
+// Changed from 'algorithm' to match API response
+  @override
+  @JsonKey()
+  final bool isPersonalized;
+// Added from API response
+  @override
+  @JsonKey()
+  final int count;
+
+  @override
+  String toString() {
+    return 'RecommendationResponse(type: $type, items: $items, totalCount: $totalCount, message: $message, isPersonalized: $isPersonalized, count: $count)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$RecommendationResponseImpl &&
+            (identical(other.type, type) || other.type == type) &&
+            const DeepCollectionEquality().equals(other._items, _items) &&
+            (identical(other.totalCount, totalCount) ||
+                other.totalCount == totalCount) &&
+            (identical(other.message, message) || other.message == message) &&
+            (identical(other.isPersonalized, isPersonalized) ||
+                other.isPersonalized == isPersonalized) &&
+            (identical(other.count, count) || other.count == count));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      type,
+      const DeepCollectionEquality().hash(_items),
+      totalCount,
+      message,
+      isPersonalized,
+      count);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$RecommendationResponseImplCopyWith<_$RecommendationResponseImpl>
+      get copyWith => __$$RecommendationResponseImplCopyWithImpl<
+          _$RecommendationResponseImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$RecommendationResponseImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _RecommendationResponse implements RecommendationResponse {
+  const factory _RecommendationResponse(
+      {required final String type,
+      final List<RecommendationItem> items,
+      final int totalCount,
+      final String? message,
+      final bool isPersonalized,
+      final int count}) = _$RecommendationResponseImpl;
+
+  factory _RecommendationResponse.fromJson(Map<String, dynamic> json) =
+      _$RecommendationResponseImpl.fromJson;
+
+  @override
+  String get type;
+  @override // PERSONALIZED, SIMILAR, TRENDING, HYBRID
+  List<RecommendationItem> get items;
+  @override
+  int get totalCount;
+  @override
+  String? get message;
+  @override // Changed from 'algorithm' to match API response
+  bool get isPersonalized;
+  @override // Added from API response
+  int get count;
+  @override
+  @JsonKey(ignore: true)
+  _$$RecommendationResponseImplCopyWith<_$RecommendationResponseImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+RecommendationItem _$RecommendationItemFromJson(Map<String, dynamic> json) {
+  return _RecommendationItem.fromJson(json);
+}
+
+/// @nodoc
+mixin _$RecommendationItem {
+  String get contentType =>
+      throw _privateConstructorUsedError; // POEM, COUPLET, POET
+  String get publicId => throw _privateConstructorUsedError;
+  String get title => throw _privateConstructorUsedError;
+  String? get poetName => throw _privateConstructorUsedError;
+  String? get poetPublicId =>
+      throw _privateConstructorUsedError; // Added from API response
+  String? get poetryType =>
+      throw _privateConstructorUsedError; // Added from API response
+  String? get categoryName =>
+      throw _privateConstructorUsedError; // Added from API response
+  int get likeCount => throw _privateConstructorUsedError;
+  int get shareCount => throw _privateConstructorUsedError;
+  int get bookmarkCount => throw _privateConstructorUsedError;
+  int get viewCount =>
+      throw _privateConstructorUsedError; // Added from API response
+  @NaNDoubleConverter()
+  double get score =>
+      throw _privateConstructorUsedError; // Handle "NaN" from API
+  String? get reason => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $RecommendationItemCopyWith<RecommendationItem> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $RecommendationItemCopyWith<$Res> {
+  factory $RecommendationItemCopyWith(
+          RecommendationItem value, $Res Function(RecommendationItem) then) =
+      _$RecommendationItemCopyWithImpl<$Res, RecommendationItem>;
+  @useResult
+  $Res call(
+      {String contentType,
+      String publicId,
+      String title,
+      String? poetName,
+      String? poetPublicId,
+      String? poetryType,
+      String? categoryName,
+      int likeCount,
+      int shareCount,
+      int bookmarkCount,
+      int viewCount,
+      @NaNDoubleConverter() double score,
+      String? reason});
+}
+
+/// @nodoc
+class _$RecommendationItemCopyWithImpl<$Res, $Val extends RecommendationItem>
+    implements $RecommendationItemCopyWith<$Res> {
+  _$RecommendationItemCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? contentType = null,
+    Object? publicId = null,
+    Object? title = null,
+    Object? poetName = freezed,
+    Object? poetPublicId = freezed,
+    Object? poetryType = freezed,
+    Object? categoryName = freezed,
+    Object? likeCount = null,
+    Object? shareCount = null,
+    Object? bookmarkCount = null,
+    Object? viewCount = null,
+    Object? score = null,
+    Object? reason = freezed,
+  }) {
+    return _then(_value.copyWith(
+      contentType: null == contentType
+          ? _value.contentType
+          : contentType // ignore: cast_nullable_to_non_nullable
+              as String,
+      publicId: null == publicId
+          ? _value.publicId
+          : publicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetName: freezed == poetName
+          ? _value.poetName
+          : poetName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetPublicId: freezed == poetPublicId
+          ? _value.poetPublicId
+          : poetPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetryType: freezed == poetryType
+          ? _value.poetryType
+          : poetryType // ignore: cast_nullable_to_non_nullable
+              as String?,
+      categoryName: freezed == categoryName
+          ? _value.categoryName
+          : categoryName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      likeCount: null == likeCount
+          ? _value.likeCount
+          : likeCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      shareCount: null == shareCount
+          ? _value.shareCount
+          : shareCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      bookmarkCount: null == bookmarkCount
+          ? _value.bookmarkCount
+          : bookmarkCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      viewCount: null == viewCount
+          ? _value.viewCount
+          : viewCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      score: null == score
+          ? _value.score
+          : score // ignore: cast_nullable_to_non_nullable
+              as double,
+      reason: freezed == reason
+          ? _value.reason
+          : reason // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$RecommendationItemImplCopyWith<$Res>
+    implements $RecommendationItemCopyWith<$Res> {
+  factory _$$RecommendationItemImplCopyWith(_$RecommendationItemImpl value,
+          $Res Function(_$RecommendationItemImpl) then) =
+      __$$RecommendationItemImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String contentType,
+      String publicId,
+      String title,
+      String? poetName,
+      String? poetPublicId,
+      String? poetryType,
+      String? categoryName,
+      int likeCount,
+      int shareCount,
+      int bookmarkCount,
+      int viewCount,
+      @NaNDoubleConverter() double score,
+      String? reason});
+}
+
+/// @nodoc
+class __$$RecommendationItemImplCopyWithImpl<$Res>
+    extends _$RecommendationItemCopyWithImpl<$Res, _$RecommendationItemImpl>
+    implements _$$RecommendationItemImplCopyWith<$Res> {
+  __$$RecommendationItemImplCopyWithImpl(_$RecommendationItemImpl _value,
+      $Res Function(_$RecommendationItemImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? contentType = null,
+    Object? publicId = null,
+    Object? title = null,
+    Object? poetName = freezed,
+    Object? poetPublicId = freezed,
+    Object? poetryType = freezed,
+    Object? categoryName = freezed,
+    Object? likeCount = null,
+    Object? shareCount = null,
+    Object? bookmarkCount = null,
+    Object? viewCount = null,
+    Object? score = null,
+    Object? reason = freezed,
+  }) {
+    return _then(_$RecommendationItemImpl(
+      contentType: null == contentType
+          ? _value.contentType
+          : contentType // ignore: cast_nullable_to_non_nullable
+              as String,
+      publicId: null == publicId
+          ? _value.publicId
+          : publicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      poetName: freezed == poetName
+          ? _value.poetName
+          : poetName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetPublicId: freezed == poetPublicId
+          ? _value.poetPublicId
+          : poetPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetryType: freezed == poetryType
+          ? _value.poetryType
+          : poetryType // ignore: cast_nullable_to_non_nullable
+              as String?,
+      categoryName: freezed == categoryName
+          ? _value.categoryName
+          : categoryName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      likeCount: null == likeCount
+          ? _value.likeCount
+          : likeCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      shareCount: null == shareCount
+          ? _value.shareCount
+          : shareCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      bookmarkCount: null == bookmarkCount
+          ? _value.bookmarkCount
+          : bookmarkCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      viewCount: null == viewCount
+          ? _value.viewCount
+          : viewCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      score: null == score
+          ? _value.score
+          : score // ignore: cast_nullable_to_non_nullable
+              as double,
+      reason: freezed == reason
+          ? _value.reason
+          : reason // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$RecommendationItemImpl implements _RecommendationItem {
+  const _$RecommendationItemImpl(
+      {required this.contentType,
+      required this.publicId,
+      required this.title,
+      this.poetName,
+      this.poetPublicId,
+      this.poetryType,
+      this.categoryName,
+      this.likeCount = 0,
+      this.shareCount = 0,
+      this.bookmarkCount = 0,
+      this.viewCount = 0,
+      @NaNDoubleConverter() this.score = 0.0,
+      this.reason});
+
+  factory _$RecommendationItemImpl.fromJson(Map<String, dynamic> json) =>
+      _$$RecommendationItemImplFromJson(json);
+
+  @override
+  final String contentType;
+// POEM, COUPLET, POET
+  @override
+  final String publicId;
+  @override
+  final String title;
+  @override
+  final String? poetName;
+  @override
+  final String? poetPublicId;
+// Added from API response
+  @override
+  final String? poetryType;
+// Added from API response
+  @override
+  final String? categoryName;
+// Added from API response
+  @override
+  @JsonKey()
+  final int likeCount;
+  @override
+  @JsonKey()
+  final int shareCount;
+  @override
+  @JsonKey()
+  final int bookmarkCount;
+  @override
+  @JsonKey()
+  final int viewCount;
+// Added from API response
+  @override
+  @JsonKey()
+  @NaNDoubleConverter()
+  final double score;
+// Handle "NaN" from API
+  @override
+  final String? reason;
+
+  @override
+  String toString() {
+    return 'RecommendationItem(contentType: $contentType, publicId: $publicId, title: $title, poetName: $poetName, poetPublicId: $poetPublicId, poetryType: $poetryType, categoryName: $categoryName, likeCount: $likeCount, shareCount: $shareCount, bookmarkCount: $bookmarkCount, viewCount: $viewCount, score: $score, reason: $reason)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$RecommendationItemImpl &&
+            (identical(other.contentType, contentType) ||
+                other.contentType == contentType) &&
+            (identical(other.publicId, publicId) ||
+                other.publicId == publicId) &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.poetName, poetName) ||
+                other.poetName == poetName) &&
+            (identical(other.poetPublicId, poetPublicId) ||
+                other.poetPublicId == poetPublicId) &&
+            (identical(other.poetryType, poetryType) ||
+                other.poetryType == poetryType) &&
+            (identical(other.categoryName, categoryName) ||
+                other.categoryName == categoryName) &&
+            (identical(other.likeCount, likeCount) ||
+                other.likeCount == likeCount) &&
+            (identical(other.shareCount, shareCount) ||
+                other.shareCount == shareCount) &&
+            (identical(other.bookmarkCount, bookmarkCount) ||
+                other.bookmarkCount == bookmarkCount) &&
+            (identical(other.viewCount, viewCount) ||
+                other.viewCount == viewCount) &&
+            (identical(other.score, score) || other.score == score) &&
+            (identical(other.reason, reason) || other.reason == reason));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      contentType,
+      publicId,
+      title,
+      poetName,
+      poetPublicId,
+      poetryType,
+      categoryName,
+      likeCount,
+      shareCount,
+      bookmarkCount,
+      viewCount,
+      score,
+      reason);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$RecommendationItemImplCopyWith<_$RecommendationItemImpl> get copyWith =>
+      __$$RecommendationItemImplCopyWithImpl<_$RecommendationItemImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$RecommendationItemImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _RecommendationItem implements RecommendationItem {
+  const factory _RecommendationItem(
+      {required final String contentType,
+      required final String publicId,
+      required final String title,
+      final String? poetName,
+      final String? poetPublicId,
+      final String? poetryType,
+      final String? categoryName,
+      final int likeCount,
+      final int shareCount,
+      final int bookmarkCount,
+      final int viewCount,
+      @NaNDoubleConverter() final double score,
+      final String? reason}) = _$RecommendationItemImpl;
+
+  factory _RecommendationItem.fromJson(Map<String, dynamic> json) =
+      _$RecommendationItemImpl.fromJson;
+
+  @override
+  String get contentType;
+  @override // POEM, COUPLET, POET
+  String get publicId;
+  @override
+  String get title;
+  @override
+  String? get poetName;
+  @override
+  String? get poetPublicId;
+  @override // Added from API response
+  String? get poetryType;
+  @override // Added from API response
+  String? get categoryName;
+  @override // Added from API response
+  int get likeCount;
+  @override
+  int get shareCount;
+  @override
+  int get bookmarkCount;
+  @override
+  int get viewCount;
+  @override // Added from API response
+  @NaNDoubleConverter()
+  double get score;
+  @override // Handle "NaN" from API
+  String? get reason;
+  @override
+  @JsonKey(ignore: true)
+  _$$RecommendationItemImplCopyWith<_$RecommendationItemImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+UnifiedSearchResponse _$UnifiedSearchResponseFromJson(
+    Map<String, dynamic> json) {
+  return _UnifiedSearchResponse.fromJson(json);
+}
+
+/// @nodoc
+mixin _$UnifiedSearchResponse {
+// Current page item counts
+  int get totalResults => throw _privateConstructorUsedError;
+  int get poetCount => throw _privateConstructorUsedError;
+  int get poemCount => throw _privateConstructorUsedError;
+  int get verseCount => throw _privateConstructorUsedError;
+  int get coupletCount => throw _privateConstructorUsedError;
+  int get tagCount => throw _privateConstructorUsedError;
+  int get categoryCount => throw _privateConstructorUsedError; // Item arrays
+  List<PoetModel> get poets => throw _privateConstructorUsedError;
+  List<PoemModel> get poems => throw _privateConstructorUsedError;
+  List<VerseSearchResult> get verses => throw _privateConstructorUsedError;
+  List<CoupletSearchResult> get couplets => throw _privateConstructorUsedError;
+  List<AutocompleteTag> get tags => throw _privateConstructorUsedError;
+  List<AutocompleteCategory> get categories =>
+      throw _privateConstructorUsedError; // Total counts in DB — for tab labels like "Poems (847)"
+  int get totalPoems => throw _privateConstructorUsedError;
+  int get totalVerses => throw _privateConstructorUsedError;
+  int get totalPoets => throw _privateConstructorUsedError;
+  int get totalCouplets => throw _privateConstructorUsedError;
+  int get totalTags => throw _privateConstructorUsedError;
+  int get totalCategories =>
+      throw _privateConstructorUsedError; // Per-type "has more" flags — show/hide "Load More"
+  bool get hasMorePoems => throw _privateConstructorUsedError;
+  bool get hasMoreVerses => throw _privateConstructorUsedError;
+  bool get hasMorePoets => throw _privateConstructorUsedError;
+  bool get hasMoreCouplets => throw _privateConstructorUsedError;
+  bool get hasMoreTags => throw _privateConstructorUsedError;
+  bool get hasMoreCategories =>
+      throw _privateConstructorUsedError; // Pagination echo
+  int get currentPage => throw _privateConstructorUsedError;
+  int get pageSize => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $UnifiedSearchResponseCopyWith<UnifiedSearchResponse> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $UnifiedSearchResponseCopyWith<$Res> {
+  factory $UnifiedSearchResponseCopyWith(UnifiedSearchResponse value,
+          $Res Function(UnifiedSearchResponse) then) =
+      _$UnifiedSearchResponseCopyWithImpl<$Res, UnifiedSearchResponse>;
+  @useResult
+  $Res call(
+      {int totalResults,
+      int poetCount,
+      int poemCount,
+      int verseCount,
+      int coupletCount,
+      int tagCount,
+      int categoryCount,
+      List<PoetModel> poets,
+      List<PoemModel> poems,
+      List<VerseSearchResult> verses,
+      List<CoupletSearchResult> couplets,
+      List<AutocompleteTag> tags,
+      List<AutocompleteCategory> categories,
+      int totalPoems,
+      int totalVerses,
+      int totalPoets,
+      int totalCouplets,
+      int totalTags,
+      int totalCategories,
+      bool hasMorePoems,
+      bool hasMoreVerses,
+      bool hasMorePoets,
+      bool hasMoreCouplets,
+      bool hasMoreTags,
+      bool hasMoreCategories,
+      int currentPage,
+      int pageSize});
+}
+
+/// @nodoc
+class _$UnifiedSearchResponseCopyWithImpl<$Res,
+        $Val extends UnifiedSearchResponse>
+    implements $UnifiedSearchResponseCopyWith<$Res> {
+  _$UnifiedSearchResponseCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? totalResults = null,
+    Object? poetCount = null,
+    Object? poemCount = null,
+    Object? verseCount = null,
+    Object? coupletCount = null,
+    Object? tagCount = null,
+    Object? categoryCount = null,
+    Object? poets = null,
+    Object? poems = null,
+    Object? verses = null,
+    Object? couplets = null,
+    Object? tags = null,
+    Object? categories = null,
+    Object? totalPoems = null,
+    Object? totalVerses = null,
+    Object? totalPoets = null,
+    Object? totalCouplets = null,
+    Object? totalTags = null,
+    Object? totalCategories = null,
+    Object? hasMorePoems = null,
+    Object? hasMoreVerses = null,
+    Object? hasMorePoets = null,
+    Object? hasMoreCouplets = null,
+    Object? hasMoreTags = null,
+    Object? hasMoreCategories = null,
+    Object? currentPage = null,
+    Object? pageSize = null,
+  }) {
+    return _then(_value.copyWith(
+      totalResults: null == totalResults
+          ? _value.totalResults
+          : totalResults // ignore: cast_nullable_to_non_nullable
+              as int,
+      poetCount: null == poetCount
+          ? _value.poetCount
+          : poetCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      poemCount: null == poemCount
+          ? _value.poemCount
+          : poemCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      verseCount: null == verseCount
+          ? _value.verseCount
+          : verseCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      coupletCount: null == coupletCount
+          ? _value.coupletCount
+          : coupletCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      tagCount: null == tagCount
+          ? _value.tagCount
+          : tagCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      categoryCount: null == categoryCount
+          ? _value.categoryCount
+          : categoryCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      poets: null == poets
+          ? _value.poets
+          : poets // ignore: cast_nullable_to_non_nullable
+              as List<PoetModel>,
+      poems: null == poems
+          ? _value.poems
+          : poems // ignore: cast_nullable_to_non_nullable
+              as List<PoemModel>,
+      verses: null == verses
+          ? _value.verses
+          : verses // ignore: cast_nullable_to_non_nullable
+              as List<VerseSearchResult>,
+      couplets: null == couplets
+          ? _value.couplets
+          : couplets // ignore: cast_nullable_to_non_nullable
+              as List<CoupletSearchResult>,
+      tags: null == tags
+          ? _value.tags
+          : tags // ignore: cast_nullable_to_non_nullable
+              as List<AutocompleteTag>,
+      categories: null == categories
+          ? _value.categories
+          : categories // ignore: cast_nullable_to_non_nullable
+              as List<AutocompleteCategory>,
+      totalPoems: null == totalPoems
+          ? _value.totalPoems
+          : totalPoems // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalVerses: null == totalVerses
+          ? _value.totalVerses
+          : totalVerses // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalPoets: null == totalPoets
+          ? _value.totalPoets
+          : totalPoets // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalCouplets: null == totalCouplets
+          ? _value.totalCouplets
+          : totalCouplets // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalTags: null == totalTags
+          ? _value.totalTags
+          : totalTags // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalCategories: null == totalCategories
+          ? _value.totalCategories
+          : totalCategories // ignore: cast_nullable_to_non_nullable
+              as int,
+      hasMorePoems: null == hasMorePoems
+          ? _value.hasMorePoems
+          : hasMorePoems // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasMoreVerses: null == hasMoreVerses
+          ? _value.hasMoreVerses
+          : hasMoreVerses // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasMorePoets: null == hasMorePoets
+          ? _value.hasMorePoets
+          : hasMorePoets // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasMoreCouplets: null == hasMoreCouplets
+          ? _value.hasMoreCouplets
+          : hasMoreCouplets // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasMoreTags: null == hasMoreTags
+          ? _value.hasMoreTags
+          : hasMoreTags // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasMoreCategories: null == hasMoreCategories
+          ? _value.hasMoreCategories
+          : hasMoreCategories // ignore: cast_nullable_to_non_nullable
+              as bool,
+      currentPage: null == currentPage
+          ? _value.currentPage
+          : currentPage // ignore: cast_nullable_to_non_nullable
+              as int,
+      pageSize: null == pageSize
+          ? _value.pageSize
+          : pageSize // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$UnifiedSearchResponseImplCopyWith<$Res>
+    implements $UnifiedSearchResponseCopyWith<$Res> {
+  factory _$$UnifiedSearchResponseImplCopyWith(
+          _$UnifiedSearchResponseImpl value,
+          $Res Function(_$UnifiedSearchResponseImpl) then) =
+      __$$UnifiedSearchResponseImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {int totalResults,
+      int poetCount,
+      int poemCount,
+      int verseCount,
+      int coupletCount,
+      int tagCount,
+      int categoryCount,
+      List<PoetModel> poets,
+      List<PoemModel> poems,
+      List<VerseSearchResult> verses,
+      List<CoupletSearchResult> couplets,
+      List<AutocompleteTag> tags,
+      List<AutocompleteCategory> categories,
+      int totalPoems,
+      int totalVerses,
+      int totalPoets,
+      int totalCouplets,
+      int totalTags,
+      int totalCategories,
+      bool hasMorePoems,
+      bool hasMoreVerses,
+      bool hasMorePoets,
+      bool hasMoreCouplets,
+      bool hasMoreTags,
+      bool hasMoreCategories,
+      int currentPage,
+      int pageSize});
+}
+
+/// @nodoc
+class __$$UnifiedSearchResponseImplCopyWithImpl<$Res>
+    extends _$UnifiedSearchResponseCopyWithImpl<$Res,
+        _$UnifiedSearchResponseImpl>
+    implements _$$UnifiedSearchResponseImplCopyWith<$Res> {
+  __$$UnifiedSearchResponseImplCopyWithImpl(_$UnifiedSearchResponseImpl _value,
+      $Res Function(_$UnifiedSearchResponseImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? totalResults = null,
+    Object? poetCount = null,
+    Object? poemCount = null,
+    Object? verseCount = null,
+    Object? coupletCount = null,
+    Object? tagCount = null,
+    Object? categoryCount = null,
+    Object? poets = null,
+    Object? poems = null,
+    Object? verses = null,
+    Object? couplets = null,
+    Object? tags = null,
+    Object? categories = null,
+    Object? totalPoems = null,
+    Object? totalVerses = null,
+    Object? totalPoets = null,
+    Object? totalCouplets = null,
+    Object? totalTags = null,
+    Object? totalCategories = null,
+    Object? hasMorePoems = null,
+    Object? hasMoreVerses = null,
+    Object? hasMorePoets = null,
+    Object? hasMoreCouplets = null,
+    Object? hasMoreTags = null,
+    Object? hasMoreCategories = null,
+    Object? currentPage = null,
+    Object? pageSize = null,
+  }) {
+    return _then(_$UnifiedSearchResponseImpl(
+      totalResults: null == totalResults
+          ? _value.totalResults
+          : totalResults // ignore: cast_nullable_to_non_nullable
+              as int,
+      poetCount: null == poetCount
+          ? _value.poetCount
+          : poetCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      poemCount: null == poemCount
+          ? _value.poemCount
+          : poemCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      verseCount: null == verseCount
+          ? _value.verseCount
+          : verseCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      coupletCount: null == coupletCount
+          ? _value.coupletCount
+          : coupletCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      tagCount: null == tagCount
+          ? _value.tagCount
+          : tagCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      categoryCount: null == categoryCount
+          ? _value.categoryCount
+          : categoryCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      poets: null == poets
+          ? _value._poets
+          : poets // ignore: cast_nullable_to_non_nullable
+              as List<PoetModel>,
+      poems: null == poems
+          ? _value._poems
+          : poems // ignore: cast_nullable_to_non_nullable
+              as List<PoemModel>,
+      verses: null == verses
+          ? _value._verses
+          : verses // ignore: cast_nullable_to_non_nullable
+              as List<VerseSearchResult>,
+      couplets: null == couplets
+          ? _value._couplets
+          : couplets // ignore: cast_nullable_to_non_nullable
+              as List<CoupletSearchResult>,
+      tags: null == tags
+          ? _value._tags
+          : tags // ignore: cast_nullable_to_non_nullable
+              as List<AutocompleteTag>,
+      categories: null == categories
+          ? _value._categories
+          : categories // ignore: cast_nullable_to_non_nullable
+              as List<AutocompleteCategory>,
+      totalPoems: null == totalPoems
+          ? _value.totalPoems
+          : totalPoems // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalVerses: null == totalVerses
+          ? _value.totalVerses
+          : totalVerses // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalPoets: null == totalPoets
+          ? _value.totalPoets
+          : totalPoets // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalCouplets: null == totalCouplets
+          ? _value.totalCouplets
+          : totalCouplets // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalTags: null == totalTags
+          ? _value.totalTags
+          : totalTags // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalCategories: null == totalCategories
+          ? _value.totalCategories
+          : totalCategories // ignore: cast_nullable_to_non_nullable
+              as int,
+      hasMorePoems: null == hasMorePoems
+          ? _value.hasMorePoems
+          : hasMorePoems // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasMoreVerses: null == hasMoreVerses
+          ? _value.hasMoreVerses
+          : hasMoreVerses // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasMorePoets: null == hasMorePoets
+          ? _value.hasMorePoets
+          : hasMorePoets // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasMoreCouplets: null == hasMoreCouplets
+          ? _value.hasMoreCouplets
+          : hasMoreCouplets // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasMoreTags: null == hasMoreTags
+          ? _value.hasMoreTags
+          : hasMoreTags // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasMoreCategories: null == hasMoreCategories
+          ? _value.hasMoreCategories
+          : hasMoreCategories // ignore: cast_nullable_to_non_nullable
+              as bool,
+      currentPage: null == currentPage
+          ? _value.currentPage
+          : currentPage // ignore: cast_nullable_to_non_nullable
+              as int,
+      pageSize: null == pageSize
+          ? _value.pageSize
+          : pageSize // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$UnifiedSearchResponseImpl implements _UnifiedSearchResponse {
+  const _$UnifiedSearchResponseImpl(
+      {this.totalResults = 0,
+      this.poetCount = 0,
+      this.poemCount = 0,
+      this.verseCount = 0,
+      this.coupletCount = 0,
+      this.tagCount = 0,
+      this.categoryCount = 0,
+      final List<PoetModel> poets = const [],
+      final List<PoemModel> poems = const [],
+      final List<VerseSearchResult> verses = const [],
+      final List<CoupletSearchResult> couplets = const [],
+      final List<AutocompleteTag> tags = const [],
+      final List<AutocompleteCategory> categories = const [],
+      this.totalPoems = 0,
+      this.totalVerses = 0,
+      this.totalPoets = 0,
+      this.totalCouplets = 0,
+      this.totalTags = 0,
+      this.totalCategories = 0,
+      this.hasMorePoems = false,
+      this.hasMoreVerses = false,
+      this.hasMorePoets = false,
+      this.hasMoreCouplets = false,
+      this.hasMoreTags = false,
+      this.hasMoreCategories = false,
+      this.currentPage = 0,
+      this.pageSize = 10})
+      : _poets = poets,
+        _poems = poems,
+        _verses = verses,
+        _couplets = couplets,
+        _tags = tags,
+        _categories = categories;
+
+  factory _$UnifiedSearchResponseImpl.fromJson(Map<String, dynamic> json) =>
+      _$$UnifiedSearchResponseImplFromJson(json);
+
+// Current page item counts
+  @override
+  @JsonKey()
+  final int totalResults;
+  @override
+  @JsonKey()
+  final int poetCount;
+  @override
+  @JsonKey()
+  final int poemCount;
+  @override
+  @JsonKey()
+  final int verseCount;
+  @override
+  @JsonKey()
+  final int coupletCount;
+  @override
+  @JsonKey()
+  final int tagCount;
+  @override
+  @JsonKey()
+  final int categoryCount;
+// Item arrays
+  final List<PoetModel> _poets;
+// Item arrays
+  @override
+  @JsonKey()
+  List<PoetModel> get poets {
+    if (_poets is EqualUnmodifiableListView) return _poets;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_poets);
+  }
+
+  final List<PoemModel> _poems;
+  @override
+  @JsonKey()
+  List<PoemModel> get poems {
+    if (_poems is EqualUnmodifiableListView) return _poems;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_poems);
+  }
+
+  final List<VerseSearchResult> _verses;
+  @override
+  @JsonKey()
+  List<VerseSearchResult> get verses {
+    if (_verses is EqualUnmodifiableListView) return _verses;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_verses);
+  }
+
+  final List<CoupletSearchResult> _couplets;
+  @override
+  @JsonKey()
+  List<CoupletSearchResult> get couplets {
+    if (_couplets is EqualUnmodifiableListView) return _couplets;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_couplets);
+  }
+
+  final List<AutocompleteTag> _tags;
+  @override
+  @JsonKey()
+  List<AutocompleteTag> get tags {
+    if (_tags is EqualUnmodifiableListView) return _tags;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_tags);
+  }
+
+  final List<AutocompleteCategory> _categories;
+  @override
+  @JsonKey()
+  List<AutocompleteCategory> get categories {
+    if (_categories is EqualUnmodifiableListView) return _categories;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_categories);
+  }
+
+// Total counts in DB — for tab labels like "Poems (847)"
+  @override
+  @JsonKey()
+  final int totalPoems;
+  @override
+  @JsonKey()
+  final int totalVerses;
+  @override
+  @JsonKey()
+  final int totalPoets;
+  @override
+  @JsonKey()
+  final int totalCouplets;
+  @override
+  @JsonKey()
+  final int totalTags;
+  @override
+  @JsonKey()
+  final int totalCategories;
+// Per-type "has more" flags — show/hide "Load More"
+  @override
+  @JsonKey()
+  final bool hasMorePoems;
+  @override
+  @JsonKey()
+  final bool hasMoreVerses;
+  @override
+  @JsonKey()
+  final bool hasMorePoets;
+  @override
+  @JsonKey()
+  final bool hasMoreCouplets;
+  @override
+  @JsonKey()
+  final bool hasMoreTags;
+  @override
+  @JsonKey()
+  final bool hasMoreCategories;
+// Pagination echo
+  @override
+  @JsonKey()
+  final int currentPage;
+  @override
+  @JsonKey()
+  final int pageSize;
+
+  @override
+  String toString() {
+    return 'UnifiedSearchResponse(totalResults: $totalResults, poetCount: $poetCount, poemCount: $poemCount, verseCount: $verseCount, coupletCount: $coupletCount, tagCount: $tagCount, categoryCount: $categoryCount, poets: $poets, poems: $poems, verses: $verses, couplets: $couplets, tags: $tags, categories: $categories, totalPoems: $totalPoems, totalVerses: $totalVerses, totalPoets: $totalPoets, totalCouplets: $totalCouplets, totalTags: $totalTags, totalCategories: $totalCategories, hasMorePoems: $hasMorePoems, hasMoreVerses: $hasMoreVerses, hasMorePoets: $hasMorePoets, hasMoreCouplets: $hasMoreCouplets, hasMoreTags: $hasMoreTags, hasMoreCategories: $hasMoreCategories, currentPage: $currentPage, pageSize: $pageSize)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$UnifiedSearchResponseImpl &&
+            (identical(other.totalResults, totalResults) ||
+                other.totalResults == totalResults) &&
+            (identical(other.poetCount, poetCount) ||
+                other.poetCount == poetCount) &&
+            (identical(other.poemCount, poemCount) ||
+                other.poemCount == poemCount) &&
+            (identical(other.verseCount, verseCount) ||
+                other.verseCount == verseCount) &&
+            (identical(other.coupletCount, coupletCount) ||
+                other.coupletCount == coupletCount) &&
+            (identical(other.tagCount, tagCount) ||
+                other.tagCount == tagCount) &&
+            (identical(other.categoryCount, categoryCount) ||
+                other.categoryCount == categoryCount) &&
+            const DeepCollectionEquality().equals(other._poets, _poets) &&
+            const DeepCollectionEquality().equals(other._poems, _poems) &&
+            const DeepCollectionEquality().equals(other._verses, _verses) &&
+            const DeepCollectionEquality().equals(other._couplets, _couplets) &&
+            const DeepCollectionEquality().equals(other._tags, _tags) &&
+            const DeepCollectionEquality()
+                .equals(other._categories, _categories) &&
+            (identical(other.totalPoems, totalPoems) ||
+                other.totalPoems == totalPoems) &&
+            (identical(other.totalVerses, totalVerses) ||
+                other.totalVerses == totalVerses) &&
+            (identical(other.totalPoets, totalPoets) ||
+                other.totalPoets == totalPoets) &&
+            (identical(other.totalCouplets, totalCouplets) ||
+                other.totalCouplets == totalCouplets) &&
+            (identical(other.totalTags, totalTags) ||
+                other.totalTags == totalTags) &&
+            (identical(other.totalCategories, totalCategories) ||
+                other.totalCategories == totalCategories) &&
+            (identical(other.hasMorePoems, hasMorePoems) ||
+                other.hasMorePoems == hasMorePoems) &&
+            (identical(other.hasMoreVerses, hasMoreVerses) ||
+                other.hasMoreVerses == hasMoreVerses) &&
+            (identical(other.hasMorePoets, hasMorePoets) ||
+                other.hasMorePoets == hasMorePoets) &&
+            (identical(other.hasMoreCouplets, hasMoreCouplets) ||
+                other.hasMoreCouplets == hasMoreCouplets) &&
+            (identical(other.hasMoreTags, hasMoreTags) ||
+                other.hasMoreTags == hasMoreTags) &&
+            (identical(other.hasMoreCategories, hasMoreCategories) ||
+                other.hasMoreCategories == hasMoreCategories) &&
+            (identical(other.currentPage, currentPage) ||
+                other.currentPage == currentPage) &&
+            (identical(other.pageSize, pageSize) ||
+                other.pageSize == pageSize));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        totalResults,
+        poetCount,
+        poemCount,
+        verseCount,
+        coupletCount,
+        tagCount,
+        categoryCount,
+        const DeepCollectionEquality().hash(_poets),
+        const DeepCollectionEquality().hash(_poems),
+        const DeepCollectionEquality().hash(_verses),
+        const DeepCollectionEquality().hash(_couplets),
+        const DeepCollectionEquality().hash(_tags),
+        const DeepCollectionEquality().hash(_categories),
+        totalPoems,
+        totalVerses,
+        totalPoets,
+        totalCouplets,
+        totalTags,
+        totalCategories,
+        hasMorePoems,
+        hasMoreVerses,
+        hasMorePoets,
+        hasMoreCouplets,
+        hasMoreTags,
+        hasMoreCategories,
+        currentPage,
+        pageSize
+      ]);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$UnifiedSearchResponseImplCopyWith<_$UnifiedSearchResponseImpl>
+      get copyWith => __$$UnifiedSearchResponseImplCopyWithImpl<
+          _$UnifiedSearchResponseImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$UnifiedSearchResponseImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _UnifiedSearchResponse implements UnifiedSearchResponse {
+  const factory _UnifiedSearchResponse(
+      {final int totalResults,
+      final int poetCount,
+      final int poemCount,
+      final int verseCount,
+      final int coupletCount,
+      final int tagCount,
+      final int categoryCount,
+      final List<PoetModel> poets,
+      final List<PoemModel> poems,
+      final List<VerseSearchResult> verses,
+      final List<CoupletSearchResult> couplets,
+      final List<AutocompleteTag> tags,
+      final List<AutocompleteCategory> categories,
+      final int totalPoems,
+      final int totalVerses,
+      final int totalPoets,
+      final int totalCouplets,
+      final int totalTags,
+      final int totalCategories,
+      final bool hasMorePoems,
+      final bool hasMoreVerses,
+      final bool hasMorePoets,
+      final bool hasMoreCouplets,
+      final bool hasMoreTags,
+      final bool hasMoreCategories,
+      final int currentPage,
+      final int pageSize}) = _$UnifiedSearchResponseImpl;
+
+  factory _UnifiedSearchResponse.fromJson(Map<String, dynamic> json) =
+      _$UnifiedSearchResponseImpl.fromJson;
+
+  @override // Current page item counts
+  int get totalResults;
+  @override
+  int get poetCount;
+  @override
+  int get poemCount;
+  @override
+  int get verseCount;
+  @override
+  int get coupletCount;
+  @override
+  int get tagCount;
+  @override
+  int get categoryCount;
+  @override // Item arrays
+  List<PoetModel> get poets;
+  @override
+  List<PoemModel> get poems;
+  @override
+  List<VerseSearchResult> get verses;
+  @override
+  List<CoupletSearchResult> get couplets;
+  @override
+  List<AutocompleteTag> get tags;
+  @override
+  List<AutocompleteCategory> get categories;
+  @override // Total counts in DB — for tab labels like "Poems (847)"
+  int get totalPoems;
+  @override
+  int get totalVerses;
+  @override
+  int get totalPoets;
+  @override
+  int get totalCouplets;
+  @override
+  int get totalTags;
+  @override
+  int get totalCategories;
+  @override // Per-type "has more" flags — show/hide "Load More"
+  bool get hasMorePoems;
+  @override
+  bool get hasMoreVerses;
+  @override
+  bool get hasMorePoets;
+  @override
+  bool get hasMoreCouplets;
+  @override
+  bool get hasMoreTags;
+  @override
+  bool get hasMoreCategories;
+  @override // Pagination echo
+  int get currentPage;
+  @override
+  int get pageSize;
+  @override
+  @JsonKey(ignore: true)
+  _$$UnifiedSearchResponseImplCopyWith<_$UnifiedSearchResponseImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+TrendingSearch _$TrendingSearchFromJson(Map<String, dynamic> json) {
+  return _TrendingSearch.fromJson(json);
+}
+
+/// @nodoc
+mixin _$TrendingSearch {
+  String get query => throw _privateConstructorUsedError;
+  String get normalizedQuery => throw _privateConstructorUsedError;
+  int get count => throw _privateConstructorUsedError;
+  double get score => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $TrendingSearchCopyWith<TrendingSearch> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $TrendingSearchCopyWith<$Res> {
+  factory $TrendingSearchCopyWith(
+          TrendingSearch value, $Res Function(TrendingSearch) then) =
+      _$TrendingSearchCopyWithImpl<$Res, TrendingSearch>;
+  @useResult
+  $Res call({String query, String normalizedQuery, int count, double score});
+}
+
+/// @nodoc
+class _$TrendingSearchCopyWithImpl<$Res, $Val extends TrendingSearch>
+    implements $TrendingSearchCopyWith<$Res> {
+  _$TrendingSearchCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? query = null,
+    Object? normalizedQuery = null,
+    Object? count = null,
+    Object? score = null,
+  }) {
+    return _then(_value.copyWith(
+      query: null == query
+          ? _value.query
+          : query // ignore: cast_nullable_to_non_nullable
+              as String,
+      normalizedQuery: null == normalizedQuery
+          ? _value.normalizedQuery
+          : normalizedQuery // ignore: cast_nullable_to_non_nullable
+              as String,
+      count: null == count
+          ? _value.count
+          : count // ignore: cast_nullable_to_non_nullable
+              as int,
+      score: null == score
+          ? _value.score
+          : score // ignore: cast_nullable_to_non_nullable
+              as double,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$TrendingSearchImplCopyWith<$Res>
+    implements $TrendingSearchCopyWith<$Res> {
+  factory _$$TrendingSearchImplCopyWith(_$TrendingSearchImpl value,
+          $Res Function(_$TrendingSearchImpl) then) =
+      __$$TrendingSearchImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String query, String normalizedQuery, int count, double score});
+}
+
+/// @nodoc
+class __$$TrendingSearchImplCopyWithImpl<$Res>
+    extends _$TrendingSearchCopyWithImpl<$Res, _$TrendingSearchImpl>
+    implements _$$TrendingSearchImplCopyWith<$Res> {
+  __$$TrendingSearchImplCopyWithImpl(
+      _$TrendingSearchImpl _value, $Res Function(_$TrendingSearchImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? query = null,
+    Object? normalizedQuery = null,
+    Object? count = null,
+    Object? score = null,
+  }) {
+    return _then(_$TrendingSearchImpl(
+      query: null == query
+          ? _value.query
+          : query // ignore: cast_nullable_to_non_nullable
+              as String,
+      normalizedQuery: null == normalizedQuery
+          ? _value.normalizedQuery
+          : normalizedQuery // ignore: cast_nullable_to_non_nullable
+              as String,
+      count: null == count
+          ? _value.count
+          : count // ignore: cast_nullable_to_non_nullable
+              as int,
+      score: null == score
+          ? _value.score
+          : score // ignore: cast_nullable_to_non_nullable
+              as double,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$TrendingSearchImpl implements _TrendingSearch {
+  const _$TrendingSearchImpl(
+      {required this.query,
+      required this.normalizedQuery,
+      this.count = 0,
+      this.score = 0.0});
+
+  factory _$TrendingSearchImpl.fromJson(Map<String, dynamic> json) =>
+      _$$TrendingSearchImplFromJson(json);
+
+  @override
+  final String query;
+  @override
+  final String normalizedQuery;
+  @override
+  @JsonKey()
+  final int count;
+  @override
+  @JsonKey()
+  final double score;
+
+  @override
+  String toString() {
+    return 'TrendingSearch(query: $query, normalizedQuery: $normalizedQuery, count: $count, score: $score)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$TrendingSearchImpl &&
+            (identical(other.query, query) || other.query == query) &&
+            (identical(other.normalizedQuery, normalizedQuery) ||
+                other.normalizedQuery == normalizedQuery) &&
+            (identical(other.count, count) || other.count == count) &&
+            (identical(other.score, score) || other.score == score));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, query, normalizedQuery, count, score);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$TrendingSearchImplCopyWith<_$TrendingSearchImpl> get copyWith =>
+      __$$TrendingSearchImplCopyWithImpl<_$TrendingSearchImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$TrendingSearchImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _TrendingSearch implements TrendingSearch {
+  const factory _TrendingSearch(
+      {required final String query,
+      required final String normalizedQuery,
+      final int count,
+      final double score}) = _$TrendingSearchImpl;
+
+  factory _TrendingSearch.fromJson(Map<String, dynamic> json) =
+      _$TrendingSearchImpl.fromJson;
+
+  @override
+  String get query;
+  @override
+  String get normalizedQuery;
+  @override
+  int get count;
+  @override
+  double get score;
+  @override
+  @JsonKey(ignore: true)
+  _$$TrendingSearchImplCopyWith<_$TrendingSearchImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+RelatedSearchesResponse _$RelatedSearchesResponseFromJson(
+    Map<String, dynamic> json) {
+  return _RelatedSearchesResponse.fromJson(json);
+}
+
+/// @nodoc
+mixin _$RelatedSearchesResponse {
+  String get query => throw _privateConstructorUsedError;
+  List<TrendingSearch> get relatedSearches =>
+      throw _privateConstructorUsedError;
+  int get totalCount => throw _privateConstructorUsedError;
+  String get timeWindow => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $RelatedSearchesResponseCopyWith<RelatedSearchesResponse> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $RelatedSearchesResponseCopyWith<$Res> {
+  factory $RelatedSearchesResponseCopyWith(RelatedSearchesResponse value,
+          $Res Function(RelatedSearchesResponse) then) =
+      _$RelatedSearchesResponseCopyWithImpl<$Res, RelatedSearchesResponse>;
+  @useResult
+  $Res call(
+      {String query,
+      List<TrendingSearch> relatedSearches,
+      int totalCount,
+      String timeWindow});
+}
+
+/// @nodoc
+class _$RelatedSearchesResponseCopyWithImpl<$Res,
+        $Val extends RelatedSearchesResponse>
+    implements $RelatedSearchesResponseCopyWith<$Res> {
+  _$RelatedSearchesResponseCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? query = null,
+    Object? relatedSearches = null,
+    Object? totalCount = null,
+    Object? timeWindow = null,
+  }) {
+    return _then(_value.copyWith(
+      query: null == query
+          ? _value.query
+          : query // ignore: cast_nullable_to_non_nullable
+              as String,
+      relatedSearches: null == relatedSearches
+          ? _value.relatedSearches
+          : relatedSearches // ignore: cast_nullable_to_non_nullable
+              as List<TrendingSearch>,
+      totalCount: null == totalCount
+          ? _value.totalCount
+          : totalCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      timeWindow: null == timeWindow
+          ? _value.timeWindow
+          : timeWindow // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$RelatedSearchesResponseImplCopyWith<$Res>
+    implements $RelatedSearchesResponseCopyWith<$Res> {
+  factory _$$RelatedSearchesResponseImplCopyWith(
+          _$RelatedSearchesResponseImpl value,
+          $Res Function(_$RelatedSearchesResponseImpl) then) =
+      __$$RelatedSearchesResponseImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String query,
+      List<TrendingSearch> relatedSearches,
+      int totalCount,
+      String timeWindow});
+}
+
+/// @nodoc
+class __$$RelatedSearchesResponseImplCopyWithImpl<$Res>
+    extends _$RelatedSearchesResponseCopyWithImpl<$Res,
+        _$RelatedSearchesResponseImpl>
+    implements _$$RelatedSearchesResponseImplCopyWith<$Res> {
+  __$$RelatedSearchesResponseImplCopyWithImpl(
+      _$RelatedSearchesResponseImpl _value,
+      $Res Function(_$RelatedSearchesResponseImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? query = null,
+    Object? relatedSearches = null,
+    Object? totalCount = null,
+    Object? timeWindow = null,
+  }) {
+    return _then(_$RelatedSearchesResponseImpl(
+      query: null == query
+          ? _value.query
+          : query // ignore: cast_nullable_to_non_nullable
+              as String,
+      relatedSearches: null == relatedSearches
+          ? _value._relatedSearches
+          : relatedSearches // ignore: cast_nullable_to_non_nullable
+              as List<TrendingSearch>,
+      totalCount: null == totalCount
+          ? _value.totalCount
+          : totalCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      timeWindow: null == timeWindow
+          ? _value.timeWindow
+          : timeWindow // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$RelatedSearchesResponseImpl implements _RelatedSearchesResponse {
+  const _$RelatedSearchesResponseImpl(
+      {required this.query,
+      final List<TrendingSearch> relatedSearches = const [],
+      this.totalCount = 0,
+      required this.timeWindow})
+      : _relatedSearches = relatedSearches;
+
+  factory _$RelatedSearchesResponseImpl.fromJson(Map<String, dynamic> json) =>
+      _$$RelatedSearchesResponseImplFromJson(json);
+
+  @override
+  final String query;
+  final List<TrendingSearch> _relatedSearches;
+  @override
+  @JsonKey()
+  List<TrendingSearch> get relatedSearches {
+    if (_relatedSearches is EqualUnmodifiableListView) return _relatedSearches;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_relatedSearches);
+  }
+
+  @override
+  @JsonKey()
+  final int totalCount;
+  @override
+  final String timeWindow;
+
+  @override
+  String toString() {
+    return 'RelatedSearchesResponse(query: $query, relatedSearches: $relatedSearches, totalCount: $totalCount, timeWindow: $timeWindow)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$RelatedSearchesResponseImpl &&
+            (identical(other.query, query) || other.query == query) &&
+            const DeepCollectionEquality()
+                .equals(other._relatedSearches, _relatedSearches) &&
+            (identical(other.totalCount, totalCount) ||
+                other.totalCount == totalCount) &&
+            (identical(other.timeWindow, timeWindow) ||
+                other.timeWindow == timeWindow));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      query,
+      const DeepCollectionEquality().hash(_relatedSearches),
+      totalCount,
+      timeWindow);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$RelatedSearchesResponseImplCopyWith<_$RelatedSearchesResponseImpl>
+      get copyWith => __$$RelatedSearchesResponseImplCopyWithImpl<
+          _$RelatedSearchesResponseImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$RelatedSearchesResponseImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _RelatedSearchesResponse implements RelatedSearchesResponse {
+  const factory _RelatedSearchesResponse(
+      {required final String query,
+      final List<TrendingSearch> relatedSearches,
+      final int totalCount,
+      required final String timeWindow}) = _$RelatedSearchesResponseImpl;
+
+  factory _RelatedSearchesResponse.fromJson(Map<String, dynamic> json) =
+      _$RelatedSearchesResponseImpl.fromJson;
+
+  @override
+  String get query;
+  @override
+  List<TrendingSearch> get relatedSearches;
+  @override
+  int get totalCount;
+  @override
+  String get timeWindow;
+  @override
+  @JsonKey(ignore: true)
+  _$$RelatedSearchesResponseImplCopyWith<_$RelatedSearchesResponseImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+TrendingSearchesResponse _$TrendingSearchesResponseFromJson(
+    Map<String, dynamic> json) {
+  return _TrendingSearchesResponse.fromJson(json);
+}
+
+/// @nodoc
+mixin _$TrendingSearchesResponse {
+  List<TrendingSearch> get searches => throw _privateConstructorUsedError;
+  int get totalCount => throw _privateConstructorUsedError;
+  String get timeframe => throw _privateConstructorUsedError;
+  String get period => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $TrendingSearchesResponseCopyWith<TrendingSearchesResponse> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $TrendingSearchesResponseCopyWith<$Res> {
+  factory $TrendingSearchesResponseCopyWith(TrendingSearchesResponse value,
+          $Res Function(TrendingSearchesResponse) then) =
+      _$TrendingSearchesResponseCopyWithImpl<$Res, TrendingSearchesResponse>;
+  @useResult
+  $Res call(
+      {List<TrendingSearch> searches,
+      int totalCount,
+      String timeframe,
+      String period});
+}
+
+/// @nodoc
+class _$TrendingSearchesResponseCopyWithImpl<$Res,
+        $Val extends TrendingSearchesResponse>
+    implements $TrendingSearchesResponseCopyWith<$Res> {
+  _$TrendingSearchesResponseCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? searches = null,
+    Object? totalCount = null,
+    Object? timeframe = null,
+    Object? period = null,
+  }) {
+    return _then(_value.copyWith(
+      searches: null == searches
+          ? _value.searches
+          : searches // ignore: cast_nullable_to_non_nullable
+              as List<TrendingSearch>,
+      totalCount: null == totalCount
+          ? _value.totalCount
+          : totalCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      timeframe: null == timeframe
+          ? _value.timeframe
+          : timeframe // ignore: cast_nullable_to_non_nullable
+              as String,
+      period: null == period
+          ? _value.period
+          : period // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$TrendingSearchesResponseImplCopyWith<$Res>
+    implements $TrendingSearchesResponseCopyWith<$Res> {
+  factory _$$TrendingSearchesResponseImplCopyWith(
+          _$TrendingSearchesResponseImpl value,
+          $Res Function(_$TrendingSearchesResponseImpl) then) =
+      __$$TrendingSearchesResponseImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {List<TrendingSearch> searches,
+      int totalCount,
+      String timeframe,
+      String period});
+}
+
+/// @nodoc
+class __$$TrendingSearchesResponseImplCopyWithImpl<$Res>
+    extends _$TrendingSearchesResponseCopyWithImpl<$Res,
+        _$TrendingSearchesResponseImpl>
+    implements _$$TrendingSearchesResponseImplCopyWith<$Res> {
+  __$$TrendingSearchesResponseImplCopyWithImpl(
+      _$TrendingSearchesResponseImpl _value,
+      $Res Function(_$TrendingSearchesResponseImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? searches = null,
+    Object? totalCount = null,
+    Object? timeframe = null,
+    Object? period = null,
+  }) {
+    return _then(_$TrendingSearchesResponseImpl(
+      searches: null == searches
+          ? _value._searches
+          : searches // ignore: cast_nullable_to_non_nullable
+              as List<TrendingSearch>,
+      totalCount: null == totalCount
+          ? _value.totalCount
+          : totalCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      timeframe: null == timeframe
+          ? _value.timeframe
+          : timeframe // ignore: cast_nullable_to_non_nullable
+              as String,
+      period: null == period
+          ? _value.period
+          : period // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$TrendingSearchesResponseImpl implements _TrendingSearchesResponse {
+  const _$TrendingSearchesResponseImpl(
+      {final List<TrendingSearch> searches = const [],
+      this.totalCount = 0,
+      required this.timeframe,
+      required this.period})
+      : _searches = searches;
+
+  factory _$TrendingSearchesResponseImpl.fromJson(Map<String, dynamic> json) =>
+      _$$TrendingSearchesResponseImplFromJson(json);
+
+  final List<TrendingSearch> _searches;
+  @override
+  @JsonKey()
+  List<TrendingSearch> get searches {
+    if (_searches is EqualUnmodifiableListView) return _searches;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_searches);
+  }
+
+  @override
+  @JsonKey()
+  final int totalCount;
+  @override
+  final String timeframe;
+  @override
+  final String period;
+
+  @override
+  String toString() {
+    return 'TrendingSearchesResponse(searches: $searches, totalCount: $totalCount, timeframe: $timeframe, period: $period)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$TrendingSearchesResponseImpl &&
+            const DeepCollectionEquality().equals(other._searches, _searches) &&
+            (identical(other.totalCount, totalCount) ||
+                other.totalCount == totalCount) &&
+            (identical(other.timeframe, timeframe) ||
+                other.timeframe == timeframe) &&
+            (identical(other.period, period) || other.period == period));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(_searches),
+      totalCount,
+      timeframe,
+      period);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$TrendingSearchesResponseImplCopyWith<_$TrendingSearchesResponseImpl>
+      get copyWith => __$$TrendingSearchesResponseImplCopyWithImpl<
+          _$TrendingSearchesResponseImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$TrendingSearchesResponseImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _TrendingSearchesResponse implements TrendingSearchesResponse {
+  const factory _TrendingSearchesResponse(
+      {final List<TrendingSearch> searches,
+      final int totalCount,
+      required final String timeframe,
+      required final String period}) = _$TrendingSearchesResponseImpl;
+
+  factory _TrendingSearchesResponse.fromJson(Map<String, dynamic> json) =
+      _$TrendingSearchesResponseImpl.fromJson;
+
+  @override
+  List<TrendingSearch> get searches;
+  @override
+  int get totalCount;
+  @override
+  String get timeframe;
+  @override
+  String get period;
+  @override
+  @JsonKey(ignore: true)
+  _$$TrendingSearchesResponseImplCopyWith<_$TrendingSearchesResponseImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}

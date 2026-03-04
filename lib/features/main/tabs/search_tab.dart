@@ -1,97 +1,238 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/design_system/app_colors.dart';
+import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
+import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
+import 'package:flutter_poetry_app/features/search/models/global_search_state.dart';
+import 'package:flutter_poetry_app/features/search/widgets/discover_hero_header.dart';
+import 'package:flutter_poetry_app/features/search/widgets/discover_segment_control.dart';
+import 'package:flutter_poetry_app/features/search/widgets/autocomplete_suggestions.dart';
+import 'package:flutter_poetry_app/features/search/widgets/search_results_section.dart';
+import 'package:flutter_poetry_app/features/search/widgets/skeleton_loaders/couplet_skeleton.dart';
+import 'package:flutter_poetry_app/features/search/widgets/discovery_sections/recent_searches_section.dart';
+import 'package:flutter_poetry_app/features/search/widgets/discovery_sections/trending_searches_section.dart';
+import 'package:flutter_poetry_app/features/search/widgets/discovery_sections/recommendations_section.dart';
 
-/// Search tab - Search for poems, poets, and more
-class SearchTab extends ConsumerStatefulWidget {
+/// Discover tab - Premium search with discovery content
+///
+/// Features:
+/// - Hero header with integrated search
+/// - 7-segment filter (All, Poets, Poems, Verses, Categories, Dictionary, Watch)
+/// - Discovery content visible on load (trending, recommendations, recent)
+/// - No auto-focus - user taps when ready to search
+/// - Mode-based and segment-based content rendering
+class SearchTab extends ConsumerWidget {
   const SearchTab({super.key});
 
   @override
-  ConsumerState<SearchTab> createState() => _SearchTabState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final searchState = ref.watch(globalSearchProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-class _SearchTabState extends ConsumerState<SearchTab> {
-  final TextEditingController _searchController = TextEditingController();
+    return Scaffold(
+      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFFFFBF7),
+      body: CustomScrollView(
+        slivers: [
+          // Hero header
+          SliverToBoxAdapter(
+            child: DiscoverHeroHeader(
+              autofocus: false,
+            ),
+          ),
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
+          // Sticky segment control
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: DiscoverSegmentDelegate(
+              child: const DiscoverSegmentControl(),
+            ),
+          ),
+
+          // Content based on search mode and segment
+          SliverToBoxAdapter(
+            child: _buildContent(context, ref, searchState, isDark),
+          ),
+        ],
+      ),
+    );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        // App bar with search
-        SliverAppBar(
-          floating: true,
-          snap: true,
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-          title: const Text(
-            'Search',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ),
+  /// Build content based on current search mode and active segment
+  Widget _buildContent(
+    BuildContext context,
+    WidgetRef ref,
+    GlobalSearchState searchState,
+    bool isDark,
+  ) {
+    // Handle search modes
+    switch (searchState.mode) {
+      case SearchMode.idle:
+      case SearchMode.typing:
+        return _buildDiscoveryContent(searchState);
 
-        // Search bar
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search poems, poets, or verses...',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          setState(() {
-                            _searchController.clear();
-                          });
-                        },
-                      )
-                    : null,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+      case SearchMode.autocompleting:
+        return Column(
+          children: [
+            // Autocomplete suggestions
+            if (searchState.autocompleteResults != null)
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                child: AutocompleteSuggestions(
+                  suggestions: searchState.autocompleteResults!,
                 ),
-                filled: true,
-                fillColor: Colors.grey[50],
               ),
-              onChanged: (value) {
-                setState(() {});
-                // TODO: Implement search
-              },
-            ),
-          ),
-        ),
 
-        // Search results or suggestions
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          sliver: SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                return _buildSearchSuggestion(context, index);
-              },
-              childCount: 10,
-            ),
-          ),
-        ),
+            // Discovery content below autocomplete
+            _buildDiscoveryContent(searchState),
+          ],
+        );
+
+      case SearchMode.searching:
+        return _buildLoadingState();
+
+      case SearchMode.results:
+        return _buildResultsState(searchState);
+
+      case SearchMode.error:
+        return _buildErrorState(context, ref, searchState, isDark);
+    }
+  }
+
+  /// Build discovery content (recent, trending, recommendations)
+  Widget _buildDiscoveryContent(GlobalSearchState searchState) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: AppSpacing.md),
+        const RecentSearchesSection(),
+        SizedBox(height: AppSpacing.md),
+        const TrendingSearchesSection(),
+        SizedBox(height: AppSpacing.md),
+        const RecommendationsSection(),
+        SizedBox(height: AppSpacing.xl),
       ],
     );
   }
 
-  Widget _buildSearchSuggestion(BuildContext context, int index) {
-    return ListTile(
-      leading: Icon(Icons.search, color: Colors.grey[400]),
-      title: Text('Search suggestion ${index + 1}'),
-      subtitle: Text('Tap to search', style: TextStyle(color: Colors.grey[600])),
-      onTap: () {
-        // TODO: Perform search
-      },
+  /// Build loading state with skeleton loaders
+  Widget _buildLoadingState() {
+    return Column(
+      children: [
+        SizedBox(height: AppSpacing.md),
+        // Show 5 skeleton loaders
+        ...List.generate(5, (index) => const CoupletSkeleton()),
+        SizedBox(height: AppSpacing.xl),
+      ],
+    );
+  }
+
+  /// Build results state
+  Widget _buildResultsState(GlobalSearchState searchState) {
+    debugPrint('🔵 SearchTab _buildResultsState called');
+    debugPrint('🔵 unifiedResults null? ${searchState.unifiedResults == null}');
+    debugPrint('🔵 totalResults: ${searchState.unifiedResults?.totalResults}');
+
+    if (searchState.unifiedResults == null ||
+        searchState.unifiedResults!.totalResults == 0) {
+      debugPrint('🔵 Showing empty state');
+      return _buildEmptyState();
+    }
+
+    debugPrint('🔵 Showing SearchResultsSection with ${searchState.unifiedResults!.totalResults} results');
+    return Column(
+      children: [
+        SizedBox(height: AppSpacing.md),
+        const SearchResultsSection(),
+        SizedBox(height: AppSpacing.xl),
+      ],
+    );
+  }
+
+  /// Build empty state (no results found)
+  Widget _buildEmptyState() {
+    return Padding(
+      padding: EdgeInsets.all(AppSpacing.xl),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.search_off,
+              size: 64,
+              color: Colors.grey[400],
+            ),
+            SizedBox(height: AppSpacing.md),
+            Text(
+              'No results found',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[600],
+              ),
+            ),
+            SizedBox(height: AppSpacing.xs),
+            Text(
+              'Try different keywords or check your spelling',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[500],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Build error state with retry button
+  Widget _buildErrorState(
+    BuildContext context,
+    WidgetRef ref,
+    GlobalSearchState searchState,
+    bool isDark,
+  ) {
+    return Padding(
+      padding: EdgeInsets.all(AppSpacing.xl),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: Colors.red[400],
+            ),
+            SizedBox(height: AppSpacing.md),
+            Text(
+              'Search Error',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: isDark ? Colors.white : Colors.black87,
+              ),
+            ),
+            SizedBox(height: AppSpacing.xs),
+            Text(
+              searchState.errorMessage ?? 'Something went wrong',
+              style: TextStyle(
+                fontSize: 14,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.7)
+                    : Colors.black.withValues(alpha: 0.7),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: AppSpacing.md),
+            ElevatedButton.icon(
+              onPressed: () {
+                ref.read(globalSearchProvider.notifier).executeSearch();
+              },
+              icon: const Icon(Icons.refresh),
+              label: const Text('Retry'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

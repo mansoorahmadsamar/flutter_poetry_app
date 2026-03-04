@@ -35,12 +35,8 @@ mixin _$PoetImageModel {
   @JsonKey(name: 'imageType')
   String get imageType => throw _privateConstructorUsedError;
 
-  /// Serializes this PoetImageModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of PoetImageModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $PoetImageModelCopyWith<PoetImageModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -72,8 +68,6 @@ class _$PoetImageModelCopyWithImpl<$Res, $Val extends PoetImageModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of PoetImageModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -150,8 +144,6 @@ class __$$PoetImageModelImplCopyWithImpl<$Res>
       _$PoetImageModelImpl _value, $Res Function(_$PoetImageModelImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of PoetImageModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -266,14 +258,12 @@ class _$PoetImageModelImpl implements _PoetImageModel {
                 other.imageType == imageType));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, publicId, imageUrl, thumbnailUrl,
       caption, altText, displayOrder, isProfileImage, imageType);
 
-  /// Create a copy of PoetImageModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$PoetImageModelImplCopyWith<_$PoetImageModelImpl> get copyWith =>
@@ -325,11 +315,8 @@ abstract class _PoetImageModel implements PoetImageModel {
   @override
   @JsonKey(name: 'imageType')
   String get imageType;
-
-  /// Create a copy of PoetImageModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$PoetImageModelImplCopyWith<_$PoetImageModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>381838704656-p6eop70fhpv51ibck93ga9dd4mlt7k33.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.381838704656-p6eop70fhpv51ibck93ga9dd4mlt7k33</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>381838704656-4mhqe5ej6tjhtj9p16l4uvoc9bij95dq.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDAJG7wvy3VMjSQ618yyLS0wgn4fCeFjCg</string>
+	<key>GCM_SENDER_ID</key>
+	<string>381838704656</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.techhikes.poetryapp</string>
+	<key>PROJECT_ID</key>
+	<string>poetry-world-eaf6c</string>
+	<key>STORAGE_BUCKET</key>
+	<string>poetry-world-eaf6c.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:381838704656:ios:9a91e1b5e1f2985de88a95</string>
+</dict>
+</plist>

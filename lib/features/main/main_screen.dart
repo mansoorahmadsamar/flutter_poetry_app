@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/design_system/app_colors.dart';
-import 'tabs/feed_tab.dart';
-import 'tabs/search_tab.dart';
-import 'tabs/bookmarks_tab.dart';
+import '../feed/screens/feed_screen.dart';
+import 'tabs/bookmarks/screens/app_bookmarks_screen.dart';
 import 'tabs/poets_tab.dart';
 import 'tabs/profile_tab.dart';
+import '../discover/screens/discover_screen.dart';
 
 /// Tab configuration data
 class TabConfig {
@@ -22,7 +22,7 @@ class TabConfig {
   });
 }
 
-/// Main screen with bottom navigation tabs
+/// Main screen with bottom navigation
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
 
@@ -32,34 +32,34 @@ class MainScreen extends ConsumerStatefulWidget {
 
 class _MainScreenState extends ConsumerState<MainScreen> {
   int _currentIndex = 0;
+  final _feedScreenKey = GlobalKey<FeedScreenState>();
 
-  // Tab configurations
-  static const List<TabConfig> _tabs = [
+  late final List<TabConfig> _tabs = [
     TabConfig(
       label: 'Feed',
       icon: Icons.home_outlined,
       activeIcon: Icons.home,
-      screen: FeedTab(),
+      screen: FeedScreen(key: _feedScreenKey),
     ),
     TabConfig(
-      label: 'Search',
-      icon: Icons.search_outlined,
-      activeIcon: Icons.search,
-      screen: SearchTab(),
+      label: 'Discover',
+      icon: Icons.explore_outlined,
+      activeIcon: Icons.explore,
+      screen: DiscoverScreen(),
     ),
-    TabConfig(
+    const TabConfig(
       label: 'Bookmarks',
       icon: Icons.bookmark_border,
       activeIcon: Icons.bookmark,
-      screen: BookmarksTab(),
+      screen: AppBookmarksScreen(),
     ),
-    TabConfig(
+    const TabConfig(
       label: 'Poets',
       icon: Icons.person_outline,
       activeIcon: Icons.person,
       screen: PoetsTab(),
     ),
-    TabConfig(
+    const TabConfig(
       label: 'Profile',
       icon: Icons.account_circle_outlined,
       activeIcon: Icons.account_circle,
@@ -69,54 +69,37 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
         children: _tabs.map((tab) => tab.screen).toList(),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(),
-    );
-  }
-
-  Widget _buildBottomNavigationBar() {
-    return Container(
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: BottomNavigationBar(
+      bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
+          if (index == _currentIndex && index == 0) {
+            _feedScreenKey.currentState?.scrollToTop();
+          }
+          setState(() => _currentIndex = index);
         },
         type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
+        backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
         selectedItemColor: AppColors.primary,
-        unselectedItemColor: Colors.grey[600],
-        selectedFontSize: 12,
-        unselectedFontSize: 12,
+        unselectedItemColor:
+            isDark ? AppColors.textSecondaryDark : Colors.grey[500],
+        selectedFontSize: 11,
+        unselectedFontSize: 11,
         selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
-        elevation: 0,
-        items: _tabs.map((tab) {
-          final isSelected = _tabs[_currentIndex] == tab;
-          return BottomNavigationBarItem(
-            icon: Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Icon(
-                isSelected ? tab.activeIcon : tab.icon,
-                size: 24,
-              ),
-            ),
-            label: tab.label,
-          );
-        }).toList(),
+        elevation: 8,
+        items: _tabs
+            .map((tab) => BottomNavigationBarItem(
+                  icon: Icon(tab.icon),
+                  activeIcon: Icon(tab.activeIcon),
+                  label: tab.label,
+                ))
+            .toList(),
       ),
     );
   }

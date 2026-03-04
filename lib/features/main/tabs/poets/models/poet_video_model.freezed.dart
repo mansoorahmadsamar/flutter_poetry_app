@@ -33,12 +33,8 @@ mixin _$PoetVideoModel {
   @JsonKey(name: 'videoType')
   String get videoType => throw _privateConstructorUsedError;
 
-  /// Serializes this PoetVideoModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of PoetVideoModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $PoetVideoModelCopyWith<PoetVideoModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -70,8 +66,6 @@ class _$PoetVideoModelCopyWithImpl<$Res, $Val extends PoetVideoModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of PoetVideoModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -148,8 +142,6 @@ class __$$PoetVideoModelImplCopyWithImpl<$Res>
       _$PoetVideoModelImpl _value, $Res Function(_$PoetVideoModelImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of PoetVideoModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -263,14 +255,12 @@ class _$PoetVideoModelImpl implements _PoetVideoModel {
                 other.videoType == videoType));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, publicId, title, description,
       videoUrl, thumbnailUrl, duration, yearRecorded, videoType);
 
-  /// Create a copy of PoetVideoModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$PoetVideoModelImplCopyWith<_$PoetVideoModelImpl> get copyWith =>
@@ -320,11 +310,8 @@ abstract class _PoetVideoModel implements PoetVideoModel {
   @override
   @JsonKey(name: 'videoType')
   String get videoType;
-
-  /// Create a copy of PoetVideoModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$PoetVideoModelImplCopyWith<_$PoetVideoModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

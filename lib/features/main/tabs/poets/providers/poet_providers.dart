@@ -306,7 +306,7 @@ final poetGalleryProvider = FutureProvider.autoDispose.family<
   final service = ref.watch(poetServiceProvider);
 
   try {
-    final result = await service.getPoetGallery(publicId);
+    final result = await service.getPoetGallery(publicId: publicId);
     _logger.i('✅ Poet gallery loaded: $publicId (${result.length} images)');
     return result;
   } catch (e) {
@@ -342,11 +342,27 @@ final poetVideosProvider = FutureProvider.autoDispose.family<
   final service = ref.watch(poetServiceProvider);
 
   try {
-    final result = await service.getPoetVideos(publicId);
+    final result = await service.getPoetVideos(publicId: publicId);
     _logger.i('✅ Poet videos loaded: $publicId (${result.length} videos)');
     return result;
   } catch (e) {
     _logger.e('❌ Error loading poet videos: $e');
+    rethrow;
+  }
+});
+
+/// Provider for poet facts
+final poetFactsProvider = FutureProvider.autoDispose.family<
+    List<String>,
+    String>((ref, publicId) async {
+  final service = ref.watch(poetServiceProvider);
+
+  try {
+    final result = await service.getPoetFacts(publicId: publicId);
+    _logger.i('✅ Poet facts loaded: $publicId (${result.length} facts)');
+    return result;
+  } catch (e) {
+    _logger.e('❌ Error loading poet facts: $e');
     rethrow;
   }
 });

@@ -22,12 +22,14 @@ class BookmarksParams {
   final int page;
   final String? search;
   final String? poetryType;
+  final String? lang;
   final String sortBy;
 
   BookmarksParams({
     this.page = 0,
     this.search,
     this.poetryType,
+    this.lang,
     this.sortBy = 'NEWEST',
   });
 
@@ -39,11 +41,16 @@ class BookmarksParams {
           page == other.page &&
           search == other.search &&
           poetryType == other.poetryType &&
+          lang == other.lang &&
           sortBy == other.sortBy;
 
   @override
   int get hashCode =>
-      page.hashCode ^ search.hashCode ^ poetryType.hashCode ^ sortBy.hashCode;
+      page.hashCode ^
+      search.hashCode ^
+      poetryType.hashCode ^
+      lang.hashCode ^
+      sortBy.hashCode;
 }
 
 /// Convert UI sort option to backend field name and direction
@@ -81,10 +88,11 @@ final bookmarksProvider = FutureProvider.autoDispose
         size: 20,
         search: params.search,
         poetryType: params.poetryType,
+        lang: params.lang,
         sortBy: _mapSortByToField(params.sortBy),
         sortDir: _mapSortByToDirection(params.sortBy),
       );
-      _logger.i('✅ Bookmarks loaded - Page: ${params.page}');
+      _logger.i('✅ Bookmarks loaded - Page: ${params.page}, Lang: ${params.lang}');
       return result;
     } catch (e) {
       _logger.e('❌ Error loading bookmarks: $e');
@@ -108,15 +116,16 @@ class BookmarkActionNotifier extends StateNotifier<AsyncValue<void>> {
 
   /// Toggle bookmark (add if not bookmarked, remove if bookmarked)
   /// Returns the enriched poem model with updated engagement data
-  Future<PoemModel> toggleBookmark(String poemPublicId) async {
+  /// [lang] - Language code when bookmarking (ur, en, hi, etc.) to preserve language context
+  Future<PoemModel> toggleBookmark(String poemPublicId, {String lang = 'ur'}) async {
     state = const AsyncValue.loading();
 
     try {
       final service = ref.read(bookmarkServiceProvider);
-      final enrichedPoem = await service.toggleBookmark(poemPublicId);
+      final enrichedPoem = await service.toggleBookmark(poemPublicId, lang: lang);
 
       state = const AsyncValue.data(null);
-      _logger.i('✅ Bookmark toggled: $poemPublicId - isBookmarked: ${enrichedPoem.isBookmarkedByCurrentUser}');
+      _logger.i('✅ Bookmark toggled: $poemPublicId - lang: $lang - isBookmarked: ${enrichedPoem.isBookmarkedByCurrentUser}');
 
       // Invalidate bookmarks list to refresh
       ref.invalidate(bookmarksProvider);

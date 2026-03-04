@@ -92,10 +92,13 @@ class TagModel with _$TagModel {
 @freezed
 class VerseModel with _$VerseModel {
   const factory VerseModel({
-    required String publicId,
+    String? publicId,  // Made nullable - search API doesn't include this
     @JsonKey(name: 'verseText') required String text,
     String? verseType,
     int? verseNumber,
+    int? coupletNumber,  // Added - present in search API response
+    String? romanizedText,  // Added - present in search API response
+    String? translation,  // Added - present in search API response
   }) = _VerseModel;
 
   factory VerseModel.fromJson(Map<String, dynamic> json) =>

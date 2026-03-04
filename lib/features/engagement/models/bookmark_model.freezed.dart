@@ -32,12 +32,8 @@ mixin _$BookmarkModel {
   DateTime get createdAt => throw _privateConstructorUsedError;
   DateTime? get updatedAt => throw _privateConstructorUsedError;
 
-  /// Serializes this BookmarkModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of BookmarkModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $BookmarkModelCopyWith<BookmarkModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -72,8 +68,6 @@ class _$BookmarkModelCopyWithImpl<$Res, $Val extends BookmarkModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of BookmarkModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -168,8 +162,6 @@ class __$$BookmarkModelImplCopyWithImpl<$Res>
       _$BookmarkModelImpl _value, $Res Function(_$BookmarkModelImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of BookmarkModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -311,7 +303,7 @@ class _$BookmarkModelImpl implements _BookmarkModel {
                 other.updatedAt == updatedAt));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -327,9 +319,7 @@ class _$BookmarkModelImpl implements _BookmarkModel {
       createdAt,
       updatedAt);
 
-  /// Create a copy of BookmarkModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$BookmarkModelImplCopyWith<_$BookmarkModelImpl> get copyWith =>
@@ -382,11 +372,8 @@ abstract class _BookmarkModel implements BookmarkModel {
   DateTime get createdAt;
   @override
   DateTime? get updatedAt;
-
-  /// Create a copy of BookmarkModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$BookmarkModelImplCopyWith<_$BookmarkModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

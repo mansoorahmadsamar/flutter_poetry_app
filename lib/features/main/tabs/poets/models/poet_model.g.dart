@@ -12,16 +12,25 @@ _$PoetModelImpl _$$PoetModelImplFromJson(Map<String, dynamic> json) =>
       name: json['name'] as String,
       shortBio: json['shortBio'] as String,
       birthYear: (json['birthYear'] as num).toInt(),
-      deathYear: (json['deathYear'] as num?)?.toInt(),
+      deathYear: (json['deathYear'] as num?)?.toInt() ?? 0,
       profileImageUrl: json['profileImageUrl'] as String?,
       gender: json['gender'] as String?,
       era: json['era'] as String?,
-      poemCount: (json['poemCount'] as num).toInt(),
-      viewCount: (json['viewCount'] as num).toInt(),
-      isFeatured: json['isFeatured'] as bool,
-      isTrending: json['isTrending'] as bool,
-      topTags:
-          (json['topTags'] as List<dynamic>?)?.map((e) => e as String).toList(),
+      poemCount: (json['poemCount'] as num?)?.toInt() ?? 0,
+      viewCount: (json['viewCount'] as num?)?.toInt() ?? 0,
+      followerCount: (json['followerCount'] as num?)?.toInt() ?? 0,
+      isFeatured: json['isFeatured'] as bool? ?? false,
+      isTrending: json['isTrending'] as bool? ?? false,
+      isVerified: json['isVerified'] as bool? ?? false,
+      birthPlace: json['birthPlace'] as String?,
+      country: json['country'] as String?,
+      countryFlag: json['countryFlag'] as String?,
+      countryFlagUrl: json['countryFlagUrl'] as String?,
+      topTags: (json['topTags'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      isActive: json['isActive'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$$PoetModelImplToJson(_$PoetModelImpl instance) =>
@@ -36,7 +45,14 @@ Map<String, dynamic> _$$PoetModelImplToJson(_$PoetModelImpl instance) =>
       'era': instance.era,
       'poemCount': instance.poemCount,
       'viewCount': instance.viewCount,
+      'followerCount': instance.followerCount,
       'isFeatured': instance.isFeatured,
       'isTrending': instance.isTrending,
+      'isVerified': instance.isVerified,
+      'birthPlace': instance.birthPlace,
+      'country': instance.country,
+      'countryFlag': instance.countryFlag,
+      'countryFlagUrl': instance.countryFlagUrl,
       'topTags': instance.topTags,
+      'isActive': instance.isActive,
     };

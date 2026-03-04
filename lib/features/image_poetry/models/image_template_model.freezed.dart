@@ -34,12 +34,8 @@ mixin _$ImageTemplateModel {
   int get usageCount => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
 
-  /// Serializes this ImageTemplateModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of ImageTemplateModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $ImageTemplateModelCopyWith<ImageTemplateModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -75,8 +71,6 @@ class _$ImageTemplateModelCopyWithImpl<$Res, $Val extends ImageTemplateModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of ImageTemplateModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -177,8 +171,6 @@ class __$$ImageTemplateModelImplCopyWithImpl<$Res>
       $Res Function(_$ImageTemplateModelImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of ImageTemplateModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -255,10 +247,10 @@ class _$ImageTemplateModelImpl implements _ImageTemplateModel {
       {required this.publicId,
       required this.name,
       this.description,
-      required this.category,
-      required this.backgroundImageUrl,
+      this.category = '',
+      this.backgroundImageUrl = '',
       this.thumbnailUrl,
-      required final Map<String, dynamic> layoutConfig,
+      final Map<String, dynamic> layoutConfig = const {},
       this.isPremium = false,
       this.isActive = true,
       this.displayOrder = 0,
@@ -276,14 +268,17 @@ class _$ImageTemplateModelImpl implements _ImageTemplateModel {
   @override
   final String? description;
   @override
+  @JsonKey()
   final String category;
 // NATURE, MINIMAL, ARTISTIC, TRADITIONAL
   @override
+  @JsonKey()
   final String backgroundImageUrl;
   @override
   final String? thumbnailUrl;
   final Map<String, dynamic> _layoutConfig;
   @override
+  @JsonKey()
   Map<String, dynamic> get layoutConfig {
     if (_layoutConfig is EqualUnmodifiableMapView) return _layoutConfig;
     // ignore: implicit_dynamic_type
@@ -340,7 +335,7 @@ class _$ImageTemplateModelImpl implements _ImageTemplateModel {
                 other.createdAt == createdAt));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -357,9 +352,7 @@ class _$ImageTemplateModelImpl implements _ImageTemplateModel {
       usageCount,
       createdAt);
 
-  /// Create a copy of ImageTemplateModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$ImageTemplateModelImplCopyWith<_$ImageTemplateModelImpl> get copyWith =>
@@ -379,10 +372,10 @@ abstract class _ImageTemplateModel implements ImageTemplateModel {
       {required final String publicId,
       required final String name,
       final String? description,
-      required final String category,
-      required final String backgroundImageUrl,
+      final String category,
+      final String backgroundImageUrl,
       final String? thumbnailUrl,
-      required final Map<String, dynamic> layoutConfig,
+      final Map<String, dynamic> layoutConfig,
       final bool isPremium,
       final bool isActive,
       final int displayOrder,
@@ -399,8 +392,8 @@ abstract class _ImageTemplateModel implements ImageTemplateModel {
   @override
   String? get description;
   @override
-  String get category; // NATURE, MINIMAL, ARTISTIC, TRADITIONAL
-  @override
+  String get category;
+  @override // NATURE, MINIMAL, ARTISTIC, TRADITIONAL
   String get backgroundImageUrl;
   @override
   String? get thumbnailUrl;
@@ -416,11 +409,8 @@ abstract class _ImageTemplateModel implements ImageTemplateModel {
   int get usageCount;
   @override
   DateTime? get createdAt;
-
-  /// Create a copy of ImageTemplateModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$ImageTemplateModelImplCopyWith<_$ImageTemplateModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

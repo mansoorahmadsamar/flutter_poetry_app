@@ -6,6 +6,8 @@ import '../../features/main/main_screen.dart';
 import '../../features/main/tabs/poets/screens/poet_detail_screen.dart';
 import '../../features/main/tabs/poets/screens/poem_detail_screen.dart';
 import '../../features/search/screens/poets_search_screen.dart';
+import '../../features/search/screens/app_search_screen.dart';
+import '../../features/search/screens/category_results_screen.dart';
 import '../../features/engagement/screens/bookmark_search_screen.dart';
 import '../../features/engagement/screens/bookmarked_couplets_screen.dart';
 import '../../features/image_poetry/screens/template_selection_screen.dart';
@@ -13,6 +15,7 @@ import '../../features/image_poetry/screens/image_generation_screen.dart';
 import '../../features/image_poetry/screens/generated_image_gallery_screen.dart';
 import '../../features/image_poetry/screens/saved_images_screen.dart';
 import '../../features/image_poetry/screens/image_detail_screen.dart';
+import '../../features/image_poetry/editor/screens/poetry_editor_screen.dart';
 import '../auth/auth_provider.dart';
 
 /// App routes
@@ -76,12 +79,14 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: 'poets/:publicId',
+            name: 'poet-detail',
             builder: (context, state) => PoetDetailScreen(
               publicId: state.pathParameters['publicId']!,
             ),
           ),
           GoRoute(
             path: 'poems/:publicId',
+            name: 'poem-detail',
             builder: (context, state) => PoemDetailScreen(
               publicId: state.pathParameters['publicId']!,
             ),
@@ -134,9 +139,62 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/image-poetry/image/:imageId',
         name: 'image-detail',
-        builder: (context, state) => ImageDetailScreen(
-          imageId: state.pathParameters['imageId']!,
-        ),
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return ImageDetailScreen(
+            imageId: state.pathParameters['imageId']!,
+            imageUrl: extra?['imageUrl'] as String?,
+          );
+        },
+      ),
+      // Generic image poetry detail route (for bookmark navigation)
+      GoRoute(
+        path: '/image-poetry/:contentId',
+        name: 'image-poetry-detail',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return ImageDetailScreen(
+            imageId: state.pathParameters['contentId']!,
+            imageUrl: extra?['imageUrl'] as String?,
+          );
+        },
+      ),
+      // Poetry Editor (NEW - Canvas-based editor)
+      GoRoute(
+        path: '/poetry-editor',
+        name: 'poetry-editor',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return PoetryEditorScreen(
+            coupletId: extra?['coupletId'] as String?,
+            initialVerses: extra?['verses'] as List<String>?,
+          );
+        },
+      ),
+      // Global Search routes
+      GoRoute(
+        path: '/search',
+        name: 'global-search',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return AppSearchScreen(
+            initialQuery: extra?['query'] as String?,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/search/results/:category',
+        name: 'category-results',
+        builder: (context, state) {
+          final category = state.pathParameters['category']!;
+          final extra = state.extra as Map<String, dynamic>?;
+          return CategoryResultsScreen(
+            query: extra?['query'] as String? ?? '',
+            sortBy: extra?['sortBy'] as String? ?? 'relevance',
+            category: category,
+            poetId: extra?['poetId'] as String?,
+          );
+        },
       ),
     ],
   );

@@ -1,0 +1,49 @@
+ANDROID FIREBASE APP DISTRIBUTION - QUICK SETUP GUIDE
+=====================================================
+
+STEP 1: Add GitHub Secrets
+---------------------------
+Go to: https://github.com/YOUR_USERNAME/YOUR_REPO/settings/secrets/actions
+
+Add these 3 secrets:
+
+1. FIREBASE_ANDROID_APP_ID
+   Value: 1:381838704656:android:aaa0ddbf1692003ee88a95
+
+2. GOOGLE_SERVICES_JSON
+   Value: [Copy entire content from .github/GOOGLE_SERVICES_JSON.base64]
+
+3. FIREBASE_SERVICE_ACCOUNT
+   Value: [Copy entire content from .github/FIREBASE_SERVICE_ACCOUNT.base64]
+
+
+STEP 2: Create Tester Group in Firebase
+----------------------------------------
+1. Go to: https://console.firebase.google.com/project/poetry-world-eaf6c/appdistribution
+2. Click "Testers & Groups" tab
+3. Click "Add group"
+4. Name: testers
+5. Add tester email addresses
+6. Click "Save"
+
+
+STEP 3: Test the Workflow
+--------------------------
+Option A: Push to develop branch
+   git add .
+   git commit -m "Setup Firebase App Distribution"
+   git push origin develop
+
+Option B: Manual trigger
+   1. Go to: https://github.com/YOUR_USERNAME/YOUR_REPO/actions
+   2. Click "Firebase App Distribution"
+   3. Click "Run workflow"
+   4. Select branch and click "Run workflow"
+
+
+IMPORTANT NOTES:
+----------------
+- The .base64 files are added to .gitignore for security
+- Never commit the actual service account JSON file
+- The Firebase service account file in root should be deleted after setup
+- Keep the .base64 files locally for reference only

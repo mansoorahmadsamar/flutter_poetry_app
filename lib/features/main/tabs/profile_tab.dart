@@ -5,6 +5,9 @@ import '../../../core/auth/auth_provider.dart';
 import '../../../core/design_system/app_colors.dart';
 import '../../../core/providers/user_provider.dart';
 import '../../../core/providers/language_provider.dart';
+import '../../../core/widgets/standard_app_bar.dart';
+import 'profile/providers/app_content_providers.dart';
+import 'profile/screens/app_content_detail_screen.dart';
 
 /// Profile tab - User profile and settings
 class ProfileTab extends ConsumerWidget {
@@ -54,15 +57,8 @@ class ProfileTab extends ConsumerWidget {
     return CustomScrollView(
       slivers: [
         // App bar
-        SliverAppBar(
-          floating: true,
-          snap: true,
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-          title: const Text(
-            'Profile',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
+        const StandardSliverAppBar(
+          title: 'Profile',
         ),
 
         // Profile content
@@ -80,92 +76,18 @@ class ProfileTab extends ConsumerWidget {
 
               const SizedBox(height: 32),
 
-              // Profile sections
+              // Language section
               _buildSection(
                 context,
-                title: 'Account',
+                title: 'Settings',
                 items: [
-                  _buildListTile(
-                    context,
-                    icon: Icons.person_outline,
-                    title: 'Edit Profile',
-                    onTap: () {
-                      // TODO: Navigate to edit profile
-                    },
-                  ),
-                  _buildListTile(
-                    context,
-                    icon: Icons.notifications_none,
-                    title: 'Notifications',
-                    onTap: () {
-                      // TODO: Navigate to notifications settings
-                    },
-                  ),
                   _buildLanguageTile(context, ref),
                 ],
               ),
 
               const SizedBox(height: 24),
 
-              _buildSection(
-                context,
-                title: 'Preferences',
-                items: [
-                  _buildListTile(
-                    context,
-                    icon: Icons.dark_mode_outlined,
-                    title: 'Dark Mode',
-                    trailing: Switch(
-                      value: false,
-                      onChanged: (value) {
-                        // TODO: Toggle dark mode
-                      },
-                    ),
-                  ),
-                  _buildListTile(
-                    context,
-                    icon: Icons.text_fields,
-                    title: 'Font Size',
-                    subtitle: 'Medium',
-                    onTap: () {
-                      // TODO: Show font size picker
-                    },
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 24),
-
-              _buildSection(
-                context,
-                title: 'About',
-                items: [
-                  _buildListTile(
-                    context,
-                    icon: Icons.info_outline,
-                    title: 'About App',
-                    onTap: () {
-                      // TODO: Show about dialog
-                    },
-                  ),
-                  _buildListTile(
-                    context,
-                    icon: Icons.privacy_tip_outlined,
-                    title: 'Privacy Policy',
-                    onTap: () {
-                      // TODO: Show privacy policy
-                    },
-                  ),
-                  _buildListTile(
-                    context,
-                    icon: Icons.description_outlined,
-                    title: 'Terms of Service',
-                    onTap: () {
-                      // TODO: Show terms of service
-                    },
-                  ),
-                ],
-              ),
+              _buildAboutSection(context, ref),
 
               const SizedBox(height: 32),
 
@@ -544,6 +466,75 @@ class ProfileTab extends ConsumerWidget {
           ? null
           : () => _showLanguageBottomSheet(context, ref),
     );
+  }
+
+  /// Build the "About" section dynamically from the API
+  Widget _buildAboutSection(BuildContext context, WidgetRef ref) {
+    final contentAsync = ref.watch(appContentListProvider);
+
+    return contentAsync.when(
+      data: (items) {
+        if (items.isEmpty) return const SizedBox.shrink();
+        return _buildSection(
+          context,
+          title: 'About',
+          items: items
+              .map((item) => _buildListTile(
+                    context,
+                    icon: _iconForContentKey(item.contentKey),
+                    title: item.title,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => AppContentDetailScreen(
+                            contentKey: item.contentKey,
+                            title: item.title,
+                          ),
+                        ),
+                      );
+                    },
+                  ))
+              .toList(),
+        );
+      },
+      loading: () => _buildSection(
+        context,
+        title: 'About',
+        items: [
+          _buildListTile(context, icon: Icons.info_outline, title: 'About App'),
+          _buildListTile(context, icon: Icons.privacy_tip_outlined, title: 'Privacy Policy'),
+          _buildListTile(context, icon: Icons.description_outlined, title: 'Terms of Service'),
+        ],
+      ),
+      error: (_, __) => _buildSection(
+        context,
+        title: 'About',
+        items: [
+          _buildListTile(context, icon: Icons.info_outline, title: 'About App'),
+          _buildListTile(context, icon: Icons.privacy_tip_outlined, title: 'Privacy Policy'),
+          _buildListTile(context, icon: Icons.description_outlined, title: 'Terms of Service'),
+        ],
+      ),
+    );
+  }
+
+  /// Map content keys to appropriate icons
+  IconData _iconForContentKey(String key) {
+    switch (key.toUpperCase()) {
+      case 'ABOUT_APP':
+        return Icons.info_outline;
+      case 'PRIVACY_POLICY':
+        return Icons.privacy_tip_outlined;
+      case 'TERMS_OF_SERVICE':
+        return Icons.description_outlined;
+      case 'CONTACT_US':
+        return Icons.contact_mail_outlined;
+      case 'FAQ':
+        return Icons.help_outline;
+      default:
+        return Icons.article_outlined;
+    }
   }
 
   /// Show language selection bottom sheet

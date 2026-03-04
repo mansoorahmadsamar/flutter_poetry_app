@@ -10,15 +10,22 @@ class PoetModel with _$PoetModel {
     required String name,
     @JsonKey(name: 'shortBio') required String shortBio,
     required int birthYear,
-    int? deathYear,
+    @Default(0) int deathYear,
     @JsonKey(name: 'profileImageUrl') String? profileImageUrl,
     String? gender, // MALE, FEMALE, OTHER
     String? era, // CLASSICAL, MODERN, CONTEMPORARY, EMERGING
-    required int poemCount,
-    required int viewCount,
-    @JsonKey(name: 'isFeatured') required bool isFeatured,
-    @JsonKey(name: 'isTrending') required bool isTrending,
-    @JsonKey(name: 'topTags') List<String>? topTags,
+    @Default(0) int poemCount,
+    @Default(0) int viewCount,
+    @Default(0) int followerCount,
+    @JsonKey(name: 'isFeatured') @Default(false) bool isFeatured,
+    @JsonKey(name: 'isTrending') @Default(false) bool isTrending,
+    @JsonKey(name: 'isVerified') @Default(false) bool isVerified,
+    @JsonKey(name: 'birthPlace') String? birthPlace,
+    String? country,
+    @JsonKey(name: 'countryFlag') String? countryFlag,
+    @JsonKey(name: 'countryFlagUrl') String? countryFlagUrl,
+    @JsonKey(name: 'topTags') @Default([]) List<String> topTags,
+    @JsonKey(name: 'isActive') @Default(true) bool isActive,  // Added from API response
   }) = _PoetModel;
 
   factory PoetModel.fromJson(Map<String, dynamic> json) =>

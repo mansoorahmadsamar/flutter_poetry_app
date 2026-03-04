@@ -27,9 +27,7 @@ mixin _$BookmarkSearchState {
   String? get poetryTypeFilter => throw _privateConstructorUsedError;
   String? get sortBy => throw _privateConstructorUsedError;
 
-  /// Create a copy of BookmarkSearchState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $BookmarkSearchStateCopyWith<BookmarkSearchState> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -63,8 +61,6 @@ class _$BookmarkSearchStateCopyWithImpl<$Res, $Val extends BookmarkSearchState>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of BookmarkSearchState
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -153,8 +149,6 @@ class __$$BookmarkSearchStateImplCopyWithImpl<$Res>
       $Res Function(_$BookmarkSearchStateImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of BookmarkSearchState
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -306,9 +300,7 @@ class _$BookmarkSearchStateImpl extends _BookmarkSearchState {
       poetryTypeFilter,
       sortBy);
 
-  /// Create a copy of BookmarkSearchState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$BookmarkSearchStateImplCopyWith<_$BookmarkSearchStateImpl> get copyWith =>
@@ -350,11 +342,8 @@ abstract class _BookmarkSearchState extends BookmarkSearchState {
   String? get poetryTypeFilter;
   @override
   String? get sortBy;
-
-  /// Create a copy of BookmarkSearchState
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$BookmarkSearchStateImplCopyWith<_$BookmarkSearchStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

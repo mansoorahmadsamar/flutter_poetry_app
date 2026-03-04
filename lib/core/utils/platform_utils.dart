@@ -9,8 +9,11 @@ class PlatformUtils {
     } else if (Platform.isAndroid) {
       // Android emulator uses 10.0.2.2 to access host machine's localhost
       return 'http://10.0.2.2:$port';
+    } else if (Platform.isIOS) {
+      // iOS simulator can access localhost directly
+      // For physical devices, you would need to use your Mac's local network IP
+      return 'http://localhost:$port';
     } else {
-      // iOS simulator and real devices can use localhost
       return 'http://localhost:$port';
     }
   }

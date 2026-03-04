@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/io_client.dart';
 import 'package:logger/logger.dart';
 import '../config/app_config.dart';
 import '../storage/secure_storage.dart';
@@ -20,6 +22,19 @@ class FirebaseAuthService {
   static const String _firebaseTokenKey = 'firebase_token';
 
   FirebaseAuthService(this._secureStorage);
+
+  /// Create HTTP client that accepts self-signed certificates for production server
+  http.Client _createHttpClient() {
+    if (appConfig.baseApiUrl.contains('134.199.243.167')) {
+      final ioClient = HttpClient()
+        ..badCertificateCallback = (X509Certificate cert, String host, int port) {
+          // Accept self-signed certificate for the production server
+          return host == '134.199.243.167';
+        };
+      return IOClient(ioClient);
+    }
+    return http.Client();
+  }
 
   /// Get current Firebase user
   User? get currentUser => _firebaseAuth.currentUser;
@@ -90,7 +105,8 @@ class FirebaseAuthService {
       _logger.i('📤 Step 6: Sending Firebase token to backend...');
       _logger.i('   Endpoint: ${appConfig.baseApiUrl}/api/auth/firebase/verify');
 
-      final response = await http.post(
+      final client = _createHttpClient();
+      final response = await client.post(
         Uri.parse('${appConfig.baseApiUrl}/api/auth/firebase/verify'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
@@ -99,6 +115,7 @@ class FirebaseAuthService {
           'deviceType': 'android', // or detect dynamically
         }),
       );
+      client.close();
 
       _logger.i('📡 Backend response:');
       _logger.i('   Status Code: ${response.statusCode}');
@@ -113,6 +130,8 @@ class FirebaseAuthService {
           final accessToken = tokenData['accessToken'] as String?;
           final refreshToken = tokenData['refreshToken'] as String?;
           final email = tokenData['email'] as String? ?? googleUser.email;
+          final userId = tokenData['userId']?.toString() ??
+              tokenData['id']?.toString();
 
           if (accessToken == null || refreshToken == null) {
             throw Exception('Backend did not return required tokens');
@@ -130,6 +149,12 @@ class FirebaseAuthService {
 
           if (email.isNotEmpty) {
             await _secureStorage.saveUserEmail(email);
+          }
+
+          // Save user ID for personalization (X-User-Id header)
+          if (userId != null && userId.isNotEmpty) {
+            await _secureStorage.saveUserId(userId);
+            _logger.i('   User ID saved: $userId');
           }
 
           _logger.i('✅ Tokens saved successfully');
@@ -189,11 +214,13 @@ class FirebaseAuthService {
 
       _logger.i('   Sending refresh request to backend...');
 
-      final response = await http.post(
+      final client = _createHttpClient();
+      final response = await client.post(
         Uri.parse('${appConfig.baseApiUrl}/api/auth/refresh'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'refreshToken': refreshToken}),
       );
+      client.close();
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -329,11 +356,13 @@ class FirebaseAuthService {
       if (refreshToken != null) {
         try {
           _logger.i('   Calling backend logout endpoint...');
-          await http.post(
+          final client = _createHttpClient();
+          await client.post(
             Uri.parse('${appConfig.baseApiUrl}/api/auth/logout'),
             headers: {'Content-Type': 'application/json'},
             body: json.encode({'refreshToken': refreshToken}),
           );
+          client.close();
           _logger.i('✅ Backend logout successful');
         } catch (e) {
           _logger.e('⚠️  Backend logout failed: $e');
@@ -350,6 +379,7 @@ class FirebaseAuthService {
       await _secureStorage.deleteRefreshToken();
       await _secureStorage.deleteToken(_firebaseTokenKey);
       await _secureStorage.deleteUserEmail();
+      await _secureStorage.deleteUserId();
 
       _logger.i('✅ Sign out completed successfully');
     } catch (e) {

@@ -60,15 +60,17 @@ PaginatedResponse<T> _$PaginatedResponseFromJson<T>(
 ) =>
     PaginatedResponse<T>(
       content: (json['content'] as List<dynamic>).map(fromJsonT).toList(),
-      pageable: Pageable.fromJson(json['pageable'] as Map<String, dynamic>),
+      pageable: json['pageable'] == null
+          ? null
+          : Pageable.fromJson(json['pageable'] as Map<String, dynamic>),
       totalElements: (json['totalElements'] as num).toInt(),
       totalPages: (json['totalPages'] as num).toInt(),
       last: json['last'] as bool,
       first: json['first'] as bool,
-      numberOfElements: (json['numberOfElements'] as num).toInt(),
+      numberOfElements: (json['numberOfElements'] as num?)?.toInt(),
       size: (json['size'] as num).toInt(),
       number: (json['number'] as num).toInt(),
-      empty: json['empty'] as bool,
+      empty: json['empty'] as bool?,
     );
 
 Map<String, dynamic> _$PaginatedResponseToJson<T>(

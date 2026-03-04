@@ -36,6 +36,10 @@ mixin _$PoetProfileModel {
   @JsonKey(name: 'birthPlace')
   String? get birthPlace => throw _privateConstructorUsedError;
   String? get country => throw _privateConstructorUsedError;
+  @JsonKey(name: 'countryFlag')
+  String? get countryFlag => throw _privateConstructorUsedError;
+  @JsonKey(name: 'countryFlagUrl')
+  String? get countryFlagUrl => throw _privateConstructorUsedError;
   @JsonKey(name: 'primaryLanguageCode')
   String? get primaryLanguageCode => throw _privateConstructorUsedError;
   @JsonKey(name: 'primaryLanguageName')
@@ -64,12 +68,8 @@ mixin _$PoetProfileModel {
   @JsonKey(name: 'updatedAt')
   String? get updatedAt => throw _privateConstructorUsedError;
 
-  /// Serializes this PoetProfileModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of PoetProfileModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $PoetProfileModelCopyWith<PoetProfileModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -93,6 +93,8 @@ abstract class $PoetProfileModelCopyWith<$Res> {
       @JsonKey(name: 'deathDate') String? deathDate,
       @JsonKey(name: 'birthPlace') String? birthPlace,
       String? country,
+      @JsonKey(name: 'countryFlag') String? countryFlag,
+      @JsonKey(name: 'countryFlagUrl') String? countryFlagUrl,
       @JsonKey(name: 'primaryLanguageCode') String? primaryLanguageCode,
       @JsonKey(name: 'primaryLanguageName') String? primaryLanguageName,
       @JsonKey(name: 'isFeatured') bool isFeatured,
@@ -121,8 +123,6 @@ class _$PoetProfileModelCopyWithImpl<$Res, $Val extends PoetProfileModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of PoetProfileModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -138,6 +138,8 @@ class _$PoetProfileModelCopyWithImpl<$Res, $Val extends PoetProfileModel>
     Object? deathDate = freezed,
     Object? birthPlace = freezed,
     Object? country = freezed,
+    Object? countryFlag = freezed,
+    Object? countryFlagUrl = freezed,
     Object? primaryLanguageCode = freezed,
     Object? primaryLanguageName = freezed,
     Object? isFeatured = null,
@@ -203,6 +205,14 @@ class _$PoetProfileModelCopyWithImpl<$Res, $Val extends PoetProfileModel>
       country: freezed == country
           ? _value.country
           : country // ignore: cast_nullable_to_non_nullable
+              as String?,
+      countryFlag: freezed == countryFlag
+          ? _value.countryFlag
+          : countryFlag // ignore: cast_nullable_to_non_nullable
+              as String?,
+      countryFlagUrl: freezed == countryFlagUrl
+          ? _value.countryFlagUrl
+          : countryFlagUrl // ignore: cast_nullable_to_non_nullable
               as String?,
       primaryLanguageCode: freezed == primaryLanguageCode
           ? _value.primaryLanguageCode
@@ -293,6 +303,8 @@ abstract class _$$PoetProfileModelImplCopyWith<$Res>
       @JsonKey(name: 'deathDate') String? deathDate,
       @JsonKey(name: 'birthPlace') String? birthPlace,
       String? country,
+      @JsonKey(name: 'countryFlag') String? countryFlag,
+      @JsonKey(name: 'countryFlagUrl') String? countryFlagUrl,
       @JsonKey(name: 'primaryLanguageCode') String? primaryLanguageCode,
       @JsonKey(name: 'primaryLanguageName') String? primaryLanguageName,
       @JsonKey(name: 'isFeatured') bool isFeatured,
@@ -319,8 +331,6 @@ class __$$PoetProfileModelImplCopyWithImpl<$Res>
       $Res Function(_$PoetProfileModelImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of PoetProfileModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -336,6 +346,8 @@ class __$$PoetProfileModelImplCopyWithImpl<$Res>
     Object? deathDate = freezed,
     Object? birthPlace = freezed,
     Object? country = freezed,
+    Object? countryFlag = freezed,
+    Object? countryFlagUrl = freezed,
     Object? primaryLanguageCode = freezed,
     Object? primaryLanguageName = freezed,
     Object? isFeatured = null,
@@ -401,6 +413,14 @@ class __$$PoetProfileModelImplCopyWithImpl<$Res>
       country: freezed == country
           ? _value.country
           : country // ignore: cast_nullable_to_non_nullable
+              as String?,
+      countryFlag: freezed == countryFlag
+          ? _value.countryFlag
+          : countryFlag // ignore: cast_nullable_to_non_nullable
+              as String?,
+      countryFlagUrl: freezed == countryFlagUrl
+          ? _value.countryFlagUrl
+          : countryFlagUrl // ignore: cast_nullable_to_non_nullable
               as String?,
       primaryLanguageCode: freezed == primaryLanguageCode
           ? _value.primaryLanguageCode
@@ -486,6 +506,8 @@ class _$PoetProfileModelImpl implements _PoetProfileModel {
       @JsonKey(name: 'deathDate') this.deathDate,
       @JsonKey(name: 'birthPlace') this.birthPlace,
       this.country,
+      @JsonKey(name: 'countryFlag') this.countryFlag,
+      @JsonKey(name: 'countryFlagUrl') this.countryFlagUrl,
       @JsonKey(name: 'primaryLanguageCode') this.primaryLanguageCode,
       @JsonKey(name: 'primaryLanguageName') this.primaryLanguageName,
       @JsonKey(name: 'isFeatured') required this.isFeatured,
@@ -539,6 +561,12 @@ class _$PoetProfileModelImpl implements _PoetProfileModel {
   final String? birthPlace;
   @override
   final String? country;
+  @override
+  @JsonKey(name: 'countryFlag')
+  final String? countryFlag;
+  @override
+  @JsonKey(name: 'countryFlagUrl')
+  final String? countryFlagUrl;
   @override
   @JsonKey(name: 'primaryLanguageCode')
   final String? primaryLanguageCode;
@@ -625,7 +653,7 @@ class _$PoetProfileModelImpl implements _PoetProfileModel {
 
   @override
   String toString() {
-    return 'PoetProfileModel(publicId: $publicId, name: $name, biography: $biography, shortBio: $shortBio, gender: $gender, era: $era, birthYear: $birthYear, deathYear: $deathYear, birthDate: $birthDate, deathDate: $deathDate, birthPlace: $birthPlace, country: $country, primaryLanguageCode: $primaryLanguageCode, primaryLanguageName: $primaryLanguageName, isFeatured: $isFeatured, isTrending: $isTrending, isVerified: $isVerified, viewCount: $viewCount, followerCount: $followerCount, poemCount: $poemCount, profileImageUrl: $profileImageUrl, gallery: $gallery, books: $books, videos: $videos, facts: $facts, tags: $tags, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'PoetProfileModel(publicId: $publicId, name: $name, biography: $biography, shortBio: $shortBio, gender: $gender, era: $era, birthYear: $birthYear, deathYear: $deathYear, birthDate: $birthDate, deathDate: $deathDate, birthPlace: $birthPlace, country: $country, countryFlag: $countryFlag, countryFlagUrl: $countryFlagUrl, primaryLanguageCode: $primaryLanguageCode, primaryLanguageName: $primaryLanguageName, isFeatured: $isFeatured, isTrending: $isTrending, isVerified: $isVerified, viewCount: $viewCount, followerCount: $followerCount, poemCount: $poemCount, profileImageUrl: $profileImageUrl, gallery: $gallery, books: $books, videos: $videos, facts: $facts, tags: $tags, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -653,6 +681,10 @@ class _$PoetProfileModelImpl implements _PoetProfileModel {
             (identical(other.birthPlace, birthPlace) ||
                 other.birthPlace == birthPlace) &&
             (identical(other.country, country) || other.country == country) &&
+            (identical(other.countryFlag, countryFlag) ||
+                other.countryFlag == countryFlag) &&
+            (identical(other.countryFlagUrl, countryFlagUrl) ||
+                other.countryFlagUrl == countryFlagUrl) &&
             (identical(other.primaryLanguageCode, primaryLanguageCode) ||
                 other.primaryLanguageCode == primaryLanguageCode) &&
             (identical(other.primaryLanguageName, primaryLanguageName) ||
@@ -682,7 +714,7 @@ class _$PoetProfileModelImpl implements _PoetProfileModel {
                 other.updatedAt == updatedAt));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hashAll([
         runtimeType,
@@ -698,6 +730,8 @@ class _$PoetProfileModelImpl implements _PoetProfileModel {
         deathDate,
         birthPlace,
         country,
+        countryFlag,
+        countryFlagUrl,
         primaryLanguageCode,
         primaryLanguageName,
         isFeatured,
@@ -716,9 +750,7 @@ class _$PoetProfileModelImpl implements _PoetProfileModel {
         updatedAt
       ]);
 
-  /// Create a copy of PoetProfileModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$PoetProfileModelImplCopyWith<_$PoetProfileModelImpl> get copyWith =>
@@ -747,6 +779,8 @@ abstract class _PoetProfileModel implements PoetProfileModel {
       @JsonKey(name: 'deathDate') final String? deathDate,
       @JsonKey(name: 'birthPlace') final String? birthPlace,
       final String? country,
+      @JsonKey(name: 'countryFlag') final String? countryFlag,
+      @JsonKey(name: 'countryFlagUrl') final String? countryFlagUrl,
       @JsonKey(name: 'primaryLanguageCode') final String? primaryLanguageCode,
       @JsonKey(name: 'primaryLanguageName') final String? primaryLanguageName,
       @JsonKey(name: 'isFeatured') required final bool isFeatured,
@@ -797,6 +831,12 @@ abstract class _PoetProfileModel implements PoetProfileModel {
   @override
   String? get country;
   @override
+  @JsonKey(name: 'countryFlag')
+  String? get countryFlag;
+  @override
+  @JsonKey(name: 'countryFlagUrl')
+  String? get countryFlagUrl;
+  @override
   @JsonKey(name: 'primaryLanguageCode')
   String? get primaryLanguageCode;
   @override
@@ -839,11 +879,8 @@ abstract class _PoetProfileModel implements PoetProfileModel {
   @override
   @JsonKey(name: 'updatedAt')
   String? get updatedAt;
-
-  /// Create a copy of PoetProfileModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$PoetProfileModelImplCopyWith<_$PoetProfileModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

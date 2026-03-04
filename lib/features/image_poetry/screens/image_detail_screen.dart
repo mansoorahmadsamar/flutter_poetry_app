@@ -3,16 +3,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
+import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/features/image_poetry/widgets/image_viewer.dart';
 import 'package:flutter_poetry_app/features/image_poetry/widgets/collection_dialog.dart';
 import 'package:flutter_poetry_app/features/image_poetry/providers/image_collection_providers.dart';
+import 'package:flutter_poetry_app/features/image_poetry/providers/image_bookmark_providers.dart';
 
 class ImageDetailScreen extends ConsumerStatefulWidget {
   final String imageId;
+  final String? imageUrl;
 
   const ImageDetailScreen({
     super.key,
     required this.imageId,
+    this.imageUrl,
   });
 
   @override
@@ -21,11 +25,34 @@ class ImageDetailScreen extends ConsumerStatefulWidget {
 
 class _ImageDetailScreenState extends ConsumerState<ImageDetailScreen> {
   bool _showMetadata = false;
+  bool? _isBookmarked;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBookmarkStatus();
+  }
+
+  Future<void> _loadBookmarkStatus() async {
+    final isBookmarked = await ref
+        .read(imageBookmarkActionProvider.notifier)
+        .isBookmarked(widget.imageId);
+
+    if (mounted) {
+      setState(() {
+        _isBookmarked = isBookmarked;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    // For now, we'll fetch from saved images
-    // In a real app, you'd have a separate provider for a single image
+    // If imageUrl is provided directly (e.g. from bookmarks), show it directly
+    if (widget.imageUrl != null) {
+      return _buildDirectImageView(widget.imageUrl!);
+    }
+
+    // Otherwise, fetch from saved images
     final params = const SavedImagesParams(page: 1, size: 100);
     final imagesAsync = ref.watch(savedImagesProvider(params));
 
@@ -36,100 +63,10 @@ class _ImageDetailScreenState extends ConsumerState<ImageDetailScreen> {
           orElse: () => paginatedResponse.content.first,
         );
 
-        return Scaffold(
-          body: Stack(
-            children: [
-              // Full-screen image
-              ImageViewer(
-                imageUrl: image.imageUrl,
-                heroTag: 'image_${image.publicId}',
-              ),
-
-              // Metadata panel (slide up from bottom)
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  height: _showMetadata ? 300 : 80,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(20),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.3),
-                        blurRadius: 10,
-                        offset: const Offset(0, -2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      // Handle
-                      GestureDetector(
-                        onTap: () {
-                          setState(() => _showMetadata = !_showMetadata);
-                        },
-                        child: Container(
-                          padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
-                          child: Container(
-                            width: 40,
-                            height: 4,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[300],
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      // Action buttons (always visible)
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            _buildActionButton(
-                              icon: Icons.download,
-                              label: 'Download',
-                              onTap: () => _downloadImage(image.imageUrl),
-                            ),
-                            _buildActionButton(
-                              icon: Icons.share,
-                              label: 'Share',
-                              onTap: () => _shareImage(image.imageUrl),
-                            ),
-                            _buildActionButton(
-                              icon: Icons.collections_bookmark,
-                              label: 'Save',
-                              onTap: () => _showCollectionDialog(image.publicId),
-                            ),
-                            _buildActionButton(
-                              icon: Icons.favorite_border,
-                              label: 'Favorite',
-                              onTap: () => _toggleFavorite(image.publicId),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Metadata (shown when expanded)
-                      if (_showMetadata)
-                        Expanded(
-                          child: SingleChildScrollView(
-                            padding: EdgeInsets.all(AppSpacing.md),
-                            child: _buildMetadata(image),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+        return _buildImageDetail(
+          imageUrl: image.imageUrl,
+          imageId: image.publicId,
+          metadata: image,
         );
       },
       loading: () => const Scaffold(
@@ -166,10 +103,129 @@ class _ImageDetailScreenState extends ConsumerState<ImageDetailScreen> {
     );
   }
 
+  /// Build view when imageUrl is provided directly (bookmark navigation)
+  Widget _buildDirectImageView(String imageUrl) {
+    return _buildImageDetail(
+      imageUrl: imageUrl,
+      imageId: widget.imageId,
+      metadata: null,
+    );
+  }
+
+  /// Shared image detail layout
+  Widget _buildImageDetail({
+    required String imageUrl,
+    required String imageId,
+    dynamic metadata,
+  }) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          // Full-screen image
+          ImageViewer(
+            imageUrl: imageUrl,
+            heroTag: 'image_$imageId',
+          ),
+
+          // Metadata panel (slide up from bottom)
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              height: _showMetadata && metadata != null ? 300 : 80,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(20),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  // Handle
+                  if (metadata != null)
+                    GestureDetector(
+                      onTap: () {
+                        setState(() => _showMetadata = !_showMetadata);
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                        child: Container(
+                          width: 40,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                  // Action buttons (always visible)
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildActionButton(
+                          icon: _isBookmarked == true
+                              ? Icons.bookmark
+                              : Icons.bookmark_border,
+                          label: 'Bookmark',
+                          onTap: () => _toggleBookmark(imageId),
+                          isActive: _isBookmarked == true,
+                        ),
+                        _buildActionButton(
+                          icon: Icons.share,
+                          label: 'Share',
+                          onTap: () => _shareImage(imageUrl),
+                        ),
+                        if (metadata != null) ...[
+                          _buildActionButton(
+                            icon: Icons.collections_bookmark,
+                            label: 'Save',
+                            onTap: () => _showCollectionDialog(imageId),
+                          ),
+                          _buildActionButton(
+                            icon: Icons.favorite_border,
+                            label: 'Favorite',
+                            onTap: () => _toggleFavorite(imageId),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+
+                  // Metadata (shown when expanded)
+                  if (_showMetadata && metadata != null)
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: EdgeInsets.all(AppSpacing.md),
+                        child: _buildMetadata(metadata),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildActionButton({
     required IconData icon,
     required String label,
     required VoidCallback onTap,
+    bool isActive = false,
   }) {
     return InkWell(
       onTap: onTap,
@@ -179,13 +235,18 @@ class _ImageDetailScreenState extends ConsumerState<ImageDetailScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 24, color: AppColors.primary),
+            Icon(
+              icon,
+              size: 24,
+              color: isActive ? AppColors.primary : Colors.grey[700],
+            ),
             SizedBox(height: AppSpacing.xs),
             Text(
               label,
               style: TextStyle(
                 fontSize: 11,
-                color: Colors.grey[700],
+                color: isActive ? AppColors.primary : Colors.grey[700],
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
           ],
@@ -421,6 +482,40 @@ class _ImageDetailScreenState extends ConsumerState<ImageDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to update favorite: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _toggleBookmark(String imageId) async {
+    final currentLang = ref.read(selectedLanguageProvider);
+
+    try {
+      final isBookmarked = await ref
+          .read(imageBookmarkActionProvider.notifier)
+          .toggleBookmark(imageId, lang: currentLang);
+
+      if (mounted) {
+        setState(() {
+          _isBookmarked = isBookmarked;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              isBookmarked ? 'Image bookmarked' : 'Bookmark removed',
+            ),
+            duration: const Duration(seconds: 1),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to toggle bookmark: $e'),
             backgroundColor: Colors.red,
           ),
         );

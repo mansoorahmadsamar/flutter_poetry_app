@@ -52,6 +52,10 @@ class SecureStorageService {
     return await _storage.read(key: AppConstants.userIdKey);
   }
 
+  Future<void> deleteUserId() async {
+    await _storage.delete(key: AppConstants.userIdKey);
+  }
+
   Future<void> saveUserEmail(String email) async {
     await _storage.write(key: AppConstants.userEmailKey, value: email);
   }

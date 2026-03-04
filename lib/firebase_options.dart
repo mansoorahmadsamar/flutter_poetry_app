@@ -55,13 +55,13 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBrIHJkk6mLJECzfJfJQ7BZ9L7F8K8K8K8',
-    appId: '1:381838704656:ios:aaa0ddbf1692003ee88a96',
+    apiKey: 'AIzaSyDAJG7wvy3VMjSQ618yyLS0wgn4fCeFjCg',
+    appId: '1:381838704656:ios:9a91e1b5e1f2985de88a95',
     messagingSenderId: '381838704656',
     projectId: 'poetry-world-eaf6c',
     storageBucket: 'poetry-world-eaf6c.firebasestorage.app',
-    iosClientId: '381838704656-ios-client-id.apps.googleusercontent.com',
-    iosBundleId: 'com.techhikes.poetryApp',
+    iosClientId: '381838704656-p6eop70fhpv51ibck93ga9dd4mlt7k33.apps.googleusercontent.com',
+    iosBundleId: 'com.techhikes.poetryapp',
   );
 
   static const FirebaseOptions web = FirebaseOptions(

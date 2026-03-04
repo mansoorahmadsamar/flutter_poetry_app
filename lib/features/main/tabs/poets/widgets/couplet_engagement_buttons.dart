@@ -2,31 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
+import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/couplet_model.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/couplet_providers.dart';
 import 'package:flutter_poetry_app/features/image_poetry/widgets/share_options_sheet.dart';
 
 class CoupletEngagementButtons extends ConsumerWidget {
   final CoupletModel couplet;
+  final String? poemPublicId; // Optional: to invalidate the specific coupletsProvider instance
 
   const CoupletEngagementButtons({
     super.key,
     required this.couplet,
+    this.poemPublicId,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Always rebuild when the widget rebuilds to show updated states
+    final isLiked = couplet.isLikedByCurrentUser;
+    final isBookmarked = couplet.isBookmarkedByCurrentUser;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         // Like button
         _EngagementButton(
-          icon: couplet.isLikedByCurrentUser == true
-              ? Icons.favorite
-              : Icons.favorite_border,
-          iconColor: couplet.isLikedByCurrentUser == true
-              ? Colors.red
-              : Colors.grey,
+          icon: isLiked ? Icons.favorite : Icons.favorite_border,
+          iconColor: isLiked ? Colors.red : Colors.grey,
           count: couplet.likeCount,
           label: 'Like',
           onPressed: () => _handleLike(context, ref),
@@ -34,12 +37,8 @@ class CoupletEngagementButtons extends ConsumerWidget {
 
         // Bookmark button
         _EngagementButton(
-          icon: couplet.isBookmarkedByCurrentUser == true
-              ? Icons.bookmark
-              : Icons.bookmark_border,
-          iconColor: couplet.isBookmarkedByCurrentUser == true
-              ? AppColors.primary
-              : Colors.grey,
+          icon: isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+          iconColor: isBookmarked ? AppColors.primary : Colors.grey,
           count: couplet.bookmarkCount,
           label: 'Save',
           onPressed: () => _handleBookmark(context, ref),
@@ -58,10 +57,15 @@ class CoupletEngagementButtons extends ConsumerWidget {
   }
 
   Future<void> _handleLike(BuildContext context, WidgetRef ref) async {
-    final isLiked = couplet.isLikedByCurrentUser ?? false;
+    final isLiked = couplet.isLikedByCurrentUser;
 
     try {
       await ref.read(coupletActionProvider.notifier).toggleLike(couplet.publicId);
+
+      // Manually invalidate the specific coupletsProvider instance if poemPublicId is available
+      if (poemPublicId != null) {
+        ref.invalidate(coupletsProvider(poemPublicId!));
+      }
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -84,18 +88,24 @@ class CoupletEngagementButtons extends ConsumerWidget {
   }
 
   Future<void> _handleBookmark(BuildContext context, WidgetRef ref) async {
-    final isBookmarked = couplet.isBookmarkedByCurrentUser ?? false;
+    final isBookmarked = couplet.isBookmarkedByCurrentUser;
+    final currentLang = ref.read(selectedLanguageProvider);
 
     try {
       final enrichedCouplet = await ref
           .read(coupletActionProvider.notifier)
-          .toggleBookmark(couplet.publicId);
+          .toggleBookmark(couplet.publicId, lang: currentLang);
+
+      // Manually invalidate the specific coupletsProvider instance if poemPublicId is available
+      if (poemPublicId != null) {
+        ref.invalidate(coupletsProvider(poemPublicId!));
+      }
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              (enrichedCouplet.isBookmarkedByCurrentUser ?? false)
+              enrichedCouplet.isBookmarkedByCurrentUser
                   ? 'Couplet bookmarked'
                   : 'Couplet removed from bookmarks',
             ),

@@ -34,7 +34,7 @@ class ImageCollectionService {
   Future<PaginatedResponse<GeneratedImageModel>> getSavedImages({
     String? collectionName,
     bool? favoritesOnly,
-    int page = 1,
+    int page = 0,
     int size = 20,
   }) async {
     final queryParams = <String, dynamic>{
@@ -134,5 +134,137 @@ class ImageCollectionService {
     }
 
     return CollectionStatsModel.fromJson(apiResponse.data!);
+  }
+
+  /// Toggle bookmark for an image
+  /// Works for both generated poetry images and poet gallery images.
+  /// [lang] - Language code when bookmarking (ur, en, hi, etc.) to preserve language context
+  /// Returns true if bookmarked, false if unbookmarked
+  Future<bool> toggleBookmark(String imageId, {String lang = 'ur'}) async {
+    final response = await _dio.post(
+      '/api/poetry-images/$imageId/bookmark',
+      queryParameters: {'lang': lang},
+    );
+
+    final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+      response.data,
+      (json) => json as Map<String, dynamic>,
+    );
+
+    if (!apiResponse.success || apiResponse.data == null) {
+      throw Exception(apiResponse.message ?? 'Failed to toggle bookmark');
+    }
+
+    return apiResponse.data!['isBookmarked'] as bool? ?? false;
+  }
+
+  /// Toggle like for a poetry image
+  /// Returns true if liked, false if unliked
+  Future<bool> toggleLike(String imageId) async {
+    final response = await _dio.post(
+      '/api/poetry-images/$imageId/like',
+    );
+
+    final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+      response.data,
+      (json) => json as Map<String, dynamic>,
+    );
+
+    if (!apiResponse.success || apiResponse.data == null) {
+      throw Exception(apiResponse.message ?? 'Failed to toggle like');
+    }
+
+    return apiResponse.data!['isLiked'] as bool? ?? false;
+  }
+
+  /// Record a share event for a poetry image
+  /// Returns the updated share count
+  Future<int> recordShare(String imageId) async {
+    final response = await _dio.post(
+      '/api/poetry-images/$imageId/share',
+    );
+
+    final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+      response.data,
+      (json) => json as Map<String, dynamic>,
+    );
+
+    if (!apiResponse.success || apiResponse.data == null) {
+      throw Exception(apiResponse.message ?? 'Failed to record share');
+    }
+
+    return apiResponse.data!['shareCount'] as int? ?? 0;
+  }
+
+  /// Get full engagement status for a poetry image in one call
+  /// Returns { isLiked, isBookmarked, likeCount, bookmarkCount, shareCount }
+  Future<Map<String, dynamic>> getImageStatus(String imageId) async {
+    final response = await _dio.get(
+      '/api/poetry-images/$imageId/status',
+    );
+
+    final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+      response.data,
+      (json) => json as Map<String, dynamic>,
+    );
+
+    if (!apiResponse.success || apiResponse.data == null) {
+      throw Exception(apiResponse.message ?? 'Failed to get image status');
+    }
+
+    return apiResponse.data!;
+  }
+
+  /// Get bookmarked images with pagination and language filtering (NEW - Phase 1 & 2)
+  Future<PaginatedResponse<GeneratedImageModel>> getBookmarkedImages({
+    String? lang,
+    int page = 0,
+    int size = 20,
+  }) async {
+    final queryParams = <String, dynamic>{
+      'page': page,
+      'size': size,
+    };
+
+    if (lang != null) {
+      queryParams['lang'] = lang;
+    }
+
+    final response = await _dio.get(
+      '/api/users/me/image-bookmarks',
+      queryParameters: queryParams,
+    );
+
+    final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+      response.data,
+      (json) => json as Map<String, dynamic>,
+    );
+
+    if (!apiResponse.success || apiResponse.data == null) {
+      throw Exception(apiResponse.message ?? 'Failed to load bookmarked images');
+    }
+
+    return PaginatedResponse.fromJson(
+      apiResponse.data!,
+      (json) => GeneratedImageModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Check if an image is bookmarked
+  Future<bool> isImageBookmarked(String imageId) async {
+    final response = await _dio.get('/api/poetry-images/$imageId/is-bookmarked');
+
+    final rawData = response.data;
+    if (rawData is! Map<String, dynamic>) return false;
+
+    final success = rawData['success'] as bool? ?? false;
+    if (!success) return false;
+
+    final data = rawData['data'];
+    if (data is bool) return data;
+    if (data is Map<String, dynamic>) {
+      return data['isBookmarked'] as bool? ?? false;
+    }
+    return false;
   }
 }

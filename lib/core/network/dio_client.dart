@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/app_config.dart';
 import '../constants/app_constants.dart';
@@ -23,6 +25,19 @@ class DioClient {
         },
       ),
     );
+
+    // Configure SSL certificate handling for production server with self-signed cert
+    // Note: In production with a proper domain, remove this and use valid certificates
+    if (appConfig.baseApiUrl.contains('134.199.243.167')) {
+      (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
+        final client = HttpClient();
+        client.badCertificateCallback = (X509Certificate cert, String host, int port) {
+          // Accept self-signed certificate for the production server
+          return host == '134.199.243.167';
+        };
+        return client;
+      };
+    }
 
     // Add interceptors
     // Auth interceptor must be added first to intercept requests

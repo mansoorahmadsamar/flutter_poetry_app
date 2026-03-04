@@ -33,6 +33,10 @@ _$GeneratedImageModelImpl _$$GeneratedImageModelImplFromJson(
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
+      isBookmarkedByCurrentUser: json['isBookmarkedByCurrentUser'] as bool?,
+      bookmarkedAt: json['bookmarkedAt'] == null
+          ? null
+          : DateTime.parse(json['bookmarkedAt'] as String),
     );
 
 Map<String, dynamic> _$$GeneratedImageModelImplToJson(
@@ -58,6 +62,8 @@ Map<String, dynamic> _$$GeneratedImageModelImplToJson(
       'userId': instance.userId,
       'isUserCreated': instance.isUserCreated,
       'createdAt': instance.createdAt?.toIso8601String(),
+      'isBookmarkedByCurrentUser': instance.isBookmarkedByCurrentUser,
+      'bookmarkedAt': instance.bookmarkedAt?.toIso8601String(),
     };
 
 _$GenerateImageRequestImpl _$$GenerateImageRequestImplFromJson(

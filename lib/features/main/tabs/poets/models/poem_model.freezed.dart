@@ -58,12 +58,8 @@ mixin _$PoemModel {
   String? get title => throw _privateConstructorUsedError;
   String? get excerpt => throw _privateConstructorUsedError;
 
-  /// Serializes this PoemModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of PoemModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $PoemModelCopyWith<PoemModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -123,8 +119,6 @@ class _$PoemModelCopyWithImpl<$Res, $Val extends PoemModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of PoemModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -308,8 +302,6 @@ class _$PoemModelCopyWithImpl<$Res, $Val extends PoemModel>
     ) as $Val);
   }
 
-  /// Create a copy of PoemModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $PoemContentModelCopyWith<$Res>? get originalContent {
@@ -380,8 +372,6 @@ class __$$PoemModelImplCopyWithImpl<$Res>
       _$PoemModelImpl _value, $Res Function(_$PoemModelImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of PoemModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -780,7 +770,7 @@ class _$PoemModelImpl implements _PoemModel {
             (identical(other.excerpt, excerpt) || other.excerpt == excerpt));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hashAll([
         runtimeType,
@@ -821,9 +811,7 @@ class _$PoemModelImpl implements _PoemModel {
         excerpt
       ]);
 
-  /// Create a copy of PoemModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$PoemModelImplCopyWith<_$PoemModelImpl> get copyWith =>
@@ -944,17 +932,13 @@ abstract class _PoemModel implements PoemModel {
   @override
   List<PoemContentModel> get contents;
   @override
-  PoemContentModel?
-      get originalContent; // Simple list API fields (for backward compatibility)
-  @override
+  PoemContentModel? get originalContent;
+  @override // Simple list API fields (for backward compatibility)
   String? get title;
   @override
   String? get excerpt;
-
-  /// Create a copy of PoemModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$PoemModelImplCopyWith<_$PoemModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -982,12 +966,8 @@ mixin _$PoemContentModel {
   int get totalVerses => throw _privateConstructorUsedError;
   int get totalCouplets => throw _privateConstructorUsedError;
 
-  /// Serializes this PoemContentModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of PoemContentModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $PoemContentModelCopyWith<PoemContentModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1027,8 +1007,6 @@ class _$PoemContentModelCopyWithImpl<$Res, $Val extends PoemContentModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of PoemContentModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1153,8 +1131,6 @@ class __$$PoemContentModelImplCopyWithImpl<$Res>
       $Res Function(_$PoemContentModelImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of PoemContentModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1352,7 +1328,7 @@ class _$PoemContentModelImpl implements _PoemContentModel {
                 other.totalCouplets == totalCouplets));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -1373,9 +1349,7 @@ class _$PoemContentModelImpl implements _PoemContentModel {
       totalVerses,
       totalCouplets);
 
-  /// Create a copy of PoemContentModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$PoemContentModelImplCopyWith<_$PoemContentModelImpl> get copyWith =>
@@ -1444,11 +1418,8 @@ abstract class _PoemContentModel implements PoemContentModel {
   int get totalVerses;
   @override
   int get totalCouplets;
-
-  /// Create a copy of PoemContentModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$PoemContentModelImplCopyWith<_$PoemContentModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1466,12 +1437,8 @@ mixin _$TagModel {
   String get tagType => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
 
-  /// Serializes this TagModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of TagModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $TagModelCopyWith<TagModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1500,8 +1467,6 @@ class _$TagModelCopyWithImpl<$Res, $Val extends TagModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of TagModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1566,8 +1531,6 @@ class __$$TagModelImplCopyWithImpl<$Res>
       _$TagModelImpl _value, $Res Function(_$TagModelImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of TagModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1654,14 +1617,12 @@ class _$TagModelImpl implements _TagModel {
                 other.description == description));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType, publicId, name, slug, color, tagType, description);
 
-  /// Create a copy of TagModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$TagModelImplCopyWith<_$TagModelImpl> get copyWith =>
@@ -1699,11 +1660,8 @@ abstract class _TagModel implements TagModel {
   String get tagType;
   @override
   String? get description;
-
-  /// Create a copy of TagModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$TagModelImplCopyWith<_$TagModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1714,18 +1672,20 @@ VerseModel _$VerseModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$VerseModel {
-  String get publicId => throw _privateConstructorUsedError;
+  String? get publicId =>
+      throw _privateConstructorUsedError; // Made nullable - search API doesn't include this
   @JsonKey(name: 'verseText')
   String get text => throw _privateConstructorUsedError;
   String? get verseType => throw _privateConstructorUsedError;
   int? get verseNumber => throw _privateConstructorUsedError;
+  int? get coupletNumber =>
+      throw _privateConstructorUsedError; // Added - present in search API response
+  String? get romanizedText =>
+      throw _privateConstructorUsedError; // Added - present in search API response
+  String? get translation => throw _privateConstructorUsedError;
 
-  /// Serializes this VerseModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of VerseModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $VerseModelCopyWith<VerseModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1737,10 +1697,13 @@ abstract class $VerseModelCopyWith<$Res> {
       _$VerseModelCopyWithImpl<$Res, VerseModel>;
   @useResult
   $Res call(
-      {String publicId,
+      {String? publicId,
       @JsonKey(name: 'verseText') String text,
       String? verseType,
-      int? verseNumber});
+      int? verseNumber,
+      int? coupletNumber,
+      String? romanizedText,
+      String? translation});
 }
 
 /// @nodoc
@@ -1753,21 +1716,22 @@ class _$VerseModelCopyWithImpl<$Res, $Val extends VerseModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of VerseModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? publicId = null,
+    Object? publicId = freezed,
     Object? text = null,
     Object? verseType = freezed,
     Object? verseNumber = freezed,
+    Object? coupletNumber = freezed,
+    Object? romanizedText = freezed,
+    Object? translation = freezed,
   }) {
     return _then(_value.copyWith(
-      publicId: null == publicId
+      publicId: freezed == publicId
           ? _value.publicId
           : publicId // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       text: null == text
           ? _value.text
           : text // ignore: cast_nullable_to_non_nullable
@@ -1780,6 +1744,18 @@ class _$VerseModelCopyWithImpl<$Res, $Val extends VerseModel>
           ? _value.verseNumber
           : verseNumber // ignore: cast_nullable_to_non_nullable
               as int?,
+      coupletNumber: freezed == coupletNumber
+          ? _value.coupletNumber
+          : coupletNumber // ignore: cast_nullable_to_non_nullable
+              as int?,
+      romanizedText: freezed == romanizedText
+          ? _value.romanizedText
+          : romanizedText // ignore: cast_nullable_to_non_nullable
+              as String?,
+      translation: freezed == translation
+          ? _value.translation
+          : translation // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -1793,10 +1769,13 @@ abstract class _$$VerseModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String publicId,
+      {String? publicId,
       @JsonKey(name: 'verseText') String text,
       String? verseType,
-      int? verseNumber});
+      int? verseNumber,
+      int? coupletNumber,
+      String? romanizedText,
+      String? translation});
 }
 
 /// @nodoc
@@ -1807,21 +1786,22 @@ class __$$VerseModelImplCopyWithImpl<$Res>
       _$VerseModelImpl _value, $Res Function(_$VerseModelImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of VerseModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? publicId = null,
+    Object? publicId = freezed,
     Object? text = null,
     Object? verseType = freezed,
     Object? verseNumber = freezed,
+    Object? coupletNumber = freezed,
+    Object? romanizedText = freezed,
+    Object? translation = freezed,
   }) {
     return _then(_$VerseModelImpl(
-      publicId: null == publicId
+      publicId: freezed == publicId
           ? _value.publicId
           : publicId // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       text: null == text
           ? _value.text
           : text // ignore: cast_nullable_to_non_nullable
@@ -1834,6 +1814,18 @@ class __$$VerseModelImplCopyWithImpl<$Res>
           ? _value.verseNumber
           : verseNumber // ignore: cast_nullable_to_non_nullable
               as int?,
+      coupletNumber: freezed == coupletNumber
+          ? _value.coupletNumber
+          : coupletNumber // ignore: cast_nullable_to_non_nullable
+              as int?,
+      romanizedText: freezed == romanizedText
+          ? _value.romanizedText
+          : romanizedText // ignore: cast_nullable_to_non_nullable
+              as String?,
+      translation: freezed == translation
+          ? _value.translation
+          : translation // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -1842,16 +1834,20 @@ class __$$VerseModelImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$VerseModelImpl implements _VerseModel {
   const _$VerseModelImpl(
-      {required this.publicId,
+      {this.publicId,
       @JsonKey(name: 'verseText') required this.text,
       this.verseType,
-      this.verseNumber});
+      this.verseNumber,
+      this.coupletNumber,
+      this.romanizedText,
+      this.translation});
 
   factory _$VerseModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$VerseModelImplFromJson(json);
 
   @override
-  final String publicId;
+  final String? publicId;
+// Made nullable - search API doesn't include this
   @override
   @JsonKey(name: 'verseText')
   final String text;
@@ -1859,10 +1855,18 @@ class _$VerseModelImpl implements _VerseModel {
   final String? verseType;
   @override
   final int? verseNumber;
+  @override
+  final int? coupletNumber;
+// Added - present in search API response
+  @override
+  final String? romanizedText;
+// Added - present in search API response
+  @override
+  final String? translation;
 
   @override
   String toString() {
-    return 'VerseModel(publicId: $publicId, text: $text, verseType: $verseType, verseNumber: $verseNumber)';
+    return 'VerseModel(publicId: $publicId, text: $text, verseType: $verseType, verseNumber: $verseNumber, coupletNumber: $coupletNumber, romanizedText: $romanizedText, translation: $translation)';
   }
 
   @override
@@ -1876,17 +1880,21 @@ class _$VerseModelImpl implements _VerseModel {
             (identical(other.verseType, verseType) ||
                 other.verseType == verseType) &&
             (identical(other.verseNumber, verseNumber) ||
-                other.verseNumber == verseNumber));
+                other.verseNumber == verseNumber) &&
+            (identical(other.coupletNumber, coupletNumber) ||
+                other.coupletNumber == coupletNumber) &&
+            (identical(other.romanizedText, romanizedText) ||
+                other.romanizedText == romanizedText) &&
+            (identical(other.translation, translation) ||
+                other.translation == translation));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, publicId, text, verseType, verseNumber);
+  int get hashCode => Object.hash(runtimeType, publicId, text, verseType,
+      verseNumber, coupletNumber, romanizedText, translation);
 
-  /// Create a copy of VerseModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$VerseModelImplCopyWith<_$VerseModelImpl> get copyWith =>
@@ -1902,28 +1910,34 @@ class _$VerseModelImpl implements _VerseModel {
 
 abstract class _VerseModel implements VerseModel {
   const factory _VerseModel(
-      {required final String publicId,
+      {final String? publicId,
       @JsonKey(name: 'verseText') required final String text,
       final String? verseType,
-      final int? verseNumber}) = _$VerseModelImpl;
+      final int? verseNumber,
+      final int? coupletNumber,
+      final String? romanizedText,
+      final String? translation}) = _$VerseModelImpl;
 
   factory _VerseModel.fromJson(Map<String, dynamic> json) =
       _$VerseModelImpl.fromJson;
 
   @override
-  String get publicId;
-  @override
+  String? get publicId;
+  @override // Made nullable - search API doesn't include this
   @JsonKey(name: 'verseText')
   String get text;
   @override
   String? get verseType;
   @override
   int? get verseNumber;
-
-  /// Create a copy of VerseModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  int? get coupletNumber;
+  @override // Added - present in search API response
+  String? get romanizedText;
+  @override // Added - present in search API response
+  String? get translation;
+  @override
+  @JsonKey(ignore: true)
   _$$VerseModelImplCopyWith<_$VerseModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
