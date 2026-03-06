@@ -745,6 +745,220 @@ abstract class _PoemContentData implements PoemContentData {
       throw _privateConstructorUsedError;
 }
 
+FeaturedCouplet _$FeaturedCoupletFromJson(Map<String, dynamic> json) {
+  return _FeaturedCouplet.fromJson(json);
+}
+
+/// @nodoc
+mixin _$FeaturedCouplet {
+  String? get coupletPublicId => throw _privateConstructorUsedError;
+  List<String> get verses => throw _privateConstructorUsedError;
+  int get likeCount => throw _privateConstructorUsedError;
+  String get script => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $FeaturedCoupletCopyWith<FeaturedCouplet> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $FeaturedCoupletCopyWith<$Res> {
+  factory $FeaturedCoupletCopyWith(
+          FeaturedCouplet value, $Res Function(FeaturedCouplet) then) =
+      _$FeaturedCoupletCopyWithImpl<$Res, FeaturedCouplet>;
+  @useResult
+  $Res call(
+      {String? coupletPublicId,
+      List<String> verses,
+      int likeCount,
+      String script});
+}
+
+/// @nodoc
+class _$FeaturedCoupletCopyWithImpl<$Res, $Val extends FeaturedCouplet>
+    implements $FeaturedCoupletCopyWith<$Res> {
+  _$FeaturedCoupletCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? coupletPublicId = freezed,
+    Object? verses = null,
+    Object? likeCount = null,
+    Object? script = null,
+  }) {
+    return _then(_value.copyWith(
+      coupletPublicId: freezed == coupletPublicId
+          ? _value.coupletPublicId
+          : coupletPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      verses: null == verses
+          ? _value.verses
+          : verses // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      likeCount: null == likeCount
+          ? _value.likeCount
+          : likeCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      script: null == script
+          ? _value.script
+          : script // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$FeaturedCoupletImplCopyWith<$Res>
+    implements $FeaturedCoupletCopyWith<$Res> {
+  factory _$$FeaturedCoupletImplCopyWith(_$FeaturedCoupletImpl value,
+          $Res Function(_$FeaturedCoupletImpl) then) =
+      __$$FeaturedCoupletImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String? coupletPublicId,
+      List<String> verses,
+      int likeCount,
+      String script});
+}
+
+/// @nodoc
+class __$$FeaturedCoupletImplCopyWithImpl<$Res>
+    extends _$FeaturedCoupletCopyWithImpl<$Res, _$FeaturedCoupletImpl>
+    implements _$$FeaturedCoupletImplCopyWith<$Res> {
+  __$$FeaturedCoupletImplCopyWithImpl(
+      _$FeaturedCoupletImpl _value, $Res Function(_$FeaturedCoupletImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? coupletPublicId = freezed,
+    Object? verses = null,
+    Object? likeCount = null,
+    Object? script = null,
+  }) {
+    return _then(_$FeaturedCoupletImpl(
+      coupletPublicId: freezed == coupletPublicId
+          ? _value.coupletPublicId
+          : coupletPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      verses: null == verses
+          ? _value._verses
+          : verses // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      likeCount: null == likeCount
+          ? _value.likeCount
+          : likeCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      script: null == script
+          ? _value.script
+          : script // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$FeaturedCoupletImpl implements _FeaturedCouplet {
+  const _$FeaturedCoupletImpl(
+      {this.coupletPublicId,
+      final List<String> verses = const [],
+      this.likeCount = 0,
+      this.script = 'ARABIC'})
+      : _verses = verses;
+
+  factory _$FeaturedCoupletImpl.fromJson(Map<String, dynamic> json) =>
+      _$$FeaturedCoupletImplFromJson(json);
+
+  @override
+  final String? coupletPublicId;
+  final List<String> _verses;
+  @override
+  @JsonKey()
+  List<String> get verses {
+    if (_verses is EqualUnmodifiableListView) return _verses;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_verses);
+  }
+
+  @override
+  @JsonKey()
+  final int likeCount;
+  @override
+  @JsonKey()
+  final String script;
+
+  @override
+  String toString() {
+    return 'FeaturedCouplet(coupletPublicId: $coupletPublicId, verses: $verses, likeCount: $likeCount, script: $script)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$FeaturedCoupletImpl &&
+            (identical(other.coupletPublicId, coupletPublicId) ||
+                other.coupletPublicId == coupletPublicId) &&
+            const DeepCollectionEquality().equals(other._verses, _verses) &&
+            (identical(other.likeCount, likeCount) ||
+                other.likeCount == likeCount) &&
+            (identical(other.script, script) || other.script == script));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, coupletPublicId,
+      const DeepCollectionEquality().hash(_verses), likeCount, script);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$FeaturedCoupletImplCopyWith<_$FeaturedCoupletImpl> get copyWith =>
+      __$$FeaturedCoupletImplCopyWithImpl<_$FeaturedCoupletImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$FeaturedCoupletImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _FeaturedCouplet implements FeaturedCouplet {
+  const factory _FeaturedCouplet(
+      {final String? coupletPublicId,
+      final List<String> verses,
+      final int likeCount,
+      final String script}) = _$FeaturedCoupletImpl;
+
+  factory _FeaturedCouplet.fromJson(Map<String, dynamic> json) =
+      _$FeaturedCoupletImpl.fromJson;
+
+  @override
+  String? get coupletPublicId;
+  @override
+  List<String> get verses;
+  @override
+  int get likeCount;
+  @override
+  String get script;
+  @override
+  @JsonKey(ignore: true)
+  _$$FeaturedCoupletImplCopyWith<_$FeaturedCoupletImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 PoetSpotlightContentData _$PoetSpotlightContentDataFromJson(
     Map<String, dynamic> json) {
   return _PoetSpotlightContentData.fromJson(json);
@@ -761,6 +975,7 @@ mixin _$PoetSpotlightContentData {
   int get poemCount => throw _privateConstructorUsedError;
   int get followerCount => throw _privateConstructorUsedError;
   int get viewCount => throw _privateConstructorUsedError;
+  FeaturedCouplet? get featuredCouplet => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -783,7 +998,10 @@ abstract class $PoetSpotlightContentDataCopyWith<$Res> {
       int? deathYear,
       int poemCount,
       int followerCount,
-      int viewCount});
+      int viewCount,
+      FeaturedCouplet? featuredCouplet});
+
+  $FeaturedCoupletCopyWith<$Res>? get featuredCouplet;
 }
 
 /// @nodoc
@@ -809,6 +1027,7 @@ class _$PoetSpotlightContentDataCopyWithImpl<$Res,
     Object? poemCount = null,
     Object? followerCount = null,
     Object? viewCount = null,
+    Object? featuredCouplet = freezed,
   }) {
     return _then(_value.copyWith(
       poetName: freezed == poetName
@@ -847,7 +1066,23 @@ class _$PoetSpotlightContentDataCopyWithImpl<$Res,
           ? _value.viewCount
           : viewCount // ignore: cast_nullable_to_non_nullable
               as int,
+      featuredCouplet: freezed == featuredCouplet
+          ? _value.featuredCouplet
+          : featuredCouplet // ignore: cast_nullable_to_non_nullable
+              as FeaturedCouplet?,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $FeaturedCoupletCopyWith<$Res>? get featuredCouplet {
+    if (_value.featuredCouplet == null) {
+      return null;
+    }
+
+    return $FeaturedCoupletCopyWith<$Res>(_value.featuredCouplet!, (value) {
+      return _then(_value.copyWith(featuredCouplet: value) as $Val);
+    });
   }
 }
 
@@ -869,7 +1104,11 @@ abstract class _$$PoetSpotlightContentDataImplCopyWith<$Res>
       int? deathYear,
       int poemCount,
       int followerCount,
-      int viewCount});
+      int viewCount,
+      FeaturedCouplet? featuredCouplet});
+
+  @override
+  $FeaturedCoupletCopyWith<$Res>? get featuredCouplet;
 }
 
 /// @nodoc
@@ -894,6 +1133,7 @@ class __$$PoetSpotlightContentDataImplCopyWithImpl<$Res>
     Object? poemCount = null,
     Object? followerCount = null,
     Object? viewCount = null,
+    Object? featuredCouplet = freezed,
   }) {
     return _then(_$PoetSpotlightContentDataImpl(
       poetName: freezed == poetName
@@ -932,6 +1172,10 @@ class __$$PoetSpotlightContentDataImplCopyWithImpl<$Res>
           ? _value.viewCount
           : viewCount // ignore: cast_nullable_to_non_nullable
               as int,
+      featuredCouplet: freezed == featuredCouplet
+          ? _value.featuredCouplet
+          : featuredCouplet // ignore: cast_nullable_to_non_nullable
+              as FeaturedCouplet?,
     ));
   }
 }
@@ -948,7 +1192,8 @@ class _$PoetSpotlightContentDataImpl implements _PoetSpotlightContentData {
       this.deathYear,
       this.poemCount = 0,
       this.followerCount = 0,
-      this.viewCount = 0});
+      this.viewCount = 0,
+      this.featuredCouplet});
 
   factory _$PoetSpotlightContentDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$PoetSpotlightContentDataImplFromJson(json);
@@ -974,10 +1219,12 @@ class _$PoetSpotlightContentDataImpl implements _PoetSpotlightContentData {
   @override
   @JsonKey()
   final int viewCount;
+  @override
+  final FeaturedCouplet? featuredCouplet;
 
   @override
   String toString() {
-    return 'PoetSpotlightContentData(poetName: $poetName, bio: $bio, poetPublicId: $poetPublicId, profileImageUrl: $profileImageUrl, birthYear: $birthYear, deathYear: $deathYear, poemCount: $poemCount, followerCount: $followerCount, viewCount: $viewCount)';
+    return 'PoetSpotlightContentData(poetName: $poetName, bio: $bio, poetPublicId: $poetPublicId, profileImageUrl: $profileImageUrl, birthYear: $birthYear, deathYear: $deathYear, poemCount: $poemCount, followerCount: $followerCount, viewCount: $viewCount, featuredCouplet: $featuredCouplet)';
   }
 
   @override
@@ -1001,7 +1248,9 @@ class _$PoetSpotlightContentDataImpl implements _PoetSpotlightContentData {
             (identical(other.followerCount, followerCount) ||
                 other.followerCount == followerCount) &&
             (identical(other.viewCount, viewCount) ||
-                other.viewCount == viewCount));
+                other.viewCount == viewCount) &&
+            (identical(other.featuredCouplet, featuredCouplet) ||
+                other.featuredCouplet == featuredCouplet));
   }
 
   @JsonKey(ignore: true)
@@ -1016,7 +1265,8 @@ class _$PoetSpotlightContentDataImpl implements _PoetSpotlightContentData {
       deathYear,
       poemCount,
       followerCount,
-      viewCount);
+      viewCount,
+      featuredCouplet);
 
   @JsonKey(ignore: true)
   @override
@@ -1043,7 +1293,8 @@ abstract class _PoetSpotlightContentData implements PoetSpotlightContentData {
       final int? deathYear,
       final int poemCount,
       final int followerCount,
-      final int viewCount}) = _$PoetSpotlightContentDataImpl;
+      final int viewCount,
+      final FeaturedCouplet? featuredCouplet}) = _$PoetSpotlightContentDataImpl;
 
   factory _PoetSpotlightContentData.fromJson(Map<String, dynamic> json) =
       _$PoetSpotlightContentDataImpl.fromJson;
@@ -1066,6 +1317,8 @@ abstract class _PoetSpotlightContentData implements PoetSpotlightContentData {
   int get followerCount;
   @override
   int get viewCount;
+  @override
+  FeaturedCouplet? get featuredCouplet;
   @override
   @JsonKey(ignore: true)
   _$$PoetSpotlightContentDataImplCopyWith<_$PoetSpotlightContentDataImpl>

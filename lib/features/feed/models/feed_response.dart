@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'feed_item.dart';
 
@@ -15,11 +16,21 @@ class FeedResponse with _$FeedResponse {
   }) = _FeedResponse;
 
   factory FeedResponse.fromJson(Map<String, dynamic> json) {
+    final rawItems = json['items'] as List<dynamic>? ?? [];
+    final items = <FeedItem>[];
+    for (final raw in rawItems) {
+      try {
+        items.add(FeedItem.fromJson(raw as Map<String, dynamic>));
+      } catch (e, stack) {
+        // Skip malformed items — never let one bad item crash the feed.
+        debugPrint('FeedResponse: Failed to parse item: $e');
+        debugPrint('FeedResponse: Raw item: $raw');
+        debugPrint('FeedResponse: Stack: $stack');
+      }
+    }
+
     return FeedResponse(
-      items: (json['items'] as List<dynamic>?)
-              ?.map((i) => FeedItem.fromJson(i as Map<String, dynamic>))
-              .toList() ??
-          [],
+      items: items,
       nextCursor: json['nextCursor'] as String?,
       hasMore: json['hasMore'] as bool? ?? false,
       isPersonalized: json['isPersonalized'] as bool? ?? false,

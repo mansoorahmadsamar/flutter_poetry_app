@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
+import 'package:flutter_poetry_app/features/image_poetry/providers/image_bookmark_providers.dart';
 import '../models/feed_content_data.dart';
 import '../models/feed_item.dart';
 import '../providers/feed_engagement_provider.dart';
@@ -135,7 +136,9 @@ class PoetImageFeedCard extends ConsumerWidget {
                         data.likeCount + (overlay?.likeCountDelta ?? 0),
                     shareCount: data.shareCount,
                     isLiked: overlay?.isLiked ?? false,
+                    isBookmarked: overlay?.isBookmarked ?? false,
                     onLike: () => _onLike(ref, itemKey, overlay),
+                    onBookmark: () => _onBookmark(ref, itemKey, overlay),
                     onShare: () => _onShare(ref),
                   ),
                 ],
@@ -162,6 +165,59 @@ class PoetImageFeedCard extends ConsumerWidget {
       itemKey: newOverlay,
     };
     ref.read(feedProvider.notifier).trackAction(item, 'like');
+
+    // Fire real API call — revert overlay on error
+    _fireToggleLike(ref, item.publicId, itemKey, overlay);
+  }
+
+  void _onBookmark(
+      WidgetRef ref, String itemKey, FeedEngagementOverlay? overlay) {
+    final wasBookmarked = overlay?.isBookmarked ?? false;
+    final newOverlay = (overlay ?? const FeedEngagementOverlay()).copyWith(
+      isBookmarked: !wasBookmarked,
+      bookmarkCountDelta:
+          (overlay?.bookmarkCountDelta ?? 0) + (wasBookmarked ? -1 : 1),
+    );
+    ref.read(feedEngagementProvider.notifier).state = {
+      ...ref.read(feedEngagementProvider),
+      itemKey: newOverlay,
+    };
+    ref.read(feedProvider.notifier).trackAction(item, 'bookmark');
+
+    // Fire real API call — revert overlay on error
+    _fireToggleBookmark(ref, item.publicId, itemKey, overlay);
+  }
+
+  Future<void> _fireToggleLike(
+    WidgetRef ref,
+    String publicId,
+    String itemKey,
+    FeedEngagementOverlay? previousOverlay,
+  ) async {
+    try {
+      await ref.read(imageBookmarkActionProvider.notifier).toggleLike(publicId);
+    } catch (_) {
+      ref.read(feedEngagementProvider.notifier).state = {
+        ...ref.read(feedEngagementProvider),
+        itemKey: previousOverlay ?? const FeedEngagementOverlay(),
+      };
+    }
+  }
+
+  Future<void> _fireToggleBookmark(
+    WidgetRef ref,
+    String publicId,
+    String itemKey,
+    FeedEngagementOverlay? previousOverlay,
+  ) async {
+    try {
+      await ref.read(imageBookmarkActionProvider.notifier).toggleBookmark(publicId);
+    } catch (_) {
+      ref.read(feedEngagementProvider.notifier).state = {
+        ...ref.read(feedEngagementProvider),
+        itemKey: previousOverlay ?? const FeedEngagementOverlay(),
+      };
+    }
   }
 
   void _onShare(WidgetRef ref) {

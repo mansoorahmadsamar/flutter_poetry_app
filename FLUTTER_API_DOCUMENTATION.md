@@ -1,14 +1,30 @@
 # Poetry Backend API - Flutter Mobile App Documentation
 
-**Version:** 1.2.0
-**Last Updated:** February 27, 2026
+**Version:** 1.3.0
+**Last Updated:** February 28, 2026
 **Base URL (Production):** `https://api.poetry.com`
 **Base URL (Development):** `https://dev-api.poetry.com`
-**Base URL (Local):** `http://localhost:8080`
+**Base URL (Local):** `http://localhost:8081`
 
 ---
 
 ## Recent Updates (December 2025 - February 2026)
+
+### Personalized Feed ("For You" Tab) ⭐ NEW (February 2026)
+
+**What's New:**
+- ✅ **Infinite-scroll personalized feed**: `GET /api/feed?lang=ur&cursor=<cursor>&limit=20`
+- ✅ **Mixed content types in one response**: Couplets, Poems, Poet Spotlights, and Poet Gallery Images interleaved intelligently
+- ✅ **Cursor-based pagination**: No offset drift, stable ordering per session, tamper-proof HMAC-signed cursor
+- ✅ **Pull-to-refresh creates a new session**: New ordering on every fresh open — never feels stale
+- ✅ **Feed events endpoint**: `POST /api/events/batch` — send impressions, dwell time, likes, skips to improve personalization
+- ✅ **Session-aware deduplication**: Items shown on page 1 never reappear on page 2+ within the same session
+- ✅ **Event idempotency**: Include an `eid` UUID on each event to safely retry without duplicates
+- ✅ **Authentication required** — the feed is fully personalized; pass your JWT `Authorization` header
+
+**See Section 17 for full documentation.**
+
+---
 
 ### App Content (About App, Privacy Policy, etc.) ⭐ NEW (February 2026)
 
@@ -344,6 +360,19 @@ A single, consolidated API that provides access to all bookmark types (poems, co
 - [16.4 AppContentResponse — Field Reference](#164-appcontentresponse--field-reference)
 - [16.5 Flutter Implementation Guide](#165-flutter-implementation-guide)
 
+### 17. Personalized Feed ("For You" Tab) ⭐ NEW
+- [17.1 Overview](#171-overview-personalized-feed)
+- [17.2 Get Feed Page](#172-get-feed-page)
+- [17.3 FeedItem — Field Reference](#173-feeditem--field-reference)
+- [17.4 Content Type Data Fields](#174-content-type-data-fields)
+  - [17.4.1 COUPLET](#1741-couplet-contentdata)
+  - [17.4.2 POEM](#1742-poem-contentdata)
+  - [17.4.3 POET_SPOTLIGHT](#1743-poet_spotlight-contentdata)
+  - [17.4.4 POET_IMAGE](#1744-poet_image-contentdata)
+- [17.5 Report Feed Events (POST /api/events/batch)](#175-report-feed-events)
+- [17.6 Cursor Pagination Guide](#176-cursor-pagination-guide)
+- [17.7 Flutter Implementation Guide](#177-flutter-implementation-guide)
+
 ### Appendix
 - [A. Flutter Code Examples](#appendix-a-flutter-code-examples)
 - [B. API Endpoints Summary](#appendix-b-api-endpoints-summary)
@@ -542,9 +571,9 @@ All API responses follow a standardized format:
 
 | Environment | Base URL | Description |
 |------------|----------|-------------|
-| **Local Development** | `http://localhost:8080` | Your local machine |
-| **Android Emulator** | `http://10.0.2.2:8080` | Special IP for Android emulator |
-| **iOS Simulator** | `http://localhost:8080` | iOS simulator uses localhost |
+| **Local Development** | `http://localhost:8081` | Your local machine |
+| **Android Emulator** | `http://10.0.2.2:8081` | Special IP for Android emulator |
+| **iOS Simulator** | `http://localhost:8081` | iOS simulator uses localhost |
 | **Development Server** | `https://dev-api.poetry.com` | Development environment |
 | **Production** | `https://api.poetry.com` | Live production API |
 
@@ -564,9 +593,9 @@ class Environment {
         return 'https://dev-api.poetry.com';
       default:
         // For local development
-        return Platform.isAndroid 
-            ? 'http://10.0.2.2:8080'
-            : 'http://localhost:8080';
+        return Platform.isAndroid
+            ? 'http://10.0.2.2:8081'
+            : 'http://localhost:8081';
     }
   }
 }
@@ -693,74 +722,6 @@ sufi-mystic        15 poems
 **📖 Reference:**
 - See `DATA_MIGRATION_GUIDE.md` for migration details
 - To expand data: Change `.limit(50)` in `PoemDataMigration.java` and re-run
-
----
-
-## Base URLs by Environment
-
-Configure these base URLs in your Flutter app based on the environment:
-
-| Environment    | Base URL                                    | Usage                         |
-|----------------|---------------------------------------------|-------------------------------|
-| **Local**      | `http://localhost:8080/api`                 | Development on local machine  |
-| **Development**| `https://dev-api.yourpoetryapp.com/api`     | Testing/staging server        |
-| **Production** | `https://api.yourpoetryapp.com/api`         | Live production server        |
-
-**Important Notes:**
-- Replace `yourpoetryapp.com` with your actual domain
-- For Android emulator testing: Use `http://10.0.2.2:8080/api` (Android maps this to host machine's localhost)
-- For iOS simulator testing: Use `http://localhost:8080/api`
-- For physical device testing on same network: Use `http://YOUR_MACHINE_IP:8080/api` (e.g., `http://192.168.1.100:8080/api`)
-
-### Flutter Configuration Example
-
-```dart
-class ApiConfig {
-  static const String environment = String.fromEnvironment(
-    'ENV',
-    defaultValue: 'local',
-  );
-
-  static String get baseUrl {
-    switch (environment) {
-      case 'prod':
-        return 'https://api.yourpoetryapp.com/api';
-      case 'dev':
-        return 'https://dev-api.yourpoetryapp.com/api';
-      case 'local':
-      default:
-        return 'http://localhost:8080/api';
-    }
-  }
-}
-```
-
-**Run with environment:**
-```bash
-# Local
-flutter run
-
-# Development
-flutter run --dart-define=ENV=dev
-
-# Production
-flutter run --dart-define=ENV=prod
-```
-
-### Backend Server Ports
-
-The Spring Boot backend runs on different ports based on configuration:
-
-- **Default Port:** `8080`
-- Configure in `application.properties`:
-  ```properties
-  server.port=8080
-  ```
-
-**Backend URLs by Environment:**
-- Local: Backend runs on your machine at port 8080
-- Dev: Backend deployed to development server (configure your dev server URL)
-- Prod: Backend deployed to production server (configure your prod server URL)
 
 ---
 
@@ -6792,16 +6753,16 @@ Soft delete (shows as "[deleted]").
 
 ```bash
 # Initial search — page 0
-curl "http://localhost:8080/api/search?q=duniya&type=all&lang=ur&page=0&size=10"
+curl "http://localhost:8081/api/search?q=duniya&type=all&lang=ur&page=0&size=10"
 
 # Load more poems — page 1
-curl "http://localhost:8080/api/search?q=duniya&type=poems_only&lang=ur&page=1&size=10"
+curl "http://localhost:8081/api/search?q=duniya&type=poems_only&lang=ur&page=1&size=10"
 
 # Load more verses — page 2
-curl "http://localhost:8080/api/search?q=duniya&type=verses_only&lang=ur&page=2&size=10"
+curl "http://localhost:8081/api/search?q=duniya&type=verses_only&lang=ur&page=2&size=10"
 
 # Search poets only
-curl "http://localhost:8080/api/search?q=غالب&type=poets_only&lang=ur"
+curl "http://localhost:8081/api/search?q=غالب&type=poets_only&lang=ur"
 ```
 
 **Success Response (200):**
@@ -7022,7 +6983,7 @@ if (hasMorePoems)
 
 **Example Request:**
 ```bash
-curl "http://localhost:8080/api/search/quick?q=love&lang=en"
+curl "http://localhost:8081/api/search/quick?q=love&lang=en"
 ```
 
 **Success Response (200):**
@@ -7059,22 +7020,22 @@ Same format as Unified Search — includes `totalPoems`, `hasMorePoems`, `curren
 
 **Search all couplets:**
 ```bash
-curl "http://localhost:8080/api/search/couplets?q=love&lang=en&sort=relevance"
+curl "http://localhost:8081/api/search/couplets?q=love&lang=en&sort=relevance"
 ```
 
 **Search by poet:**
 ```bash
-curl "http://localhost:8080/api/search/couplets?q=محبت&poet=mirza-ghalib&sort=likes&lang=ur"
+curl "http://localhost:8081/api/search/couplets?q=محبت&poet=mirza-ghalib&sort=likes&lang=ur"
 ```
 
 **Trending couplets:**
 ```bash
-curl "http://localhost:8080/api/search/couplets?q=*&sort=trending&size=20"
+curl "http://localhost:8081/api/search/couplets?q=*&sort=trending&size=20"
 ```
 
 **Most liked couplets:**
 ```bash
-curl "http://localhost:8080/api/search/couplets?q=*&sort=likes&size=20"
+curl "http://localhost:8081/api/search/couplets?q=*&sort=likes&size=20"
 ```
 
 **Response Format:**
@@ -7159,12 +7120,12 @@ curl "http://localhost:8080/api/search/couplets?q=*&sort=likes&size=20"
 
 **English Query:**
 ```bash
-curl "http://localhost:8080/api/search/autocomplete?q=gha&lang=en"
+curl "http://localhost:8081/api/search/autocomplete?q=gha&lang=en"
 ```
 
 **Urdu Query:**
 ```bash
-curl "http://localhost:8080/api/search/autocomplete?q=love&lang=en"
+curl "http://localhost:8081/api/search/autocomplete?q=love&lang=en"
 ```
 
 **Success Response (200):**
@@ -7688,23 +7649,23 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
 **1. Hybrid Recommendations (Default):**
 ```bash
-curl "http://localhost:8080/api/search/recommendations?type=hybrid&limit=10"
+curl "http://localhost:8081/api/search/recommendations?type=hybrid&limit=10"
 ```
 
 **2. Trending Content:**
 ```bash
-curl "http://localhost:8080/api/search/recommendations?type=trending&timeframe=week&limit=5"
+curl "http://localhost:8081/api/search/recommendations?type=trending&timeframe=week&limit=5"
 ```
 
 **3. Personalized Recommendations:**
 ```bash
 curl -H "X-User-Id: 12345" \
-  "http://localhost:8080/api/search/recommendations?type=personalized&limit=10"
+  "http://localhost:8081/api/search/recommendations?type=personalized&limit=10"
 ```
 
 **4. Similar Content:**
 ```bash
-curl "http://localhost:8080/api/search/recommendations?type=similar&contentType=POEM&contentId=poem-xyz&limit=10"
+curl "http://localhost:8081/api/search/recommendations?type=similar&contentType=POEM&contentId=poem-xyz&limit=10"
 ```
 
 **Success Response (200) - Hybrid:**
@@ -7883,12 +7844,12 @@ Analytics endpoints for tracking search behavior and providing "People also sear
 
 **Related searches for "love":**
 ```bash
-curl "http://localhost:8080/api/search/related?q=love&limit=5"
+curl "http://localhost:8081/api/search/related?q=love&limit=5"
 ```
 
 **Related searches for "غالب":**
 ```bash
-curl "http://localhost:8080/api/search/related?q=غالب&limit=5"
+curl "http://localhost:8081/api/search/related?q=غالب&limit=5"
 ```
 
 **Success Response (200):**
@@ -8018,17 +7979,17 @@ GET /api/search/related?q=غالیب  # Suggests "غالب" (correct spelling)
 
 **Trending this week:**
 ```bash
-curl "http://localhost:8080/api/search/trending?timeframe=week&limit=10"
+curl "http://localhost:8081/api/search/trending?timeframe=week&limit=10"
 ```
 
 **Trending today:**
 ```bash
-curl "http://localhost:8080/api/search/trending?timeframe=day&limit=5"
+curl "http://localhost:8081/api/search/trending?timeframe=day&limit=5"
 ```
 
 **Trending this month:**
 ```bash
-curl "http://localhost:8080/api/search/trending?timeframe=month&limit=20"
+curl "http://localhost:8081/api/search/trending?timeframe=month&limit=20"
 ```
 
 **Success Response (200):**
@@ -8190,13 +8151,13 @@ GET /api/search/trending?timeframe=day&limit=5
 
 | Endpoint | Purpose | Curl Example | Test Data |
 |----------|---------|--------------|-----------|
-| `/api/search` | Unified search across all content | `curl "localhost:8080/api/search?q=love&type=all&lang=en"` | ✅ Working |
-| `/api/search/quick` | Simplified unified search | `curl "localhost:8080/api/search/quick?q=love&lang=en"` | ✅ Working |
-| `/api/search/couplets` | Advanced couplet search | `curl "localhost:8080/api/search/couplets?q=love&sort=relevance"` | ✅ Working |
-| `/api/search/autocomplete` | Real-time suggestions | `curl "localhost:8080/api/search/autocomplete?q=gha&lang=en"` | ✅ Working |
-| `/api/search/recommendations` | Content recommendations | `curl "localhost:8080/api/search/recommendations?type=hybrid&limit=10"` | ✅ Working with data |
-| `/api/search/trending` | Trending searches | `curl "localhost:8080/api/search/trending?timeframe=week&limit=10"` | ✅ Working with 282 queries |
-| `/api/search/related` | Related searches | `curl "localhost:8080/api/search/related?q=love&limit=5"` | ✅ Working with data |
+| `/api/search` | Unified search across all content | `curl "localhost:8081/api/search?q=love&type=all&lang=en"` | ✅ Working |
+| `/api/search/quick` | Simplified unified search | `curl "localhost:8081/api/search/quick?q=love&lang=en"` | ✅ Working |
+| `/api/search/couplets` | Advanced couplet search | `curl "localhost:8081/api/search/couplets?q=love&sort=relevance"` | ✅ Working |
+| `/api/search/autocomplete` | Real-time suggestions | `curl "localhost:8081/api/search/autocomplete?q=gha&lang=en"` | ✅ Working |
+| `/api/search/recommendations` | Content recommendations | `curl "localhost:8081/api/search/recommendations?type=hybrid&limit=10"` | ✅ Working with data |
+| `/api/search/trending` | Trending searches | `curl "localhost:8081/api/search/trending?timeframe=week&limit=10"` | ✅ Working with 282 queries |
+| `/api/search/related` | Related searches | `curl "localhost:8081/api/search/related?q=love&limit=5"` | ✅ Working with data |
 
 **Sample Test Queries (from dummy data):**
 - Popular queries: `محبت`, `عشق`, `دل`, `غزل`, `نظم`, `love`, `poetry`, `romantic`
@@ -8936,7 +8897,7 @@ class Couplet {
 
 ## Appendix B: API Endpoints Summary
 
-**Total Endpoints:** 110+
+**Total Endpoints:** 115+
 
 **By Category:**
 - Authentication: 5
@@ -8954,16 +8915,31 @@ class Couplet {
 - Languages: 3
 - Health: 4
 - Analytics: 15+
+- **Feed: 2** ⭐ NEW
+  - `GET /api/feed` — personalized infinite-scroll feed
+  - `POST /api/events/batch` — ingest feed engagement events
 
 **Public Endpoints (No Auth):** 8
 - Authentication endpoints (4)
 - Health checks (4)
 
-**Protected Endpoints:** 100+
+**Protected Endpoints:** 105+
 
 ---
 
 ## Appendix C: Changelog
+
+### February 2026 ⭐ NEW
+- **Added Personalized Feed Engine ("Silk Road")** — Section 17
+  - `GET /api/feed` — infinite-scroll personalized feed with cursor-based pagination
+  - `POST /api/events/batch` — feed engagement events (impression, dwell, skip_fast, etc.)
+  - Mixed content types: COUPLET, POEM, POET_SPOTLIGHT, POET_IMAGE in a single response
+  - HMAC-signed cursor (tamper-proof), session deduplication, pull-to-refresh support
+  - Event idempotency via `eid` field — safe to retry on network failure
+  - Full Flutter integration guide: infinite scroll, pull-to-refresh, event batching, visibility tracking
+- **Added App Content endpoints** (Section 16)
+  - `GET /api/app-content?lang=en` — list all active content pages
+  - `GET /api/app-content/{contentKey}?lang=en` — get single page by key
 
 ### January 2026 ⭐ NEW
 - **Added Poet Follow System** (4 endpoints)
@@ -9248,13 +9224,823 @@ Scaffold(
 
 ---
 
+## 17. Personalized Feed ("For You" Tab) ⭐ NEW
+
+### 17.1 Overview — Personalized Feed
+
+The feed is an infinite-scroll, personalized stream of mixed poetry content. It powers the **"For You"** tab and assembles couplets, poems, poet spotlights, and poet gallery images into a single ranked list — different on every session, improving as the user engages.
+
+**Key Design Points:**
+- **Authentication required** — every request needs a valid JWT `Authorization: Bearer <token>` header
+- **Cursor-based pagination** — pass the `nextCursor` from the previous response as the `cursor` param on the next request
+- **Pull-to-refresh = omit the cursor** — sending no cursor starts a new session with fresh ordering
+- **No duplicates within a session** — items shown on page 1 are excluded from page 2+
+- **Mixed content types** — one response contains couplets, poems, poet spotlights, and images
+- **Events improve personalization** — send `POST /api/events/batch` after each page to make the next page smarter
+- **Strict language filtering** — `COUPLET` and `POEM` items are strictly filtered to the requested `lang`; items with no content in that language are silently dropped. `POET_IMAGE` items are always language-neutral and appear regardless of the selected language
+
+---
+
+### 17.2 Get Feed Page
+
+Fetch the next page of the personalized feed.
+
+**Endpoint**: `GET /api/feed`
+
+**Authentication Required**: Yes (`Authorization: Bearer <jwt>`)
+
+**Query Parameters**:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `lang` | String | No | `ur` | Content language: `ur`, `en`, `hi`, `fa`, `ar`, `pa` |
+| `cursor` | String | No | — | Opaque cursor from previous response. Omit for first page or pull-to-refresh |
+| `limit` | Integer | No | `20` | Items per page (max: 20) |
+
+**Debug Header** (development only):
+- `X-Feed-Debug: true` — adds `debugInfo` to the response (sources used, cache hit, build time)
+
+**Example — First page:**
+```
+GET /api/feed?lang=ur
+Authorization: Bearer <jwt>
+```
+
+**Example — Next page:**
+```
+GET /api/feed?lang=ur&cursor=eyJzaWQiOiI1NTBlODQwMCIsInAiOjIsImxhbmciOiJ1ciJ9...
+Authorization: Bearer <jwt>
+```
+
+**Success Response (200)**:
+```json
+{
+  "success": true,
+  "message": "Feed loaded successfully",
+  "data": {
+    "items": [
+      {
+        "type": "COUPLET",
+        "publicId": "couplet_abc123",
+        "reason": "TRENDING",
+        "sourceId": "couplet_trending_7d",
+        "lang": "ur",
+        "contentData": {
+          "versesTextArabic": "ہزاروں خواہشیں ایسی کہ ہر خواہش پہ دم نکلے\nبہت نکلے مرے ارمان لیکن پھر بھی کم نکلے",
+          "versesTextRoman": "Hazaron khwahishen aisi ke har khwahish pe dam nikle\nBahut nikle mere armaan lekin phir bhi kam nikle",
+          "poetPublicId": "poet_mirza_ghalib",
+          "poetProfileImageUrl": "https://cdn.example.com/ghalib.jpg",
+          "poetBirthYear": 1797,
+          "poetDeathYear": 1869,
+          "poetName": "مرزا غالب",
+          "poemPublicId": "poem_xyz789",
+          "likeCount": 1823,
+          "shareCount": 441,
+          "bookmarkCount": 287
+        }
+      },
+      {
+        "type": "POEM",
+        "publicId": "poem_def456",
+        "reason": "PERSONALIZED",
+        "sourceId": "poem_trending_7d",
+        "lang": "ur",
+        "contentData": {
+          "title": "شکوہ",
+          "excerpt": "کیوں زیاں کار بندوں میں شامل ہے نام میرا...",
+          "poetPublicId": "poet_iqbal",
+          "poetProfileImageUrl": "https://cdn.example.com/iqbal.jpg",
+          "poetBirthYear": 1877,
+          "poetDeathYear": 1938,
+          "poetName": "علامہ اقبال",
+          "poetryType": "NAZAM",
+          "likeCount": 456,
+          "viewCount": 12340,
+          "thumbnailUrl": null
+        }
+      },
+      {
+        "type": "POET_SPOTLIGHT",
+        "publicId": "poet_faiz_ahmed",
+        "reason": "DISCOVERY",
+        "sourceId": "poet_discovery",
+        "lang": "ur",
+        "contentData": {
+          "poetName": "فیض احمد فیض",
+          "bio": "فیض احمد فیض ایک ممتاز پاکستانی شاعر تھے جن کی شاعری میں انقلاب اور محبت کا حسین امتزاج ملتا ہے...",
+          "poetPublicId": "poet_faiz_ahmed",
+          "profileImageUrl": "https://cdn.example.com/faiz.jpg",
+          "birthYear": 1911,
+          "deathYear": 1984,
+          "poemCount": 89,
+          "followerCount": 4201,
+          "viewCount": 98500,
+          "featuredCouplet": {
+            "coupletPublicId": "coup-def-456",
+            "verses": [
+              "ہم پرورشِ لوح و قلم کرتے رہیں گے",
+              "جو دل پہ گزرتی ہے رقم کرتے رہیں گے"
+            ],
+            "likeCount": 42,
+            "script": "ARABIC"
+          }
+        }
+      },
+      {
+        "type": "POET_IMAGE",
+        "publicId": "poet_image_ghi789",
+        "reason": "DISCOVERY",
+        "sourceId": "poet_image_gallery",
+        "lang": null,
+        "contentData": {
+          "imageUrl": "https://cdn.example.com/poets/ghalib-portrait.jpg",
+          "thumbnailUrl": "https://cdn.example.com/poets/ghalib-portrait-thumb.jpg",
+          "contentText": "مرزا غالب",
+          "likeCount": 312,
+          "shareCount": 87,
+          "poetPublicId": "poet_mirza_ghalib"
+        }
+      }
+    ],
+    "nextCursor": "eyJzaWQiOiI1NTBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDAiLCJwIjoyLCJsYW5nIjoidXIiLCJzZWVkIjoxNzA5MDAwMDAwLCJzaWciOiJITUFDLVNIQTI1Ni4uLiJ9",
+    "hasMore": true,
+    "isPersonalized": true,
+    "sessionId": "550e8400-e29b-41d4-a716-446655440000",
+    "itemCount": 20,
+    "debugInfo": null
+  }
+}
+```
+
+**Error — Not Authenticated (401)**:
+```json
+{
+  "success": false,
+  "message": "Authentication required to access the feed",
+  "data": null
+}
+```
+
+**Invalid Cursor (no error):**
+A missing, expired, or tampered cursor is silently ignored — the server starts a new feed session and returns fresh content. No error is returned to the client.
+
+**Notes:**
+- `hasMore` is **always `true`** — the feed never ends. When all fresh content is exhausted the dedup filter relaxes and content recycles.
+- `itemCount: 0` with `hasMore: true` can occur when the cross-session seen history covers all candidates; pass `nextCursor` to continue and content will appear on the next page.
+- The cursor is opaque (Base64-encoded HMAC-signed JSON) — treat it as a string, never parse it.
+- An invalid or tampered cursor is silently treated as a new session (no error returned).
+- `isPersonalized: false` means the feed ran in guest mode (only trending content, no personalization) — this should not happen as auth is required, but handle it defensively.
+
+---
+
+### 17.3 FeedItem — Field Reference
+
+Every item in the `items` array has these top-level fields:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `type` | String | Content type: `COUPLET`, `POEM`, `POET_SPOTLIGHT`, `POET_IMAGE` |
+| `publicId` | String | The public ID of the content item |
+| `reason` | String | Why this item was included: `TRENDING`, `PERSONALIZED`, `DISCOVERY`, `CURATED` |
+| `sourceId` | String | Internal source identifier (e.g., `couplet_trending_7d`) — useful for A/B analytics |
+| `lang` | String | Language of the content (`ur`, `en`, `hi`, …). `null` for `POET_IMAGE` (images are language-neutral) |
+| `contentData` | Object | Type-specific fields — see Section 17.4 |
+
+---
+
+### 17.4 Content Type Data Fields
+
+#### 17.4.1 COUPLET contentData
+
+| Field | Type | Nullable | Description |
+|-------|------|----------|-------------|
+| `versesTextArabic` | String | Yes | Couplet text in original Arabic/Urdu script (Nastaliq) |
+| `versesTextRoman` | String | Yes | Romanized transliteration |
+| `poetPublicId` | String | Yes | Poet's public ID — navigate to poet profile |
+| `poetProfileImageUrl` | String | Yes | Poet's profile image URL |
+| `poetBirthYear` | Integer | Yes | Poet's birth year (e.g. `1797`) |
+| `poetDeathYear` | Integer | Yes | Poet's death year (e.g. `1869`). `null` if still living or unknown |
+| `poetName` | String | Yes | Poet's name in requested language |
+| `poemPublicId` | String | Yes | Parent poem's public ID — navigate to full poem |
+| `likeCount` | Integer | No | Total likes |
+| `shareCount` | Integer | No | Total shares |
+| `bookmarkCount` | Integer | No | Total bookmarks |
+
+#### 17.4.2 POEM contentData
+
+| Field | Type | Nullable | Description |
+|-------|------|----------|-------------|
+| `title` | String | Yes | Poem title in requested language |
+| `excerpt` | String | Yes | First 150 characters of the poem content |
+| `poetPublicId` | String | Yes | Poet's public ID |
+| `poetProfileImageUrl` | String | Yes | Poet's profile image URL |
+| `poetBirthYear` | Integer | Yes | Poet's birth year (e.g. `1877`) |
+| `poetDeathYear` | Integer | Yes | Poet's death year (e.g. `1938`). `null` if still living or unknown |
+| `poetName` | String | Yes | Poet's name in requested language |
+| `poetryType` | String | Yes | Poetry form: `GHAZAL`, `NAZAM`, `RUBAI`, etc. |
+| `likeCount` | Integer | No | Total likes |
+| `viewCount` | Integer | No | Total views |
+| `thumbnailUrl` | String | Yes | Cover image URL (may be null) |
+
+#### 17.4.3 POET_SPOTLIGHT contentData
+
+| Field | Type | Nullable | Description |
+|-------|------|----------|-------------|
+| `poetName` | String | Yes | Poet's name in requested language |
+| `bio` | String | Yes | Short biography (up to 200 characters + "…"). Null if no bio. |
+| `poetPublicId` | String | No | Poet's public ID |
+| `profileImageUrl` | String | Yes | Poet's profile image URL |
+| `birthYear` | Integer | Yes | Poet's birth year (e.g. `1911`) |
+| `deathYear` | Integer | Yes | Poet's death year (e.g. `1984`). `null` if still living or unknown |
+| `poemCount` | Integer | Yes | Number of poems by this poet |
+| `followerCount` | Integer | Yes | Number of followers |
+| `viewCount` | Integer | Yes | Total profile views |
+| `featuredCouplet` | Object | Yes | The poet's most-liked couplet in the requested script. `null` if no couplets exist. |
+| `featuredCouplet.coupletPublicId` | String | Yes | Public ID of the couplet |
+| `featuredCouplet.verses` | String[] | Yes | Array of verse lines (usually 2). Render each on its own line. |
+| `featuredCouplet.likeCount` | Integer | Yes | Like count on this couplet |
+| `featuredCouplet.script` | String | Yes | Script of the verses: `ARABIC` (ur/RTL), `ROMAN` (en/LTR), `DEVANAGARI` (hi/LTR) |
+
+**Rendering notes for `featuredCouplet`:**
+- Show verses below the bio as a preview of the poet's finest work.
+- `script = "ARABIC"` → RTL, Nastaliq font. `script = "ROMAN"` or `"DEVANAGARI"` → LTR.
+- If `featuredCouplet` is `null`, render the poet card without the sher section.
+
+#### 17.4.4 POET_IMAGE contentData
+
+| Field | Type | Nullable | Description |
+|-------|------|----------|-------------|
+| `imageUrl` | String | Yes | Full-size image URL (CDN) |
+| `thumbnailUrl` | String | Yes | Thumbnail image URL |
+| `contentText` | String | Yes | Caption or associated poetry text |
+| `likeCount` | Integer | No | Total likes on this image |
+| `shareCount` | Integer | No | Total shares |
+| `poetPublicId` | String | Yes | Associated poet's public ID |
+
+---
+
+### 17.5 Report Feed Events
+
+Send engagement signals after rendering each page. These events make the next page smarter: high dwell time boosts similar content; skip_fast demotes it.
+
+**Endpoint**: `POST /api/events/batch`
+
+**Authentication Required**: Yes (`Authorization: Bearer <jwt>`)
+
+**Request Body**: Array of event objects
+
+```json
+[
+  {
+    "eid": "550e8400-e29b-41d4-a716-446655440001",
+    "t": "impression",
+    "itemKey": "COUPLET:couplet_abc123",
+    "sid": "550e8400-e29b-41d4-a716-446655440000",
+    "ts": 1709000000
+  },
+  {
+    "eid": "550e8400-e29b-41d4-a716-446655440002",
+    "t": "dwell_ms",
+    "itemKey": "COUPLET:couplet_abc123",
+    "sid": "550e8400-e29b-41d4-a716-446655440000",
+    "ts": 1709000001,
+    "v": 4200
+  },
+  {
+    "eid": "550e8400-e29b-41d4-a716-446655440003",
+    "t": "open_item",
+    "itemKey": "POEM:poem_def456",
+    "sid": "550e8400-e29b-41d4-a716-446655440000",
+    "ts": 1709000002
+  },
+  {
+    "eid": "550e8400-e29b-41d4-a716-446655440004",
+    "t": "skip_fast",
+    "itemKey": "POET_SPOTLIGHT:poet_faiz_ahmed",
+    "sid": "550e8400-e29b-41d4-a716-446655440000",
+    "ts": 1709000003
+  }
+]
+```
+
+**Event Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `eid` | String (UUID) | Recommended | Client-generated UUID for idempotency. Include to safely retry without duplicate processing |
+| `t` | String | Yes | Event type (see table below) |
+| `itemKey` | String | Yes | `"TYPE:publicId"` — e.g., `"COUPLET:couplet_abc123"`, `"POET_SPOTLIGHT:poet_xyz"` |
+| `sid` | String | Yes | Feed session ID from `sessionId` in the feed response |
+| `ts` | Long | Yes | Unix timestamp in seconds when the event occurred |
+| `v` | Long | No | Numeric value — only used for `dwell_ms` (value = milliseconds) |
+
+**Event Types:**
+
+| Type | Signal | When to Send |
+|------|--------|-------------|
+| `impression` | Item appeared on screen | When item enters the visible viewport |
+| `dwell_ms` | Milliseconds spent viewing | When item leaves viewport; `v` = time in ms |
+| `open_item` | Tapped to view full content | User navigated to poem detail or poet profile |
+| `bookmark` | Bookmarked from feed | Triggered by bookmark action in feed |
+| `share` | Shared externally | Triggered by share action in feed |
+| `follow` | Followed a poet from feed | Triggered by follow button in POET_SPOTLIGHT card |
+| `skip_fast` | Scrolled past in < 500ms | Item shown for less than 500ms (negative signal) |
+| `hide` | "Not interested" | User explicitly dismissed the item |
+| `report` | Reported content | User reported inappropriate content |
+
+**Success Response (202 Accepted)**:
+```
+HTTP 202 Accepted
+(empty body)
+```
+
+**Notes:**
+- The response is always `202` — processing happens asynchronously
+- The `eid` field enables safe retries: sending the same event twice with the same `eid` + `sid` is idempotent
+- Send events in batches (not one by one) — batch at minimum when the user scrolls to the next page
+- `itemKey` format: `"CONTENT_TYPE:publicId"` using the `type` field from the FeedItem uppercased
+
+---
+
+### 17.6 Cursor Pagination Guide
+
+#### First Page (App Opens / Pull-to-Refresh)
+```
+GET /api/feed?lang=ur
+Authorization: Bearer <jwt>
+```
+- No `cursor` param → server starts a new session
+- Save `data.sessionId` and `data.nextCursor` from the response
+
+#### Next Page (User Scrolls to Bottom)
+```
+GET /api/feed?lang=ur&cursor=<nextCursor from previous response>
+Authorization: Bearer <jwt>
+```
+- Pass the exact `nextCursor` string — do not parse or modify it
+- Keep updating `nextCursor` with the new value from each response
+
+#### End of Feed
+- `hasMore` is **always `true`** — the feed never ends; it recycles content when the pool is exhausted.
+- `itemCount: 0` with `hasMore: true` means cross-session seen history temporarily covered all candidates — pass `nextCursor` as-is and fresh items will appear on the next page.
+- There is no `hasMore == false` end signal. Never stop polling based on `hasMore`; stop only when the user leaves the feed screen.
+
+#### Pull-to-Refresh
+- Clear your local cursor (`nextCursor = null`)
+- Send `GET /api/feed?lang=ur` with no cursor
+- Replace the entire item list with the new response
+
+---
+
+### 17.7 Flutter Implementation Guide
+
+#### Data Models
+
+```dart
+class FeedResponse {
+  final List<FeedItem> items;
+  final String? nextCursor;
+  final bool hasMore;
+  final bool isPersonalized;
+  final String sessionId;
+  final int itemCount;
+
+  FeedResponse({
+    required this.items,
+    this.nextCursor,
+    required this.hasMore,
+    required this.isPersonalized,
+    required this.sessionId,
+    required this.itemCount,
+  });
+
+  factory FeedResponse.fromJson(Map<String, dynamic> json) {
+    return FeedResponse(
+      items: (json['items'] as List)
+          .map((i) => FeedItem.fromJson(i))
+          .toList(),
+      nextCursor: json['nextCursor'],
+      hasMore: json['hasMore'] ?? true,
+      isPersonalized: json['isPersonalized'] ?? false,
+      sessionId: json['sessionId'] ?? '',
+      itemCount: json['itemCount'] ?? 0,
+    );
+  }
+}
+
+class FeedItem {
+  final String type;        // COUPLET | POEM | POET_SPOTLIGHT | POET_IMAGE
+  final String publicId;
+  final String reason;      // TRENDING | PERSONALIZED | DISCOVERY | CURATED
+  final String sourceId;
+  final String? lang;
+  final Map<String, dynamic> contentData;
+
+  FeedItem({
+    required this.type,
+    required this.publicId,
+    required this.reason,
+    required this.sourceId,
+    this.lang,
+    required this.contentData,
+  });
+
+  factory FeedItem.fromJson(Map<String, dynamic> json) {
+    return FeedItem(
+      type: json['type'],
+      publicId: json['publicId'],
+      reason: json['reason'] ?? '',
+      sourceId: json['sourceId'] ?? '',
+      lang: json['lang'],
+      contentData: Map<String, dynamic>.from(json['contentData'] ?? {}),
+    );
+  }
+}
+
+class FeedEvent {
+  final String eid;         // UUID — generate one per event for idempotency
+  final String t;           // event type
+  final String itemKey;     // "COUPLET:publicId"
+  final String sid;         // feed session ID
+  final int ts;             // unix timestamp (seconds)
+  final int? v;             // optional value (dwell_ms)
+
+  FeedEvent({
+    required this.eid,
+    required this.t,
+    required this.itemKey,
+    required this.sid,
+    required this.ts,
+    this.v,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'eid': eid,
+    't': t,
+    'itemKey': itemKey,
+    'sid': sid,
+    'ts': ts,
+    if (v != null) 'v': v,
+  };
+}
+```
+
+#### Feed Service (API Calls)
+
+```dart
+class FeedApiService {
+  final String baseUrl;
+  final String? authToken;
+
+  FeedApiService({required this.baseUrl, this.authToken});
+
+  Future<FeedResponse?> getFeed({
+    String lang = 'ur',
+    String? cursor,
+    int limit = 20,
+  }) async {
+    final uri = Uri.parse('$baseUrl/api/feed').replace(queryParameters: {
+      'lang': lang,
+      'limit': '$limit',
+      if (cursor != null) 'cursor': cursor,
+    });
+
+    final response = await http.get(uri, headers: {
+      'Authorization': 'Bearer $authToken',
+      'Content-Type': 'application/json',
+    });
+
+    if (response.statusCode == 200) {
+      final body = jsonDecode(response.body);
+      if (body['success'] == true) {
+        return FeedResponse.fromJson(body['data']);
+      }
+    }
+    return null;
+  }
+
+  Future<void> sendEvents(List<FeedEvent> events) async {
+    if (events.isEmpty) return;
+    try {
+      await http.post(
+        Uri.parse('$baseUrl/api/events/batch'),
+        headers: {
+          'Authorization': 'Bearer $authToken',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(events.map((e) => e.toJson()).toList()),
+      );
+      // 202 = success; ignore other status codes (best-effort)
+    } catch (_) {
+      // Events are non-critical — never let this crash the UI
+    }
+  }
+}
+```
+
+#### Feed State Controller (infinite scroll + event batching)
+
+```dart
+class FeedController extends ChangeNotifier {
+  final FeedApiService api;
+  final String lang;
+
+  List<FeedItem> _items = [];
+  String? _nextCursor;
+  String? _sessionId;
+  bool _hasMore = true;
+  bool _loading = false;
+  bool _error = false;
+
+  // Event buffer — flushed on page load and dispose
+  final List<FeedEvent> _pendingEvents = [];
+  final Map<String, int> _impressionStartTimes = {};
+
+  List<FeedItem> get items => _items;
+  bool get hasMore => _hasMore;
+  bool get loading => _loading;
+  bool get error => _error;
+
+  FeedController({required this.api, this.lang = 'ur'});
+
+  /// Load first page (call on init or pull-to-refresh)
+  Future<void> loadFirstPage() async {
+    await _flushEvents();           // flush events from previous session
+    _items = [];
+    _nextCursor = null;
+    _sessionId = null;
+    _hasMore = true;
+    _error = false;
+    await _loadPage();
+  }
+
+  /// Load next page (call when user scrolls near bottom)
+  Future<void> loadNextPage() async {
+    if (_loading || !_hasMore) return;
+    await _flushEvents();           // send events from current page before fetching next
+    await _loadPage();
+  }
+
+  Future<void> _loadPage() async {
+    _loading = true;
+    _error = false;
+    notifyListeners();
+
+    final response = await api.getFeed(
+      lang: lang,
+      cursor: _nextCursor,
+    );
+
+    _loading = false;
+    if (response == null) {
+      _error = true;
+    } else {
+      _items.addAll(response.items);
+      _nextCursor = response.nextCursor;
+      _sessionId = response.sessionId;
+      _hasMore = response.hasMore;
+    }
+    notifyListeners();
+  }
+
+  // ─── Event tracking ──────────────────────────────────────────────────────
+
+  void onItemVisible(FeedItem item) {
+    _impressionStartTimes[item.publicId] = DateTime.now().millisecondsSinceEpoch;
+    _addEvent(FeedEvent(
+      eid: _uuid(),
+      t: 'impression',
+      itemKey: '${item.type}:${item.publicId}',
+      sid: _sessionId ?? '',
+      ts: _nowSec(),
+    ));
+  }
+
+  void onItemHidden(FeedItem item) {
+    final start = _impressionStartTimes.remove(item.publicId);
+    if (start != null) {
+      final dwellMs = DateTime.now().millisecondsSinceEpoch - start;
+      if (dwellMs < 500) {
+        // Scrolled past too fast — negative signal
+        _addEvent(FeedEvent(
+          eid: _uuid(),
+          t: 'skip_fast',
+          itemKey: '${item.type}:${item.publicId}',
+          sid: _sessionId ?? '',
+          ts: _nowSec(),
+        ));
+      } else {
+        _addEvent(FeedEvent(
+          eid: _uuid(),
+          t: 'dwell_ms',
+          itemKey: '${item.type}:${item.publicId}',
+          sid: _sessionId ?? '',
+          ts: _nowSec(),
+          v: dwellMs,
+        ));
+      }
+    }
+  }
+
+  void onItemOpened(FeedItem item) {
+    _addEvent(FeedEvent(
+      eid: _uuid(),
+      t: 'open_item',
+      itemKey: '${item.type}:${item.publicId}',
+      sid: _sessionId ?? '',
+      ts: _nowSec(),
+    ));
+  }
+
+  void onPoetFollowed(FeedItem item) {
+    _addEvent(FeedEvent(
+      eid: _uuid(),
+      t: 'follow',
+      itemKey: '${item.type}:${item.publicId}',
+      sid: _sessionId ?? '',
+      ts: _nowSec(),
+    ));
+  }
+
+  void _addEvent(FeedEvent event) {
+    _pendingEvents.add(event);
+  }
+
+  Future<void> _flushEvents() async {
+    if (_pendingEvents.isEmpty || _sessionId == null) return;
+    final batch = List<FeedEvent>.from(_pendingEvents);
+    _pendingEvents.clear();
+    await api.sendEvents(batch);
+  }
+
+  @override
+  void dispose() {
+    _flushEvents(); // best-effort flush on screen exit
+    super.dispose();
+  }
+
+  int _nowSec() => DateTime.now().millisecondsSinceEpoch ~/ 1000;
+  String _uuid() => DateTime.now().microsecondsSinceEpoch.toString() +
+      (1000 + (DateTime.now().millisecond % 1000)).toString();
+}
+```
+
+> **Note:** For production use, replace the `_uuid()` helper with a proper UUID library (e.g., `package:uuid`).
+
+#### Rendering Feed Items
+
+```dart
+Widget buildFeedItem(FeedItem item) {
+  switch (item.type) {
+    case 'COUPLET':
+      return CoupletFeedCard(item: item);
+    case 'POEM':
+      return PoemFeedCard(item: item);
+    case 'POET_SPOTLIGHT':
+      return PoetSpotlightCard(item: item);
+    case 'POET_IMAGE':
+      return PoetImageCard(item: item);
+    default:
+      return const SizedBox.shrink(); // unknown future type — skip silently
+  }
+}
+
+// Example: Couplet card
+class CoupletFeedCard extends StatelessWidget {
+  final FeedItem item;
+  const CoupletFeedCard({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    final data = item.contentData;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (data['versesTextArabic'] != null)
+              Text(data['versesTextArabic'],
+                  style: const TextStyle(fontSize: 20, fontFamily: 'NotoNastaliqUrdu')),
+            if (data['versesTextRoman'] != null)
+              Text(data['versesTextRoman'],
+                  style: const TextStyle(fontSize: 14, color: Colors.grey)),
+            const SizedBox(height: 8),
+            if (data['poetName'] != null)
+              Text('— ${data['poetName']}',
+                  style: const TextStyle(fontStyle: FontStyle.italic)),
+            Row(
+              children: [
+                const Icon(Icons.favorite_border, size: 16),
+                Text(' ${data['likeCount'] ?? 0}'),
+                const SizedBox(width: 12),
+                const Icon(Icons.share, size: 16),
+                Text(' ${data['shareCount'] ?? 0}'),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+#### Infinite Scroll ListView
+
+```dart
+class FeedScreen extends StatefulWidget {
+  @override
+  State<FeedScreen> createState() => _FeedScreenState();
+}
+
+class _FeedScreenState extends State<FeedScreen> {
+  late FeedController _controller;
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = FeedController(api: FeedApiService(
+      baseUrl: AppConfig.baseUrl,
+      authToken: AuthService.instance.token,
+    ));
+    _controller.loadFirstPage();
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 300) {
+      _controller.loadNextPage();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) => RefreshIndicator(
+        onRefresh: _controller.loadFirstPage,
+        child: ListView.builder(
+          controller: _scrollController,
+          itemCount: _controller.items.length + 1,
+          itemBuilder: (context, index) {
+            if (index == _controller.items.length) {
+              return _controller.hasMore
+                  ? const Center(child: CircularProgressIndicator())
+                  : const Padding(
+                      padding: EdgeInsets.all(24),
+                      child: Center(child: Text('آپ نے سب کچھ دیکھ لیا')),
+                    );
+            }
+            final item = _controller.items[index];
+            return VisibilityDetector(
+              key: Key(item.publicId),
+              onVisibilityChanged: (info) {
+                if (info.visibleFraction > 0.5) {
+                  _controller.onItemVisible(item);
+                } else {
+                  _controller.onItemHidden(item);
+                }
+              },
+              child: GestureDetector(
+                onTap: () {
+                  _controller.onItemOpened(item);
+                  // Navigate to detail screen
+                },
+                child: buildFeedItem(item),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+}
+```
+
+> Use `package:visibility_detector` for `VisibilityDetector`. Add to `pubspec.yaml`:
+> ```yaml
+> visibility_detector: ^0.4.0+2
+> ```
+
+---
+
 ## Support & Feedback
 
 For issues or questions:
 - GitHub: https://github.com/your-repo/issues
 - Email: support@poetry.com
 
-**Documentation Version:** 1.2.0
-**Last Updated:** February 27, 2026
+**Documentation Version:** 1.3.0
+**Last Updated:** February 28, 2026
 
 ---

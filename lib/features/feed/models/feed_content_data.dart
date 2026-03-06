@@ -58,6 +58,19 @@ class PoemContentData with _$PoemContentData implements FeedContentData {
 }
 
 @freezed
+class FeaturedCouplet with _$FeaturedCouplet {
+  const factory FeaturedCouplet({
+    String? coupletPublicId,
+    @Default([]) List<String> verses,
+    @Default(0) int likeCount,
+    @Default('ARABIC') String script,
+  }) = _FeaturedCouplet;
+
+  factory FeaturedCouplet.fromJson(Map<String, dynamic> json) =>
+      _$FeaturedCoupletFromJson(json);
+}
+
+@freezed
 class PoetSpotlightContentData with _$PoetSpotlightContentData
     implements FeedContentData {
   const factory PoetSpotlightContentData({
@@ -70,6 +83,7 @@ class PoetSpotlightContentData with _$PoetSpotlightContentData
     @Default(0) int poemCount,
     @Default(0) int followerCount,
     @Default(0) int viewCount,
+    FeaturedCouplet? featuredCouplet,
   }) = _PoetSpotlightContentData;
 
   factory PoetSpotlightContentData.fromJson(Map<String, dynamic> json) =>

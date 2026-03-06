@@ -101,6 +101,15 @@ class FeedScreenState extends ConsumerState<FeedScreen>
                   isDark: isDark,
                 ),
               )
+            else if (state.items.isEmpty && !state.isLoading)
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: _EmptyFeed(
+                  onRefresh: () =>
+                      ref.read(feedProvider.notifier).loadFirstPage(),
+                  isDark: isDark,
+                ),
+              )
             else
               SliverList(
                 delegate: SliverChildBuilderDelegate(
@@ -129,6 +138,69 @@ class FeedScreenState extends ConsumerState<FeedScreen>
                   childCount: state.items.length + 1,
                 ),
               ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyFeed extends StatelessWidget {
+  final VoidCallback onRefresh;
+  final bool isDark;
+
+  const _EmptyFeed({required this.onRefresh, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.xl),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.auto_stories_outlined,
+              size: AppSpacing.xxxl,
+              color: isDark
+                  ? AppColors.textSecondaryDark
+                  : AppColors.textSecondaryLight,
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              'No poems available yet',
+              style: textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: isDark
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimaryLight,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              'Pull down to refresh or check back later.',
+              style: textTheme.bodyMedium?.copyWith(
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondaryLight,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            ElevatedButton.icon(
+              onPressed: onRefresh,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Refresh'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                ),
+              ),
+            ),
           ],
         ),
       ),

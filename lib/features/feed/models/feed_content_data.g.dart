@@ -70,6 +70,27 @@ Map<String, dynamic> _$$PoemContentDataImplToJson(
       'thumbnailUrl': instance.thumbnailUrl,
     };
 
+_$FeaturedCoupletImpl _$$FeaturedCoupletImplFromJson(
+        Map<String, dynamic> json) =>
+    _$FeaturedCoupletImpl(
+      coupletPublicId: json['coupletPublicId'] as String?,
+      verses: (json['verses'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      likeCount: (json['likeCount'] as num?)?.toInt() ?? 0,
+      script: json['script'] as String? ?? 'ARABIC',
+    );
+
+Map<String, dynamic> _$$FeaturedCoupletImplToJson(
+        _$FeaturedCoupletImpl instance) =>
+    <String, dynamic>{
+      'coupletPublicId': instance.coupletPublicId,
+      'verses': instance.verses,
+      'likeCount': instance.likeCount,
+      'script': instance.script,
+    };
+
 _$PoetSpotlightContentDataImpl _$$PoetSpotlightContentDataImplFromJson(
         Map<String, dynamic> json) =>
     _$PoetSpotlightContentDataImpl(
@@ -82,6 +103,10 @@ _$PoetSpotlightContentDataImpl _$$PoetSpotlightContentDataImplFromJson(
       poemCount: (json['poemCount'] as num?)?.toInt() ?? 0,
       followerCount: (json['followerCount'] as num?)?.toInt() ?? 0,
       viewCount: (json['viewCount'] as num?)?.toInt() ?? 0,
+      featuredCouplet: json['featuredCouplet'] == null
+          ? null
+          : FeaturedCouplet.fromJson(
+              json['featuredCouplet'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$PoetSpotlightContentDataImplToJson(
@@ -96,6 +121,7 @@ Map<String, dynamic> _$$PoetSpotlightContentDataImplToJson(
       'poemCount': instance.poemCount,
       'followerCount': instance.followerCount,
       'viewCount': instance.viewCount,
+      'featuredCouplet': instance.featuredCouplet,
     };
 
 _$PoetImageContentDataImpl _$$PoetImageContentDataImplFromJson(
