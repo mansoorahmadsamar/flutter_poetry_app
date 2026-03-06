@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
+import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/widgets/follow_button.dart';
 import '../models/feed_content_data.dart';
 import '../models/feed_item.dart';
@@ -26,6 +27,7 @@ class PoetSpotlightFeedCard extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textTheme = Theme.of(context).textTheme;
     final isUrdu = item.lang == 'ur';
+    final isAppUrdu = ref.watch(selectedLanguageProvider) == 'ur';
     final couplet = data.featuredCouplet;
     final hasVerse = couplet != null && couplet.verses.isNotEmpty;
 
@@ -34,10 +36,10 @@ class PoetSpotlightFeedCard extends ConsumerWidget {
       child: Container(
         margin: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm,
+          vertical: AppSpacing.feedCardVerticalMargin,
         ),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -51,52 +53,53 @@ class PoetSpotlightFeedCard extends ConsumerWidget {
                     const Color(0xFF163D31),
                   ],
           ),
-          boxShadow: [
-            BoxShadow(
-              color: isDark
-                  ? Colors.black.withValues(alpha: 0.3)
-                  : AppColors.primary.withValues(alpha: 0.15),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
-            ),
-          ],
         ),
         child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
+          padding: const EdgeInsets.all(AppSpacing.feedCardPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Discover badge
-              _buildBadge(textTheme),
-              const SizedBox(height: AppSpacing.md),
+              _buildBadge(textTheme, isAppUrdu),
+              const SizedBox(height: AppSpacing.feedSectionGap),
 
               // Header: Avatar + Name/years + Follow
               _buildHeader(context, textTheme, isDark, isUrdu),
 
               // Featured couplet block
               if (hasVerse) ...[
-                const SizedBox(height: AppSpacing.md),
+                const SizedBox(height: AppSpacing.feedSectionGap),
                 _buildCoupletBlock(couplet, isDark, isUrdu),
               ],
 
-              const SizedBox(height: AppSpacing.md),
+              const SizedBox(height: AppSpacing.feedSectionGap),
 
               // Stats row or fallback text
               _buildStatsRow(),
 
-              // "View Profile →" CTA
+              // "View Profile" CTA
               const SizedBox(height: AppSpacing.sm),
               Align(
-                alignment: Alignment.centerRight,
+                alignment: Alignment.center,
                 child: GestureDetector(
                   onTap: () => _onTap(context, ref),
                   child: Text(
-                    'View Profile →',
-                    style: GoogleFonts.roboto(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white.withValues(alpha: 0.8),
-                    ),
+                    isAppUrdu ? 'پروفائل دیکھیے' : 'View Profile →',
+                    style: isAppUrdu
+                        ? TextStyle(
+                            fontFamily: AppTypography.urduFontFamily,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white.withValues(alpha: 0.85),
+                            height: 1.6,
+                          )
+                        : GoogleFonts.roboto(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white.withValues(alpha: 0.8),
+                          ),
+                    textDirection:
+                        isAppUrdu ? TextDirection.rtl : TextDirection.ltr,
                   ),
                 ),
               ),
@@ -107,7 +110,7 @@ class PoetSpotlightFeedCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildBadge(TextTheme textTheme) {
+  Widget _buildBadge(TextTheme textTheme, bool isAppUrdu) {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 10,
@@ -127,7 +130,7 @@ class PoetSpotlightFeedCard extends ConsumerWidget {
           ),
           const SizedBox(width: AppSpacing.xs),
           Text(
-            _reasonLabel(item.reason),
+            _reasonLabel(item.reason, isAppUrdu),
             style: textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.w600,
               color: AppColors.secondary,
@@ -146,16 +149,16 @@ class PoetSpotlightFeedCard extends ConsumerWidget {
   ) {
     return Row(
       children: [
-        // Avatar 60x60
+        // Avatar
         ClipRRect(
           borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           child: data.profileImageUrl != null
               ? CachedNetworkImage(
                   imageUrl: data.profileImageUrl!,
-                  width: 60,
-                  height: 60,
+                  width: AppSpacing.feedSpotlightAvatarSize,
+                  height: AppSpacing.feedSpotlightAvatarSize,
                   fit: BoxFit.cover,
-                  memCacheWidth: 120,
+                  memCacheWidth: 128,
                   placeholder: (_, __) => _imagePlaceholder(isDark),
                   errorWidget: (_, __, ___) => _imagePlaceholder(isDark),
                 )
@@ -265,8 +268,7 @@ class PoetSpotlightFeedCard extends ConsumerWidget {
                     textDirection: isArabicScript
                         ? TextDirection.rtl
                         : TextDirection.ltr,
-                    textAlign:
-                        isArabicScript ? TextAlign.center : TextAlign.center,
+                    textAlign: TextAlign.center,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -306,7 +308,6 @@ class PoetSpotlightFeedCard extends ConsumerWidget {
         data.poemCount == 0 && data.followerCount == 0 && data.viewCount == 0;
 
     if (allZero) {
-      // Show reason-based fallback instead of "0 0 0"
       final fallback = switch (item.reason) {
         'DISCOVERY' => 'Discover this poet',
         'TRENDING' => 'Trending poet',
@@ -325,7 +326,6 @@ class PoetSpotlightFeedCard extends ConsumerWidget {
       );
     }
 
-    // Show only non-zero stats
     final parts = <String>[];
     if (data.poemCount > 0) parts.add('${_formatCount(data.poemCount)} Poems');
     if (data.followerCount > 0) {
@@ -351,8 +351,8 @@ class PoetSpotlightFeedCard extends ConsumerWidget {
 
   Widget _imagePlaceholder(bool isDark) {
     return Container(
-      width: 60,
-      height: 60,
+      width: AppSpacing.feedSpotlightAvatarSize,
+      height: AppSpacing.feedSpotlightAvatarSize,
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -376,7 +376,16 @@ class PoetSpotlightFeedCard extends ConsumerWidget {
     return count.toString();
   }
 
-  String _reasonLabel(String reason) {
+  String _reasonLabel(String reason, bool isAppUrdu) {
+    if (isAppUrdu) {
+      return switch (reason) {
+        'DISCOVERY' => 'تجویز کردہ شاعر',
+        'TRENDING' => 'مقبول شاعر',
+        'PERSONALIZED' => 'آپ کے لیے',
+        'CURATED' => 'ایڈیٹر کی پسند',
+        _ => 'دریافت',
+      };
+    }
     return switch (reason) {
       'DISCOVERY' => 'Suggested Poet',
       'TRENDING' => 'Trending Poet',

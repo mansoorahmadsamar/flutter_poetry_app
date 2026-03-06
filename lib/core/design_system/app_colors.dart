@@ -54,6 +54,13 @@ abstract class AppColors {
   static const Color urduTextAccent = Color(0xFF2A6F5C); // Lighter green for Urdu text emphasis
   static const Color verseBackground = Color(0xFFFAFAED); // Very pale cream with green undertone - paper-like feel
   static const Color poetBadge = Color(0xFFC5A059); // Accent Gold for poet name badges
+
+  // Feed accent colors
+  static const Color feedAccent = Color(0xFFCF6679); // Soft rose for badges & CTAs
+  static const Color feedAccentBg = Color(0x1FCF6679); // 12% rose for badge background
+  static const Color engagementIcon = Color(0xFF9E9E9E); // Softer gray for engagement icons (light)
+  static const Color engagementIconDark = Color(0xFF8A8A8A); // Softer gray for engagement icons (dark)
+  static const Color feedLiked = Color(0xFFE57373); // Soft red for liked heart
 }
 
 /// Poetic Green Theme Colors

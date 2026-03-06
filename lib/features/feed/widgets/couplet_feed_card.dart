@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
+import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/couplet_providers.dart';
 import '../models/feed_content_data.dart';
 import '../models/feed_item.dart';
@@ -28,38 +29,50 @@ class CoupletFeedCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isUrdu = item.lang == 'ur';
+    final isAppUrdu = ref.watch(selectedLanguageProvider) == 'ur';
     final itemKey = '${item.type}:${item.publicId}';
     final overlay = ref.watch(feedEngagementProvider)[itemKey];
 
     return Card(
       margin: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
+        vertical: AppSpacing.feedCardVerticalMargin,
       ),
-      elevation: AppSpacing.elevationSm,
+      elevation: AppSpacing.elevationNone,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        side: BorderSide(
+          color: isDark ? AppColors.borderDark : AppColors.dividerLight,
+          width: 0.5,
+        ),
       ),
       color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
       child: InkWell(
         onTap: () => _onTap(context, ref),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.feedCardPadding,
+            AppSpacing.feedCardPaddingVertical,
+            AppSpacing.feedCardPadding,
+            AppSpacing.feedCardPadding,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildHeader(context, isDark, isUrdu),
-              const SizedBox(height: AppSpacing.md),
+              _buildHeader(context, isDark, isUrdu, isAppUrdu),
+              const SizedBox(height: AppSpacing.feedSectionGap),
 
               // Urdu verses
               if (data.versesTextArabic != null)
                 Text(
                   data.versesTextArabic!,
                   style: AppTypography.urduVerseStyle.copyWith(
+                    fontSize: 22,
                     color: isDark
                         ? AppColors.textPrimaryDark
                         : AppColors.textPrimaryLight,
+                    height: 2.4,
                   ),
                   textDirection: TextDirection.rtl,
                   textAlign: TextAlign.center,
@@ -84,67 +97,59 @@ class CoupletFeedCard extends ConsumerWidget {
               if (data.poemPublicId != null) ...[
                 const SizedBox(height: AppSpacing.sm),
                 Align(
-                  alignment: Alignment.centerRight,
+                  alignment: Alignment.center,
                   child: GestureDetector(
                     onTap: () => _onTap(context, ref),
                     child: Text(
-                      'Open poem →',
-                      style: GoogleFonts.roboto(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.primary,
-                      ),
+                      isAppUrdu ? 'مزید پڑھیے' : 'Open poem →',
+                      style: isAppUrdu
+                          ? TextStyle(
+                              fontFamily: AppTypography.urduFontFamily,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.feedAccent,
+                              height: 1.6,
+                            )
+                          : GoogleFonts.roboto(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.feedAccent,
+                            ),
+                      textDirection:
+                          isAppUrdu ? TextDirection.rtl : TextDirection.ltr,
                     ),
                   ),
                 ),
               ],
 
-              const SizedBox(height: AppSpacing.md),
+              const SizedBox(height: AppSpacing.feedSectionGap),
               Divider(
                 color: isDark ? AppColors.dividerDark : AppColors.dividerLight,
                 height: 1,
               ),
               const SizedBox(height: AppSpacing.sm),
 
-              // Engagement row with copy button
-              Row(
-                children: [
-                  Expanded(
-                    child: FeedEngagementRow(
-                      likeCount:
-                          data.likeCount + (overlay?.likeCountDelta ?? 0),
-                      bookmarkCount:
-                          data.bookmarkCount +
-                          (overlay?.bookmarkCountDelta ?? 0),
-                      shareCount: data.shareCount,
-                      isLiked: overlay?.isLiked ?? false,
-                      isBookmarked: overlay?.isBookmarked ?? false,
-                      onLike: () => _onLike(ref, itemKey, overlay),
-                      onBookmark: () => _onBookmark(ref, itemKey, overlay),
-                      onShare: () => _onShare(ref),
-                    ),
-                  ),
-                  // Copy button
-                  if (data.versesTextArabic != null)
-                    InkWell(
-                      onTap: () => _onCopy(context),
-                      borderRadius:
-                          BorderRadius.circular(AppSpacing.radiusSm),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.sm,
-                          vertical: AppSpacing.xs,
+              // Engagement row with copy button as extra action
+              FeedEngagementRow(
+                likeCount:
+                    data.likeCount + (overlay?.likeCountDelta ?? 0),
+                bookmarkCount:
+                    data.bookmarkCount +
+                    (overlay?.bookmarkCountDelta ?? 0),
+                shareCount: data.shareCount,
+                isLiked: overlay?.isLiked ?? false,
+                isBookmarked: overlay?.isBookmarked ?? false,
+                onLike: () => _onLike(ref, itemKey, overlay),
+                onBookmark: () => _onBookmark(ref, itemKey, overlay),
+                onShare: () => _onShare(ref),
+                extraActions: data.versesTextArabic != null
+                    ? [
+                        _CopyButton(
+                          onTap: () => _onCopy(context),
+                          isDark: isDark,
                         ),
-                        child: Icon(
-                          Icons.copy_outlined,
-                          size: AppSpacing.iconSm,
-                          color: isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondaryLight,
-                        ),
-                      ),
-                    ),
-                ],
+                      ]
+                    : null,
               ),
             ],
           ),
@@ -153,10 +158,11 @@ class CoupletFeedCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, bool isDark, bool isUrdu) {
+  Widget _buildHeader(
+      BuildContext context, bool isDark, bool isUrdu, bool isAppUrdu) {
     return Row(
       children: [
-        // Poet avatar — taps to poet profile
+        // Poet avatar
         GestureDetector(
           onTap: () {
             if (data.poetPublicId != null) {
@@ -167,10 +173,10 @@ class CoupletFeedCard extends ConsumerWidget {
             child: data.poetProfileImageUrl != null
                 ? CachedNetworkImage(
                     imageUrl: data.poetProfileImageUrl!,
-                    width: 40,
-                    height: 40,
+                    width: AppSpacing.feedAvatarSize,
+                    height: AppSpacing.feedAvatarSize,
                     fit: BoxFit.cover,
-                    memCacheWidth: 80,
+                    memCacheWidth: 88,
                     placeholder: (_, __) => _avatarPlaceholder(isDark),
                     errorWidget: (_, __, ___) => _avatarPlaceholder(isDark),
                   )
@@ -230,16 +236,15 @@ class CoupletFeedCard extends ConsumerWidget {
           ),
         ),
 
-        // Reason badge
+        // Reason badge — poetic green, always English
         if (item.reason.isNotEmpty)
           Container(
             padding: const EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: 4,
+              horizontal: 12,
+              vertical: 5,
             ),
             decoration: BoxDecoration(
-              color:
-                  _reasonColor(item.reason, isDark).withValues(alpha: 0.12),
+              color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
             ),
             child: Text(
@@ -248,7 +253,7 @@ class CoupletFeedCard extends ConsumerWidget {
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.5,
-                color: _reasonColor(item.reason, isDark),
+                color: isDark ? AppColors.primaryLight : AppColors.primary,
               ),
             ),
           ),
@@ -258,8 +263,8 @@ class CoupletFeedCard extends ConsumerWidget {
 
   Widget _avatarPlaceholder(bool isDark) {
     return Container(
-      width: 40,
-      height: 40,
+      width: AppSpacing.feedAvatarSize,
+      height: AppSpacing.feedAvatarSize,
       decoration: BoxDecoration(
         color: isDark ? AppColors.borderDark : AppColors.shimmerBase,
         shape: BoxShape.circle,
@@ -303,8 +308,6 @@ class CoupletFeedCard extends ConsumerWidget {
       itemKey: newOverlay,
     };
     ref.read(feedProvider.notifier).trackAction(item, 'like');
-
-    // Fire real API call — revert overlay on error
     _fireToggleLike(ref, item.publicId, itemKey, overlay);
   }
 
@@ -321,8 +324,6 @@ class CoupletFeedCard extends ConsumerWidget {
       itemKey: newOverlay,
     };
     ref.read(feedProvider.notifier).trackAction(item, 'bookmark');
-
-    // Fire real API call — revert overlay on error
     _fireToggleBookmark(ref, item.publicId, item.lang ?? 'ur', itemKey, overlay);
   }
 
@@ -369,16 +370,6 @@ class CoupletFeedCard extends ConsumerWidget {
     return '$birthYear \u2013 $deathYear';
   }
 
-  Color _reasonColor(String reason, bool isDark) {
-    return switch (reason) {
-      'TRENDING' => AppColors.secondary,
-      'PERSONALIZED' => AppColors.primary,
-      'DISCOVERY' => AppColors.info,
-      'CURATED' => AppColors.secondaryDark,
-      _ => isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
-    };
-  }
-
   String _reasonLabel(String reason) {
     return switch (reason) {
       'TRENDING' => 'Trending',
@@ -387,5 +378,32 @@ class CoupletFeedCard extends ConsumerWidget {
       'CURATED' => 'Curated',
       _ => reason,
     };
+  }
+}
+
+/// Copy button widget for use as an extra action in the engagement row.
+class _CopyButton extends StatelessWidget {
+  final VoidCallback onTap;
+  final bool isDark;
+
+  const _CopyButton({required this.onTap, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: 8,
+        ),
+        child: Icon(
+          Icons.copy_outlined,
+          size: AppSpacing.feedEngagementIconSize,
+          color: isDark ? AppColors.engagementIconDark : AppColors.engagementIcon,
+        ),
+      ),
+    );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
@@ -26,16 +27,19 @@ class PoetImageFeedCard extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final itemKey = '${item.type}:${item.publicId}';
     final overlay = ref.watch(feedEngagementProvider)[itemKey];
-    final textTheme = Theme.of(context).textTheme;
 
     return Card(
       margin: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
+        vertical: AppSpacing.feedCardVerticalMargin,
       ),
-      elevation: AppSpacing.elevationSm,
+      elevation: AppSpacing.elevationNone,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        side: BorderSide(
+          color: isDark ? AppColors.borderDark : AppColors.dividerLight,
+          width: 0.5,
+        ),
       ),
       color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
       clipBehavior: Clip.antiAlias,
@@ -44,34 +48,43 @@ class PoetImageFeedCard extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header: Gallery label
+            // Header: Gallery badge
             Padding(
               padding: const EdgeInsets.fromLTRB(
-                AppSpacing.md,
-                AppSpacing.md,
-                AppSpacing.md,
+                AppSpacing.feedCardPadding,
+                AppSpacing.feedCardPadding,
+                AppSpacing.feedCardPadding,
                 AppSpacing.sm,
               ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.photo_library_outlined,
-                    size: AppSpacing.iconXs,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondaryLight,
-                  ),
-                  const SizedBox(width: AppSpacing.xs),
-                  Text(
-                    'Gallery',
-                    style: textTheme.labelMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondaryLight,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.feedAccentBg,
+                  borderRadius:
+                      BorderRadius.circular(AppSpacing.radiusRound),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.photo_library_outlined,
+                      size: 14,
+                      color: AppColors.feedAccent,
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 4),
+                    Text(
+                      'Gallery',
+                      style: GoogleFonts.roboto(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.feedAccent,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
 
@@ -83,11 +96,11 @@ class PoetImageFeedCard extends ConsumerWidget {
                 fit: BoxFit.cover,
                 memCacheWidth: 600,
                 placeholder: (_, __) => Container(
-                  height: 220,
+                  height: 280,
                   color: isDark ? AppColors.borderDark : AppColors.shimmerBase,
                 ),
                 errorWidget: (_, __, ___) => Container(
-                  height: 220,
+                  height: 280,
                   color: isDark ? AppColors.borderDark : AppColors.shimmerBase,
                   child: Icon(
                     Icons.broken_image_outlined,
@@ -101,7 +114,7 @@ class PoetImageFeedCard extends ConsumerWidget {
 
             // Caption + engagement
             Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
+              padding: const EdgeInsets.all(AppSpacing.feedCardPadding),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -112,7 +125,7 @@ class PoetImageFeedCard extends ConsumerWidget {
                       child: Text(
                         data.contentText!,
                         style: AppTypography.urduVerseStyle.copyWith(
-                          fontSize: 16,
+                          fontSize: 18,
                           color: isDark
                               ? AppColors.textPrimaryDark
                               : AppColors.textPrimaryLight,
@@ -165,8 +178,6 @@ class PoetImageFeedCard extends ConsumerWidget {
       itemKey: newOverlay,
     };
     ref.read(feedProvider.notifier).trackAction(item, 'like');
-
-    // Fire real API call — revert overlay on error
     _fireToggleLike(ref, item.publicId, itemKey, overlay);
   }
 
@@ -183,8 +194,6 @@ class PoetImageFeedCard extends ConsumerWidget {
       itemKey: newOverlay,
     };
     ref.read(feedProvider.notifier).trackAction(item, 'bookmark');
-
-    // Fire real API call — revert overlay on error
     _fireToggleBookmark(ref, item.publicId, itemKey, overlay);
   }
 

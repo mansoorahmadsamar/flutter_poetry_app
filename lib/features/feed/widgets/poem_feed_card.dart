@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
+import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/like_providers.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/bookmark_providers.dart';
 import '../models/feed_content_data.dart';
@@ -28,23 +29,27 @@ class PoemFeedCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isUrdu = item.lang == 'ur';
+    final isAppUrdu = ref.watch(selectedLanguageProvider) == 'ur';
     final itemKey = '${item.type}:${item.publicId}';
     final overlay = ref.watch(feedEngagementProvider)[itemKey];
-    final textTheme = Theme.of(context).textTheme;
 
     return Card(
       margin: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
+        vertical: AppSpacing.feedCardVerticalMargin,
       ),
-      elevation: AppSpacing.elevationSm,
+      elevation: AppSpacing.elevationNone,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        side: BorderSide(
+          color: isDark ? AppColors.borderDark : AppColors.dividerLight,
+          width: 0.5,
+        ),
       ),
       color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
       child: InkWell(
         onTap: () => _onTap(context, ref),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -52,16 +57,16 @@ class PoemFeedCard extends ConsumerWidget {
             if (data.thumbnailUrl != null)
               ClipRRect(
                 borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(AppSpacing.radiusLg),
+                  top: Radius.circular(AppSpacing.radiusMd),
                 ),
                 child: CachedNetworkImage(
                   imageUrl: data.thumbnailUrl!,
-                  height: 160,
+                  height: 180,
                   width: double.infinity,
                   fit: BoxFit.cover,
                   memCacheWidth: 600,
                   placeholder: (_, __) => Container(
-                    height: 160,
+                    height: 180,
                     color:
                         isDark ? AppColors.borderDark : AppColors.shimmerBase,
                   ),
@@ -70,12 +75,17 @@ class PoemFeedCard extends ConsumerWidget {
               ),
 
             Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.feedCardPadding,
+                AppSpacing.feedCardPaddingVertical,
+                AppSpacing.feedCardPadding,
+                AppSpacing.feedCardPadding,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _buildHeader(context, isDark, isUrdu, textTheme),
-                  const SizedBox(height: AppSpacing.md),
+                  _buildHeader(context, isDark, isUrdu, isAppUrdu),
+                  const SizedBox(height: AppSpacing.feedSectionGap),
 
                   // Title
                   if (data.title != null)
@@ -83,18 +93,19 @@ class PoemFeedCard extends ConsumerWidget {
                       data.title!,
                       style: isUrdu
                           ? AppTypography.urduPoetNameStyle.copyWith(
-                              fontSize: 22,
+                              fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: isDark
                                   ? AppColors.textPrimaryDark
                                   : AppColors.textPrimaryLight,
                             )
-                          : textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: isDark
-                                  ? AppColors.textPrimaryDark
-                                  : AppColors.textPrimaryLight,
-                            ),
+                          : Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                                color: isDark
+                                    ? AppColors.textPrimaryDark
+                                    : AppColors.textPrimaryLight,
+                              ),
                       textDirection:
                           isUrdu ? TextDirection.rtl : TextDirection.ltr,
                       textAlign: TextAlign.center,
@@ -109,45 +120,57 @@ class PoemFeedCard extends ConsumerWidget {
                       data.excerpt!,
                       style: isUrdu
                           ? AppTypography.urduVerseStyle.copyWith(
-                              fontSize: 19,
+                              fontSize: 21,
                               color: isDark
-                                  ? AppColors.textSecondaryDark
-                                  : AppColors.textSecondaryLight,
-                              height: 2.0,
+                                  ? AppColors.textPrimaryDark
+                                  : AppColors.textPrimaryLight,
+                              height: 2.2,
                             )
-                          : textTheme.bodyMedium?.copyWith(
-                              color: isDark
-                                  ? AppColors.textSecondaryDark
-                                  : AppColors.textSecondaryLight,
-                            ),
+                          : Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: isDark
+                                    ? AppColors.textSecondaryDark
+                                    : AppColors.textSecondaryLight,
+                              ),
                       textDirection:
                           isUrdu ? TextDirection.rtl : TextDirection.ltr,
                       textAlign: TextAlign.center,
-                      maxLines: 3,
+                      maxLines: 4,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
 
-                  // "Read full ghazal →" / "Read full poem →" CTA
+                  // "Read more" CTA
                   const SizedBox(height: AppSpacing.sm),
                   Align(
-                    alignment: Alignment.centerRight,
+                    alignment: Alignment.center,
                     child: GestureDetector(
                       onTap: () => _onTap(context, ref),
                       child: Text(
-                        data.poetryType?.toUpperCase() == 'GHAZAL'
-                            ? 'Read full ghazal →'
-                            : 'Read full poem →',
-                        style: GoogleFonts.roboto(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.primary,
-                        ),
+                        isAppUrdu
+                            ? 'مزید پڑھیے'
+                            : data.poetryType?.toUpperCase() == 'GHAZAL'
+                                ? 'Read full ghazal →'
+                                : 'Read full poem →',
+                        style: isAppUrdu
+                            ? TextStyle(
+                                fontFamily: AppTypography.urduFontFamily,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.feedAccent,
+                                height: 1.6,
+                              )
+                            : GoogleFonts.roboto(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.feedAccent,
+                              ),
+                        textDirection:
+                            isAppUrdu ? TextDirection.rtl : TextDirection.ltr,
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: AppSpacing.sm),
+                  const SizedBox(height: AppSpacing.feedSectionGap),
                   Divider(
                     color: isDark
                         ? AppColors.dividerDark
@@ -179,11 +202,11 @@ class PoemFeedCard extends ConsumerWidget {
     BuildContext context,
     bool isDark,
     bool isUrdu,
-    TextTheme textTheme,
+    bool isAppUrdu,
   ) {
     return Row(
       children: [
-        // Poet avatar — taps to poet profile
+        // Poet avatar
         GestureDetector(
           onTap: () {
             if (data.poetPublicId != null) {
@@ -194,10 +217,10 @@ class PoemFeedCard extends ConsumerWidget {
             child: data.poetProfileImageUrl != null
                 ? CachedNetworkImage(
                     imageUrl: data.poetProfileImageUrl!,
-                    width: 40,
-                    height: 40,
+                    width: AppSpacing.feedAvatarSize,
+                    height: AppSpacing.feedAvatarSize,
                     fit: BoxFit.cover,
-                    memCacheWidth: 80,
+                    memCacheWidth: 88,
                     placeholder: (_, __) => _avatarPlaceholder(isDark),
                     errorWidget: (_, __, ___) => _avatarPlaceholder(isDark),
                   )
@@ -206,7 +229,7 @@ class PoemFeedCard extends ConsumerWidget {
         ),
         const SizedBox(width: AppSpacing.sm),
 
-        // Poet name + era — taps to poet profile
+        // Poet name + era
         Expanded(
           child: GestureDetector(
             onTap: () {
@@ -257,26 +280,27 @@ class PoemFeedCard extends ConsumerWidget {
           ),
         ),
 
-        // Poetry type badge
+        // Poetry type badge — Urdu Nastaliq, poetic green
         if (data.poetryType != null)
           Container(
             padding: const EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: 4,
+              horizontal: 12,
+              vertical: 5,
             ),
             decoration: BoxDecoration(
-              color:
-                  _poetryTypeColor(data.poetryType!).withValues(alpha: 0.12),
+              color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
             ),
             child: Text(
-              data.poetryType!.toUpperCase(),
-              style: GoogleFonts.roboto(
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.5,
-                color: _poetryTypeColor(data.poetryType!),
+              _poetryTypeLabel(data.poetryType!),
+              style: TextStyle(
+                fontFamily: AppTypography.urduFontFamily,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: isDark ? AppColors.primaryLight : AppColors.primary,
+                height: 1.6,
               ),
+              textDirection: TextDirection.rtl,
             ),
           ),
       ],
@@ -285,8 +309,8 @@ class PoemFeedCard extends ConsumerWidget {
 
   Widget _avatarPlaceholder(bool isDark) {
     return Container(
-      width: 40,
-      height: 40,
+      width: AppSpacing.feedAvatarSize,
+      height: AppSpacing.feedAvatarSize,
       decoration: BoxDecoration(
         color: isDark ? AppColors.borderDark : AppColors.shimmerBase,
         shape: BoxShape.circle,
@@ -317,8 +341,6 @@ class PoemFeedCard extends ConsumerWidget {
       itemKey: newOverlay,
     };
     ref.read(feedProvider.notifier).trackAction(item, 'like');
-
-    // Fire real API call — revert overlay on error
     _fireToggleLike(ref, item.publicId, itemKey, overlay);
   }
 
@@ -335,8 +357,6 @@ class PoemFeedCard extends ConsumerWidget {
       itemKey: newOverlay,
     };
     ref.read(feedProvider.notifier).trackAction(item, 'bookmark');
-
-    // Fire real API call — revert overlay on error
     _fireToggleBookmark(ref, item.publicId, item.lang ?? 'ur', itemKey, overlay);
   }
 
@@ -383,17 +403,19 @@ class PoemFeedCard extends ConsumerWidget {
     return '$birthYear \u2013 $deathYear';
   }
 
-  Color _poetryTypeColor(String type) {
+  String _poetryTypeLabel(String type) {
     return switch (type.toUpperCase()) {
-      'GHAZAL' => AppColors.primary,
-      'NAZAM' => AppColors.info,
-      'RUBAI' => AppColors.success,
-      'QITA' => AppColors.primaryLight,
-      'MARSIYA' => AppColors.secondaryDark,
-      'MASNAVI' => AppColors.warning,
-      'HAMD' => AppColors.success,
-      'NAAT' => AppColors.secondary,
-      _ => AppColors.primary,
+      'GHAZAL' => 'غزل',
+      'NAZM' || 'NAZAM' => 'نظم',
+      'RUBAI' => 'رباعی',
+      'QITA' => 'قطعہ',
+      'MARSIYA' => 'مرثیہ',
+      'MASNAVI' => 'مثنوی',
+      'HAMD' => 'حمد',
+      'NAAT' => 'نعت',
+      'QASIDA' => 'قصیدہ',
+      'FREE_VERSE' => 'آزاد نظم',
+      _ => type,
     };
   }
 }

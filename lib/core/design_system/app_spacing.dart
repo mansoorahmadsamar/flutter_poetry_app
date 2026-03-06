@@ -48,4 +48,13 @@ class AppSpacing {
   static const double elevationMd = 4.0;
   static const double elevationLg = 8.0;
   static const double elevationXl = 16.0;
+
+  // Feed card spacing
+  static const double feedCardVerticalMargin = 12.0;
+  static const double feedCardPadding = 20.0;
+  static const double feedCardPaddingVertical = 24.0;
+  static const double feedSectionGap = 20.0;
+  static const double feedEngagementIconSize = 22.0;
+  static const double feedAvatarSize = 44.0;
+  static const double feedSpotlightAvatarSize = 64.0;
 }

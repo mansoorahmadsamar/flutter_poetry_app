@@ -23,16 +23,14 @@ class FeedShimmer extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm,
+          vertical: AppSpacing.feedCardVerticalMargin,
         ),
         children: const [
           _CoupletShimmerCard(),
-          SizedBox(height: AppSpacing.sm),
+          SizedBox(height: AppSpacing.feedCardVerticalMargin),
           _PoemShimmerCard(),
-          SizedBox(height: AppSpacing.sm),
+          SizedBox(height: AppSpacing.feedCardVerticalMargin),
           _SpotlightShimmerCard(),
-          SizedBox(height: AppSpacing.sm),
-          _ImageShimmerCard(),
         ],
       ),
     );
@@ -46,10 +44,15 @@ class _CoupletShimmerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.feedCardPadding,
+        AppSpacing.feedCardPaddingVertical,
+        AppSpacing.feedCardPadding,
+        AppSpacing.feedCardPadding,
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,7 +60,7 @@ class _CoupletShimmerCard extends StatelessWidget {
           // Avatar + name row
           Row(
             children: [
-              const CircleAvatar(radius: 18, backgroundColor: Colors.white),
+              const CircleAvatar(radius: 22, backgroundColor: Colors.white),
               const SizedBox(width: AppSpacing.sm),
               Container(
                 width: 120,
@@ -73,12 +76,12 @@ class _CoupletShimmerCard extends StatelessWidget {
                 height: 20,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacing.feedSectionGap),
           // Verse lines (centered)
           Center(
             child: Container(
@@ -112,9 +115,9 @@ class _CoupletShimmerCard extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: AppSpacing.lg),
-          // Engagement row
-          _ShimmerEngagementRow(),
+          const SizedBox(height: AppSpacing.feedSectionGap),
+          // Engagement row — Instagram style
+          const _ShimmerEngagementRow(),
         ],
       ),
     );
@@ -130,23 +133,28 @@ class _PoemShimmerCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Thumbnail placeholder
           Container(
-            height: 160,
+            height: 180,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.vertical(
-                top: Radius.circular(AppSpacing.radiusLg),
+                top: Radius.circular(AppSpacing.radiusMd),
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.feedCardPadding,
+              AppSpacing.feedCardPaddingVertical,
+              AppSpacing.feedCardPadding,
+              AppSpacing.feedCardPadding,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -154,7 +162,7 @@ class _PoemShimmerCard extends StatelessWidget {
                 Row(
                   children: [
                     const CircleAvatar(
-                        radius: 18, backgroundColor: Colors.white),
+                        radius: 22, backgroundColor: Colors.white),
                     const SizedBox(width: AppSpacing.sm),
                     Container(
                       width: 100,
@@ -166,37 +174,43 @@ class _PoemShimmerCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: AppSpacing.md),
+                const SizedBox(height: AppSpacing.feedSectionGap),
                 // Title
-                Container(
-                  width: 180,
-                  height: 16,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
+                Center(
+                  child: Container(
+                    width: 180,
+                    height: 16,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
+                    ),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 // Excerpt lines
-                Container(
-                  width: double.infinity,
-                  height: 12,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
+                Center(
+                  child: Container(
+                    width: double.infinity,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
+                    ),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xs),
-                Container(
-                  width: 260,
-                  height: 12,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
+                Center(
+                  child: Container(
+                    width: 260,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
+                    ),
                   ),
                 ),
-                const SizedBox(height: AppSpacing.md),
-                _ShimmerEngagementRow(),
+                const SizedBox(height: AppSpacing.feedSectionGap),
+                const _ShimmerEngagementRow(),
               ],
             ),
           ),
@@ -213,10 +227,10 @@ class _SpotlightShimmerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
+      padding: const EdgeInsets.all(AppSpacing.feedCardPadding),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,17 +241,17 @@ class _SpotlightShimmerCard extends StatelessWidget {
             height: 22,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
             ),
           ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.feedSectionGap),
           // Profile row
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 80,
-                height: 80,
+                width: AppSpacing.feedSpotlightAvatarSize,
+                height: AppSpacing.feedSpotlightAvatarSize,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -288,7 +302,7 @@ class _SpotlightShimmerCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.feedSectionGap),
           // Stats row
           Row(
             children: List.generate(
@@ -312,83 +326,54 @@ class _SpotlightShimmerCard extends StatelessWidget {
   }
 }
 
-/// Card with large image area for poet images
-class _ImageShimmerCard extends StatelessWidget {
-  const _ImageShimmerCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.md,
-              AppSpacing.md,
-              AppSpacing.md,
-              AppSpacing.sm,
-            ),
-            child: Container(
-              width: 70,
-              height: 14,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
-              ),
-            ),
-          ),
-          // Image placeholder
-          Container(
-            height: 220,
-            color: Colors.white,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: _ShimmerEngagementRow(),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
+/// Instagram-style shimmer engagement row:
+/// [icon+count]  [icon]  ──spacer──  [icon]
 class _ShimmerEngagementRow extends StatelessWidget {
+  const _ShimmerEngagementRow();
+
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: List.generate(
-        3,
-        (i) => Padding(
-          padding: EdgeInsets.only(right: i < 2 ? AppSpacing.md : 0),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 20,
-                height: 20,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.xs),
-              Container(
-                width: 24,
-                height: 12,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
-                ),
-              ),
-            ],
+      children: [
+        // Like icon + count placeholder
+        Container(
+          width: 22,
+          height: 22,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
           ),
         ),
-      ),
+        const SizedBox(width: AppSpacing.xs),
+        Container(
+          width: 24,
+          height: 12,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.lg),
+        // Share icon placeholder
+        Container(
+          width: 22,
+          height: 22,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const Spacer(),
+        // Bookmark icon placeholder (far right)
+        Container(
+          width: 22,
+          height: 22,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+          ),
+        ),
+      ],
     );
   }
 }
