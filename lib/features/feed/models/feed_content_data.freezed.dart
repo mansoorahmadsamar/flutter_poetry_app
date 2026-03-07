@@ -1336,7 +1336,12 @@ mixin _$PoetImageContentData {
   String? get contentText => throw _privateConstructorUsedError;
   int get likeCount => throw _privateConstructorUsedError;
   int get shareCount => throw _privateConstructorUsedError;
+  int get bookmarkCount => throw _privateConstructorUsedError;
   String? get poetPublicId => throw _privateConstructorUsedError;
+  String? get poetName => throw _privateConstructorUsedError;
+  String? get poetProfileImageUrl => throw _privateConstructorUsedError;
+  int? get poetBirthYear => throw _privateConstructorUsedError;
+  int? get poetDeathYear => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -1356,7 +1361,12 @@ abstract class $PoetImageContentDataCopyWith<$Res> {
       String? contentText,
       int likeCount,
       int shareCount,
-      String? poetPublicId});
+      int bookmarkCount,
+      String? poetPublicId,
+      String? poetName,
+      String? poetProfileImageUrl,
+      int? poetBirthYear,
+      int? poetDeathYear});
 }
 
 /// @nodoc
@@ -1378,7 +1388,12 @@ class _$PoetImageContentDataCopyWithImpl<$Res,
     Object? contentText = freezed,
     Object? likeCount = null,
     Object? shareCount = null,
+    Object? bookmarkCount = null,
     Object? poetPublicId = freezed,
+    Object? poetName = freezed,
+    Object? poetProfileImageUrl = freezed,
+    Object? poetBirthYear = freezed,
+    Object? poetDeathYear = freezed,
   }) {
     return _then(_value.copyWith(
       imageUrl: freezed == imageUrl
@@ -1401,10 +1416,30 @@ class _$PoetImageContentDataCopyWithImpl<$Res,
           ? _value.shareCount
           : shareCount // ignore: cast_nullable_to_non_nullable
               as int,
+      bookmarkCount: null == bookmarkCount
+          ? _value.bookmarkCount
+          : bookmarkCount // ignore: cast_nullable_to_non_nullable
+              as int,
       poetPublicId: freezed == poetPublicId
           ? _value.poetPublicId
           : poetPublicId // ignore: cast_nullable_to_non_nullable
               as String?,
+      poetName: freezed == poetName
+          ? _value.poetName
+          : poetName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetProfileImageUrl: freezed == poetProfileImageUrl
+          ? _value.poetProfileImageUrl
+          : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetBirthYear: freezed == poetBirthYear
+          ? _value.poetBirthYear
+          : poetBirthYear // ignore: cast_nullable_to_non_nullable
+              as int?,
+      poetDeathYear: freezed == poetDeathYear
+          ? _value.poetDeathYear
+          : poetDeathYear // ignore: cast_nullable_to_non_nullable
+              as int?,
     ) as $Val);
   }
 }
@@ -1423,7 +1458,12 @@ abstract class _$$PoetImageContentDataImplCopyWith<$Res>
       String? contentText,
       int likeCount,
       int shareCount,
-      String? poetPublicId});
+      int bookmarkCount,
+      String? poetPublicId,
+      String? poetName,
+      String? poetProfileImageUrl,
+      int? poetBirthYear,
+      int? poetDeathYear});
 }
 
 /// @nodoc
@@ -1442,7 +1482,12 @@ class __$$PoetImageContentDataImplCopyWithImpl<$Res>
     Object? contentText = freezed,
     Object? likeCount = null,
     Object? shareCount = null,
+    Object? bookmarkCount = null,
     Object? poetPublicId = freezed,
+    Object? poetName = freezed,
+    Object? poetProfileImageUrl = freezed,
+    Object? poetBirthYear = freezed,
+    Object? poetDeathYear = freezed,
   }) {
     return _then(_$PoetImageContentDataImpl(
       imageUrl: freezed == imageUrl
@@ -1465,10 +1510,30 @@ class __$$PoetImageContentDataImplCopyWithImpl<$Res>
           ? _value.shareCount
           : shareCount // ignore: cast_nullable_to_non_nullable
               as int,
+      bookmarkCount: null == bookmarkCount
+          ? _value.bookmarkCount
+          : bookmarkCount // ignore: cast_nullable_to_non_nullable
+              as int,
       poetPublicId: freezed == poetPublicId
           ? _value.poetPublicId
           : poetPublicId // ignore: cast_nullable_to_non_nullable
               as String?,
+      poetName: freezed == poetName
+          ? _value.poetName
+          : poetName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetProfileImageUrl: freezed == poetProfileImageUrl
+          ? _value.poetProfileImageUrl
+          : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetBirthYear: freezed == poetBirthYear
+          ? _value.poetBirthYear
+          : poetBirthYear // ignore: cast_nullable_to_non_nullable
+              as int?,
+      poetDeathYear: freezed == poetDeathYear
+          ? _value.poetDeathYear
+          : poetDeathYear // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -1482,7 +1547,12 @@ class _$PoetImageContentDataImpl implements _PoetImageContentData {
       this.contentText,
       this.likeCount = 0,
       this.shareCount = 0,
-      this.poetPublicId});
+      this.bookmarkCount = 0,
+      this.poetPublicId,
+      this.poetName,
+      this.poetProfileImageUrl,
+      this.poetBirthYear,
+      this.poetDeathYear});
 
   factory _$PoetImageContentDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$PoetImageContentDataImplFromJson(json);
@@ -1500,11 +1570,22 @@ class _$PoetImageContentDataImpl implements _PoetImageContentData {
   @JsonKey()
   final int shareCount;
   @override
+  @JsonKey()
+  final int bookmarkCount;
+  @override
   final String? poetPublicId;
+  @override
+  final String? poetName;
+  @override
+  final String? poetProfileImageUrl;
+  @override
+  final int? poetBirthYear;
+  @override
+  final int? poetDeathYear;
 
   @override
   String toString() {
-    return 'PoetImageContentData(imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, contentText: $contentText, likeCount: $likeCount, shareCount: $shareCount, poetPublicId: $poetPublicId)';
+    return 'PoetImageContentData(imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, contentText: $contentText, likeCount: $likeCount, shareCount: $shareCount, bookmarkCount: $bookmarkCount, poetPublicId: $poetPublicId, poetName: $poetName, poetProfileImageUrl: $poetProfileImageUrl, poetBirthYear: $poetBirthYear, poetDeathYear: $poetDeathYear)';
   }
 
   @override
@@ -1522,14 +1603,35 @@ class _$PoetImageContentDataImpl implements _PoetImageContentData {
                 other.likeCount == likeCount) &&
             (identical(other.shareCount, shareCount) ||
                 other.shareCount == shareCount) &&
+            (identical(other.bookmarkCount, bookmarkCount) ||
+                other.bookmarkCount == bookmarkCount) &&
             (identical(other.poetPublicId, poetPublicId) ||
-                other.poetPublicId == poetPublicId));
+                other.poetPublicId == poetPublicId) &&
+            (identical(other.poetName, poetName) ||
+                other.poetName == poetName) &&
+            (identical(other.poetProfileImageUrl, poetProfileImageUrl) ||
+                other.poetProfileImageUrl == poetProfileImageUrl) &&
+            (identical(other.poetBirthYear, poetBirthYear) ||
+                other.poetBirthYear == poetBirthYear) &&
+            (identical(other.poetDeathYear, poetDeathYear) ||
+                other.poetDeathYear == poetDeathYear));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, imageUrl, thumbnailUrl,
-      contentText, likeCount, shareCount, poetPublicId);
+  int get hashCode => Object.hash(
+      runtimeType,
+      imageUrl,
+      thumbnailUrl,
+      contentText,
+      likeCount,
+      shareCount,
+      bookmarkCount,
+      poetPublicId,
+      poetName,
+      poetProfileImageUrl,
+      poetBirthYear,
+      poetDeathYear);
 
   @JsonKey(ignore: true)
   @override
@@ -1554,7 +1656,12 @@ abstract class _PoetImageContentData implements PoetImageContentData {
       final String? contentText,
       final int likeCount,
       final int shareCount,
-      final String? poetPublicId}) = _$PoetImageContentDataImpl;
+      final int bookmarkCount,
+      final String? poetPublicId,
+      final String? poetName,
+      final String? poetProfileImageUrl,
+      final int? poetBirthYear,
+      final int? poetDeathYear}) = _$PoetImageContentDataImpl;
 
   factory _PoetImageContentData.fromJson(Map<String, dynamic> json) =
       _$PoetImageContentDataImpl.fromJson;
@@ -1570,7 +1677,17 @@ abstract class _PoetImageContentData implements PoetImageContentData {
   @override
   int get shareCount;
   @override
+  int get bookmarkCount;
+  @override
   String? get poetPublicId;
+  @override
+  String? get poetName;
+  @override
+  String? get poetProfileImageUrl;
+  @override
+  int? get poetBirthYear;
+  @override
+  int? get poetDeathYear;
   @override
   @JsonKey(ignore: true)
   _$$PoetImageContentDataImplCopyWith<_$PoetImageContentDataImpl>

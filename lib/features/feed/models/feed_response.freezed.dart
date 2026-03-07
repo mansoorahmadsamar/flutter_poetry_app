@@ -158,7 +158,7 @@ class __$$FeedResponseImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$FeedResponseImpl implements _FeedResponse {
+class _$FeedResponseImpl with DiagnosticableTreeMixin implements _FeedResponse {
   const _$FeedResponseImpl(
       {required final List<FeedItem> items,
       this.nextCursor,
@@ -192,8 +192,21 @@ class _$FeedResponseImpl implements _FeedResponse {
   final int itemCount;
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'FeedResponse(items: $items, nextCursor: $nextCursor, hasMore: $hasMore, isPersonalized: $isPersonalized, sessionId: $sessionId, itemCount: $itemCount)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'FeedResponse'))
+      ..add(DiagnosticsProperty('items', items))
+      ..add(DiagnosticsProperty('nextCursor', nextCursor))
+      ..add(DiagnosticsProperty('hasMore', hasMore))
+      ..add(DiagnosticsProperty('isPersonalized', isPersonalized))
+      ..add(DiagnosticsProperty('sessionId', sessionId))
+      ..add(DiagnosticsProperty('itemCount', itemCount));
   }
 
   @override

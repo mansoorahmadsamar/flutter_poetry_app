@@ -132,7 +132,12 @@ _$PoetImageContentDataImpl _$$PoetImageContentDataImplFromJson(
       contentText: json['contentText'] as String?,
       likeCount: (json['likeCount'] as num?)?.toInt() ?? 0,
       shareCount: (json['shareCount'] as num?)?.toInt() ?? 0,
+      bookmarkCount: (json['bookmarkCount'] as num?)?.toInt() ?? 0,
       poetPublicId: json['poetPublicId'] as String?,
+      poetName: json['poetName'] as String?,
+      poetProfileImageUrl: json['poetProfileImageUrl'] as String?,
+      poetBirthYear: (json['poetBirthYear'] as num?)?.toInt(),
+      poetDeathYear: (json['poetDeathYear'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$$PoetImageContentDataImplToJson(
@@ -143,5 +148,10 @@ Map<String, dynamic> _$$PoetImageContentDataImplToJson(
       'contentText': instance.contentText,
       'likeCount': instance.likeCount,
       'shareCount': instance.shareCount,
+      'bookmarkCount': instance.bookmarkCount,
       'poetPublicId': instance.poetPublicId,
+      'poetName': instance.poetName,
+      'poetProfileImageUrl': instance.poetProfileImageUrl,
+      'poetBirthYear': instance.poetBirthYear,
+      'poetDeathYear': instance.poetDeathYear,
     };

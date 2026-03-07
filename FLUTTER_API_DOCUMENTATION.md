@@ -8,7 +8,7 @@
 
 ---
 
-## Recent Updates (December 2025 - February 2026)
+## Recent Updates (December 2025 - March 2026)
 
 ### Personalized Feed ("For You" Tab) ⭐ NEW (February 2026)
 
@@ -8929,6 +8929,9 @@ class Couplet {
 
 ## Appendix C: Changelog
 
+### March 2026
+- **Feed `POET_IMAGE` — consistent poet fields** — `poetName`, `poetProfileImageUrl`, `poetBirthYear`, `poetDeathYear`, and `bookmarkCount` added to `POET_IMAGE` `contentData`. `lang` field is now populated (was previously `null`). All four feed item types now return the same set of poet identity fields.
+
 ### February 2026 ⭐ NEW
 - **Added Personalized Feed Engine ("Silk Road")** — Section 17
   - `GET /api/feed` — infinite-scroll personalized feed with cursor-based pagination
@@ -9237,7 +9240,7 @@ The feed is an infinite-scroll, personalized stream of mixed poetry content. It 
 - **No duplicates within a session** — items shown on page 1 are excluded from page 2+
 - **Mixed content types** — one response contains couplets, poems, poet spotlights, and images
 - **Events improve personalization** — send `POST /api/events/batch` after each page to make the next page smarter
-- **Strict language filtering** — `COUPLET` and `POEM` items are strictly filtered to the requested `lang`; items with no content in that language are silently dropped. `POET_IMAGE` items are always language-neutral and appear regardless of the selected language
+- **Strict language filtering** — `COUPLET` and `POEM` items are strictly filtered to the requested `lang`; items with no content in that language are silently dropped. `POET_IMAGE` items are not filtered by language but do use `lang` to return `poetName` in the correct language
 
 ---
 
@@ -9351,14 +9354,19 @@ Authorization: Bearer <jwt>
         "publicId": "poet_image_ghi789",
         "reason": "DISCOVERY",
         "sourceId": "poet_image_gallery",
-        "lang": null,
+        "lang": "ur",
         "contentData": {
           "imageUrl": "https://cdn.example.com/poets/ghalib-portrait.jpg",
           "thumbnailUrl": "https://cdn.example.com/poets/ghalib-portrait-thumb.jpg",
           "contentText": "مرزا غالب",
           "likeCount": 312,
           "shareCount": 87,
-          "poetPublicId": "poet_mirza_ghalib"
+          "bookmarkCount": 14,
+          "poetPublicId": "poet_mirza_ghalib",
+          "poetProfileImageUrl": "https://cdn.example.com/poets/ghalib-round.png",
+          "poetBirthYear": 1797,
+          "poetDeathYear": 1869,
+          "poetName": "مرزا غالب"
         }
       }
     ],
@@ -9403,7 +9411,7 @@ Every item in the `items` array has these top-level fields:
 | `publicId` | String | The public ID of the content item |
 | `reason` | String | Why this item was included: `TRENDING`, `PERSONALIZED`, `DISCOVERY`, `CURATED` |
 | `sourceId` | String | Internal source identifier (e.g., `couplet_trending_7d`) — useful for A/B analytics |
-| `lang` | String | Language of the content (`ur`, `en`, `hi`, …). `null` for `POET_IMAGE` (images are language-neutral) |
+| `lang` | String | Language of the content (`ur`, `en`, `hi`, …). Always set for all types including `POET_IMAGE` (used to return `poetName` in the correct language) |
 | `contentData` | Object | Type-specific fields — see Section 17.4 |
 
 ---
@@ -9475,7 +9483,12 @@ Every item in the `items` array has these top-level fields:
 | `contentText` | String | Yes | Caption or associated poetry text |
 | `likeCount` | Integer | No | Total likes on this image |
 | `shareCount` | Integer | No | Total shares |
+| `bookmarkCount` | Integer | No | Total bookmarks |
 | `poetPublicId` | String | Yes | Associated poet's public ID |
+| `poetProfileImageUrl` | String | Yes | Poet's profile image URL |
+| `poetBirthYear` | Integer | Yes | Poet's birth year (e.g. `1797`) |
+| `poetDeathYear` | Integer | Yes | Poet's death year (e.g. `1869`). `null` if still living or unknown |
+| `poetName` | String | Yes | Poet's name in the requested language |
 
 ---
 

@@ -99,7 +99,12 @@ class PoetImageContentData with _$PoetImageContentData
     String? contentText,
     @Default(0) int likeCount,
     @Default(0) int shareCount,
+    @Default(0) int bookmarkCount,
     String? poetPublicId,
+    String? poetName,
+    String? poetProfileImageUrl,
+    int? poetBirthYear,
+    int? poetDeathYear,
   }) = _PoetImageContentData;
 
   factory PoetImageContentData.fromJson(Map<String, dynamic> json) =>
