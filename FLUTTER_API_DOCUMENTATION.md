@@ -45,7 +45,7 @@
 
 **What's New:**
 - ✅ **Like / Unlike**: `POST /api/poetry-images/{imageId}/like` — toggle like on poet gallery images
-- ✅ **Share Tracking**: `POST /api/poetry-images/{imageId}/share` — record share events, returns updated count
+- ✅ **Share Tracking**: `POST /api/poetry-images/{imageId}/share?lang=ur` — record share event, returns `shareCount` + `shareText` + `shareImageUrl` for native share sheet
 - ✅ **Status Check**: `GET /api/poetry-images/{imageId}/status` — single call for all engagement state (isLiked, isBookmarked, counts)
 - ✅ **Unified Bookmark**: `POST /api/poetry-images/{imageId}/bookmark` — now works for both `PoetImage` (gallery) and `GeneratedPoetryImage` publicIds
 
@@ -5764,26 +5764,40 @@ Toggle like/unlike on a poet gallery image (`PoetImage`). Each call flips the st
 
 #### 7.5.11 Share Poet Gallery Image (NEW)
 
-**Endpoint:** `POST /api/poetry-images/{imageId}/share`
+**Endpoint:** `POST /api/poetry-images/{imageId}/share?lang=ur`
 
 **Authentication Required:** No (optional — tracks userId if authenticated)
 
 **Description:**
-Record a share event for a poet gallery image. Call this after the native share sheet is dismissed (whether or not the user actually shared). Increments the `shareCount` and tracks engagement for analytics.
+Record a share event for a poet gallery image. Increments `shareCount`, tracks engagement, and returns pre-formatted content for the native share sheet — so Flutter can open the share sheet with no extra API calls beforehand.
+
+Call this endpoint **after** the user taps the share button (before the share sheet opens) to get the share text and image URL. Do NOT call it before you have confirmed the user intends to share, but calling it to populate the share sheet is the intended use case.
 
 **Path Parameters:**
 - `imageId` (required): Public ID of the poet gallery image
 
-**Example:** `POST /api/poetry-images/img_gallery_abc/share`
+**Query Parameters:**
+- `lang` (optional, default `ur`): Language code for poet name in `shareText`
+
+**Example:** `POST /api/poetry-images/img_gallery_abc/share?lang=ur`
 
 **Success Response (200):**
 ```json
 {
   "success": true,
   "message": "Share recorded",
-  "data": { "shareCount": 42 }
+  "data": {
+    "shareCount": 43,
+    "shareImageUrl": "https://cdn.example.com/poets/faiz/gallery-abc.jpg",
+    "shareText": "کچھ دن سے انتظار سوال بن گیا ہے\n\n— فیض احمد فیض"
+  }
 }
 ```
+
+**Notes:**
+- `shareText` is only present if the image has `contentText` set. If absent, build your own caption from `contentData` in the feed item.
+- `shareImageUrl` is always the full-resolution image URL. Download it and pass to `share_plus` as a file attachment for rich sharing.
+- If the image has no `contentText`, share `shareImageUrl` alone.
 
 ---
 
@@ -9572,6 +9586,70 @@ HTTP 202 Accepted
 - The `eid` field enables safe retries: sending the same event twice with the same `eid` + `sid` is idempotent
 - Send events in batches (not one by one) — batch at minimum when the user scrolls to the next page
 - `itemKey` format: `"CONTENT_TYPE:publicId"` using the `type` field from the FeedItem uppercased
+- For `share` events: the backend automatically increments `share_count` on the entity (COUPLET, POEM, POET_IMAGE). No separate share endpoint call is needed for count tracking from the feed.
+
+---
+
+### 17.5a Feed Share Pattern (Native Share Sheet)
+
+The feed share button uses Flutter's native system share sheet (no deeplinks). The pattern varies by feed item type:
+
+| Feed Type | Share Text | Share Image | Backend call |
+|-----------|------------|-------------|--------------|
+| `COUPLET` | `versesTextArabic + "\n\n— " + poetName` | none | none before share |
+| `POEM` | `title + "\n" + firstLineExcerpt + "\n\n— " + poetName` | `thumbnailUrl` (optional) | none before share |
+| `POET_IMAGE` | returned by API | `shareImageUrl` (download first) | `POST /api/poetry-images/{id}/share?lang=ur` |
+| `POET_SPOTLIGHT` | `poetName + "\n\n" + shortBio` | `profileImageUrl` (optional) | none |
+
+**For COUPLET / POEM / POET_SPOTLIGHT** — build content from `contentData` already in the feed item and open the share sheet directly. Zero latency.
+
+**For POET_IMAGE** — call `POST /api/poetry-images/{id}/share?lang=ur` first to get pre-formatted `shareText` and `shareImageUrl`. Download the image, then open the share sheet.
+
+**After every successful share** (share sheet returned a result, user did not cancel), fire a feed event:
+
+```json
+POST /api/events/batch
+[{
+  "eid": "550e8400-e29b-41d4-a716-446655440001",
+  "t": "share",
+  "itemKey": "COUPLET:couplet_abc123",
+  "sid": "550e8400-e29b-41d4-a716-446655440000",
+  "ts": 1709000010
+}]
+```
+
+This single event handles both personalization (session interest weight +4) and `share_count` increment on the entity. For POET_IMAGE, the `POST /api/poetry-images/{id}/share` call already increments `share_count`, so the feed event provides the personalization signal only.
+
+**Flutter share_plus example for COUPLET:**
+```dart
+Future<void> shareFeedCouplet(FeedItem item) async {
+  final data = item.contentData;
+  final text = '${data['versesTextArabic']}\n\n— ${data['poetName']}';
+  final result = await Share.share(text);
+  if (result.status == ShareResultStatus.success) {
+    feedEventsQueue.add(FeedEvent(t: 'share', itemKey: 'COUPLET:${item.publicId}', sid: sessionId));
+  }
+}
+```
+
+**Flutter share_plus example for POET_IMAGE:**
+```dart
+Future<void> shareFeedPoetImage(FeedItem item) async {
+  // Get formatted share text + image URL from backend
+  final resp = await api.post('/poetry-images/${item.publicId}/share?lang=$lang');
+  final shareInfo = resp.data['data'];
+
+  // Download image to temp file
+  final tmpFile = await downloadToTemp(shareInfo['shareImageUrl']);
+  final result = await Share.shareXFiles(
+    [XFile(tmpFile.path)],
+    text: shareInfo['shareText'] ?? '',
+  );
+  if (result.status == ShareResultStatus.success) {
+    feedEventsQueue.add(FeedEvent(t: 'share', itemKey: 'POET_IMAGE:${item.publicId}', sid: sessionId));
+  }
+}
+```
 
 ---
 

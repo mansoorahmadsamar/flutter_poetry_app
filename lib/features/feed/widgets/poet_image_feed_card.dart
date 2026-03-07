@@ -1,11 +1,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
+import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/features/image_poetry/providers/image_bookmark_providers.dart';
 import '../models/feed_content_data.dart';
 import '../models/feed_item.dart';
@@ -115,7 +119,7 @@ class PoetImageFeedCard extends ConsumerWidget {
                     isBookmarked: overlay?.isBookmarked ?? false,
                     onLike: () => _onLike(ref, itemKey, overlay),
                     onBookmark: () => _onBookmark(ref, itemKey, overlay),
-                    onShare: () => _onShare(ref),
+                    onShare: () => _onShare(context, ref),
                     extraActions:
                         data.contentText != null &&
                                 data.contentText!.isNotEmpty
@@ -356,8 +360,52 @@ class PoetImageFeedCard extends ConsumerWidget {
     }
   }
 
-  void _onShare(WidgetRef ref) {
-    ref.read(feedProvider.notifier).trackAction(item, 'share');
+  void _onShare(BuildContext context, WidgetRef ref) {
+    _shareAsync(context, ref);
+  }
+
+  Future<void> _shareAsync(BuildContext context, WidgetRef ref) async {
+    final lang = ref.read(selectedLanguageProvider);
+    try {
+      // Call backend to get formatted share text + image URL
+      final service = ref.read(imageCollectionServiceProvider);
+      final shareInfo = await service.recordShare(item.publicId, lang: lang);
+      final shareText = shareInfo['shareText'] as String?;
+      final shareImageUrl = shareInfo['shareImageUrl'] as String?;
+
+      ShareResult result;
+
+      if (shareImageUrl != null && shareImageUrl.isNotEmpty) {
+        // Download image to temp file
+        final tmpDir = await getTemporaryDirectory();
+        final ext = shareImageUrl.contains('.png') ? 'png' : 'jpg';
+        final tmpPath = '${tmpDir.path}/share_${item.publicId}.$ext';
+        await Dio().download(shareImageUrl, tmpPath);
+
+        result = await Share.shareXFiles(
+          [XFile(tmpPath)],
+          text: shareText ?? '',
+        );
+      } else {
+        // Text-only fallback
+        result = await Share.shareWithResult(shareText ?? '');
+      }
+
+      if (result.status == ShareResultStatus.success) {
+        ref.read(feedProvider.notifier).trackAction(item, 'share');
+      }
+    } catch (_) {
+      // Fallback: share contentText locally if API fails
+      final fallbackText = data.contentText;
+      if (fallbackText != null && fallbackText.isNotEmpty) {
+        final poet = data.poetName ?? '';
+        final text = poet.isNotEmpty ? '$fallbackText\n\n— $poet' : fallbackText;
+        final result = await Share.shareWithResult(text);
+        if (result.status == ShareResultStatus.success) {
+          ref.read(feedProvider.notifier).trackAction(item, 'share');
+        }
+      }
+    }
   }
 
   String? _formatEra(int? birthYear, int? deathYear) {

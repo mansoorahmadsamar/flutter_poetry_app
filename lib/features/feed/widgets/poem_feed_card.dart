@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
@@ -187,7 +188,7 @@ class PoemFeedCard extends ConsumerWidget {
                     isBookmarked: overlay?.isBookmarked ?? false,
                     onLike: () => _onLike(ref, itemKey, overlay),
                     onBookmark: () => _onBookmark(ref, itemKey, overlay),
-                    onShare: () => _onShare(ref),
+                    onShare: () => _onShare(context, ref),
                   ),
                 ],
               ),
@@ -393,8 +394,20 @@ class PoemFeedCard extends ConsumerWidget {
     }
   }
 
-  void _onShare(WidgetRef ref) {
-    ref.read(feedProvider.notifier).trackAction(item, 'share');
+  void _onShare(BuildContext context, WidgetRef ref) {
+    final parts = <String>[];
+    if (data.title != null) parts.add(data.title!);
+    if (data.excerpt != null) parts.add(data.excerpt!);
+    if (parts.isEmpty) return;
+    final poet = data.poetName ?? '';
+    final text = poet.isNotEmpty
+        ? '${parts.join('\n')}\n\n— $poet'
+        : parts.join('\n');
+    Share.shareWithResult(text).then((result) {
+      if (result.status == ShareResultStatus.success) {
+        ref.read(feedProvider.notifier).trackAction(item, 'share');
+      }
+    });
   }
 
   String? _formatEra(int? birthYear, int? deathYear) {
