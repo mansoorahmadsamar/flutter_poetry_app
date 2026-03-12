@@ -1,0 +1,77 @@
+name: Play Store Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      track:
+        description: 'Play Store track'
+        required: true
+        default: 'internal'
+        type: choice
+        options:
+          - internal
+          - alpha
+          - beta
+          - production
+      release_notes:
+        description: 'Release notes (English)'
+        required: false
+        default: 'Bug fixes and improvements'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.1'
+          channel: 'stable'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Decode google-services.json
+        run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 --decode > android/app/google-services.json
+
+      - name: Setup release keystore
+        run: |
+          mkdir -p android/app/keystore
+          echo "${{ secrets.RELEASE_KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore/release.keystore
+
+      - name: Build Android App Bundle
+        env:
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEYSTORE_PATH: keystore/release.keystore
+        run: flutter build appbundle --release
+
+      - name: Write release notes
+        if: ${{ inputs.release_notes != 'Bug fixes and improvements' }}
+        run: |
+          mkdir -p distribution/whatsnew
+          echo "${{ inputs.release_notes }}" > distribution/whatsnew/whatsnew-en-US
+
+      - name: Decode Play Store service account
+        run: echo "${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}" | base64 --decode > ${{ runner.temp }}/play-store-credentials.json
+
+      - name: Upload to Google Play
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: ${{ runner.temp }}/play-store-credentials.json
+          packageName: com.techhikes.poetry_app
+          releaseFiles: build/app/outputs/bundle/release/app-release.aab
+          track: ${{ inputs.track }}
+          status: completed
+          whatsNewDirectory: distribution/whatsnew
