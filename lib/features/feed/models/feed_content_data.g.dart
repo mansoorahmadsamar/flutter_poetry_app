@@ -20,6 +20,10 @@ _$CoupletContentDataImpl _$$CoupletContentDataImplFromJson(
       likeCount: (json['likeCount'] as num?)?.toInt() ?? 0,
       shareCount: (json['shareCount'] as num?)?.toInt() ?? 0,
       bookmarkCount: (json['bookmarkCount'] as num?)?.toInt() ?? 0,
+      tagSlugs: (json['tagSlugs'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$$CoupletContentDataImplToJson(
@@ -36,6 +40,7 @@ Map<String, dynamic> _$$CoupletContentDataImplToJson(
       'likeCount': instance.likeCount,
       'shareCount': instance.shareCount,
       'bookmarkCount': instance.bookmarkCount,
+      'tagSlugs': instance.tagSlugs,
     };
 
 _$PoemContentDataImpl _$$PoemContentDataImplFromJson(

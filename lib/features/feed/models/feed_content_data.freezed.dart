@@ -31,6 +31,7 @@ mixin _$CoupletContentData {
   int get likeCount => throw _privateConstructorUsedError;
   int get shareCount => throw _privateConstructorUsedError;
   int get bookmarkCount => throw _privateConstructorUsedError;
+  List<String> get tagSlugs => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -55,7 +56,8 @@ abstract class $CoupletContentDataCopyWith<$Res> {
       String? poemPublicId,
       int likeCount,
       int shareCount,
-      int bookmarkCount});
+      int bookmarkCount,
+      List<String> tagSlugs});
 }
 
 /// @nodoc
@@ -82,6 +84,7 @@ class _$CoupletContentDataCopyWithImpl<$Res, $Val extends CoupletContentData>
     Object? likeCount = null,
     Object? shareCount = null,
     Object? bookmarkCount = null,
+    Object? tagSlugs = null,
   }) {
     return _then(_value.copyWith(
       versesTextArabic: freezed == versesTextArabic
@@ -128,6 +131,10 @@ class _$CoupletContentDataCopyWithImpl<$Res, $Val extends CoupletContentData>
           ? _value.bookmarkCount
           : bookmarkCount // ignore: cast_nullable_to_non_nullable
               as int,
+      tagSlugs: null == tagSlugs
+          ? _value.tagSlugs
+          : tagSlugs // ignore: cast_nullable_to_non_nullable
+              as List<String>,
     ) as $Val);
   }
 }
@@ -151,7 +158,8 @@ abstract class _$$CoupletContentDataImplCopyWith<$Res>
       String? poemPublicId,
       int likeCount,
       int shareCount,
-      int bookmarkCount});
+      int bookmarkCount,
+      List<String> tagSlugs});
 }
 
 /// @nodoc
@@ -176,6 +184,7 @@ class __$$CoupletContentDataImplCopyWithImpl<$Res>
     Object? likeCount = null,
     Object? shareCount = null,
     Object? bookmarkCount = null,
+    Object? tagSlugs = null,
   }) {
     return _then(_$CoupletContentDataImpl(
       versesTextArabic: freezed == versesTextArabic
@@ -222,6 +231,10 @@ class __$$CoupletContentDataImplCopyWithImpl<$Res>
           ? _value.bookmarkCount
           : bookmarkCount // ignore: cast_nullable_to_non_nullable
               as int,
+      tagSlugs: null == tagSlugs
+          ? _value._tagSlugs
+          : tagSlugs // ignore: cast_nullable_to_non_nullable
+              as List<String>,
     ));
   }
 }
@@ -240,7 +253,9 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
       this.poemPublicId,
       this.likeCount = 0,
       this.shareCount = 0,
-      this.bookmarkCount = 0});
+      this.bookmarkCount = 0,
+      final List<String> tagSlugs = const []})
+      : _tagSlugs = tagSlugs;
 
   factory _$CoupletContentDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$CoupletContentDataImplFromJson(json);
@@ -270,10 +285,18 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
   @override
   @JsonKey()
   final int bookmarkCount;
+  final List<String> _tagSlugs;
+  @override
+  @JsonKey()
+  List<String> get tagSlugs {
+    if (_tagSlugs is EqualUnmodifiableListView) return _tagSlugs;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_tagSlugs);
+  }
 
   @override
   String toString() {
-    return 'CoupletContentData(versesTextArabic: $versesTextArabic, versesTextRoman: $versesTextRoman, poetPublicId: $poetPublicId, poetProfileImageUrl: $poetProfileImageUrl, poetBirthYear: $poetBirthYear, poetDeathYear: $poetDeathYear, poetName: $poetName, poemPublicId: $poemPublicId, likeCount: $likeCount, shareCount: $shareCount, bookmarkCount: $bookmarkCount)';
+    return 'CoupletContentData(versesTextArabic: $versesTextArabic, versesTextRoman: $versesTextRoman, poetPublicId: $poetPublicId, poetProfileImageUrl: $poetProfileImageUrl, poetBirthYear: $poetBirthYear, poetDeathYear: $poetDeathYear, poetName: $poetName, poemPublicId: $poemPublicId, likeCount: $likeCount, shareCount: $shareCount, bookmarkCount: $bookmarkCount, tagSlugs: $tagSlugs)';
   }
 
   @override
@@ -302,7 +325,8 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
             (identical(other.shareCount, shareCount) ||
                 other.shareCount == shareCount) &&
             (identical(other.bookmarkCount, bookmarkCount) ||
-                other.bookmarkCount == bookmarkCount));
+                other.bookmarkCount == bookmarkCount) &&
+            const DeepCollectionEquality().equals(other._tagSlugs, _tagSlugs));
   }
 
   @JsonKey(ignore: true)
@@ -319,7 +343,8 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
       poemPublicId,
       likeCount,
       shareCount,
-      bookmarkCount);
+      bookmarkCount,
+      const DeepCollectionEquality().hash(_tagSlugs));
 
   @JsonKey(ignore: true)
   @override
@@ -348,7 +373,8 @@ abstract class _CoupletContentData implements CoupletContentData {
       final String? poemPublicId,
       final int likeCount,
       final int shareCount,
-      final int bookmarkCount}) = _$CoupletContentDataImpl;
+      final int bookmarkCount,
+      final List<String> tagSlugs}) = _$CoupletContentDataImpl;
 
   factory _CoupletContentData.fromJson(Map<String, dynamic> json) =
       _$CoupletContentDataImpl.fromJson;
@@ -375,6 +401,8 @@ abstract class _CoupletContentData implements CoupletContentData {
   int get shareCount;
   @override
   int get bookmarkCount;
+  @override
+  List<String> get tagSlugs;
   @override
   @JsonKey(ignore: true)
   _$$CoupletContentDataImplCopyWith<_$CoupletContentDataImpl> get copyWith =>

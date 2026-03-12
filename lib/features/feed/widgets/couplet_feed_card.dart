@@ -10,6 +10,7 @@ import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/couplet_providers.dart';
+import 'package:flutter_poetry_app/features/hashtags/widgets/hashtag_pill.dart';
 import '../models/feed_content_data.dart';
 import '../models/feed_item.dart';
 import '../providers/feed_engagement_provider.dart';
@@ -92,6 +93,12 @@ class CoupletFeedCard extends ConsumerWidget {
                   ),
                   textAlign: TextAlign.center,
                 ),
+              ],
+
+              // Hashtag pills
+              if (data.tagSlugs.isNotEmpty) ...[
+                const SizedBox(height: AppSpacing.sm),
+                HashtagSlugRow(slugs: data.tagSlugs),
               ],
 
               // "Open poem →" CTA

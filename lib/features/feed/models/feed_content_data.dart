@@ -31,6 +31,7 @@ class CoupletContentData with _$CoupletContentData implements FeedContentData {
     @Default(0) int likeCount,
     @Default(0) int shareCount,
     @Default(0) int bookmarkCount,
+    @Default([]) List<String> tagSlugs,
   }) = _CoupletContentData;
 
   factory CoupletContentData.fromJson(Map<String, dynamic> json) =>

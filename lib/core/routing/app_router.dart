@@ -16,6 +16,7 @@ import '../../features/image_poetry/screens/generated_image_gallery_screen.dart'
 import '../../features/image_poetry/screens/saved_images_screen.dart';
 import '../../features/image_poetry/screens/image_detail_screen.dart';
 import '../../features/image_poetry/editor/screens/poetry_editor_screen.dart';
+import '../../features/hashtags/screens/hashtag_detail_screen.dart';
 import '../auth/auth_provider.dart';
 
 /// App routes
@@ -170,6 +171,14 @@ final routerProvider = Provider<GoRouter>((ref) {
             initialVerses: extra?['verses'] as List<String>?,
           );
         },
+      ),
+      // Hashtag routes
+      GoRoute(
+        path: '/hashtags/:slug',
+        name: 'hashtag-detail',
+        builder: (context, state) => HashtagDetailScreen(
+          slug: state.pathParameters['slug']!,
+        ),
       ),
       // Global Search routes
       GoRoute(

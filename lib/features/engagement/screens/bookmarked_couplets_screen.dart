@@ -5,6 +5,7 @@ import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/widgets/localized_text.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/couplet_providers.dart';
+import 'package:flutter_poetry_app/features/hashtags/widgets/hashtag_pill.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/couplet_model.dart';
 
 class BookmarkedCoupletsScreen extends ConsumerStatefulWidget {
@@ -219,6 +220,12 @@ class _BookmarkedCoupletsScreenState
                       textAlign: TextAlign.center,
                     ),
                   )),
+
+              // Hashtag pills
+              if (couplet.tagSlugs.isNotEmpty) ...[
+                SizedBox(height: AppSpacing.sm),
+                HashtagSlugRow(slugs: couplet.tagSlugs),
+              ],
 
               SizedBox(height: AppSpacing.md),
               Divider(color: Colors.grey[300]),

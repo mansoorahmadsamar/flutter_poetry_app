@@ -14,6 +14,7 @@ import '../widgets/discover_shimmer.dart';
 import '../widgets/horizontal_content_rail.dart';
 import '../widgets/poet_grid.dart';
 import '../widgets/trending_chips.dart';
+import '../../hashtags/widgets/hashtag_pill.dart';
 
 /// Premium discover screen with staggered section entrance animations.
 class DiscoverScreen extends ConsumerStatefulWidget {
@@ -142,6 +143,22 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen>
             trending: discoverState.bundle!.trendingSearches,
             isRtl: isRtl,
             onQueryTap: (query) => context.push('/search', extra: {'query': query}),
+          ),
+        ),
+      ));
+    }
+
+    // Trending Hashtags
+    if (discoverState.bundle != null &&
+        discoverState.bundle!.trendingHashtags.isNotEmpty) {
+      final anim = _sectionAnimation(sectionIndex++);
+      slivers.add(SliverToBoxAdapter(
+        child: _StaggeredSection(
+          animation: anim,
+          child: _buildTrendingHashtags(
+            discoverState.bundle!.trendingHashtags,
+            isRtl,
+            isDark,
           ),
         ),
       ));
@@ -399,6 +416,56 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen>
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTrendingHashtags(
+    List<dynamic> hashtags,
+    bool isRtl,
+    bool isDark,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsetsDirectional.fromSTEB(16, 20, 16, 0),
+          child: Row(
+            children: [
+              Icon(
+                Icons.tag_rounded,
+                size: 20,
+                color: AppColors.feedAccent,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  isRtl ? 'مقبول ہیش ٹیگز' : 'Trending Hashtags',
+                  style: TextStyle(
+                    fontFamily: isRtl ? 'Jameel Noori Nastaleeq' : null,
+                    fontSize: isRtl ? 18 : 16,
+                    fontWeight: FontWeight.w600,
+                    height: isRtl ? 1.8 : 1.4,
+                    color: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimaryLight,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 38,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: hashtags.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            itemBuilder: (_, i) => HashtagPill(hashtag: hashtags[i]),
+          ),
+        ),
+      ],
     );
   }
 
