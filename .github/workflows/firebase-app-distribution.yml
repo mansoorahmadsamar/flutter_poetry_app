@@ -1,10 +1,11 @@
 name: Firebase App Distribution
 
 on:
-  push:
-    branches:
-      - develop
-      - main
+  # Auto push trigger disabled — Play Store workflow handles Android distribution now
+  # push:
+  #   branches:
+  #     - develop
+  #     - main
   workflow_dispatch:
     inputs:
       release_notes:
