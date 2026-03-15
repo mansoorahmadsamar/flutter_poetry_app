@@ -1,6 +1,9 @@
 name: Play Store Release
 
 on:
+  push:
+    branches:
+      - develop
   workflow_dispatch:
     inputs:
       track:
@@ -72,6 +75,6 @@ jobs:
           serviceAccountJson: ${{ runner.temp }}/play-store-credentials.json
           packageName: com.techhikes.poetry_app
           releaseFiles: build/app/outputs/bundle/release/app-release.aab
-          track: ${{ inputs.track }}
+          track: ${{ inputs.track || 'internal' }}
           status: completed
           whatsNewDirectory: distribution/whatsnew
