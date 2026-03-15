@@ -9,11 +9,11 @@ on:
       track:
         description: 'Play Store track'
         required: true
-        default: 'internal'
+        default: 'alpha'
         type: choice
         options:
-          - internal
           - alpha
+          - internal
           - beta
           - production
       release_notes:
@@ -96,6 +96,6 @@ jobs:
           serviceAccountJson: ${{ runner.temp }}/play-store-credentials.json
           packageName: com.techhikes.poetry_app
           releaseFiles: build/app/outputs/bundle/release/app-release.aab
-          track: ${{ inputs.track || 'internal' }}
+          track: ${{ inputs.track || 'alpha' }}
           status: completed
           whatsNewDirectory: distribution/whatsnew
