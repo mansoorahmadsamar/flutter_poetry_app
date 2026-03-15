@@ -15,7 +15,7 @@ class PreferencesService {
   }
 
   String getLanguage() {
-    return _prefs.getString(AppConstants.languagePreferenceKey) ?? 'en';
+    return _prefs.getString(AppConstants.languagePreferenceKey) ?? 'ur';
   }
 
   // Theme preference
