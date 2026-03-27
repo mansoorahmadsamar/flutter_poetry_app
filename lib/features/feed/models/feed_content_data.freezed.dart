@@ -847,6 +847,7 @@ FeaturedCouplet _$FeaturedCoupletFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$FeaturedCouplet {
   String? get coupletPublicId => throw _privateConstructorUsedError;
+  String? get poemPublicId => throw _privateConstructorUsedError;
   List<String> get verses => throw _privateConstructorUsedError;
   int get likeCount => throw _privateConstructorUsedError;
   String get script => throw _privateConstructorUsedError;
@@ -865,6 +866,7 @@ abstract class $FeaturedCoupletCopyWith<$Res> {
   @useResult
   $Res call(
       {String? coupletPublicId,
+      String? poemPublicId,
       List<String> verses,
       int likeCount,
       String script});
@@ -884,6 +886,7 @@ class _$FeaturedCoupletCopyWithImpl<$Res, $Val extends FeaturedCouplet>
   @override
   $Res call({
     Object? coupletPublicId = freezed,
+    Object? poemPublicId = freezed,
     Object? verses = null,
     Object? likeCount = null,
     Object? script = null,
@@ -892,6 +895,10 @@ class _$FeaturedCoupletCopyWithImpl<$Res, $Val extends FeaturedCouplet>
       coupletPublicId: freezed == coupletPublicId
           ? _value.coupletPublicId
           : coupletPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poemPublicId: freezed == poemPublicId
+          ? _value.poemPublicId
+          : poemPublicId // ignore: cast_nullable_to_non_nullable
               as String?,
       verses: null == verses
           ? _value.verses
@@ -919,6 +926,7 @@ abstract class _$$FeaturedCoupletImplCopyWith<$Res>
   @useResult
   $Res call(
       {String? coupletPublicId,
+      String? poemPublicId,
       List<String> verses,
       int likeCount,
       String script});
@@ -936,6 +944,7 @@ class __$$FeaturedCoupletImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? coupletPublicId = freezed,
+    Object? poemPublicId = freezed,
     Object? verses = null,
     Object? likeCount = null,
     Object? script = null,
@@ -944,6 +953,10 @@ class __$$FeaturedCoupletImplCopyWithImpl<$Res>
       coupletPublicId: freezed == coupletPublicId
           ? _value.coupletPublicId
           : coupletPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poemPublicId: freezed == poemPublicId
+          ? _value.poemPublicId
+          : poemPublicId // ignore: cast_nullable_to_non_nullable
               as String?,
       verses: null == verses
           ? _value._verses
@@ -966,6 +979,7 @@ class __$$FeaturedCoupletImplCopyWithImpl<$Res>
 class _$FeaturedCoupletImpl implements _FeaturedCouplet {
   const _$FeaturedCoupletImpl(
       {this.coupletPublicId,
+      this.poemPublicId,
       final List<String> verses = const [],
       this.likeCount = 0,
       this.script = 'ARABIC'})
@@ -976,6 +990,8 @@ class _$FeaturedCoupletImpl implements _FeaturedCouplet {
 
   @override
   final String? coupletPublicId;
+  @override
+  final String? poemPublicId;
   final List<String> _verses;
   @override
   @JsonKey()
@@ -994,7 +1010,7 @@ class _$FeaturedCoupletImpl implements _FeaturedCouplet {
 
   @override
   String toString() {
-    return 'FeaturedCouplet(coupletPublicId: $coupletPublicId, verses: $verses, likeCount: $likeCount, script: $script)';
+    return 'FeaturedCouplet(coupletPublicId: $coupletPublicId, poemPublicId: $poemPublicId, verses: $verses, likeCount: $likeCount, script: $script)';
   }
 
   @override
@@ -1004,6 +1020,8 @@ class _$FeaturedCoupletImpl implements _FeaturedCouplet {
             other is _$FeaturedCoupletImpl &&
             (identical(other.coupletPublicId, coupletPublicId) ||
                 other.coupletPublicId == coupletPublicId) &&
+            (identical(other.poemPublicId, poemPublicId) ||
+                other.poemPublicId == poemPublicId) &&
             const DeepCollectionEquality().equals(other._verses, _verses) &&
             (identical(other.likeCount, likeCount) ||
                 other.likeCount == likeCount) &&
@@ -1012,7 +1030,7 @@ class _$FeaturedCoupletImpl implements _FeaturedCouplet {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, coupletPublicId,
+  int get hashCode => Object.hash(runtimeType, coupletPublicId, poemPublicId,
       const DeepCollectionEquality().hash(_verses), likeCount, script);
 
   @JsonKey(ignore: true)
@@ -1033,6 +1051,7 @@ class _$FeaturedCoupletImpl implements _FeaturedCouplet {
 abstract class _FeaturedCouplet implements FeaturedCouplet {
   const factory _FeaturedCouplet(
       {final String? coupletPublicId,
+      final String? poemPublicId,
       final List<String> verses,
       final int likeCount,
       final String script}) = _$FeaturedCoupletImpl;
@@ -1042,6 +1061,8 @@ abstract class _FeaturedCouplet implements FeaturedCouplet {
 
   @override
   String? get coupletPublicId;
+  @override
+  String? get poemPublicId;
   @override
   List<String> get verses;
   @override

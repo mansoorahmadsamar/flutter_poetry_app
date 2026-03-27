@@ -11,6 +11,7 @@ import 'package:flutter_poetry_app/features/main/tabs/poets/widgets/follow_butto
 import '../models/feed_content_data.dart';
 import '../models/feed_item.dart';
 import '../providers/feed_provider.dart';
+import 'social_proof_badge.dart';
 
 class PoetSpotlightFeedCard extends ConsumerWidget {
   final FeedItem item;
@@ -66,10 +67,57 @@ class PoetSpotlightFeedCard extends ConsumerWidget {
               // Header: Avatar + Name/years + Follow
               _buildHeader(context, textTheme, isDark, isUrdu),
 
-              // Featured couplet block
+              // "From a poet you follow" / "You saved this before"
+              if (item.reason == 'FOLLOWING') ...[
+                const SizedBox(height: 4),
+                Text(
+                  isAppUrdu ? 'آپ کے پسندیدہ شاعر' : 'From a poet you follow',
+                  style: GoogleFonts.roboto(
+                    fontSize: 11,
+                    color: Colors.white.withValues(alpha: 0.8),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+              if (item.reason == 'TIME_CAPSULE') ...[
+                const SizedBox(height: 4),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.bookmark, size: 13,
+                        color: Colors.white.withValues(alpha: 0.7)),
+                    const SizedBox(width: 4),
+                    Text(
+                      isAppUrdu ? 'آپ نے پہلے محفوظ کیا تھا' : 'You saved this before',
+                      style: GoogleFonts.roboto(
+                        fontSize: 11,
+                        color: Colors.white.withValues(alpha: 0.7),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+
+              // Social proof
+              if (item.socialContext != null) ...[
+                const SizedBox(height: AppSpacing.sm),
+                SocialProofBadgeDark(socialContext: item.socialContext),
+              ],
+
+              // Featured couplet block — taps to poem if available
               if (hasVerse) ...[
                 const SizedBox(height: AppSpacing.feedSectionGap),
-                _buildCoupletBlock(couplet, isDark, isUrdu),
+                GestureDetector(
+                  onTap: () {
+                    final poemId = couplet.poemPublicId;
+                    if (poemId != null && poemId.isNotEmpty) {
+                      ref.read(feedProvider.notifier).trackAction(item, 'open_item');
+                      context.push('/main/poems/$poemId');
+                    }
+                  },
+                  child: _buildCoupletBlock(couplet, isDark, isUrdu),
+                ),
               ],
 
               const SizedBox(height: AppSpacing.feedSectionGap),
@@ -90,13 +138,13 @@ class PoetSpotlightFeedCard extends ConsumerWidget {
                             fontFamily: AppTypography.urduFontFamily,
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
-                            color: Colors.white.withValues(alpha: 0.85),
+                            color: AppColors.secondary,
                             height: 1.6,
                           )
                         : GoogleFonts.roboto(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
-                            color: Colors.white.withValues(alpha: 0.8),
+                            color: AppColors.secondary,
                           ),
                     textDirection:
                         isAppUrdu ? TextDirection.rtl : TextDirection.ltr,
@@ -207,6 +255,7 @@ class PoetSpotlightFeedCard extends ConsumerWidget {
         FollowButton(
           publicId: data.poetPublicId,
           compact: true,
+          onDarkBackground: true,
         ),
       ],
     );
@@ -383,6 +432,8 @@ class PoetSpotlightFeedCard extends ConsumerWidget {
         'TRENDING' => 'مقبول شاعر',
         'PERSONALIZED' => 'آپ کے لیے',
         'CURATED' => 'ایڈیٹر کی پسند',
+        'FOLLOWING' => 'آپ کے شاعر',
+        'TIME_CAPSULE' => 'یادداشت',
         _ => 'دریافت',
       };
     }
@@ -391,6 +442,8 @@ class PoetSpotlightFeedCard extends ConsumerWidget {
       'TRENDING' => 'Trending Poet',
       'PERSONALIZED' => 'For You',
       'CURATED' => 'Editor\'s Pick',
+      'FOLLOWING' => 'Following',
+      'TIME_CAPSULE' => 'Memory',
       _ => 'Discover',
     };
   }

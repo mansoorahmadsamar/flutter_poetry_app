@@ -66,6 +66,7 @@ class PoemContentData with _$PoemContentData implements FeedContentData {
 class FeaturedCouplet with _$FeaturedCouplet {
   const factory FeaturedCouplet({
     String? coupletPublicId,
+    String? poemPublicId,
     @Default([]) List<String> verses,
     @Default(0) int likeCount,
     @Default('ARABIC') String script,

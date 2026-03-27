@@ -83,6 +83,7 @@ _$FeaturedCoupletImpl _$$FeaturedCoupletImplFromJson(
         Map<String, dynamic> json) =>
     _$FeaturedCoupletImpl(
       coupletPublicId: json['coupletPublicId'] as String?,
+      poemPublicId: json['poemPublicId'] as String?,
       verses: (json['verses'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
@@ -95,6 +96,7 @@ Map<String, dynamic> _$$FeaturedCoupletImplToJson(
         _$FeaturedCoupletImpl instance) =>
     <String, dynamic>{
       'coupletPublicId': instance.coupletPublicId,
+      'poemPublicId': instance.poemPublicId,
       'verses': instance.verses,
       'likeCount': instance.likeCount,
       'script': instance.script,
