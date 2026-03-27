@@ -32,6 +32,8 @@ class CoupletContentData with _$CoupletContentData implements FeedContentData {
     @Default(0) int shareCount,
     @Default(0) int bookmarkCount,
     @Default([]) List<String> tagSlugs,
+    // Reactions system (Section 19)
+    Map<String, dynamic>? reactions,
   }) = _CoupletContentData;
 
   factory CoupletContentData.fromJson(Map<String, dynamic> json) =>
@@ -52,6 +54,8 @@ class PoemContentData with _$PoemContentData implements FeedContentData {
     @Default(0) int likeCount,
     @Default(0) int viewCount,
     String? thumbnailUrl,
+    // Reactions system (Section 19)
+    Map<String, dynamic>? reactions,
   }) = _PoemContentData;
 
   factory PoemContentData.fromJson(Map<String, dynamic> json) =>
@@ -106,6 +110,8 @@ class PoetImageContentData with _$PoetImageContentData
     String? poetProfileImageUrl,
     int? poetBirthYear,
     int? poetDeathYear,
+    // Reactions system (Section 19)
+    Map<String, dynamic>? reactions,
   }) = _PoetImageContentData;
 
   factory PoetImageContentData.fromJson(Map<String, dynamic> json) =>

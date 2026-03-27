@@ -8,13 +8,14 @@ import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
-import 'package:flutter_poetry_app/features/engagement/providers/like_providers.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/bookmark_providers.dart';
+import 'package:flutter_poetry_app/features/engagement/providers/reaction_providers.dart';
 import '../models/feed_content_data.dart';
 import '../models/feed_item.dart';
 import '../providers/feed_engagement_provider.dart';
 import '../providers/feed_provider.dart';
 import 'feed_engagement_row.dart';
+import 'social_proof_badge.dart';
 
 class PoemFeedCard extends ConsumerWidget {
   final FeedItem item;
@@ -47,7 +48,7 @@ class PoemFeedCard extends ConsumerWidget {
           width: 0.5,
         ),
       ),
-      color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+      color: _cardColor(isDark),
       child: InkWell(
         onTap: () => _onTap(context, ref),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -86,7 +87,43 @@ class PoemFeedCard extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   _buildHeader(context, isDark, isUrdu, isAppUrdu),
+
+                  // "From a poet you follow" / "You saved this before"
+                  if (item.reason == 'FOLLOWING') ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      isAppUrdu ? 'آپ کے پسندیدہ شاعر کی طرف سے' : 'From a poet you follow',
+                      style: GoogleFonts.roboto(
+                        fontSize: 11,
+                        color: isDark ? const Color(0xFF64B5F6) : const Color(0xFF1565C0),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                  if (item.reason == 'TIME_CAPSULE') ...[
+                    const SizedBox(height: 4),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.bookmark, size: 13,
+                            color: isDark ? const Color(0xFFFFB74D) : const Color(0xFFE65100)),
+                        const SizedBox(width: 4),
+                        Text(
+                          isAppUrdu ? 'آپ نے پہلے محفوظ کیا تھا' : 'You saved this before',
+                          style: GoogleFonts.roboto(
+                            fontSize: 11,
+                            color: isDark ? const Color(0xFFFFB74D) : const Color(0xFFE65100),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+
                   const SizedBox(height: AppSpacing.feedSectionGap),
+
+                  // Social proof
+                  SocialProofBadge(socialContext: item.socialContext),
 
                   // Title
                   if (data.title != null)
@@ -114,7 +151,7 @@ class PoemFeedCard extends ConsumerWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
 
-                  // Excerpt
+                  // Excerpt — auto-expand removes maxLines to show full first verse
                   if (data.excerpt != null) ...[
                     const SizedBox(height: AppSpacing.sm),
                     Text(
@@ -182,13 +219,17 @@ class PoemFeedCard extends ConsumerWidget {
 
                   FeedEngagementRow(
                     likeCount:
-                        data.likeCount + (overlay?.likeCountDelta ?? 0),
+                        data.likeCount + (overlay?.reactionCountDelta ?? overlay?.likeCountDelta ?? 0),
                     shareCount: 0,
-                    isLiked: overlay?.isLiked ?? false,
+                    isLiked: overlay?.userReaction != null || overlay?.isLiked == true,
                     isBookmarked: overlay?.isBookmarked ?? false,
-                    onLike: () => _onLike(ref, itemKey, overlay),
                     onBookmark: () => _onBookmark(ref, itemKey, overlay),
                     onShare: () => _onShare(context, ref),
+                    totalReactions: item.socialContext?.totalReactions,
+                    userReaction: overlay?.userReaction,
+                    reactionsByType: _parseReactionsByType(data.reactions),
+                    reactionTypes: ref.watch(reactionTypesProvider).valueOrNull ?? [],
+                    onReact: (reactionType) => _onReact(ref, itemKey, overlay, reactionType),
                   ),
                 ],
               ),
@@ -331,18 +372,25 @@ class PoemFeedCard extends ConsumerWidget {
     context.push('/main/poems/${item.publicId}');
   }
 
-  void _onLike(WidgetRef ref, String itemKey, FeedEngagementOverlay? overlay) {
-    final wasLiked = overlay?.isLiked ?? false;
+  void _onReact(WidgetRef ref, String itemKey, FeedEngagementOverlay? overlay, String reactionType) {
+    final currentReaction = overlay?.userReaction;
+    final bool isRemoving = currentReaction == reactionType;
+    final bool isAdding = currentReaction == null;
+
     final newOverlay = (overlay ?? const FeedEngagementOverlay()).copyWith(
-      isLiked: !wasLiked,
-      likeCountDelta: (overlay?.likeCountDelta ?? 0) + (wasLiked ? -1 : 1),
+      userReaction: () => isRemoving ? null : reactionType,
+      isLiked: !isRemoving,
+      reactionCountDelta: (overlay?.reactionCountDelta ?? 0) +
+          (isRemoving ? -1 : (isAdding ? 1 : 0)),
+      likeCountDelta: (overlay?.likeCountDelta ?? 0) +
+          (isRemoving ? -1 : (isAdding ? 1 : 0)),
     );
     ref.read(feedEngagementProvider.notifier).state = {
       ...ref.read(feedEngagementProvider),
       itemKey: newOverlay,
     };
-    ref.read(feedProvider.notifier).trackAction(item, 'like');
-    _fireToggleLike(ref, item.publicId, itemKey, overlay);
+    ref.read(feedProvider.notifier).trackAction(item, 'react');
+    _fireReact(ref, item.publicId, reactionType, itemKey, overlay);
   }
 
   void _onBookmark(
@@ -361,14 +409,19 @@ class PoemFeedCard extends ConsumerWidget {
     _fireToggleBookmark(ref, item.publicId, item.lang ?? 'ur', itemKey, overlay);
   }
 
-  Future<void> _fireToggleLike(
+  Future<void> _fireReact(
     WidgetRef ref,
     String publicId,
+    String reactionType,
     String itemKey,
     FeedEngagementOverlay? previousOverlay,
   ) async {
     try {
-      await ref.read(likeActionProvider.notifier).toggleLike(publicId);
+      await ref.read(reactionActionProvider.notifier).react(
+            targetType: 'poems',
+            publicId: publicId,
+            reactionType: reactionType,
+          );
     } catch (_) {
       ref.read(feedEngagementProvider.notifier).state = {
         ...ref.read(feedEngagementProvider),
@@ -414,6 +467,17 @@ class PoemFeedCard extends ConsumerWidget {
     if (birthYear == null || birthYear == 0) return null;
     if (deathYear == null || deathYear == 0) return '$birthYear';
     return '$birthYear \u2013 $deathYear';
+  }
+
+  Color _cardColor(bool isDark) {
+    return isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
+  }
+
+  Map<String, int>? _parseReactionsByType(Map<String, dynamic>? reactions) {
+    if (reactions == null) return null;
+    final byType = reactions['byType'];
+    if (byType == null) return null;
+    return Map<String, int>.from(byType as Map);
   }
 
   String _poetryTypeLabel(String type) {

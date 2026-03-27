@@ -5,11 +5,13 @@ import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/couplet_model.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/couplet_providers.dart';
+import 'package:flutter_poetry_app/features/engagement/providers/reaction_providers.dart';
+import 'package:flutter_poetry_app/features/engagement/widgets/reaction_button.dart';
 import 'package:flutter_poetry_app/features/image_poetry/widgets/share_options_sheet.dart';
 
 class CoupletEngagementButtons extends ConsumerWidget {
   final CoupletModel couplet;
-  final String? poemPublicId; // Optional: to invalidate the specific coupletsProvider instance
+  final String? poemPublicId;
 
   const CoupletEngagementButtons({
     super.key,
@@ -19,20 +21,21 @@ class CoupletEngagementButtons extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Always rebuild when the widget rebuilds to show updated states
-    final isLiked = couplet.isLikedByCurrentUser;
     final isBookmarked = couplet.isBookmarkedByCurrentUser;
+
+    // Parse user reaction from couplet's reactions map
+    final String? userReaction = _getUserReaction(couplet.reactions);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        // Like button
-        _EngagementButton(
-          icon: isLiked ? Icons.favorite : Icons.favorite_border,
-          iconColor: isLiked ? Colors.red : Colors.grey,
-          count: couplet.likeCount,
-          label: 'Like',
-          onPressed: () => _handleLike(context, ref),
+        // Reaction button (replaces like)
+        ReactionButton(
+          userReaction: userReaction,
+          totalCount: couplet.likeCount,
+          reactionsByType: _parseReactionsByType(couplet.reactions),
+          onReact: (reactionType) => _handleReact(context, ref, reactionType),
+          size: ReactionButtonSize.expanded,
         ),
 
         // Bookmark button
@@ -56,30 +59,22 @@ class CoupletEngagementButtons extends ConsumerWidget {
     );
   }
 
-  Future<void> _handleLike(BuildContext context, WidgetRef ref) async {
-    final isLiked = couplet.isLikedByCurrentUser;
-
+  Future<void> _handleReact(BuildContext context, WidgetRef ref, String reactionType) async {
     try {
-      await ref.read(coupletActionProvider.notifier).toggleLike(couplet.publicId);
+      await ref.read(reactionActionProvider.notifier).react(
+            targetType: 'couplets',
+            publicId: couplet.publicId,
+            reactionType: reactionType,
+          );
 
-      // Manually invalidate the specific coupletsProvider instance if poemPublicId is available
       if (poemPublicId != null) {
         ref.invalidate(coupletsProvider(poemPublicId!));
-      }
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(isLiked ? 'Couplet unliked' : 'Couplet liked'),
-            duration: const Duration(seconds: 1),
-          ),
-        );
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to ${isLiked ? 'unlike' : 'like'} couplet'),
+          const SnackBar(
+            content: Text('Failed to react'),
             backgroundColor: Colors.red,
           ),
         );
@@ -96,7 +91,6 @@ class CoupletEngagementButtons extends ConsumerWidget {
           .read(coupletActionProvider.notifier)
           .toggleBookmark(couplet.publicId, lang: currentLang);
 
-      // Manually invalidate the specific coupletsProvider instance if poemPublicId is available
       if (poemPublicId != null) {
         ref.invalidate(coupletsProvider(poemPublicId!));
       }
@@ -133,6 +127,18 @@ class CoupletEngagementButtons extends ConsumerWidget {
       builder: (context) => ShareOptionsSheet(coupletId: couplet.publicId),
     );
   }
+
+  String? _getUserReaction(Map<String, dynamic>? reactions) {
+    if (reactions == null) return null;
+    return reactions['userReaction'] as String?;
+  }
+
+  Map<String, int>? _parseReactionsByType(Map<String, dynamic>? reactions) {
+    if (reactions == null) return null;
+    final byType = reactions['byType'];
+    if (byType == null) return null;
+    return Map<String, int>.from(byType as Map);
+  }
 }
 
 class _EngagementButton extends StatelessWidget {
@@ -156,12 +162,12 @@ class _EngagementButton extends StatelessWidget {
       onTap: onPressed,
       borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
       child: Padding(
-        padding: EdgeInsets.all(AppSpacing.sm),
+        padding: const EdgeInsets.all(AppSpacing.sm),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, color: iconColor, size: 24),
-            SizedBox(height: AppSpacing.xs),
+            const SizedBox(height: AppSpacing.xs),
             Text(
               count > 0 ? '$count' : label,
               style: TextStyle(

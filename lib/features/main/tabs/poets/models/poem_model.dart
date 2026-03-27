@@ -43,6 +43,8 @@ class PoemModel with _$PoemModel {
     // Simple list API fields (for backward compatibility)
     String? title,
     String? excerpt,
+    // Reactions system (Section 19)
+    Map<String, dynamic>? reactions,
   }) = _PoemModel;
 
   factory PoemModel.fromJson(Map<String, dynamic> json) =>

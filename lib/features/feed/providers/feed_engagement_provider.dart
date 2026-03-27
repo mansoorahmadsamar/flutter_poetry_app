@@ -9,12 +9,21 @@ class FeedEngagementOverlay {
   final int likeCountDelta;
   final int bookmarkCountDelta;
 
+  /// The user's current reaction key (e.g. "WAH_WAH", "LOVE").
+  /// null = no reaction. When non-null, isLiked is derived as true.
+  final String? userReaction;
+
+  /// Optimistic delta for total reaction count (+1 / -1 / 0).
+  final int reactionCountDelta;
+
   const FeedEngagementOverlay({
     this.isLiked,
     this.isBookmarked,
     this.isFollowed,
     this.likeCountDelta = 0,
     this.bookmarkCountDelta = 0,
+    this.userReaction,
+    this.reactionCountDelta = 0,
   });
 
   FeedEngagementOverlay copyWith({
@@ -23,6 +32,8 @@ class FeedEngagementOverlay {
     bool? isFollowed,
     int? likeCountDelta,
     int? bookmarkCountDelta,
+    String? Function()? userReaction,
+    int? reactionCountDelta,
   }) {
     return FeedEngagementOverlay(
       isLiked: isLiked ?? this.isLiked,
@@ -30,6 +41,8 @@ class FeedEngagementOverlay {
       isFollowed: isFollowed ?? this.isFollowed,
       likeCountDelta: likeCountDelta ?? this.likeCountDelta,
       bookmarkCountDelta: bookmarkCountDelta ?? this.bookmarkCountDelta,
+      userReaction: userReaction != null ? userReaction() : this.userReaction,
+      reactionCountDelta: reactionCountDelta ?? this.reactionCountDelta,
     );
   }
 }

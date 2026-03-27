@@ -20,6 +20,8 @@ class CoupletModel with _$CoupletModel {
     @JsonKey(name: 'isBookmarked') required bool isBookmarkedByCurrentUser,
     @Default([]) List<String> tagSlugs,
     DateTime? createdAt,
+    // Reactions system (Section 19)
+    Map<String, dynamic>? reactions,
   }) = _CoupletModel;
 
   factory CoupletModel.fromJson(Map<String, dynamic> json) =>
@@ -53,6 +55,8 @@ class CoupletDetailResponse with _$CoupletDetailResponse {
     @Default([]) List<String> tagSlugs,
     DateTime? createdAt,
     DateTime? updatedAt,
+    // Reactions system (Section 19)
+    Map<String, dynamic>? reactions,
   }) = _CoupletDetailResponse;
 
   factory CoupletDetailResponse.fromJson(Map<String, dynamic> json) =>

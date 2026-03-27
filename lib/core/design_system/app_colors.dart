@@ -61,6 +61,11 @@ abstract class AppColors {
   static const Color engagementIcon = Color(0xFF9E9E9E); // Softer gray for engagement icons (light)
   static const Color engagementIconDark = Color(0xFF8A8A8A); // Softer gray for engagement icons (dark)
   static const Color feedLiked = Color(0xFFE57373); // Soft red for liked heart
+
+  // Reaction picker
+  static const Color reactionPickerBg = Color(0xFFFFFFFF); // White pill background
+  static const Color reactionPickerBgDark = Color(0xFF3A3A3A); // Dark mode picker
+  static const Color reactionSelectedBg = Color(0x1F1B4D3E); // 12% primary for selected emoji
 }
 
 /// Poetic Green Theme Colors

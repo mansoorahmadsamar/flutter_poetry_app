@@ -27,6 +27,7 @@ _$CoupletModelImpl _$$CoupletModelImplFromJson(Map<String, dynamic> json) =>
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
+      reactions: json['reactions'] as Map<String, dynamic>?,
     );
 
 Map<String, dynamic> _$$CoupletModelImplToJson(_$CoupletModelImpl instance) =>
@@ -43,6 +44,7 @@ Map<String, dynamic> _$$CoupletModelImplToJson(_$CoupletModelImpl instance) =>
       'isBookmarked': instance.isBookmarkedByCurrentUser,
       'tagSlugs': instance.tagSlugs,
       'createdAt': instance.createdAt?.toIso8601String(),
+      'reactions': instance.reactions,
     };
 
 _$CoupletDetailResponseImpl _$$CoupletDetailResponseImplFromJson(
@@ -77,6 +79,7 @@ _$CoupletDetailResponseImpl _$$CoupletDetailResponseImplFromJson(
       updatedAt: json['updatedAt'] == null
           ? null
           : DateTime.parse(json['updatedAt'] as String),
+      reactions: json['reactions'] as Map<String, dynamic>?,
     );
 
 Map<String, dynamic> _$$CoupletDetailResponseImplToJson(
@@ -102,6 +105,7 @@ Map<String, dynamic> _$$CoupletDetailResponseImplToJson(
       'tagSlugs': instance.tagSlugs,
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
+      'reactions': instance.reactions,
     };
 
 _$BookmarkedCoupletResponseImpl _$$BookmarkedCoupletResponseImplFromJson(

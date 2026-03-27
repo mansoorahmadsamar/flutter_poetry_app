@@ -24,6 +24,7 @@ _$CoupletContentDataImpl _$$CoupletContentDataImplFromJson(
               ?.map((e) => e as String)
               .toList() ??
           const [],
+      reactions: json['reactions'] as Map<String, dynamic>?,
     );
 
 Map<String, dynamic> _$$CoupletContentDataImplToJson(
@@ -41,6 +42,7 @@ Map<String, dynamic> _$$CoupletContentDataImplToJson(
       'shareCount': instance.shareCount,
       'bookmarkCount': instance.bookmarkCount,
       'tagSlugs': instance.tagSlugs,
+      'reactions': instance.reactions,
     };
 
 _$PoemContentDataImpl _$$PoemContentDataImplFromJson(
@@ -57,6 +59,7 @@ _$PoemContentDataImpl _$$PoemContentDataImplFromJson(
       likeCount: (json['likeCount'] as num?)?.toInt() ?? 0,
       viewCount: (json['viewCount'] as num?)?.toInt() ?? 0,
       thumbnailUrl: json['thumbnailUrl'] as String?,
+      reactions: json['reactions'] as Map<String, dynamic>?,
     );
 
 Map<String, dynamic> _$$PoemContentDataImplToJson(
@@ -73,6 +76,7 @@ Map<String, dynamic> _$$PoemContentDataImplToJson(
       'likeCount': instance.likeCount,
       'viewCount': instance.viewCount,
       'thumbnailUrl': instance.thumbnailUrl,
+      'reactions': instance.reactions,
     };
 
 _$FeaturedCoupletImpl _$$FeaturedCoupletImplFromJson(
@@ -143,6 +147,7 @@ _$PoetImageContentDataImpl _$$PoetImageContentDataImplFromJson(
       poetProfileImageUrl: json['poetProfileImageUrl'] as String?,
       poetBirthYear: (json['poetBirthYear'] as num?)?.toInt(),
       poetDeathYear: (json['poetDeathYear'] as num?)?.toInt(),
+      reactions: json['reactions'] as Map<String, dynamic>?,
     );
 
 Map<String, dynamic> _$$PoetImageContentDataImplToJson(
@@ -159,4 +164,5 @@ Map<String, dynamic> _$$PoetImageContentDataImplToJson(
       'poetProfileImageUrl': instance.poetProfileImageUrl,
       'poetBirthYear': instance.poetBirthYear,
       'poetDeathYear': instance.poetDeathYear,
+      'reactions': instance.reactions,
     };

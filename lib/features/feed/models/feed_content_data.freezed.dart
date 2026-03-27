@@ -31,7 +31,9 @@ mixin _$CoupletContentData {
   int get likeCount => throw _privateConstructorUsedError;
   int get shareCount => throw _privateConstructorUsedError;
   int get bookmarkCount => throw _privateConstructorUsedError;
-  List<String> get tagSlugs => throw _privateConstructorUsedError;
+  List<String> get tagSlugs =>
+      throw _privateConstructorUsedError; // Reactions system (Section 19)
+  Map<String, dynamic>? get reactions => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -57,7 +59,8 @@ abstract class $CoupletContentDataCopyWith<$Res> {
       int likeCount,
       int shareCount,
       int bookmarkCount,
-      List<String> tagSlugs});
+      List<String> tagSlugs,
+      Map<String, dynamic>? reactions});
 }
 
 /// @nodoc
@@ -85,6 +88,7 @@ class _$CoupletContentDataCopyWithImpl<$Res, $Val extends CoupletContentData>
     Object? shareCount = null,
     Object? bookmarkCount = null,
     Object? tagSlugs = null,
+    Object? reactions = freezed,
   }) {
     return _then(_value.copyWith(
       versesTextArabic: freezed == versesTextArabic
@@ -135,6 +139,10 @@ class _$CoupletContentDataCopyWithImpl<$Res, $Val extends CoupletContentData>
           ? _value.tagSlugs
           : tagSlugs // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      reactions: freezed == reactions
+          ? _value.reactions
+          : reactions // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ) as $Val);
   }
 }
@@ -159,7 +167,8 @@ abstract class _$$CoupletContentDataImplCopyWith<$Res>
       int likeCount,
       int shareCount,
       int bookmarkCount,
-      List<String> tagSlugs});
+      List<String> tagSlugs,
+      Map<String, dynamic>? reactions});
 }
 
 /// @nodoc
@@ -185,6 +194,7 @@ class __$$CoupletContentDataImplCopyWithImpl<$Res>
     Object? shareCount = null,
     Object? bookmarkCount = null,
     Object? tagSlugs = null,
+    Object? reactions = freezed,
   }) {
     return _then(_$CoupletContentDataImpl(
       versesTextArabic: freezed == versesTextArabic
@@ -235,6 +245,10 @@ class __$$CoupletContentDataImplCopyWithImpl<$Res>
           ? _value._tagSlugs
           : tagSlugs // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      reactions: freezed == reactions
+          ? _value._reactions
+          : reactions // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ));
   }
 }
@@ -254,8 +268,10 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
       this.likeCount = 0,
       this.shareCount = 0,
       this.bookmarkCount = 0,
-      final List<String> tagSlugs = const []})
-      : _tagSlugs = tagSlugs;
+      final List<String> tagSlugs = const [],
+      final Map<String, dynamic>? reactions})
+      : _tagSlugs = tagSlugs,
+        _reactions = reactions;
 
   factory _$CoupletContentDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$CoupletContentDataImplFromJson(json);
@@ -294,9 +310,21 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
     return EqualUnmodifiableListView(_tagSlugs);
   }
 
+// Reactions system (Section 19)
+  final Map<String, dynamic>? _reactions;
+// Reactions system (Section 19)
+  @override
+  Map<String, dynamic>? get reactions {
+    final value = _reactions;
+    if (value == null) return null;
+    if (_reactions is EqualUnmodifiableMapView) return _reactions;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
+
   @override
   String toString() {
-    return 'CoupletContentData(versesTextArabic: $versesTextArabic, versesTextRoman: $versesTextRoman, poetPublicId: $poetPublicId, poetProfileImageUrl: $poetProfileImageUrl, poetBirthYear: $poetBirthYear, poetDeathYear: $poetDeathYear, poetName: $poetName, poemPublicId: $poemPublicId, likeCount: $likeCount, shareCount: $shareCount, bookmarkCount: $bookmarkCount, tagSlugs: $tagSlugs)';
+    return 'CoupletContentData(versesTextArabic: $versesTextArabic, versesTextRoman: $versesTextRoman, poetPublicId: $poetPublicId, poetProfileImageUrl: $poetProfileImageUrl, poetBirthYear: $poetBirthYear, poetDeathYear: $poetDeathYear, poetName: $poetName, poemPublicId: $poemPublicId, likeCount: $likeCount, shareCount: $shareCount, bookmarkCount: $bookmarkCount, tagSlugs: $tagSlugs, reactions: $reactions)';
   }
 
   @override
@@ -326,7 +354,9 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
                 other.shareCount == shareCount) &&
             (identical(other.bookmarkCount, bookmarkCount) ||
                 other.bookmarkCount == bookmarkCount) &&
-            const DeepCollectionEquality().equals(other._tagSlugs, _tagSlugs));
+            const DeepCollectionEquality().equals(other._tagSlugs, _tagSlugs) &&
+            const DeepCollectionEquality()
+                .equals(other._reactions, _reactions));
   }
 
   @JsonKey(ignore: true)
@@ -344,7 +374,8 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
       likeCount,
       shareCount,
       bookmarkCount,
-      const DeepCollectionEquality().hash(_tagSlugs));
+      const DeepCollectionEquality().hash(_tagSlugs),
+      const DeepCollectionEquality().hash(_reactions));
 
   @JsonKey(ignore: true)
   @override
@@ -374,7 +405,8 @@ abstract class _CoupletContentData implements CoupletContentData {
       final int likeCount,
       final int shareCount,
       final int bookmarkCount,
-      final List<String> tagSlugs}) = _$CoupletContentDataImpl;
+      final List<String> tagSlugs,
+      final Map<String, dynamic>? reactions}) = _$CoupletContentDataImpl;
 
   factory _CoupletContentData.fromJson(Map<String, dynamic> json) =
       _$CoupletContentDataImpl.fromJson;
@@ -403,6 +435,8 @@ abstract class _CoupletContentData implements CoupletContentData {
   int get bookmarkCount;
   @override
   List<String> get tagSlugs;
+  @override // Reactions system (Section 19)
+  Map<String, dynamic>? get reactions;
   @override
   @JsonKey(ignore: true)
   _$$CoupletContentDataImplCopyWith<_$CoupletContentDataImpl> get copyWith =>
@@ -425,7 +459,9 @@ mixin _$PoemContentData {
   String? get poetryType => throw _privateConstructorUsedError;
   int get likeCount => throw _privateConstructorUsedError;
   int get viewCount => throw _privateConstructorUsedError;
-  String? get thumbnailUrl => throw _privateConstructorUsedError;
+  String? get thumbnailUrl =>
+      throw _privateConstructorUsedError; // Reactions system (Section 19)
+  Map<String, dynamic>? get reactions => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -450,7 +486,8 @@ abstract class $PoemContentDataCopyWith<$Res> {
       String? poetryType,
       int likeCount,
       int viewCount,
-      String? thumbnailUrl});
+      String? thumbnailUrl,
+      Map<String, dynamic>? reactions});
 }
 
 /// @nodoc
@@ -477,6 +514,7 @@ class _$PoemContentDataCopyWithImpl<$Res, $Val extends PoemContentData>
     Object? likeCount = null,
     Object? viewCount = null,
     Object? thumbnailUrl = freezed,
+    Object? reactions = freezed,
   }) {
     return _then(_value.copyWith(
       title: freezed == title
@@ -523,6 +561,10 @@ class _$PoemContentDataCopyWithImpl<$Res, $Val extends PoemContentData>
           ? _value.thumbnailUrl
           : thumbnailUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      reactions: freezed == reactions
+          ? _value.reactions
+          : reactions // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ) as $Val);
   }
 }
@@ -546,7 +588,8 @@ abstract class _$$PoemContentDataImplCopyWith<$Res>
       String? poetryType,
       int likeCount,
       int viewCount,
-      String? thumbnailUrl});
+      String? thumbnailUrl,
+      Map<String, dynamic>? reactions});
 }
 
 /// @nodoc
@@ -571,6 +614,7 @@ class __$$PoemContentDataImplCopyWithImpl<$Res>
     Object? likeCount = null,
     Object? viewCount = null,
     Object? thumbnailUrl = freezed,
+    Object? reactions = freezed,
   }) {
     return _then(_$PoemContentDataImpl(
       title: freezed == title
@@ -617,6 +661,10 @@ class __$$PoemContentDataImplCopyWithImpl<$Res>
           ? _value.thumbnailUrl
           : thumbnailUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      reactions: freezed == reactions
+          ? _value._reactions
+          : reactions // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ));
   }
 }
@@ -635,7 +683,9 @@ class _$PoemContentDataImpl implements _PoemContentData {
       this.poetryType,
       this.likeCount = 0,
       this.viewCount = 0,
-      this.thumbnailUrl});
+      this.thumbnailUrl,
+      final Map<String, dynamic>? reactions})
+      : _reactions = reactions;
 
   factory _$PoemContentDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$PoemContentDataImplFromJson(json);
@@ -664,10 +714,21 @@ class _$PoemContentDataImpl implements _PoemContentData {
   final int viewCount;
   @override
   final String? thumbnailUrl;
+// Reactions system (Section 19)
+  final Map<String, dynamic>? _reactions;
+// Reactions system (Section 19)
+  @override
+  Map<String, dynamic>? get reactions {
+    final value = _reactions;
+    if (value == null) return null;
+    if (_reactions is EqualUnmodifiableMapView) return _reactions;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
 
   @override
   String toString() {
-    return 'PoemContentData(title: $title, excerpt: $excerpt, poetPublicId: $poetPublicId, poetProfileImageUrl: $poetProfileImageUrl, poetBirthYear: $poetBirthYear, poetDeathYear: $poetDeathYear, poetName: $poetName, poetryType: $poetryType, likeCount: $likeCount, viewCount: $viewCount, thumbnailUrl: $thumbnailUrl)';
+    return 'PoemContentData(title: $title, excerpt: $excerpt, poetPublicId: $poetPublicId, poetProfileImageUrl: $poetProfileImageUrl, poetBirthYear: $poetBirthYear, poetDeathYear: $poetDeathYear, poetName: $poetName, poetryType: $poetryType, likeCount: $likeCount, viewCount: $viewCount, thumbnailUrl: $thumbnailUrl, reactions: $reactions)';
   }
 
   @override
@@ -694,7 +755,9 @@ class _$PoemContentDataImpl implements _PoemContentData {
             (identical(other.viewCount, viewCount) ||
                 other.viewCount == viewCount) &&
             (identical(other.thumbnailUrl, thumbnailUrl) ||
-                other.thumbnailUrl == thumbnailUrl));
+                other.thumbnailUrl == thumbnailUrl) &&
+            const DeepCollectionEquality()
+                .equals(other._reactions, _reactions));
   }
 
   @JsonKey(ignore: true)
@@ -711,7 +774,8 @@ class _$PoemContentDataImpl implements _PoemContentData {
       poetryType,
       likeCount,
       viewCount,
-      thumbnailUrl);
+      thumbnailUrl,
+      const DeepCollectionEquality().hash(_reactions));
 
   @JsonKey(ignore: true)
   @override
@@ -740,7 +804,8 @@ abstract class _PoemContentData implements PoemContentData {
       final String? poetryType,
       final int likeCount,
       final int viewCount,
-      final String? thumbnailUrl}) = _$PoemContentDataImpl;
+      final String? thumbnailUrl,
+      final Map<String, dynamic>? reactions}) = _$PoemContentDataImpl;
 
   factory _PoemContentData.fromJson(Map<String, dynamic> json) =
       _$PoemContentDataImpl.fromJson;
@@ -767,6 +832,8 @@ abstract class _PoemContentData implements PoemContentData {
   int get viewCount;
   @override
   String? get thumbnailUrl;
+  @override // Reactions system (Section 19)
+  Map<String, dynamic>? get reactions;
   @override
   @JsonKey(ignore: true)
   _$$PoemContentDataImplCopyWith<_$PoemContentDataImpl> get copyWith =>
@@ -1369,7 +1436,9 @@ mixin _$PoetImageContentData {
   String? get poetName => throw _privateConstructorUsedError;
   String? get poetProfileImageUrl => throw _privateConstructorUsedError;
   int? get poetBirthYear => throw _privateConstructorUsedError;
-  int? get poetDeathYear => throw _privateConstructorUsedError;
+  int? get poetDeathYear =>
+      throw _privateConstructorUsedError; // Reactions system (Section 19)
+  Map<String, dynamic>? get reactions => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -1394,7 +1463,8 @@ abstract class $PoetImageContentDataCopyWith<$Res> {
       String? poetName,
       String? poetProfileImageUrl,
       int? poetBirthYear,
-      int? poetDeathYear});
+      int? poetDeathYear,
+      Map<String, dynamic>? reactions});
 }
 
 /// @nodoc
@@ -1422,6 +1492,7 @@ class _$PoetImageContentDataCopyWithImpl<$Res,
     Object? poetProfileImageUrl = freezed,
     Object? poetBirthYear = freezed,
     Object? poetDeathYear = freezed,
+    Object? reactions = freezed,
   }) {
     return _then(_value.copyWith(
       imageUrl: freezed == imageUrl
@@ -1468,6 +1539,10 @@ class _$PoetImageContentDataCopyWithImpl<$Res,
           ? _value.poetDeathYear
           : poetDeathYear // ignore: cast_nullable_to_non_nullable
               as int?,
+      reactions: freezed == reactions
+          ? _value.reactions
+          : reactions // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ) as $Val);
   }
 }
@@ -1491,7 +1566,8 @@ abstract class _$$PoetImageContentDataImplCopyWith<$Res>
       String? poetName,
       String? poetProfileImageUrl,
       int? poetBirthYear,
-      int? poetDeathYear});
+      int? poetDeathYear,
+      Map<String, dynamic>? reactions});
 }
 
 /// @nodoc
@@ -1516,6 +1592,7 @@ class __$$PoetImageContentDataImplCopyWithImpl<$Res>
     Object? poetProfileImageUrl = freezed,
     Object? poetBirthYear = freezed,
     Object? poetDeathYear = freezed,
+    Object? reactions = freezed,
   }) {
     return _then(_$PoetImageContentDataImpl(
       imageUrl: freezed == imageUrl
@@ -1562,6 +1639,10 @@ class __$$PoetImageContentDataImplCopyWithImpl<$Res>
           ? _value.poetDeathYear
           : poetDeathYear // ignore: cast_nullable_to_non_nullable
               as int?,
+      reactions: freezed == reactions
+          ? _value._reactions
+          : reactions // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ));
   }
 }
@@ -1580,7 +1661,9 @@ class _$PoetImageContentDataImpl implements _PoetImageContentData {
       this.poetName,
       this.poetProfileImageUrl,
       this.poetBirthYear,
-      this.poetDeathYear});
+      this.poetDeathYear,
+      final Map<String, dynamic>? reactions})
+      : _reactions = reactions;
 
   factory _$PoetImageContentDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$PoetImageContentDataImplFromJson(json);
@@ -1610,10 +1693,21 @@ class _$PoetImageContentDataImpl implements _PoetImageContentData {
   final int? poetBirthYear;
   @override
   final int? poetDeathYear;
+// Reactions system (Section 19)
+  final Map<String, dynamic>? _reactions;
+// Reactions system (Section 19)
+  @override
+  Map<String, dynamic>? get reactions {
+    final value = _reactions;
+    if (value == null) return null;
+    if (_reactions is EqualUnmodifiableMapView) return _reactions;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
 
   @override
   String toString() {
-    return 'PoetImageContentData(imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, contentText: $contentText, likeCount: $likeCount, shareCount: $shareCount, bookmarkCount: $bookmarkCount, poetPublicId: $poetPublicId, poetName: $poetName, poetProfileImageUrl: $poetProfileImageUrl, poetBirthYear: $poetBirthYear, poetDeathYear: $poetDeathYear)';
+    return 'PoetImageContentData(imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, contentText: $contentText, likeCount: $likeCount, shareCount: $shareCount, bookmarkCount: $bookmarkCount, poetPublicId: $poetPublicId, poetName: $poetName, poetProfileImageUrl: $poetProfileImageUrl, poetBirthYear: $poetBirthYear, poetDeathYear: $poetDeathYear, reactions: $reactions)';
   }
 
   @override
@@ -1642,7 +1736,9 @@ class _$PoetImageContentDataImpl implements _PoetImageContentData {
             (identical(other.poetBirthYear, poetBirthYear) ||
                 other.poetBirthYear == poetBirthYear) &&
             (identical(other.poetDeathYear, poetDeathYear) ||
-                other.poetDeathYear == poetDeathYear));
+                other.poetDeathYear == poetDeathYear) &&
+            const DeepCollectionEquality()
+                .equals(other._reactions, _reactions));
   }
 
   @JsonKey(ignore: true)
@@ -1659,7 +1755,8 @@ class _$PoetImageContentDataImpl implements _PoetImageContentData {
       poetName,
       poetProfileImageUrl,
       poetBirthYear,
-      poetDeathYear);
+      poetDeathYear,
+      const DeepCollectionEquality().hash(_reactions));
 
   @JsonKey(ignore: true)
   @override
@@ -1689,7 +1786,8 @@ abstract class _PoetImageContentData implements PoetImageContentData {
       final String? poetName,
       final String? poetProfileImageUrl,
       final int? poetBirthYear,
-      final int? poetDeathYear}) = _$PoetImageContentDataImpl;
+      final int? poetDeathYear,
+      final Map<String, dynamic>? reactions}) = _$PoetImageContentDataImpl;
 
   factory _PoetImageContentData.fromJson(Map<String, dynamic> json) =
       _$PoetImageContentDataImpl.fromJson;
@@ -1716,6 +1814,8 @@ abstract class _PoetImageContentData implements PoetImageContentData {
   int? get poetBirthYear;
   @override
   int? get poetDeathYear;
+  @override // Reactions system (Section 19)
+  Map<String, dynamic>? get reactions;
   @override
   @JsonKey(ignore: true)
   _$$PoetImageContentDataImplCopyWith<_$PoetImageContentDataImpl>
