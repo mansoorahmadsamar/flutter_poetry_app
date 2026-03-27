@@ -201,8 +201,52 @@ class FeedNotifier extends StateNotifier<FeedState> {
     return result;
   }
 
-  /// Pull-to-refresh alias.
+  /// Pull-to-refresh alias (full reset).
   Future<void> refresh() => loadFirstPage();
+
+  /// Smart refresh: fetch new items since last cursor and prepend them.
+  /// Returns the number of new items added.
+  Future<int> smartRefresh() async {
+    // No cursor yet — fall back to full reload
+    if (state.nextCursor == null) {
+      await loadFirstPage();
+      return 0;
+    }
+
+    await _flushEvents();
+
+    try {
+      final response = await _feedService.getFeed(
+        lang: _lang,
+        cursor: state.nextCursor,
+        refresh: true,
+      );
+      final newItems = _dedup(response.items);
+      if (newItems.isEmpty) return 0;
+
+      state = state.copyWith(
+        items: [...newItems, ...state.items],
+        nextCursor: () => response.nextCursor ?? state.nextCursor,
+        sessionId: () =>
+            response.sessionId.isNotEmpty ? response.sessionId : state.sessionId,
+        hasMore: response.hasMore,
+      );
+      return response.newCount ?? newItems.length;
+    } catch (_) {
+      // Smart refresh should not show errors — silently fail
+      return 0;
+    }
+  }
+
+  /// Remove an item from the feed and send a hide event.
+  void hideItem(FeedItem item) {
+    trackAction(item, 'hide');
+    state = state.copyWith(
+      items: state.items
+          .where((i) => i.publicId != item.publicId)
+          .toList(),
+    );
+  }
 
   /// Track item becoming visible in viewport.
   void onItemVisible(FeedItem item) {

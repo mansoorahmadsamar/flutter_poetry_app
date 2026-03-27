@@ -22,6 +22,12 @@ mixin _$FeedItem {
   String get sourceId => throw _privateConstructorUsedError;
   String? get lang => throw _privateConstructorUsedError;
   FeedContentData get contentData => throw _privateConstructorUsedError;
+  SocialContext? get socialContext =>
+      throw _privateConstructorUsedError; // RESERVED — not currently sent by backend. Always null for now.
+  String? get displayMode => throw _privateConstructorUsedError;
+  String? get primaryAction => throw _privateConstructorUsedError;
+  bool? get autoExpandFirstVerse => throw _privateConstructorUsedError;
+  int? get previewDurationMs => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $FeedItemCopyWith<FeedItem> get copyWith =>
@@ -39,7 +45,14 @@ abstract class $FeedItemCopyWith<$Res> {
       String reason,
       String sourceId,
       String? lang,
-      FeedContentData contentData});
+      FeedContentData contentData,
+      SocialContext? socialContext,
+      String? displayMode,
+      String? primaryAction,
+      bool? autoExpandFirstVerse,
+      int? previewDurationMs});
+
+  $SocialContextCopyWith<$Res>? get socialContext;
 }
 
 /// @nodoc
@@ -61,6 +74,11 @@ class _$FeedItemCopyWithImpl<$Res, $Val extends FeedItem>
     Object? sourceId = null,
     Object? lang = freezed,
     Object? contentData = null,
+    Object? socialContext = freezed,
+    Object? displayMode = freezed,
+    Object? primaryAction = freezed,
+    Object? autoExpandFirstVerse = freezed,
+    Object? previewDurationMs = freezed,
   }) {
     return _then(_value.copyWith(
       type: null == type
@@ -87,7 +105,39 @@ class _$FeedItemCopyWithImpl<$Res, $Val extends FeedItem>
           ? _value.contentData
           : contentData // ignore: cast_nullable_to_non_nullable
               as FeedContentData,
+      socialContext: freezed == socialContext
+          ? _value.socialContext
+          : socialContext // ignore: cast_nullable_to_non_nullable
+              as SocialContext?,
+      displayMode: freezed == displayMode
+          ? _value.displayMode
+          : displayMode // ignore: cast_nullable_to_non_nullable
+              as String?,
+      primaryAction: freezed == primaryAction
+          ? _value.primaryAction
+          : primaryAction // ignore: cast_nullable_to_non_nullable
+              as String?,
+      autoExpandFirstVerse: freezed == autoExpandFirstVerse
+          ? _value.autoExpandFirstVerse
+          : autoExpandFirstVerse // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      previewDurationMs: freezed == previewDurationMs
+          ? _value.previewDurationMs
+          : previewDurationMs // ignore: cast_nullable_to_non_nullable
+              as int?,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $SocialContextCopyWith<$Res>? get socialContext {
+    if (_value.socialContext == null) {
+      return null;
+    }
+
+    return $SocialContextCopyWith<$Res>(_value.socialContext!, (value) {
+      return _then(_value.copyWith(socialContext: value) as $Val);
+    });
   }
 }
 
@@ -105,7 +155,15 @@ abstract class _$$FeedItemImplCopyWith<$Res>
       String reason,
       String sourceId,
       String? lang,
-      FeedContentData contentData});
+      FeedContentData contentData,
+      SocialContext? socialContext,
+      String? displayMode,
+      String? primaryAction,
+      bool? autoExpandFirstVerse,
+      int? previewDurationMs});
+
+  @override
+  $SocialContextCopyWith<$Res>? get socialContext;
 }
 
 /// @nodoc
@@ -125,6 +183,11 @@ class __$$FeedItemImplCopyWithImpl<$Res>
     Object? sourceId = null,
     Object? lang = freezed,
     Object? contentData = null,
+    Object? socialContext = freezed,
+    Object? displayMode = freezed,
+    Object? primaryAction = freezed,
+    Object? autoExpandFirstVerse = freezed,
+    Object? previewDurationMs = freezed,
   }) {
     return _then(_$FeedItemImpl(
       type: null == type
@@ -151,6 +214,26 @@ class __$$FeedItemImplCopyWithImpl<$Res>
           ? _value.contentData
           : contentData // ignore: cast_nullable_to_non_nullable
               as FeedContentData,
+      socialContext: freezed == socialContext
+          ? _value.socialContext
+          : socialContext // ignore: cast_nullable_to_non_nullable
+              as SocialContext?,
+      displayMode: freezed == displayMode
+          ? _value.displayMode
+          : displayMode // ignore: cast_nullable_to_non_nullable
+              as String?,
+      primaryAction: freezed == primaryAction
+          ? _value.primaryAction
+          : primaryAction // ignore: cast_nullable_to_non_nullable
+              as String?,
+      autoExpandFirstVerse: freezed == autoExpandFirstVerse
+          ? _value.autoExpandFirstVerse
+          : autoExpandFirstVerse // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      previewDurationMs: freezed == previewDurationMs
+          ? _value.previewDurationMs
+          : previewDurationMs // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -164,7 +247,12 @@ class _$FeedItemImpl implements _FeedItem {
       this.reason = '',
       this.sourceId = '',
       this.lang,
-      required this.contentData});
+      required this.contentData,
+      this.socialContext,
+      this.displayMode,
+      this.primaryAction,
+      this.autoExpandFirstVerse,
+      this.previewDurationMs});
 
   @override
   final String type;
@@ -180,10 +268,21 @@ class _$FeedItemImpl implements _FeedItem {
   final String? lang;
   @override
   final FeedContentData contentData;
+  @override
+  final SocialContext? socialContext;
+// RESERVED — not currently sent by backend. Always null for now.
+  @override
+  final String? displayMode;
+  @override
+  final String? primaryAction;
+  @override
+  final bool? autoExpandFirstVerse;
+  @override
+  final int? previewDurationMs;
 
   @override
   String toString() {
-    return 'FeedItem(type: $type, publicId: $publicId, reason: $reason, sourceId: $sourceId, lang: $lang, contentData: $contentData)';
+    return 'FeedItem(type: $type, publicId: $publicId, reason: $reason, sourceId: $sourceId, lang: $lang, contentData: $contentData, socialContext: $socialContext, displayMode: $displayMode, primaryAction: $primaryAction, autoExpandFirstVerse: $autoExpandFirstVerse, previewDurationMs: $previewDurationMs)';
   }
 
   @override
@@ -199,12 +298,33 @@ class _$FeedItemImpl implements _FeedItem {
                 other.sourceId == sourceId) &&
             (identical(other.lang, lang) || other.lang == lang) &&
             (identical(other.contentData, contentData) ||
-                other.contentData == contentData));
+                other.contentData == contentData) &&
+            (identical(other.socialContext, socialContext) ||
+                other.socialContext == socialContext) &&
+            (identical(other.displayMode, displayMode) ||
+                other.displayMode == displayMode) &&
+            (identical(other.primaryAction, primaryAction) ||
+                other.primaryAction == primaryAction) &&
+            (identical(other.autoExpandFirstVerse, autoExpandFirstVerse) ||
+                other.autoExpandFirstVerse == autoExpandFirstVerse) &&
+            (identical(other.previewDurationMs, previewDurationMs) ||
+                other.previewDurationMs == previewDurationMs));
   }
 
   @override
   int get hashCode => Object.hash(
-      runtimeType, type, publicId, reason, sourceId, lang, contentData);
+      runtimeType,
+      type,
+      publicId,
+      reason,
+      sourceId,
+      lang,
+      contentData,
+      socialContext,
+      displayMode,
+      primaryAction,
+      autoExpandFirstVerse,
+      previewDurationMs);
 
   @JsonKey(ignore: true)
   @override
@@ -220,7 +340,12 @@ abstract class _FeedItem implements FeedItem {
       final String reason,
       final String sourceId,
       final String? lang,
-      required final FeedContentData contentData}) = _$FeedItemImpl;
+      required final FeedContentData contentData,
+      final SocialContext? socialContext,
+      final String? displayMode,
+      final String? primaryAction,
+      final bool? autoExpandFirstVerse,
+      final int? previewDurationMs}) = _$FeedItemImpl;
 
   @override
   String get type;
@@ -234,6 +359,16 @@ abstract class _FeedItem implements FeedItem {
   String? get lang;
   @override
   FeedContentData get contentData;
+  @override
+  SocialContext? get socialContext;
+  @override // RESERVED — not currently sent by backend. Always null for now.
+  String? get displayMode;
+  @override
+  String? get primaryAction;
+  @override
+  bool? get autoExpandFirstVerse;
+  @override
+  int? get previewDurationMs;
   @override
   @JsonKey(ignore: true)
   _$$FeedItemImplCopyWith<_$FeedItemImpl> get copyWith =>

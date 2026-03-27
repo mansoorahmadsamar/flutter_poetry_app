@@ -68,7 +68,18 @@ class FeedScreenState extends ConsumerState<FeedScreen>
 
     return Scaffold(
       body: RefreshIndicator(
-        onRefresh: () => ref.read(feedProvider.notifier).refresh(),
+        onRefresh: () async {
+          final count =
+              await ref.read(feedProvider.notifier).smartRefresh();
+          if (count > 0 && context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('$count new items'),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
+        },
         color: AppColors.primary,
         child: CustomScrollView(
           controller: scrollController,
@@ -81,6 +92,20 @@ class FeedScreenState extends ConsumerState<FeedScreen>
                   onPressed: () {
                     // TODO: Show notifications
                   },
+                ),
+                PopupMenuButton<String>(
+                  onSelected: (value) {
+                    if (value == 'reset') {
+                      ref.read(feedProvider.notifier).loadFirstPage();
+                      scrollToTop();
+                    }
+                  },
+                  itemBuilder: (_) => const [
+                    PopupMenuItem(
+                      value: 'reset',
+                      child: Text('Reset Feed'),
+                    ),
+                  ],
                 ),
               ],
             ),

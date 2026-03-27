@@ -13,6 +13,7 @@ class FeedResponse with _$FeedResponse {
     @Default(false) bool isPersonalized,
     @Default('') String sessionId,
     @Default(0) int itemCount,
+    int? newCount,
   }) = _FeedResponse;
 
   factory FeedResponse.fromJson(Map<String, dynamic> json) {
@@ -36,6 +37,7 @@ class FeedResponse with _$FeedResponse {
       isPersonalized: json['isPersonalized'] as bool? ?? false,
       sessionId: json['sessionId'] as String? ?? '',
       itemCount: json['itemCount'] as int? ?? 0,
+      newCount: json['newCount'] as int?,
     );
   }
 }

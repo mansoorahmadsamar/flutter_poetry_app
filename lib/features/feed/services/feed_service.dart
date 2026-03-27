@@ -16,6 +16,7 @@ class FeedService {
     String lang = 'ur',
     String? cursor,
     int limit = 20,
+    bool refresh = false,
   }) async {
     final queryParams = <String, dynamic>{
       'lang': lang,
@@ -23,6 +24,9 @@ class FeedService {
     };
     if (cursor != null) {
       queryParams['cursor'] = cursor;
+    }
+    if (refresh) {
+      queryParams['refresh'] = 'true';
     }
 
     final response = await _dio.get(
