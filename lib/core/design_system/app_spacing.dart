@@ -48,4 +48,20 @@ class AppSpacing {
   static const double elevationMd = 4.0;
   static const double elevationLg = 8.0;
   static const double elevationXl = 16.0;
+
+  // Feed card spacing
+  static const double feedCardVerticalMargin = 12.0;
+  static const double feedCardPadding = 20.0;
+  static const double feedCardPaddingVertical = 24.0;
+  static const double feedSectionGap = 20.0;
+  static const double feedEngagementIconSize = 22.0;
+  static const double feedAvatarSize = 44.0;
+  static const double feedSpotlightAvatarSize = 64.0;
+
+  // Reaction system
+  static const double reactionEmojiSize = 26.0; // Emoji in picker
+  static const double reactionEmojiCompact = 20.0; // Emoji in feed button
+  static const double reactionEmojiExpanded = 26.0; // Emoji in detail button
+  static const double reactionSummaryEmojiSize = 22.0; // Overlapping summary circles
+  static const double reactionPickerHeight = 56.0; // Picker pill height
 }

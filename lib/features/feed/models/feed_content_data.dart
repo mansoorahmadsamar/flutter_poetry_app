@@ -24,11 +24,16 @@ class CoupletContentData with _$CoupletContentData implements FeedContentData {
     String? versesTextRoman,
     String? poetPublicId,
     String? poetProfileImageUrl,
+    int? poetBirthYear,
+    int? poetDeathYear,
     String? poetName,
     String? poemPublicId,
     @Default(0) int likeCount,
     @Default(0) int shareCount,
     @Default(0) int bookmarkCount,
+    @Default([]) List<String> tagSlugs,
+    // Reactions system (Section 19)
+    Map<String, dynamic>? reactions,
   }) = _CoupletContentData;
 
   factory CoupletContentData.fromJson(Map<String, dynamic> json) =>
@@ -42,15 +47,33 @@ class PoemContentData with _$PoemContentData implements FeedContentData {
     String? excerpt,
     String? poetPublicId,
     String? poetProfileImageUrl,
+    int? poetBirthYear,
+    int? poetDeathYear,
     String? poetName,
     String? poetryType,
     @Default(0) int likeCount,
     @Default(0) int viewCount,
     String? thumbnailUrl,
+    // Reactions system (Section 19)
+    Map<String, dynamic>? reactions,
   }) = _PoemContentData;
 
   factory PoemContentData.fromJson(Map<String, dynamic> json) =>
       _$PoemContentDataFromJson(json);
+}
+
+@freezed
+class FeaturedCouplet with _$FeaturedCouplet {
+  const factory FeaturedCouplet({
+    String? coupletPublicId,
+    String? poemPublicId,
+    @Default([]) List<String> verses,
+    @Default(0) int likeCount,
+    @Default('ARABIC') String script,
+  }) = _FeaturedCouplet;
+
+  factory FeaturedCouplet.fromJson(Map<String, dynamic> json) =>
+      _$FeaturedCoupletFromJson(json);
 }
 
 @freezed
@@ -61,9 +84,12 @@ class PoetSpotlightContentData with _$PoetSpotlightContentData
     String? bio,
     required String poetPublicId,
     String? profileImageUrl,
+    int? birthYear,
+    int? deathYear,
     @Default(0) int poemCount,
     @Default(0) int followerCount,
     @Default(0) int viewCount,
+    FeaturedCouplet? featuredCouplet,
   }) = _PoetSpotlightContentData;
 
   factory PoetSpotlightContentData.fromJson(Map<String, dynamic> json) =>
@@ -79,7 +105,14 @@ class PoetImageContentData with _$PoetImageContentData
     String? contentText,
     @Default(0) int likeCount,
     @Default(0) int shareCount,
+    @Default(0) int bookmarkCount,
     String? poetPublicId,
+    String? poetName,
+    String? poetProfileImageUrl,
+    int? poetBirthYear,
+    int? poetDeathYear,
+    // Reactions system (Section 19)
+    Map<String, dynamic>? reactions,
   }) = _PoetImageContentData;
 
   factory PoetImageContentData.fromJson(Map<String, dynamic> json) =>

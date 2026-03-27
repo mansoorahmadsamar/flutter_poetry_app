@@ -14,10 +14,15 @@ class FollowButton extends ConsumerWidget {
   final String publicId;
   final bool compact;
 
+  /// When true, uses light colors for text/border suitable for dark backgrounds
+  /// (e.g., poet spotlight card with green gradient).
+  final bool onDarkBackground;
+
   const FollowButton({
     super.key,
     required this.publicId,
     this.compact = false,
+    this.onDarkBackground = false,
   });
 
   @override
@@ -77,14 +82,16 @@ class FollowButton extends ConsumerWidget {
         decoration: BoxDecoration(
           color: isFollowing
               ? Colors.transparent
-              : AppColors.primary,
+              : (onDarkBackground ? AppColors.secondary : AppColors.primary),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: isFollowing
-                ? (isDark
-                    ? Colors.white.withValues(alpha: 0.2)
-                    : Colors.black.withValues(alpha: 0.15))
-                : AppColors.primary,
+                ? (onDarkBackground
+                    ? AppColors.secondary.withValues(alpha: 0.5)
+                    : (isDark
+                        ? Colors.white.withValues(alpha: 0.2)
+                        : Colors.black.withValues(alpha: 0.15)))
+                : (onDarkBackground ? AppColors.secondary : AppColors.primary),
             width: 1.5,
           ),
         ),
@@ -95,7 +102,9 @@ class FollowButton extends ConsumerWidget {
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
                   valueColor: AlwaysStoppedAnimation<Color>(
-                    isFollowing ? AppColors.primary : Colors.white,
+                    isFollowing
+                        ? (onDarkBackground ? AppColors.secondary : AppColors.primary)
+                        : (onDarkBackground ? AppColors.primaryDark : Colors.white),
                   ),
                 ),
               )
@@ -106,10 +115,12 @@ class FollowButton extends ConsumerWidget {
                     isFollowing ? Icons.check_rounded : Icons.person_add_outlined,
                     size: iconSize,
                     color: isFollowing
-                        ? (isDark
-                            ? Colors.white.withValues(alpha: 0.6)
-                            : Colors.black.withValues(alpha: 0.5))
-                        : Colors.white,
+                        ? (onDarkBackground
+                            ? AppColors.secondary
+                            : (isDark
+                                ? Colors.white.withValues(alpha: 0.6)
+                                : Colors.black.withValues(alpha: 0.5)))
+                        : (onDarkBackground ? AppColors.primaryDark : Colors.white),
                   ),
                   const SizedBox(width: 5),
                   Text(
@@ -118,10 +129,12 @@ class FollowButton extends ConsumerWidget {
                       fontSize: fontSize,
                       fontWeight: FontWeight.w600,
                       color: isFollowing
-                          ? (isDark
-                              ? Colors.white.withValues(alpha: 0.6)
-                              : Colors.black.withValues(alpha: 0.5))
-                          : Colors.white,
+                          ? (onDarkBackground
+                              ? AppColors.secondary
+                              : (isDark
+                                  ? Colors.white.withValues(alpha: 0.6)
+                                  : Colors.black.withValues(alpha: 0.5)))
+                          : (onDarkBackground ? AppColors.primaryDark : Colors.white),
                       letterSpacing: 0.2,
                     ),
                   ),

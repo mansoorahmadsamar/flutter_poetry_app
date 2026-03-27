@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import '../../hashtags/models/hashtag_model.dart';
 
 part 'discover_bundle_model.freezed.dart';
 part 'discover_bundle_model.g.dart';
@@ -12,6 +13,7 @@ class DiscoverBundle with _$DiscoverBundle {
     required ContentSection recommended,
     required ContentSection featuredPoets,
     required ContentSection categories,
+    @Default([]) List<HashtagDto> trendingHashtags,
     required String language,
     @Default(false) bool personalized,
     int? timestamp,

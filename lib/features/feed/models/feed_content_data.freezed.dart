@@ -24,11 +24,16 @@ mixin _$CoupletContentData {
   String? get versesTextRoman => throw _privateConstructorUsedError;
   String? get poetPublicId => throw _privateConstructorUsedError;
   String? get poetProfileImageUrl => throw _privateConstructorUsedError;
+  int? get poetBirthYear => throw _privateConstructorUsedError;
+  int? get poetDeathYear => throw _privateConstructorUsedError;
   String? get poetName => throw _privateConstructorUsedError;
   String? get poemPublicId => throw _privateConstructorUsedError;
   int get likeCount => throw _privateConstructorUsedError;
   int get shareCount => throw _privateConstructorUsedError;
   int get bookmarkCount => throw _privateConstructorUsedError;
+  List<String> get tagSlugs =>
+      throw _privateConstructorUsedError; // Reactions system (Section 19)
+  Map<String, dynamic>? get reactions => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -47,11 +52,15 @@ abstract class $CoupletContentDataCopyWith<$Res> {
       String? versesTextRoman,
       String? poetPublicId,
       String? poetProfileImageUrl,
+      int? poetBirthYear,
+      int? poetDeathYear,
       String? poetName,
       String? poemPublicId,
       int likeCount,
       int shareCount,
-      int bookmarkCount});
+      int bookmarkCount,
+      List<String> tagSlugs,
+      Map<String, dynamic>? reactions});
 }
 
 /// @nodoc
@@ -71,11 +80,15 @@ class _$CoupletContentDataCopyWithImpl<$Res, $Val extends CoupletContentData>
     Object? versesTextRoman = freezed,
     Object? poetPublicId = freezed,
     Object? poetProfileImageUrl = freezed,
+    Object? poetBirthYear = freezed,
+    Object? poetDeathYear = freezed,
     Object? poetName = freezed,
     Object? poemPublicId = freezed,
     Object? likeCount = null,
     Object? shareCount = null,
     Object? bookmarkCount = null,
+    Object? tagSlugs = null,
+    Object? reactions = freezed,
   }) {
     return _then(_value.copyWith(
       versesTextArabic: freezed == versesTextArabic
@@ -94,6 +107,14 @@ class _$CoupletContentDataCopyWithImpl<$Res, $Val extends CoupletContentData>
           ? _value.poetProfileImageUrl
           : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      poetBirthYear: freezed == poetBirthYear
+          ? _value.poetBirthYear
+          : poetBirthYear // ignore: cast_nullable_to_non_nullable
+              as int?,
+      poetDeathYear: freezed == poetDeathYear
+          ? _value.poetDeathYear
+          : poetDeathYear // ignore: cast_nullable_to_non_nullable
+              as int?,
       poetName: freezed == poetName
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
@@ -114,6 +135,14 @@ class _$CoupletContentDataCopyWithImpl<$Res, $Val extends CoupletContentData>
           ? _value.bookmarkCount
           : bookmarkCount // ignore: cast_nullable_to_non_nullable
               as int,
+      tagSlugs: null == tagSlugs
+          ? _value.tagSlugs
+          : tagSlugs // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      reactions: freezed == reactions
+          ? _value.reactions
+          : reactions // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ) as $Val);
   }
 }
@@ -131,11 +160,15 @@ abstract class _$$CoupletContentDataImplCopyWith<$Res>
       String? versesTextRoman,
       String? poetPublicId,
       String? poetProfileImageUrl,
+      int? poetBirthYear,
+      int? poetDeathYear,
       String? poetName,
       String? poemPublicId,
       int likeCount,
       int shareCount,
-      int bookmarkCount});
+      int bookmarkCount,
+      List<String> tagSlugs,
+      Map<String, dynamic>? reactions});
 }
 
 /// @nodoc
@@ -153,11 +186,15 @@ class __$$CoupletContentDataImplCopyWithImpl<$Res>
     Object? versesTextRoman = freezed,
     Object? poetPublicId = freezed,
     Object? poetProfileImageUrl = freezed,
+    Object? poetBirthYear = freezed,
+    Object? poetDeathYear = freezed,
     Object? poetName = freezed,
     Object? poemPublicId = freezed,
     Object? likeCount = null,
     Object? shareCount = null,
     Object? bookmarkCount = null,
+    Object? tagSlugs = null,
+    Object? reactions = freezed,
   }) {
     return _then(_$CoupletContentDataImpl(
       versesTextArabic: freezed == versesTextArabic
@@ -176,6 +213,14 @@ class __$$CoupletContentDataImplCopyWithImpl<$Res>
           ? _value.poetProfileImageUrl
           : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      poetBirthYear: freezed == poetBirthYear
+          ? _value.poetBirthYear
+          : poetBirthYear // ignore: cast_nullable_to_non_nullable
+              as int?,
+      poetDeathYear: freezed == poetDeathYear
+          ? _value.poetDeathYear
+          : poetDeathYear // ignore: cast_nullable_to_non_nullable
+              as int?,
       poetName: freezed == poetName
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
@@ -196,6 +241,14 @@ class __$$CoupletContentDataImplCopyWithImpl<$Res>
           ? _value.bookmarkCount
           : bookmarkCount // ignore: cast_nullable_to_non_nullable
               as int,
+      tagSlugs: null == tagSlugs
+          ? _value._tagSlugs
+          : tagSlugs // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      reactions: freezed == reactions
+          ? _value._reactions
+          : reactions // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ));
   }
 }
@@ -208,11 +261,17 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
       this.versesTextRoman,
       this.poetPublicId,
       this.poetProfileImageUrl,
+      this.poetBirthYear,
+      this.poetDeathYear,
       this.poetName,
       this.poemPublicId,
       this.likeCount = 0,
       this.shareCount = 0,
-      this.bookmarkCount = 0});
+      this.bookmarkCount = 0,
+      final List<String> tagSlugs = const [],
+      final Map<String, dynamic>? reactions})
+      : _tagSlugs = tagSlugs,
+        _reactions = reactions;
 
   factory _$CoupletContentDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$CoupletContentDataImplFromJson(json);
@@ -226,6 +285,10 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
   @override
   final String? poetProfileImageUrl;
   @override
+  final int? poetBirthYear;
+  @override
+  final int? poetDeathYear;
+  @override
   final String? poetName;
   @override
   final String? poemPublicId;
@@ -238,10 +301,30 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
   @override
   @JsonKey()
   final int bookmarkCount;
+  final List<String> _tagSlugs;
+  @override
+  @JsonKey()
+  List<String> get tagSlugs {
+    if (_tagSlugs is EqualUnmodifiableListView) return _tagSlugs;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_tagSlugs);
+  }
+
+// Reactions system (Section 19)
+  final Map<String, dynamic>? _reactions;
+// Reactions system (Section 19)
+  @override
+  Map<String, dynamic>? get reactions {
+    final value = _reactions;
+    if (value == null) return null;
+    if (_reactions is EqualUnmodifiableMapView) return _reactions;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
 
   @override
   String toString() {
-    return 'CoupletContentData(versesTextArabic: $versesTextArabic, versesTextRoman: $versesTextRoman, poetPublicId: $poetPublicId, poetProfileImageUrl: $poetProfileImageUrl, poetName: $poetName, poemPublicId: $poemPublicId, likeCount: $likeCount, shareCount: $shareCount, bookmarkCount: $bookmarkCount)';
+    return 'CoupletContentData(versesTextArabic: $versesTextArabic, versesTextRoman: $versesTextRoman, poetPublicId: $poetPublicId, poetProfileImageUrl: $poetProfileImageUrl, poetBirthYear: $poetBirthYear, poetDeathYear: $poetDeathYear, poetName: $poetName, poemPublicId: $poemPublicId, likeCount: $likeCount, shareCount: $shareCount, bookmarkCount: $bookmarkCount, tagSlugs: $tagSlugs, reactions: $reactions)';
   }
 
   @override
@@ -257,6 +340,10 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
                 other.poetPublicId == poetPublicId) &&
             (identical(other.poetProfileImageUrl, poetProfileImageUrl) ||
                 other.poetProfileImageUrl == poetProfileImageUrl) &&
+            (identical(other.poetBirthYear, poetBirthYear) ||
+                other.poetBirthYear == poetBirthYear) &&
+            (identical(other.poetDeathYear, poetDeathYear) ||
+                other.poetDeathYear == poetDeathYear) &&
             (identical(other.poetName, poetName) ||
                 other.poetName == poetName) &&
             (identical(other.poemPublicId, poemPublicId) ||
@@ -266,7 +353,10 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
             (identical(other.shareCount, shareCount) ||
                 other.shareCount == shareCount) &&
             (identical(other.bookmarkCount, bookmarkCount) ||
-                other.bookmarkCount == bookmarkCount));
+                other.bookmarkCount == bookmarkCount) &&
+            const DeepCollectionEquality().equals(other._tagSlugs, _tagSlugs) &&
+            const DeepCollectionEquality()
+                .equals(other._reactions, _reactions));
   }
 
   @JsonKey(ignore: true)
@@ -277,11 +367,15 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
       versesTextRoman,
       poetPublicId,
       poetProfileImageUrl,
+      poetBirthYear,
+      poetDeathYear,
       poetName,
       poemPublicId,
       likeCount,
       shareCount,
-      bookmarkCount);
+      bookmarkCount,
+      const DeepCollectionEquality().hash(_tagSlugs),
+      const DeepCollectionEquality().hash(_reactions));
 
   @JsonKey(ignore: true)
   @override
@@ -304,11 +398,15 @@ abstract class _CoupletContentData implements CoupletContentData {
       final String? versesTextRoman,
       final String? poetPublicId,
       final String? poetProfileImageUrl,
+      final int? poetBirthYear,
+      final int? poetDeathYear,
       final String? poetName,
       final String? poemPublicId,
       final int likeCount,
       final int shareCount,
-      final int bookmarkCount}) = _$CoupletContentDataImpl;
+      final int bookmarkCount,
+      final List<String> tagSlugs,
+      final Map<String, dynamic>? reactions}) = _$CoupletContentDataImpl;
 
   factory _CoupletContentData.fromJson(Map<String, dynamic> json) =
       _$CoupletContentDataImpl.fromJson;
@@ -322,6 +420,10 @@ abstract class _CoupletContentData implements CoupletContentData {
   @override
   String? get poetProfileImageUrl;
   @override
+  int? get poetBirthYear;
+  @override
+  int? get poetDeathYear;
+  @override
   String? get poetName;
   @override
   String? get poemPublicId;
@@ -331,6 +433,10 @@ abstract class _CoupletContentData implements CoupletContentData {
   int get shareCount;
   @override
   int get bookmarkCount;
+  @override
+  List<String> get tagSlugs;
+  @override // Reactions system (Section 19)
+  Map<String, dynamic>? get reactions;
   @override
   @JsonKey(ignore: true)
   _$$CoupletContentDataImplCopyWith<_$CoupletContentDataImpl> get copyWith =>
@@ -347,11 +453,15 @@ mixin _$PoemContentData {
   String? get excerpt => throw _privateConstructorUsedError;
   String? get poetPublicId => throw _privateConstructorUsedError;
   String? get poetProfileImageUrl => throw _privateConstructorUsedError;
+  int? get poetBirthYear => throw _privateConstructorUsedError;
+  int? get poetDeathYear => throw _privateConstructorUsedError;
   String? get poetName => throw _privateConstructorUsedError;
   String? get poetryType => throw _privateConstructorUsedError;
   int get likeCount => throw _privateConstructorUsedError;
   int get viewCount => throw _privateConstructorUsedError;
-  String? get thumbnailUrl => throw _privateConstructorUsedError;
+  String? get thumbnailUrl =>
+      throw _privateConstructorUsedError; // Reactions system (Section 19)
+  Map<String, dynamic>? get reactions => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -370,11 +480,14 @@ abstract class $PoemContentDataCopyWith<$Res> {
       String? excerpt,
       String? poetPublicId,
       String? poetProfileImageUrl,
+      int? poetBirthYear,
+      int? poetDeathYear,
       String? poetName,
       String? poetryType,
       int likeCount,
       int viewCount,
-      String? thumbnailUrl});
+      String? thumbnailUrl,
+      Map<String, dynamic>? reactions});
 }
 
 /// @nodoc
@@ -394,11 +507,14 @@ class _$PoemContentDataCopyWithImpl<$Res, $Val extends PoemContentData>
     Object? excerpt = freezed,
     Object? poetPublicId = freezed,
     Object? poetProfileImageUrl = freezed,
+    Object? poetBirthYear = freezed,
+    Object? poetDeathYear = freezed,
     Object? poetName = freezed,
     Object? poetryType = freezed,
     Object? likeCount = null,
     Object? viewCount = null,
     Object? thumbnailUrl = freezed,
+    Object? reactions = freezed,
   }) {
     return _then(_value.copyWith(
       title: freezed == title
@@ -417,6 +533,14 @@ class _$PoemContentDataCopyWithImpl<$Res, $Val extends PoemContentData>
           ? _value.poetProfileImageUrl
           : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      poetBirthYear: freezed == poetBirthYear
+          ? _value.poetBirthYear
+          : poetBirthYear // ignore: cast_nullable_to_non_nullable
+              as int?,
+      poetDeathYear: freezed == poetDeathYear
+          ? _value.poetDeathYear
+          : poetDeathYear // ignore: cast_nullable_to_non_nullable
+              as int?,
       poetName: freezed == poetName
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
@@ -437,6 +561,10 @@ class _$PoemContentDataCopyWithImpl<$Res, $Val extends PoemContentData>
           ? _value.thumbnailUrl
           : thumbnailUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      reactions: freezed == reactions
+          ? _value.reactions
+          : reactions // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ) as $Val);
   }
 }
@@ -454,11 +582,14 @@ abstract class _$$PoemContentDataImplCopyWith<$Res>
       String? excerpt,
       String? poetPublicId,
       String? poetProfileImageUrl,
+      int? poetBirthYear,
+      int? poetDeathYear,
       String? poetName,
       String? poetryType,
       int likeCount,
       int viewCount,
-      String? thumbnailUrl});
+      String? thumbnailUrl,
+      Map<String, dynamic>? reactions});
 }
 
 /// @nodoc
@@ -476,11 +607,14 @@ class __$$PoemContentDataImplCopyWithImpl<$Res>
     Object? excerpt = freezed,
     Object? poetPublicId = freezed,
     Object? poetProfileImageUrl = freezed,
+    Object? poetBirthYear = freezed,
+    Object? poetDeathYear = freezed,
     Object? poetName = freezed,
     Object? poetryType = freezed,
     Object? likeCount = null,
     Object? viewCount = null,
     Object? thumbnailUrl = freezed,
+    Object? reactions = freezed,
   }) {
     return _then(_$PoemContentDataImpl(
       title: freezed == title
@@ -499,6 +633,14 @@ class __$$PoemContentDataImplCopyWithImpl<$Res>
           ? _value.poetProfileImageUrl
           : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      poetBirthYear: freezed == poetBirthYear
+          ? _value.poetBirthYear
+          : poetBirthYear // ignore: cast_nullable_to_non_nullable
+              as int?,
+      poetDeathYear: freezed == poetDeathYear
+          ? _value.poetDeathYear
+          : poetDeathYear // ignore: cast_nullable_to_non_nullable
+              as int?,
       poetName: freezed == poetName
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
@@ -519,6 +661,10 @@ class __$$PoemContentDataImplCopyWithImpl<$Res>
           ? _value.thumbnailUrl
           : thumbnailUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      reactions: freezed == reactions
+          ? _value._reactions
+          : reactions // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ));
   }
 }
@@ -531,11 +677,15 @@ class _$PoemContentDataImpl implements _PoemContentData {
       this.excerpt,
       this.poetPublicId,
       this.poetProfileImageUrl,
+      this.poetBirthYear,
+      this.poetDeathYear,
       this.poetName,
       this.poetryType,
       this.likeCount = 0,
       this.viewCount = 0,
-      this.thumbnailUrl});
+      this.thumbnailUrl,
+      final Map<String, dynamic>? reactions})
+      : _reactions = reactions;
 
   factory _$PoemContentDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$PoemContentDataImplFromJson(json);
@@ -549,6 +699,10 @@ class _$PoemContentDataImpl implements _PoemContentData {
   @override
   final String? poetProfileImageUrl;
   @override
+  final int? poetBirthYear;
+  @override
+  final int? poetDeathYear;
+  @override
   final String? poetName;
   @override
   final String? poetryType;
@@ -560,10 +714,21 @@ class _$PoemContentDataImpl implements _PoemContentData {
   final int viewCount;
   @override
   final String? thumbnailUrl;
+// Reactions system (Section 19)
+  final Map<String, dynamic>? _reactions;
+// Reactions system (Section 19)
+  @override
+  Map<String, dynamic>? get reactions {
+    final value = _reactions;
+    if (value == null) return null;
+    if (_reactions is EqualUnmodifiableMapView) return _reactions;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
 
   @override
   String toString() {
-    return 'PoemContentData(title: $title, excerpt: $excerpt, poetPublicId: $poetPublicId, poetProfileImageUrl: $poetProfileImageUrl, poetName: $poetName, poetryType: $poetryType, likeCount: $likeCount, viewCount: $viewCount, thumbnailUrl: $thumbnailUrl)';
+    return 'PoemContentData(title: $title, excerpt: $excerpt, poetPublicId: $poetPublicId, poetProfileImageUrl: $poetProfileImageUrl, poetBirthYear: $poetBirthYear, poetDeathYear: $poetDeathYear, poetName: $poetName, poetryType: $poetryType, likeCount: $likeCount, viewCount: $viewCount, thumbnailUrl: $thumbnailUrl, reactions: $reactions)';
   }
 
   @override
@@ -577,6 +742,10 @@ class _$PoemContentDataImpl implements _PoemContentData {
                 other.poetPublicId == poetPublicId) &&
             (identical(other.poetProfileImageUrl, poetProfileImageUrl) ||
                 other.poetProfileImageUrl == poetProfileImageUrl) &&
+            (identical(other.poetBirthYear, poetBirthYear) ||
+                other.poetBirthYear == poetBirthYear) &&
+            (identical(other.poetDeathYear, poetDeathYear) ||
+                other.poetDeathYear == poetDeathYear) &&
             (identical(other.poetName, poetName) ||
                 other.poetName == poetName) &&
             (identical(other.poetryType, poetryType) ||
@@ -586,7 +755,9 @@ class _$PoemContentDataImpl implements _PoemContentData {
             (identical(other.viewCount, viewCount) ||
                 other.viewCount == viewCount) &&
             (identical(other.thumbnailUrl, thumbnailUrl) ||
-                other.thumbnailUrl == thumbnailUrl));
+                other.thumbnailUrl == thumbnailUrl) &&
+            const DeepCollectionEquality()
+                .equals(other._reactions, _reactions));
   }
 
   @JsonKey(ignore: true)
@@ -597,11 +768,14 @@ class _$PoemContentDataImpl implements _PoemContentData {
       excerpt,
       poetPublicId,
       poetProfileImageUrl,
+      poetBirthYear,
+      poetDeathYear,
       poetName,
       poetryType,
       likeCount,
       viewCount,
-      thumbnailUrl);
+      thumbnailUrl,
+      const DeepCollectionEquality().hash(_reactions));
 
   @JsonKey(ignore: true)
   @override
@@ -624,11 +798,14 @@ abstract class _PoemContentData implements PoemContentData {
       final String? excerpt,
       final String? poetPublicId,
       final String? poetProfileImageUrl,
+      final int? poetBirthYear,
+      final int? poetDeathYear,
       final String? poetName,
       final String? poetryType,
       final int likeCount,
       final int viewCount,
-      final String? thumbnailUrl}) = _$PoemContentDataImpl;
+      final String? thumbnailUrl,
+      final Map<String, dynamic>? reactions}) = _$PoemContentDataImpl;
 
   factory _PoemContentData.fromJson(Map<String, dynamic> json) =
       _$PoemContentDataImpl.fromJson;
@@ -642,6 +819,10 @@ abstract class _PoemContentData implements PoemContentData {
   @override
   String? get poetProfileImageUrl;
   @override
+  int? get poetBirthYear;
+  @override
+  int? get poetDeathYear;
+  @override
   String? get poetName;
   @override
   String? get poetryType;
@@ -651,9 +832,246 @@ abstract class _PoemContentData implements PoemContentData {
   int get viewCount;
   @override
   String? get thumbnailUrl;
+  @override // Reactions system (Section 19)
+  Map<String, dynamic>? get reactions;
   @override
   @JsonKey(ignore: true)
   _$$PoemContentDataImplCopyWith<_$PoemContentDataImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+FeaturedCouplet _$FeaturedCoupletFromJson(Map<String, dynamic> json) {
+  return _FeaturedCouplet.fromJson(json);
+}
+
+/// @nodoc
+mixin _$FeaturedCouplet {
+  String? get coupletPublicId => throw _privateConstructorUsedError;
+  String? get poemPublicId => throw _privateConstructorUsedError;
+  List<String> get verses => throw _privateConstructorUsedError;
+  int get likeCount => throw _privateConstructorUsedError;
+  String get script => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $FeaturedCoupletCopyWith<FeaturedCouplet> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $FeaturedCoupletCopyWith<$Res> {
+  factory $FeaturedCoupletCopyWith(
+          FeaturedCouplet value, $Res Function(FeaturedCouplet) then) =
+      _$FeaturedCoupletCopyWithImpl<$Res, FeaturedCouplet>;
+  @useResult
+  $Res call(
+      {String? coupletPublicId,
+      String? poemPublicId,
+      List<String> verses,
+      int likeCount,
+      String script});
+}
+
+/// @nodoc
+class _$FeaturedCoupletCopyWithImpl<$Res, $Val extends FeaturedCouplet>
+    implements $FeaturedCoupletCopyWith<$Res> {
+  _$FeaturedCoupletCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? coupletPublicId = freezed,
+    Object? poemPublicId = freezed,
+    Object? verses = null,
+    Object? likeCount = null,
+    Object? script = null,
+  }) {
+    return _then(_value.copyWith(
+      coupletPublicId: freezed == coupletPublicId
+          ? _value.coupletPublicId
+          : coupletPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poemPublicId: freezed == poemPublicId
+          ? _value.poemPublicId
+          : poemPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      verses: null == verses
+          ? _value.verses
+          : verses // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      likeCount: null == likeCount
+          ? _value.likeCount
+          : likeCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      script: null == script
+          ? _value.script
+          : script // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$FeaturedCoupletImplCopyWith<$Res>
+    implements $FeaturedCoupletCopyWith<$Res> {
+  factory _$$FeaturedCoupletImplCopyWith(_$FeaturedCoupletImpl value,
+          $Res Function(_$FeaturedCoupletImpl) then) =
+      __$$FeaturedCoupletImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String? coupletPublicId,
+      String? poemPublicId,
+      List<String> verses,
+      int likeCount,
+      String script});
+}
+
+/// @nodoc
+class __$$FeaturedCoupletImplCopyWithImpl<$Res>
+    extends _$FeaturedCoupletCopyWithImpl<$Res, _$FeaturedCoupletImpl>
+    implements _$$FeaturedCoupletImplCopyWith<$Res> {
+  __$$FeaturedCoupletImplCopyWithImpl(
+      _$FeaturedCoupletImpl _value, $Res Function(_$FeaturedCoupletImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? coupletPublicId = freezed,
+    Object? poemPublicId = freezed,
+    Object? verses = null,
+    Object? likeCount = null,
+    Object? script = null,
+  }) {
+    return _then(_$FeaturedCoupletImpl(
+      coupletPublicId: freezed == coupletPublicId
+          ? _value.coupletPublicId
+          : coupletPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poemPublicId: freezed == poemPublicId
+          ? _value.poemPublicId
+          : poemPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      verses: null == verses
+          ? _value._verses
+          : verses // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      likeCount: null == likeCount
+          ? _value.likeCount
+          : likeCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      script: null == script
+          ? _value.script
+          : script // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$FeaturedCoupletImpl implements _FeaturedCouplet {
+  const _$FeaturedCoupletImpl(
+      {this.coupletPublicId,
+      this.poemPublicId,
+      final List<String> verses = const [],
+      this.likeCount = 0,
+      this.script = 'ARABIC'})
+      : _verses = verses;
+
+  factory _$FeaturedCoupletImpl.fromJson(Map<String, dynamic> json) =>
+      _$$FeaturedCoupletImplFromJson(json);
+
+  @override
+  final String? coupletPublicId;
+  @override
+  final String? poemPublicId;
+  final List<String> _verses;
+  @override
+  @JsonKey()
+  List<String> get verses {
+    if (_verses is EqualUnmodifiableListView) return _verses;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_verses);
+  }
+
+  @override
+  @JsonKey()
+  final int likeCount;
+  @override
+  @JsonKey()
+  final String script;
+
+  @override
+  String toString() {
+    return 'FeaturedCouplet(coupletPublicId: $coupletPublicId, poemPublicId: $poemPublicId, verses: $verses, likeCount: $likeCount, script: $script)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$FeaturedCoupletImpl &&
+            (identical(other.coupletPublicId, coupletPublicId) ||
+                other.coupletPublicId == coupletPublicId) &&
+            (identical(other.poemPublicId, poemPublicId) ||
+                other.poemPublicId == poemPublicId) &&
+            const DeepCollectionEquality().equals(other._verses, _verses) &&
+            (identical(other.likeCount, likeCount) ||
+                other.likeCount == likeCount) &&
+            (identical(other.script, script) || other.script == script));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, coupletPublicId, poemPublicId,
+      const DeepCollectionEquality().hash(_verses), likeCount, script);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$FeaturedCoupletImplCopyWith<_$FeaturedCoupletImpl> get copyWith =>
+      __$$FeaturedCoupletImplCopyWithImpl<_$FeaturedCoupletImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$FeaturedCoupletImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _FeaturedCouplet implements FeaturedCouplet {
+  const factory _FeaturedCouplet(
+      {final String? coupletPublicId,
+      final String? poemPublicId,
+      final List<String> verses,
+      final int likeCount,
+      final String script}) = _$FeaturedCoupletImpl;
+
+  factory _FeaturedCouplet.fromJson(Map<String, dynamic> json) =
+      _$FeaturedCoupletImpl.fromJson;
+
+  @override
+  String? get coupletPublicId;
+  @override
+  String? get poemPublicId;
+  @override
+  List<String> get verses;
+  @override
+  int get likeCount;
+  @override
+  String get script;
+  @override
+  @JsonKey(ignore: true)
+  _$$FeaturedCoupletImplCopyWith<_$FeaturedCoupletImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -668,9 +1086,12 @@ mixin _$PoetSpotlightContentData {
   String? get bio => throw _privateConstructorUsedError;
   String get poetPublicId => throw _privateConstructorUsedError;
   String? get profileImageUrl => throw _privateConstructorUsedError;
+  int? get birthYear => throw _privateConstructorUsedError;
+  int? get deathYear => throw _privateConstructorUsedError;
   int get poemCount => throw _privateConstructorUsedError;
   int get followerCount => throw _privateConstructorUsedError;
   int get viewCount => throw _privateConstructorUsedError;
+  FeaturedCouplet? get featuredCouplet => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -689,9 +1110,14 @@ abstract class $PoetSpotlightContentDataCopyWith<$Res> {
       String? bio,
       String poetPublicId,
       String? profileImageUrl,
+      int? birthYear,
+      int? deathYear,
       int poemCount,
       int followerCount,
-      int viewCount});
+      int viewCount,
+      FeaturedCouplet? featuredCouplet});
+
+  $FeaturedCoupletCopyWith<$Res>? get featuredCouplet;
 }
 
 /// @nodoc
@@ -712,9 +1138,12 @@ class _$PoetSpotlightContentDataCopyWithImpl<$Res,
     Object? bio = freezed,
     Object? poetPublicId = null,
     Object? profileImageUrl = freezed,
+    Object? birthYear = freezed,
+    Object? deathYear = freezed,
     Object? poemCount = null,
     Object? followerCount = null,
     Object? viewCount = null,
+    Object? featuredCouplet = freezed,
   }) {
     return _then(_value.copyWith(
       poetName: freezed == poetName
@@ -733,6 +1162,14 @@ class _$PoetSpotlightContentDataCopyWithImpl<$Res,
           ? _value.profileImageUrl
           : profileImageUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      birthYear: freezed == birthYear
+          ? _value.birthYear
+          : birthYear // ignore: cast_nullable_to_non_nullable
+              as int?,
+      deathYear: freezed == deathYear
+          ? _value.deathYear
+          : deathYear // ignore: cast_nullable_to_non_nullable
+              as int?,
       poemCount: null == poemCount
           ? _value.poemCount
           : poemCount // ignore: cast_nullable_to_non_nullable
@@ -745,7 +1182,23 @@ class _$PoetSpotlightContentDataCopyWithImpl<$Res,
           ? _value.viewCount
           : viewCount // ignore: cast_nullable_to_non_nullable
               as int,
+      featuredCouplet: freezed == featuredCouplet
+          ? _value.featuredCouplet
+          : featuredCouplet // ignore: cast_nullable_to_non_nullable
+              as FeaturedCouplet?,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $FeaturedCoupletCopyWith<$Res>? get featuredCouplet {
+    if (_value.featuredCouplet == null) {
+      return null;
+    }
+
+    return $FeaturedCoupletCopyWith<$Res>(_value.featuredCouplet!, (value) {
+      return _then(_value.copyWith(featuredCouplet: value) as $Val);
+    });
   }
 }
 
@@ -763,9 +1216,15 @@ abstract class _$$PoetSpotlightContentDataImplCopyWith<$Res>
       String? bio,
       String poetPublicId,
       String? profileImageUrl,
+      int? birthYear,
+      int? deathYear,
       int poemCount,
       int followerCount,
-      int viewCount});
+      int viewCount,
+      FeaturedCouplet? featuredCouplet});
+
+  @override
+  $FeaturedCoupletCopyWith<$Res>? get featuredCouplet;
 }
 
 /// @nodoc
@@ -785,9 +1244,12 @@ class __$$PoetSpotlightContentDataImplCopyWithImpl<$Res>
     Object? bio = freezed,
     Object? poetPublicId = null,
     Object? profileImageUrl = freezed,
+    Object? birthYear = freezed,
+    Object? deathYear = freezed,
     Object? poemCount = null,
     Object? followerCount = null,
     Object? viewCount = null,
+    Object? featuredCouplet = freezed,
   }) {
     return _then(_$PoetSpotlightContentDataImpl(
       poetName: freezed == poetName
@@ -806,6 +1268,14 @@ class __$$PoetSpotlightContentDataImplCopyWithImpl<$Res>
           ? _value.profileImageUrl
           : profileImageUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      birthYear: freezed == birthYear
+          ? _value.birthYear
+          : birthYear // ignore: cast_nullable_to_non_nullable
+              as int?,
+      deathYear: freezed == deathYear
+          ? _value.deathYear
+          : deathYear // ignore: cast_nullable_to_non_nullable
+              as int?,
       poemCount: null == poemCount
           ? _value.poemCount
           : poemCount // ignore: cast_nullable_to_non_nullable
@@ -818,6 +1288,10 @@ class __$$PoetSpotlightContentDataImplCopyWithImpl<$Res>
           ? _value.viewCount
           : viewCount // ignore: cast_nullable_to_non_nullable
               as int,
+      featuredCouplet: freezed == featuredCouplet
+          ? _value.featuredCouplet
+          : featuredCouplet // ignore: cast_nullable_to_non_nullable
+              as FeaturedCouplet?,
     ));
   }
 }
@@ -830,9 +1304,12 @@ class _$PoetSpotlightContentDataImpl implements _PoetSpotlightContentData {
       this.bio,
       required this.poetPublicId,
       this.profileImageUrl,
+      this.birthYear,
+      this.deathYear,
       this.poemCount = 0,
       this.followerCount = 0,
-      this.viewCount = 0});
+      this.viewCount = 0,
+      this.featuredCouplet});
 
   factory _$PoetSpotlightContentDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$PoetSpotlightContentDataImplFromJson(json);
@@ -846,6 +1323,10 @@ class _$PoetSpotlightContentDataImpl implements _PoetSpotlightContentData {
   @override
   final String? profileImageUrl;
   @override
+  final int? birthYear;
+  @override
+  final int? deathYear;
+  @override
   @JsonKey()
   final int poemCount;
   @override
@@ -854,10 +1335,12 @@ class _$PoetSpotlightContentDataImpl implements _PoetSpotlightContentData {
   @override
   @JsonKey()
   final int viewCount;
+  @override
+  final FeaturedCouplet? featuredCouplet;
 
   @override
   String toString() {
-    return 'PoetSpotlightContentData(poetName: $poetName, bio: $bio, poetPublicId: $poetPublicId, profileImageUrl: $profileImageUrl, poemCount: $poemCount, followerCount: $followerCount, viewCount: $viewCount)';
+    return 'PoetSpotlightContentData(poetName: $poetName, bio: $bio, poetPublicId: $poetPublicId, profileImageUrl: $profileImageUrl, birthYear: $birthYear, deathYear: $deathYear, poemCount: $poemCount, followerCount: $followerCount, viewCount: $viewCount, featuredCouplet: $featuredCouplet)';
   }
 
   @override
@@ -872,18 +1355,34 @@ class _$PoetSpotlightContentDataImpl implements _PoetSpotlightContentData {
                 other.poetPublicId == poetPublicId) &&
             (identical(other.profileImageUrl, profileImageUrl) ||
                 other.profileImageUrl == profileImageUrl) &&
+            (identical(other.birthYear, birthYear) ||
+                other.birthYear == birthYear) &&
+            (identical(other.deathYear, deathYear) ||
+                other.deathYear == deathYear) &&
             (identical(other.poemCount, poemCount) ||
                 other.poemCount == poemCount) &&
             (identical(other.followerCount, followerCount) ||
                 other.followerCount == followerCount) &&
             (identical(other.viewCount, viewCount) ||
-                other.viewCount == viewCount));
+                other.viewCount == viewCount) &&
+            (identical(other.featuredCouplet, featuredCouplet) ||
+                other.featuredCouplet == featuredCouplet));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, poetName, bio, poetPublicId,
-      profileImageUrl, poemCount, followerCount, viewCount);
+  int get hashCode => Object.hash(
+      runtimeType,
+      poetName,
+      bio,
+      poetPublicId,
+      profileImageUrl,
+      birthYear,
+      deathYear,
+      poemCount,
+      followerCount,
+      viewCount,
+      featuredCouplet);
 
   @JsonKey(ignore: true)
   @override
@@ -906,9 +1405,12 @@ abstract class _PoetSpotlightContentData implements PoetSpotlightContentData {
       final String? bio,
       required final String poetPublicId,
       final String? profileImageUrl,
+      final int? birthYear,
+      final int? deathYear,
       final int poemCount,
       final int followerCount,
-      final int viewCount}) = _$PoetSpotlightContentDataImpl;
+      final int viewCount,
+      final FeaturedCouplet? featuredCouplet}) = _$PoetSpotlightContentDataImpl;
 
   factory _PoetSpotlightContentData.fromJson(Map<String, dynamic> json) =
       _$PoetSpotlightContentDataImpl.fromJson;
@@ -922,11 +1424,17 @@ abstract class _PoetSpotlightContentData implements PoetSpotlightContentData {
   @override
   String? get profileImageUrl;
   @override
+  int? get birthYear;
+  @override
+  int? get deathYear;
+  @override
   int get poemCount;
   @override
   int get followerCount;
   @override
   int get viewCount;
+  @override
+  FeaturedCouplet? get featuredCouplet;
   @override
   @JsonKey(ignore: true)
   _$$PoetSpotlightContentDataImplCopyWith<_$PoetSpotlightContentDataImpl>
@@ -944,7 +1452,14 @@ mixin _$PoetImageContentData {
   String? get contentText => throw _privateConstructorUsedError;
   int get likeCount => throw _privateConstructorUsedError;
   int get shareCount => throw _privateConstructorUsedError;
+  int get bookmarkCount => throw _privateConstructorUsedError;
   String? get poetPublicId => throw _privateConstructorUsedError;
+  String? get poetName => throw _privateConstructorUsedError;
+  String? get poetProfileImageUrl => throw _privateConstructorUsedError;
+  int? get poetBirthYear => throw _privateConstructorUsedError;
+  int? get poetDeathYear =>
+      throw _privateConstructorUsedError; // Reactions system (Section 19)
+  Map<String, dynamic>? get reactions => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -964,7 +1479,13 @@ abstract class $PoetImageContentDataCopyWith<$Res> {
       String? contentText,
       int likeCount,
       int shareCount,
-      String? poetPublicId});
+      int bookmarkCount,
+      String? poetPublicId,
+      String? poetName,
+      String? poetProfileImageUrl,
+      int? poetBirthYear,
+      int? poetDeathYear,
+      Map<String, dynamic>? reactions});
 }
 
 /// @nodoc
@@ -986,7 +1507,13 @@ class _$PoetImageContentDataCopyWithImpl<$Res,
     Object? contentText = freezed,
     Object? likeCount = null,
     Object? shareCount = null,
+    Object? bookmarkCount = null,
     Object? poetPublicId = freezed,
+    Object? poetName = freezed,
+    Object? poetProfileImageUrl = freezed,
+    Object? poetBirthYear = freezed,
+    Object? poetDeathYear = freezed,
+    Object? reactions = freezed,
   }) {
     return _then(_value.copyWith(
       imageUrl: freezed == imageUrl
@@ -1009,10 +1536,34 @@ class _$PoetImageContentDataCopyWithImpl<$Res,
           ? _value.shareCount
           : shareCount // ignore: cast_nullable_to_non_nullable
               as int,
+      bookmarkCount: null == bookmarkCount
+          ? _value.bookmarkCount
+          : bookmarkCount // ignore: cast_nullable_to_non_nullable
+              as int,
       poetPublicId: freezed == poetPublicId
           ? _value.poetPublicId
           : poetPublicId // ignore: cast_nullable_to_non_nullable
               as String?,
+      poetName: freezed == poetName
+          ? _value.poetName
+          : poetName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetProfileImageUrl: freezed == poetProfileImageUrl
+          ? _value.poetProfileImageUrl
+          : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetBirthYear: freezed == poetBirthYear
+          ? _value.poetBirthYear
+          : poetBirthYear // ignore: cast_nullable_to_non_nullable
+              as int?,
+      poetDeathYear: freezed == poetDeathYear
+          ? _value.poetDeathYear
+          : poetDeathYear // ignore: cast_nullable_to_non_nullable
+              as int?,
+      reactions: freezed == reactions
+          ? _value.reactions
+          : reactions // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ) as $Val);
   }
 }
@@ -1031,7 +1582,13 @@ abstract class _$$PoetImageContentDataImplCopyWith<$Res>
       String? contentText,
       int likeCount,
       int shareCount,
-      String? poetPublicId});
+      int bookmarkCount,
+      String? poetPublicId,
+      String? poetName,
+      String? poetProfileImageUrl,
+      int? poetBirthYear,
+      int? poetDeathYear,
+      Map<String, dynamic>? reactions});
 }
 
 /// @nodoc
@@ -1050,7 +1607,13 @@ class __$$PoetImageContentDataImplCopyWithImpl<$Res>
     Object? contentText = freezed,
     Object? likeCount = null,
     Object? shareCount = null,
+    Object? bookmarkCount = null,
     Object? poetPublicId = freezed,
+    Object? poetName = freezed,
+    Object? poetProfileImageUrl = freezed,
+    Object? poetBirthYear = freezed,
+    Object? poetDeathYear = freezed,
+    Object? reactions = freezed,
   }) {
     return _then(_$PoetImageContentDataImpl(
       imageUrl: freezed == imageUrl
@@ -1073,10 +1636,34 @@ class __$$PoetImageContentDataImplCopyWithImpl<$Res>
           ? _value.shareCount
           : shareCount // ignore: cast_nullable_to_non_nullable
               as int,
+      bookmarkCount: null == bookmarkCount
+          ? _value.bookmarkCount
+          : bookmarkCount // ignore: cast_nullable_to_non_nullable
+              as int,
       poetPublicId: freezed == poetPublicId
           ? _value.poetPublicId
           : poetPublicId // ignore: cast_nullable_to_non_nullable
               as String?,
+      poetName: freezed == poetName
+          ? _value.poetName
+          : poetName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetProfileImageUrl: freezed == poetProfileImageUrl
+          ? _value.poetProfileImageUrl
+          : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetBirthYear: freezed == poetBirthYear
+          ? _value.poetBirthYear
+          : poetBirthYear // ignore: cast_nullable_to_non_nullable
+              as int?,
+      poetDeathYear: freezed == poetDeathYear
+          ? _value.poetDeathYear
+          : poetDeathYear // ignore: cast_nullable_to_non_nullable
+              as int?,
+      reactions: freezed == reactions
+          ? _value._reactions
+          : reactions // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ));
   }
 }
@@ -1090,7 +1677,14 @@ class _$PoetImageContentDataImpl implements _PoetImageContentData {
       this.contentText,
       this.likeCount = 0,
       this.shareCount = 0,
-      this.poetPublicId});
+      this.bookmarkCount = 0,
+      this.poetPublicId,
+      this.poetName,
+      this.poetProfileImageUrl,
+      this.poetBirthYear,
+      this.poetDeathYear,
+      final Map<String, dynamic>? reactions})
+      : _reactions = reactions;
 
   factory _$PoetImageContentDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$PoetImageContentDataImplFromJson(json);
@@ -1108,11 +1702,33 @@ class _$PoetImageContentDataImpl implements _PoetImageContentData {
   @JsonKey()
   final int shareCount;
   @override
+  @JsonKey()
+  final int bookmarkCount;
+  @override
   final String? poetPublicId;
+  @override
+  final String? poetName;
+  @override
+  final String? poetProfileImageUrl;
+  @override
+  final int? poetBirthYear;
+  @override
+  final int? poetDeathYear;
+// Reactions system (Section 19)
+  final Map<String, dynamic>? _reactions;
+// Reactions system (Section 19)
+  @override
+  Map<String, dynamic>? get reactions {
+    final value = _reactions;
+    if (value == null) return null;
+    if (_reactions is EqualUnmodifiableMapView) return _reactions;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
 
   @override
   String toString() {
-    return 'PoetImageContentData(imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, contentText: $contentText, likeCount: $likeCount, shareCount: $shareCount, poetPublicId: $poetPublicId)';
+    return 'PoetImageContentData(imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, contentText: $contentText, likeCount: $likeCount, shareCount: $shareCount, bookmarkCount: $bookmarkCount, poetPublicId: $poetPublicId, poetName: $poetName, poetProfileImageUrl: $poetProfileImageUrl, poetBirthYear: $poetBirthYear, poetDeathYear: $poetDeathYear, reactions: $reactions)';
   }
 
   @override
@@ -1130,14 +1746,38 @@ class _$PoetImageContentDataImpl implements _PoetImageContentData {
                 other.likeCount == likeCount) &&
             (identical(other.shareCount, shareCount) ||
                 other.shareCount == shareCount) &&
+            (identical(other.bookmarkCount, bookmarkCount) ||
+                other.bookmarkCount == bookmarkCount) &&
             (identical(other.poetPublicId, poetPublicId) ||
-                other.poetPublicId == poetPublicId));
+                other.poetPublicId == poetPublicId) &&
+            (identical(other.poetName, poetName) ||
+                other.poetName == poetName) &&
+            (identical(other.poetProfileImageUrl, poetProfileImageUrl) ||
+                other.poetProfileImageUrl == poetProfileImageUrl) &&
+            (identical(other.poetBirthYear, poetBirthYear) ||
+                other.poetBirthYear == poetBirthYear) &&
+            (identical(other.poetDeathYear, poetDeathYear) ||
+                other.poetDeathYear == poetDeathYear) &&
+            const DeepCollectionEquality()
+                .equals(other._reactions, _reactions));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, imageUrl, thumbnailUrl,
-      contentText, likeCount, shareCount, poetPublicId);
+  int get hashCode => Object.hash(
+      runtimeType,
+      imageUrl,
+      thumbnailUrl,
+      contentText,
+      likeCount,
+      shareCount,
+      bookmarkCount,
+      poetPublicId,
+      poetName,
+      poetProfileImageUrl,
+      poetBirthYear,
+      poetDeathYear,
+      const DeepCollectionEquality().hash(_reactions));
 
   @JsonKey(ignore: true)
   @override
@@ -1162,7 +1802,13 @@ abstract class _PoetImageContentData implements PoetImageContentData {
       final String? contentText,
       final int likeCount,
       final int shareCount,
-      final String? poetPublicId}) = _$PoetImageContentDataImpl;
+      final int bookmarkCount,
+      final String? poetPublicId,
+      final String? poetName,
+      final String? poetProfileImageUrl,
+      final int? poetBirthYear,
+      final int? poetDeathYear,
+      final Map<String, dynamic>? reactions}) = _$PoetImageContentDataImpl;
 
   factory _PoetImageContentData.fromJson(Map<String, dynamic> json) =
       _$PoetImageContentDataImpl.fromJson;
@@ -1178,7 +1824,19 @@ abstract class _PoetImageContentData implements PoetImageContentData {
   @override
   int get shareCount;
   @override
+  int get bookmarkCount;
+  @override
   String? get poetPublicId;
+  @override
+  String? get poetName;
+  @override
+  String? get poetProfileImageUrl;
+  @override
+  int? get poetBirthYear;
+  @override
+  int? get poetDeathYear;
+  @override // Reactions system (Section 19)
+  Map<String, dynamic>? get reactions;
   @override
   @JsonKey(ignore: true)
   _$$PoetImageContentDataImplCopyWith<_$PoetImageContentDataImpl>

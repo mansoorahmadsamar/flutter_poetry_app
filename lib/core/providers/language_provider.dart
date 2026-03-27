@@ -40,7 +40,7 @@ class SelectedLanguageNotifier extends StateNotifier<SelectedLanguageState> {
   final LanguageService _languageService;
 
   SelectedLanguageNotifier(this._preferencesService, this._languageService)
-      : super(SelectedLanguageState(code: 'en')) {
+      : super(SelectedLanguageState(code: 'ur')) {
     _loadSavedLanguage();
   }
 

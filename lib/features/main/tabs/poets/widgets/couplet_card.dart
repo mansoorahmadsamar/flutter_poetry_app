@@ -4,6 +4,7 @@ import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/core/widgets/localized_text.dart';
+import 'package:flutter_poetry_app/features/hashtags/widgets/hashtag_pill.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/couplet_model.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/widgets/couplet_engagement_buttons.dart';
@@ -77,6 +78,12 @@ class _CoupletCardState extends ConsumerState<CoupletCard> {
 
               // Verses - show romanization only for non-Urdu languages
               ...couplet.verses.map((verse) => _buildVerseText(verse, isUrdu)),
+
+              // Hashtag pills
+              if (couplet.tagSlugs.isNotEmpty) ...[
+                SizedBox(height: AppSpacing.sm),
+                HashtagSlugRow(slugs: couplet.tagSlugs),
+              ],
 
               // Engagement buttons (shown on tap/long-press)
               if (_showEngagementButtons) ...[

@@ -20,9 +20,14 @@ _$CoupletModelImpl _$$CoupletModelImplFromJson(Map<String, dynamic> json) =>
       shareCount: (json['shareCount'] as num?)?.toInt() ?? 0,
       isLikedByCurrentUser: json['isLiked'] as bool,
       isBookmarkedByCurrentUser: json['isBookmarked'] as bool,
+      tagSlugs: (json['tagSlugs'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
+      reactions: json['reactions'] as Map<String, dynamic>?,
     );
 
 Map<String, dynamic> _$$CoupletModelImplToJson(_$CoupletModelImpl instance) =>
@@ -37,7 +42,9 @@ Map<String, dynamic> _$$CoupletModelImplToJson(_$CoupletModelImpl instance) =>
       'shareCount': instance.shareCount,
       'isLiked': instance.isLikedByCurrentUser,
       'isBookmarked': instance.isBookmarkedByCurrentUser,
+      'tagSlugs': instance.tagSlugs,
       'createdAt': instance.createdAt?.toIso8601String(),
+      'reactions': instance.reactions,
     };
 
 _$CoupletDetailResponseImpl _$$CoupletDetailResponseImplFromJson(
@@ -62,12 +69,17 @@ _$CoupletDetailResponseImpl _$$CoupletDetailResponseImplFromJson(
       shareCount: (json['shareCount'] as num?)?.toInt() ?? 0,
       isLikedByCurrentUser: json['isLiked'] as bool,
       isBookmarkedByCurrentUser: json['isBookmarked'] as bool,
+      tagSlugs: (json['tagSlugs'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
       updatedAt: json['updatedAt'] == null
           ? null
           : DateTime.parse(json['updatedAt'] as String),
+      reactions: json['reactions'] as Map<String, dynamic>?,
     );
 
 Map<String, dynamic> _$$CoupletDetailResponseImplToJson(
@@ -90,8 +102,10 @@ Map<String, dynamic> _$$CoupletDetailResponseImplToJson(
       'shareCount': instance.shareCount,
       'isLiked': instance.isLikedByCurrentUser,
       'isBookmarked': instance.isBookmarkedByCurrentUser,
+      'tagSlugs': instance.tagSlugs,
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
+      'reactions': instance.reactions,
     };
 
 _$BookmarkedCoupletResponseImpl _$$BookmarkedCoupletResponseImplFromJson(
@@ -116,6 +130,10 @@ _$BookmarkedCoupletResponseImpl _$$BookmarkedCoupletResponseImplFromJson(
       bookmarkCount: (json['bookmarkCount'] as num?)?.toInt() ?? 0,
       isLikedByCurrentUser: json['isLiked'] as bool,
       isBookmarkedByCurrentUser: json['isBookmarked'] as bool,
+      tagSlugs: (json['tagSlugs'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
       bookmarkedAt: json['bookmarkedAt'] == null
           ? null
           : DateTime.parse(json['bookmarkedAt'] as String),
@@ -141,5 +159,6 @@ Map<String, dynamic> _$$BookmarkedCoupletResponseImplToJson(
       'bookmarkCount': instance.bookmarkCount,
       'isLiked': instance.isLikedByCurrentUser,
       'isBookmarked': instance.isBookmarkedByCurrentUser,
+      'tagSlugs': instance.tagSlugs,
       'bookmarkedAt': instance.bookmarkedAt?.toIso8601String(),
     };

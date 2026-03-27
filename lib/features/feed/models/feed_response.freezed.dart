@@ -22,6 +22,7 @@ mixin _$FeedResponse {
   bool get isPersonalized => throw _privateConstructorUsedError;
   String get sessionId => throw _privateConstructorUsedError;
   int get itemCount => throw _privateConstructorUsedError;
+  int? get newCount => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $FeedResponseCopyWith<FeedResponse> get copyWith =>
@@ -40,7 +41,8 @@ abstract class $FeedResponseCopyWith<$Res> {
       bool hasMore,
       bool isPersonalized,
       String sessionId,
-      int itemCount});
+      int itemCount,
+      int? newCount});
 }
 
 /// @nodoc
@@ -62,6 +64,7 @@ class _$FeedResponseCopyWithImpl<$Res, $Val extends FeedResponse>
     Object? isPersonalized = null,
     Object? sessionId = null,
     Object? itemCount = null,
+    Object? newCount = freezed,
   }) {
     return _then(_value.copyWith(
       items: null == items
@@ -88,6 +91,10 @@ class _$FeedResponseCopyWithImpl<$Res, $Val extends FeedResponse>
           ? _value.itemCount
           : itemCount // ignore: cast_nullable_to_non_nullable
               as int,
+      newCount: freezed == newCount
+          ? _value.newCount
+          : newCount // ignore: cast_nullable_to_non_nullable
+              as int?,
     ) as $Val);
   }
 }
@@ -106,7 +113,8 @@ abstract class _$$FeedResponseImplCopyWith<$Res>
       bool hasMore,
       bool isPersonalized,
       String sessionId,
-      int itemCount});
+      int itemCount,
+      int? newCount});
 }
 
 /// @nodoc
@@ -126,6 +134,7 @@ class __$$FeedResponseImplCopyWithImpl<$Res>
     Object? isPersonalized = null,
     Object? sessionId = null,
     Object? itemCount = null,
+    Object? newCount = freezed,
   }) {
     return _then(_$FeedResponseImpl(
       items: null == items
@@ -152,20 +161,25 @@ class __$$FeedResponseImplCopyWithImpl<$Res>
           ? _value.itemCount
           : itemCount // ignore: cast_nullable_to_non_nullable
               as int,
+      newCount: freezed == newCount
+          ? _value.newCount
+          : newCount // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
 
 /// @nodoc
 
-class _$FeedResponseImpl implements _FeedResponse {
+class _$FeedResponseImpl with DiagnosticableTreeMixin implements _FeedResponse {
   const _$FeedResponseImpl(
       {required final List<FeedItem> items,
       this.nextCursor,
       this.hasMore = false,
       this.isPersonalized = false,
       this.sessionId = '',
-      this.itemCount = 0})
+      this.itemCount = 0,
+      this.newCount})
       : _items = items;
 
   final List<FeedItem> _items;
@@ -190,10 +204,26 @@ class _$FeedResponseImpl implements _FeedResponse {
   @override
   @JsonKey()
   final int itemCount;
+  @override
+  final int? newCount;
 
   @override
-  String toString() {
-    return 'FeedResponse(items: $items, nextCursor: $nextCursor, hasMore: $hasMore, isPersonalized: $isPersonalized, sessionId: $sessionId, itemCount: $itemCount)';
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'FeedResponse(items: $items, nextCursor: $nextCursor, hasMore: $hasMore, isPersonalized: $isPersonalized, sessionId: $sessionId, itemCount: $itemCount, newCount: $newCount)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'FeedResponse'))
+      ..add(DiagnosticsProperty('items', items))
+      ..add(DiagnosticsProperty('nextCursor', nextCursor))
+      ..add(DiagnosticsProperty('hasMore', hasMore))
+      ..add(DiagnosticsProperty('isPersonalized', isPersonalized))
+      ..add(DiagnosticsProperty('sessionId', sessionId))
+      ..add(DiagnosticsProperty('itemCount', itemCount))
+      ..add(DiagnosticsProperty('newCount', newCount));
   }
 
   @override
@@ -210,7 +240,9 @@ class _$FeedResponseImpl implements _FeedResponse {
             (identical(other.sessionId, sessionId) ||
                 other.sessionId == sessionId) &&
             (identical(other.itemCount, itemCount) ||
-                other.itemCount == itemCount));
+                other.itemCount == itemCount) &&
+            (identical(other.newCount, newCount) ||
+                other.newCount == newCount));
   }
 
   @override
@@ -221,7 +253,8 @@ class _$FeedResponseImpl implements _FeedResponse {
       hasMore,
       isPersonalized,
       sessionId,
-      itemCount);
+      itemCount,
+      newCount);
 
   @JsonKey(ignore: true)
   @override
@@ -237,7 +270,8 @@ abstract class _FeedResponse implements FeedResponse {
       final bool hasMore,
       final bool isPersonalized,
       final String sessionId,
-      final int itemCount}) = _$FeedResponseImpl;
+      final int itemCount,
+      final int? newCount}) = _$FeedResponseImpl;
 
   @override
   List<FeedItem> get items;
@@ -251,6 +285,8 @@ abstract class _FeedResponse implements FeedResponse {
   String get sessionId;
   @override
   int get itemCount;
+  @override
+  int? get newCount;
   @override
   @JsonKey(ignore: true)
   _$$FeedResponseImplCopyWith<_$FeedResponseImpl> get copyWith =>

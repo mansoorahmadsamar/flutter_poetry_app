@@ -2,7 +2,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import '../network/dio_client.dart';
+import '../storage/preferences_service.dart';
 import '../storage/secure_storage.dart';
+import '../../features/discover/providers/discover_provider.dart';
+import '../../features/engagement/providers/bookmark_providers.dart';
+import '../../features/engagement/providers/bookmark_search_history_provider.dart';
+import '../../features/engagement/providers/bookmark_search_provider.dart';
+import '../../features/engagement/providers/couplet_providers.dart';
+import '../../features/engagement/providers/unified_bookmark_provider.dart';
+import '../../features/feed/providers/feed_engagement_provider.dart';
+import '../../features/feed/providers/feed_provider.dart';
+import '../../features/search/providers/search_providers.dart';
 import 'firebase_auth_service.dart';
 import 'auth_state.dart';
 
@@ -197,12 +207,37 @@ class AuthNotifier extends StateNotifier<AuthState> {
       _logger.i('   Calling Firebase Auth Service logout...');
       await _firebaseAuthService.signOut();
 
+      // Clear search history from SharedPreferences
+      _logger.i('   Clearing SharedPreferences...');
+      try {
+        final prefs = _ref.read(preferencesServiceProvider);
+        await prefs.clearAll();
+      } catch (e) {
+        _logger.w('⚠️  Failed to clear preferences: $e');
+      }
+
+      // Invalidate all user-specific providers to clear cached data
+      _logger.i('   Invalidating cached providers...');
+      _ref.invalidate(feedProvider);
+      _ref.invalidate(feedEngagementProvider);
+      _ref.invalidate(discoverProvider);
+      _ref.invalidate(bookmarkedCoupletsProvider);
+      _ref.invalidate(unifiedBookmarksProvider);
+      _ref.invalidate(bookmarkActionProvider);
+      _ref.invalidate(bookmarkSearchProvider);
+      _ref.invalidate(bookmarkSearchHistoryProvider);
+      _ref.invalidate(coupletsProvider);
+      _ref.invalidate(coupletProvider);
+      _ref.invalidate(coupletActionProvider);
+      _ref.invalidate(searchHistoryProvider);
+      _ref.invalidate(searchQueryProvider);
+
       _logger.i('✅ Logout successful');
 
       state = const AuthState();
 
       _logger.i('═══════════════════════════════════════════════════════');
-      _logger.i('✅ USER LOGGED OUT - STATE CLEARED');
+      _logger.i('✅ USER LOGGED OUT - ALL DATA CLEARED');
       _logger.i('═══════════════════════════════════════════════════════');
       _logger.i('');
     } catch (e) {

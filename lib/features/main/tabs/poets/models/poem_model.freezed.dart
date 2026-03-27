@@ -56,7 +56,9 @@ mixin _$PoemModel {
   PoemContentModel? get originalContent =>
       throw _privateConstructorUsedError; // Simple list API fields (for backward compatibility)
   String? get title => throw _privateConstructorUsedError;
-  String? get excerpt => throw _privateConstructorUsedError;
+  String? get excerpt =>
+      throw _privateConstructorUsedError; // Reactions system (Section 19)
+  Map<String, dynamic>? get reactions => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -104,7 +106,8 @@ abstract class $PoemModelCopyWith<$Res> {
       List<PoemContentModel> contents,
       PoemContentModel? originalContent,
       String? title,
-      String? excerpt});
+      String? excerpt,
+      Map<String, dynamic>? reactions});
 
   $PoemContentModelCopyWith<$Res>? get originalContent;
 }
@@ -157,6 +160,7 @@ class _$PoemModelCopyWithImpl<$Res, $Val extends PoemModel>
     Object? originalContent = freezed,
     Object? title = freezed,
     Object? excerpt = freezed,
+    Object? reactions = freezed,
   }) {
     return _then(_value.copyWith(
       publicId: null == publicId
@@ -299,6 +303,10 @@ class _$PoemModelCopyWithImpl<$Res, $Val extends PoemModel>
           ? _value.excerpt
           : excerpt // ignore: cast_nullable_to_non_nullable
               as String?,
+      reactions: freezed == reactions
+          ? _value.reactions
+          : reactions // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ) as $Val);
   }
 
@@ -358,7 +366,8 @@ abstract class _$$PoemModelImplCopyWith<$Res>
       List<PoemContentModel> contents,
       PoemContentModel? originalContent,
       String? title,
-      String? excerpt});
+      String? excerpt,
+      Map<String, dynamic>? reactions});
 
   @override
   $PoemContentModelCopyWith<$Res>? get originalContent;
@@ -410,6 +419,7 @@ class __$$PoemModelImplCopyWithImpl<$Res>
     Object? originalContent = freezed,
     Object? title = freezed,
     Object? excerpt = freezed,
+    Object? reactions = freezed,
   }) {
     return _then(_$PoemModelImpl(
       publicId: null == publicId
@@ -552,6 +562,10 @@ class __$$PoemModelImplCopyWithImpl<$Res>
           ? _value.excerpt
           : excerpt // ignore: cast_nullable_to_non_nullable
               as String?,
+      reactions: freezed == reactions
+          ? _value._reactions
+          : reactions // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ));
   }
 }
@@ -594,9 +608,11 @@ class _$PoemModelImpl implements _PoemModel {
       final List<PoemContentModel> contents = const [],
       this.originalContent,
       this.title,
-      this.excerpt})
+      this.excerpt,
+      final Map<String, dynamic>? reactions})
       : _tags = tags,
-        _contents = contents;
+        _contents = contents,
+        _reactions = reactions;
 
   factory _$PoemModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$PoemModelImplFromJson(json);
@@ -692,10 +708,21 @@ class _$PoemModelImpl implements _PoemModel {
   final String? title;
   @override
   final String? excerpt;
+// Reactions system (Section 19)
+  final Map<String, dynamic>? _reactions;
+// Reactions system (Section 19)
+  @override
+  Map<String, dynamic>? get reactions {
+    final value = _reactions;
+    if (value == null) return null;
+    if (_reactions is EqualUnmodifiableMapView) return _reactions;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
 
   @override
   String toString() {
-    return 'PoemModel(publicId: $publicId, poetPublicId: $poetPublicId, poetName: $poetName, poetProfileImageUrl: $poetProfileImageUrl, categoryPublicId: $categoryPublicId, categoryName: $categoryName, poetryType: $poetryType, poetryTypeName: $poetryTypeName, poetryTypeUrduName: $poetryTypeUrduName, poetryTypeEnglishName: $poetryTypeEnglishName, contentType: $contentType, requiresStructuredParsing: $requiresStructuredParsing, imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, yearWritten: $yearWritten, source: $source, license: $license, uploadedByUsername: $uploadedByUsername, isPublic: $isPublic, isFeatured: $isFeatured, viewCount: $viewCount, likeCount: $likeCount, shareCount: $shareCount, isLikedByCurrentUser: $isLikedByCurrentUser, isBookmarkedByCurrentUser: $isBookmarkedByCurrentUser, commentCount: $commentCount, createdAt: $createdAt, updatedAt: $updatedAt, bookmarkedAt: $bookmarkedAt, likedAt: $likedAt, tags: $tags, contents: $contents, originalContent: $originalContent, title: $title, excerpt: $excerpt)';
+    return 'PoemModel(publicId: $publicId, poetPublicId: $poetPublicId, poetName: $poetName, poetProfileImageUrl: $poetProfileImageUrl, categoryPublicId: $categoryPublicId, categoryName: $categoryName, poetryType: $poetryType, poetryTypeName: $poetryTypeName, poetryTypeUrduName: $poetryTypeUrduName, poetryTypeEnglishName: $poetryTypeEnglishName, contentType: $contentType, requiresStructuredParsing: $requiresStructuredParsing, imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, yearWritten: $yearWritten, source: $source, license: $license, uploadedByUsername: $uploadedByUsername, isPublic: $isPublic, isFeatured: $isFeatured, viewCount: $viewCount, likeCount: $likeCount, shareCount: $shareCount, isLikedByCurrentUser: $isLikedByCurrentUser, isBookmarkedByCurrentUser: $isBookmarkedByCurrentUser, commentCount: $commentCount, createdAt: $createdAt, updatedAt: $updatedAt, bookmarkedAt: $bookmarkedAt, likedAt: $likedAt, tags: $tags, contents: $contents, originalContent: $originalContent, title: $title, excerpt: $excerpt, reactions: $reactions)';
   }
 
   @override
@@ -767,7 +794,9 @@ class _$PoemModelImpl implements _PoemModel {
             (identical(other.originalContent, originalContent) ||
                 other.originalContent == originalContent) &&
             (identical(other.title, title) || other.title == title) &&
-            (identical(other.excerpt, excerpt) || other.excerpt == excerpt));
+            (identical(other.excerpt, excerpt) || other.excerpt == excerpt) &&
+            const DeepCollectionEquality()
+                .equals(other._reactions, _reactions));
   }
 
   @JsonKey(ignore: true)
@@ -808,7 +837,8 @@ class _$PoemModelImpl implements _PoemModel {
         const DeepCollectionEquality().hash(_contents),
         originalContent,
         title,
-        excerpt
+        excerpt,
+        const DeepCollectionEquality().hash(_reactions)
       ]);
 
   @JsonKey(ignore: true)
@@ -861,7 +891,8 @@ abstract class _PoemModel implements PoemModel {
       final List<PoemContentModel> contents,
       final PoemContentModel? originalContent,
       final String? title,
-      final String? excerpt}) = _$PoemModelImpl;
+      final String? excerpt,
+      final Map<String, dynamic>? reactions}) = _$PoemModelImpl;
 
   factory _PoemModel.fromJson(Map<String, dynamic> json) =
       _$PoemModelImpl.fromJson;
@@ -937,6 +968,8 @@ abstract class _PoemModel implements PoemModel {
   String? get title;
   @override
   String? get excerpt;
+  @override // Reactions system (Section 19)
+  Map<String, dynamic>? get reactions;
   @override
   @JsonKey(ignore: true)
   _$$PoemModelImplCopyWith<_$PoemModelImpl> get copyWith =>

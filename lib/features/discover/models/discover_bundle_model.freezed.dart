@@ -25,6 +25,7 @@ mixin _$DiscoverBundle {
   ContentSection get recommended => throw _privateConstructorUsedError;
   ContentSection get featuredPoets => throw _privateConstructorUsedError;
   ContentSection get categories => throw _privateConstructorUsedError;
+  List<HashtagDto> get trendingHashtags => throw _privateConstructorUsedError;
   String get language => throw _privateConstructorUsedError;
   bool get personalized => throw _privateConstructorUsedError;
   int? get timestamp => throw _privateConstructorUsedError;
@@ -47,6 +48,7 @@ abstract class $DiscoverBundleCopyWith<$Res> {
       ContentSection recommended,
       ContentSection featuredPoets,
       ContentSection categories,
+      List<HashtagDto> trendingHashtags,
       String language,
       bool personalized,
       int? timestamp});
@@ -76,6 +78,7 @@ class _$DiscoverBundleCopyWithImpl<$Res, $Val extends DiscoverBundle>
     Object? recommended = null,
     Object? featuredPoets = null,
     Object? categories = null,
+    Object? trendingHashtags = null,
     Object? language = null,
     Object? personalized = null,
     Object? timestamp = freezed,
@@ -101,6 +104,10 @@ class _$DiscoverBundleCopyWithImpl<$Res, $Val extends DiscoverBundle>
           ? _value.categories
           : categories // ignore: cast_nullable_to_non_nullable
               as ContentSection,
+      trendingHashtags: null == trendingHashtags
+          ? _value.trendingHashtags
+          : trendingHashtags // ignore: cast_nullable_to_non_nullable
+              as List<HashtagDto>,
       language: null == language
           ? _value.language
           : language // ignore: cast_nullable_to_non_nullable
@@ -171,6 +178,7 @@ abstract class _$$DiscoverBundleImplCopyWith<$Res>
       ContentSection recommended,
       ContentSection featuredPoets,
       ContentSection categories,
+      List<HashtagDto> trendingHashtags,
       String language,
       bool personalized,
       int? timestamp});
@@ -203,6 +211,7 @@ class __$$DiscoverBundleImplCopyWithImpl<$Res>
     Object? recommended = null,
     Object? featuredPoets = null,
     Object? categories = null,
+    Object? trendingHashtags = null,
     Object? language = null,
     Object? personalized = null,
     Object? timestamp = freezed,
@@ -228,6 +237,10 @@ class __$$DiscoverBundleImplCopyWithImpl<$Res>
           ? _value.categories
           : categories // ignore: cast_nullable_to_non_nullable
               as ContentSection,
+      trendingHashtags: null == trendingHashtags
+          ? _value._trendingHashtags
+          : trendingHashtags // ignore: cast_nullable_to_non_nullable
+              as List<HashtagDto>,
       language: null == language
           ? _value.language
           : language // ignore: cast_nullable_to_non_nullable
@@ -253,9 +266,11 @@ class _$DiscoverBundleImpl implements _DiscoverBundle {
       required this.recommended,
       required this.featuredPoets,
       required this.categories,
+      final List<HashtagDto> trendingHashtags = const [],
       required this.language,
       this.personalized = false,
-      this.timestamp});
+      this.timestamp})
+      : _trendingHashtags = trendingHashtags;
 
   factory _$DiscoverBundleImpl.fromJson(Map<String, dynamic> json) =>
       _$$DiscoverBundleImplFromJson(json);
@@ -270,6 +285,16 @@ class _$DiscoverBundleImpl implements _DiscoverBundle {
   final ContentSection featuredPoets;
   @override
   final ContentSection categories;
+  final List<HashtagDto> _trendingHashtags;
+  @override
+  @JsonKey()
+  List<HashtagDto> get trendingHashtags {
+    if (_trendingHashtags is EqualUnmodifiableListView)
+      return _trendingHashtags;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_trendingHashtags);
+  }
+
   @override
   final String language;
   @override
@@ -280,7 +305,7 @@ class _$DiscoverBundleImpl implements _DiscoverBundle {
 
   @override
   String toString() {
-    return 'DiscoverBundle(trendingSearches: $trendingSearches, editorsPicks: $editorsPicks, recommended: $recommended, featuredPoets: $featuredPoets, categories: $categories, language: $language, personalized: $personalized, timestamp: $timestamp)';
+    return 'DiscoverBundle(trendingSearches: $trendingSearches, editorsPicks: $editorsPicks, recommended: $recommended, featuredPoets: $featuredPoets, categories: $categories, trendingHashtags: $trendingHashtags, language: $language, personalized: $personalized, timestamp: $timestamp)';
   }
 
   @override
@@ -298,6 +323,8 @@ class _$DiscoverBundleImpl implements _DiscoverBundle {
                 other.featuredPoets == featuredPoets) &&
             (identical(other.categories, categories) ||
                 other.categories == categories) &&
+            const DeepCollectionEquality()
+                .equals(other._trendingHashtags, _trendingHashtags) &&
             (identical(other.language, language) ||
                 other.language == language) &&
             (identical(other.personalized, personalized) ||
@@ -315,6 +342,7 @@ class _$DiscoverBundleImpl implements _DiscoverBundle {
       recommended,
       featuredPoets,
       categories,
+      const DeepCollectionEquality().hash(_trendingHashtags),
       language,
       personalized,
       timestamp);
@@ -341,6 +369,7 @@ abstract class _DiscoverBundle implements DiscoverBundle {
       required final ContentSection recommended,
       required final ContentSection featuredPoets,
       required final ContentSection categories,
+      final List<HashtagDto> trendingHashtags,
       required final String language,
       final bool personalized,
       final int? timestamp}) = _$DiscoverBundleImpl;
@@ -358,6 +387,8 @@ abstract class _DiscoverBundle implements DiscoverBundle {
   ContentSection get featuredPoets;
   @override
   ContentSection get categories;
+  @override
+  List<HashtagDto> get trendingHashtags;
   @override
   String get language;
   @override

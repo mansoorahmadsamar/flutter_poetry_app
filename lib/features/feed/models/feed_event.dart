@@ -7,6 +7,7 @@ class FeedEvent {
   final String sid;
   final int ts;
   final int? v;
+  final String? sourceId;
 
   FeedEvent({
     required this.eid,
@@ -15,6 +16,7 @@ class FeedEvent {
     required this.sid,
     required this.ts,
     this.v,
+    this.sourceId,
   });
 
   Map<String, dynamic> toJson() => {
@@ -24,5 +26,6 @@ class FeedEvent {
         'sid': sid,
         'ts': ts,
         if (v != null) 'v': v,
+        if (sourceId != null && sourceId!.isNotEmpty) 'sourceId': sourceId,
       };
 }

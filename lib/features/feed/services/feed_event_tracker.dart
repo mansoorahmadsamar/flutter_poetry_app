@@ -32,6 +32,7 @@ class FeedEventTracker {
       itemKey: itemKey,
       sid: sessionId,
       ts: _nowSec(),
+      sourceId: item.sourceId.isEmpty ? null : item.sourceId,
     ));
   }
 
@@ -44,6 +45,7 @@ class FeedEventTracker {
     final dwellMs = DateTime.now().millisecondsSinceEpoch - start;
     final itemKey = _itemKey(item);
 
+    final source = item.sourceId.isEmpty ? null : item.sourceId;
     if (dwellMs < 500) {
       _addEvent(FeedEvent(
         eid: _uuid.v4(),
@@ -51,6 +53,7 @@ class FeedEventTracker {
         itemKey: itemKey,
         sid: sessionId,
         ts: _nowSec(),
+        sourceId: source,
       ));
     } else {
       _addEvent(FeedEvent(
@@ -60,6 +63,7 @@ class FeedEventTracker {
         sid: sessionId,
         ts: _nowSec(),
         v: dwellMs,
+        sourceId: source,
       ));
     }
   }
@@ -72,6 +76,7 @@ class FeedEventTracker {
       itemKey: _itemKey(item),
       sid: sessionId,
       ts: _nowSec(),
+      sourceId: item.sourceId.isEmpty ? null : item.sourceId,
     ));
   }
 

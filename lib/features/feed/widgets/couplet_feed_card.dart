@@ -1,16 +1,23 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
+import 'package:flutter_poetry_app/features/engagement/providers/couplet_providers.dart';
+import 'package:flutter_poetry_app/features/engagement/providers/reaction_providers.dart';
+import 'package:flutter_poetry_app/features/hashtags/widgets/hashtag_pill.dart';
 import '../models/feed_content_data.dart';
 import '../models/feed_item.dart';
 import '../providers/feed_engagement_provider.dart';
 import '../providers/feed_provider.dart';
 import 'feed_engagement_row.dart';
+import 'social_proof_badge.dart';
 
 class CoupletFeedCard extends ConsumerWidget {
   final FeedItem item;
@@ -25,84 +32,142 @@ class CoupletFeedCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final lang = ref.watch(selectedLanguageProvider);
-    final isUrdu = lang == 'ur';
+    final isUrdu = item.lang == 'ur';
+    final isAppUrdu = ref.watch(selectedLanguageProvider) == 'ur';
     final itemKey = '${item.type}:${item.publicId}';
     final overlay = ref.watch(feedEngagementProvider)[itemKey];
 
     return Card(
       margin: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
+        vertical: AppSpacing.feedCardVerticalMargin,
       ),
-      elevation: AppSpacing.elevationSm,
+      elevation: AppSpacing.elevationNone,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        side: BorderSide(
+          color: isDark ? AppColors.borderDark : AppColors.dividerLight,
+          width: 0.5,
+        ),
       ),
-      color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+      color: _cardColor(isDark),
       child: InkWell(
         onTap: () => _onTap(context, ref),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.feedCardPadding,
+            AppSpacing.feedCardPaddingVertical,
+            AppSpacing.feedCardPadding,
+            AppSpacing.feedCardPadding,
+          ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Header: poet avatar + name + reason badge
-              _buildHeader(context, isDark),
-              const SizedBox(height: AppSpacing.md),
+              _buildHeader(context, isDark, isUrdu, isAppUrdu),
 
-              // Body: verses
+              const SizedBox(height: AppSpacing.feedSectionGap),
+
+              // Social proof
+              SocialProofBadge(socialContext: item.socialContext),
+
+              // Urdu verses
               if (data.versesTextArabic != null)
-                Center(
-                  child: Text(
-                    data.versesTextArabic!,
-                    style: AppTypography.urduVerseStyle.copyWith(
-                      color: isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimaryLight,
-                    ),
-                    textDirection: TextDirection.rtl,
-                    textAlign: TextAlign.center,
+                Text(
+                  data.versesTextArabic!,
+                  style: AppTypography.urduVerseStyle.copyWith(
+                    fontSize: 22,
+                    color: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimaryLight,
+                    height: 2.4,
                   ),
+                  textDirection: TextDirection.rtl,
+                  textAlign: TextAlign.center,
                 ),
 
+              // Roman transliteration (non-Urdu mode only)
               if (data.versesTextRoman != null && !isUrdu) ...[
                 const SizedBox(height: AppSpacing.sm),
-                Center(
-                  child: Text(
-                    data.versesTextRoman!,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondaryLight,
-                      fontStyle: FontStyle.italic,
+                Text(
+                  data.versesTextRoman!,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: isDark
+                        ? AppColors.textSecondaryDark
+                        : AppColors.textSecondaryLight,
+                    fontStyle: FontStyle.italic,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+
+              // Hashtag pills
+              if (data.tagSlugs.isNotEmpty) ...[
+                const SizedBox(height: AppSpacing.sm),
+                HashtagSlugRow(slugs: data.tagSlugs),
+              ],
+
+              // "Open poem →" CTA
+              if (data.poemPublicId != null) ...[
+                const SizedBox(height: AppSpacing.md),
+                Align(
+                  alignment: Alignment.center,
+                  child: GestureDetector(
+                    onTap: () => _onTap(context, ref),
+                    child: Text(
+                      isAppUrdu ? 'مزید پڑھیے  ←' : 'Open poem →',
+                      style: isAppUrdu
+                          ? TextStyle(
+                              fontFamily: AppTypography.urduFontFamily,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                              color: isDark ? AppColors.primaryLight : AppColors.primary,
+                              height: 1.6,
+                            )
+                          : GoogleFonts.roboto(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: isDark ? AppColors.primaryLight : AppColors.primary,
+                            ),
+                      textDirection:
+                          isAppUrdu ? TextDirection.rtl : TextDirection.ltr,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ),
               ],
 
-              const SizedBox(height: AppSpacing.md),
+              const SizedBox(height: AppSpacing.feedSectionGap),
               Divider(
                 color: isDark ? AppColors.dividerDark : AppColors.dividerLight,
                 height: 1,
               ),
               const SizedBox(height: AppSpacing.sm),
 
-              // Footer: engagement row
+              // Engagement row with copy button as extra action
               FeedEngagementRow(
                 likeCount:
-                    data.likeCount + (overlay?.likeCountDelta ?? 0),
+                    data.likeCount + (overlay?.reactionCountDelta ?? overlay?.likeCountDelta ?? 0),
                 bookmarkCount:
-                    data.bookmarkCount + (overlay?.bookmarkCountDelta ?? 0),
+                    data.bookmarkCount +
+                    (overlay?.bookmarkCountDelta ?? 0),
                 shareCount: data.shareCount,
-                isLiked: overlay?.isLiked ?? false,
+                isLiked: overlay?.userReaction != null || overlay?.isLiked == true,
                 isBookmarked: overlay?.isBookmarked ?? false,
-                onLike: () => _onLike(ref, itemKey, overlay),
                 onBookmark: () => _onBookmark(ref, itemKey, overlay),
-                onShare: () => _onShare(ref),
+                onShare: () => _onShare(context, ref),
+                totalReactions: item.socialContext?.totalReactions,
+                userReaction: overlay?.userReaction,
+                reactionsByType: _parseReactionsByType(data.reactions),
+                reactionTypes: ref.watch(reactionTypesProvider).valueOrNull ?? [],
+                onReact: (reactionType) => _onReact(ref, itemKey, overlay, reactionType),
+                extraActions: data.versesTextArabic != null
+                    ? [
+                        _CopyButton(
+                          onTap: () => _onCopy(context),
+                          isDark: isDark,
+                        ),
+                      ]
+                    : null,
               ),
             ],
           ),
@@ -111,55 +176,152 @@ class CoupletFeedCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, bool isDark) {
+  Widget _buildHeader(
+      BuildContext context, bool isDark, bool isUrdu, bool isAppUrdu) {
     return Row(
       children: [
         // Poet avatar
-        ClipOval(
-          child: data.poetProfileImageUrl != null
-              ? CachedNetworkImage(
-                  imageUrl: data.poetProfileImageUrl!,
-                  width: 36,
-                  height: 36,
-                  fit: BoxFit.cover,
-                  memCacheWidth: 72,
-                  placeholder: (_, __) => _avatarPlaceholder(isDark),
-                  errorWidget: (_, __, ___) => _avatarPlaceholder(isDark),
-                )
-              : _avatarPlaceholder(isDark),
+        GestureDetector(
+          onTap: () {
+            if (data.poetPublicId != null) {
+              context.push('/main/poets/${data.poetPublicId}');
+            }
+          },
+          child: ClipOval(
+            child: data.poetProfileImageUrl != null
+                ? CachedNetworkImage(
+                    imageUrl: data.poetProfileImageUrl!,
+                    width: AppSpacing.feedAvatarSize,
+                    height: AppSpacing.feedAvatarSize,
+                    fit: BoxFit.cover,
+                    memCacheWidth: 88,
+                    placeholder: (_, __) => _avatarPlaceholder(isDark),
+                    errorWidget: (_, __, ___) => _avatarPlaceholder(isDark),
+                  )
+                : _avatarPlaceholder(isDark),
+          ),
         ),
         const SizedBox(width: AppSpacing.sm),
 
-        // Poet name
+        // Poet name + era
         Expanded(
-          child: Text(
-            data.poetName ?? '',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: isDark
-                  ? AppColors.textPrimaryDark
-                  : AppColors.textPrimaryLight,
+          child: GestureDetector(
+            onTap: () {
+              if (data.poetPublicId != null) {
+                context.push('/main/poets/${data.poetPublicId}');
+              }
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  data.poetName ?? '',
+                  style: isUrdu
+                      ? AppTypography.urduPoetNameStyle.copyWith(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: isDark
+                              ? AppColors.textPrimaryDark
+                              : AppColors.textPrimaryLight,
+                        )
+                      : GoogleFonts.roboto(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: isDark
+                              ? AppColors.textPrimaryDark
+                              : AppColors.textPrimaryLight,
+                        ),
+                  textDirection:
+                      isUrdu ? TextDirection.rtl : TextDirection.ltr,
+                  textAlign: TextAlign.start,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (_formatEra(data.poetBirthYear, data.poetDeathYear) !=
+                    null)
+                  Text(
+                    _formatEra(data.poetBirthYear, data.poetDeathYear)!,
+                    style: GoogleFonts.roboto(
+                      fontSize: 12,
+                      color: isDark
+                          ? AppColors.textSecondaryDark
+                          : AppColors.textSecondaryLight,
+                    ),
+                  ),
+                if (item.reason == 'FOLLOWING')
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text(
+                      (isUrdu || isAppUrdu) ? 'آپ کے پسندیدہ شاعر کی طرف سے' : 'From a poet you follow',
+                      style: (isUrdu || isAppUrdu)
+                          ? TextStyle(
+                              fontFamily: AppTypography.urduFontFamily,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: isDark ? AppColors.primaryLight : AppColors.primary,
+                              height: 1.5,
+                            )
+                          : GoogleFonts.roboto(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: isDark ? AppColors.primaryLight : AppColors.primary,
+                            ),
+                      textDirection: (isUrdu || isAppUrdu) ? TextDirection.rtl : TextDirection.ltr,
+                    ),
+                  ),
+                if (item.reason == 'TIME_CAPSULE')
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.bookmark, size: 12,
+                            color: isDark ? AppColors.secondaryLight : AppColors.secondary),
+                        const SizedBox(width: 3),
+                        Text(
+                          (isUrdu || isAppUrdu) ? 'آپ نے پہلے محفوظ کیا تھا' : 'You saved this before',
+                          style: (isUrdu || isAppUrdu)
+                              ? TextStyle(
+                                  fontFamily: AppTypography.urduFontFamily,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  color: isDark ? AppColors.secondaryLight : AppColors.secondary,
+                                  height: 1.5,
+                                )
+                              : GoogleFonts.roboto(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                  color: isDark ? AppColors.secondaryLight : AppColors.secondary,
+                                ),
+                          textDirection: (isUrdu || isAppUrdu) ? TextDirection.rtl : TextDirection.ltr,
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           ),
         ),
 
-        // Reason badge
+        // Reason badge — poetic green, always English
         if (item.reason.isNotEmpty)
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 5,
+            ),
             decoration: BoxDecoration(
-              color: _reasonColor(item.reason).withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
+              color: AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
             ),
             child: Text(
               _reasonLabel(item.reason),
-              style: TextStyle(
+              style: GoogleFonts.roboto(
                 fontSize: 11,
-                fontWeight: FontWeight.w500,
-                color: _reasonColor(item.reason),
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.5,
+                color: isDark ? AppColors.primaryLight : AppColors.primary,
               ),
             ),
           ),
@@ -169,13 +331,18 @@ class CoupletFeedCard extends ConsumerWidget {
 
   Widget _avatarPlaceholder(bool isDark) {
     return Container(
-      width: 36,
-      height: 36,
-      color: isDark ? AppColors.borderDark : AppColors.borderLight,
+      width: AppSpacing.feedAvatarSize,
+      height: AppSpacing.feedAvatarSize,
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.borderDark : AppColors.shimmerBase,
+        shape: BoxShape.circle,
+      ),
       child: Icon(
         Icons.person_outline,
-        size: 20,
-        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+        size: AppSpacing.iconSm,
+        color: isDark
+            ? AppColors.textSecondaryDark
+            : AppColors.textSecondaryLight,
       ),
     );
   }
@@ -187,17 +354,36 @@ class CoupletFeedCard extends ConsumerWidget {
     }
   }
 
-  void _onLike(WidgetRef ref, String itemKey, FeedEngagementOverlay? overlay) {
-    final wasLiked = overlay?.isLiked ?? false;
+  void _onCopy(BuildContext context) {
+    if (data.versesTextArabic == null) return;
+    Clipboard.setData(ClipboardData(text: data.versesTextArabic!));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Couplet copied'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _onReact(WidgetRef ref, String itemKey, FeedEngagementOverlay? overlay, String reactionType) {
+    final currentReaction = overlay?.userReaction;
+    final bool isRemoving = currentReaction == reactionType;
+    final bool isAdding = currentReaction == null;
+
     final newOverlay = (overlay ?? const FeedEngagementOverlay()).copyWith(
-      isLiked: !wasLiked,
-      likeCountDelta: (overlay?.likeCountDelta ?? 0) + (wasLiked ? -1 : 1),
+      userReaction: () => isRemoving ? null : reactionType,
+      isLiked: !isRemoving,
+      reactionCountDelta: (overlay?.reactionCountDelta ?? 0) +
+          (isRemoving ? -1 : (isAdding ? 1 : 0)),
+      likeCountDelta: (overlay?.likeCountDelta ?? 0) +
+          (isRemoving ? -1 : (isAdding ? 1 : 0)),
     );
     ref.read(feedEngagementProvider.notifier).state = {
       ...ref.read(feedEngagementProvider),
       itemKey: newOverlay,
     };
-    ref.read(feedProvider.notifier).trackAction(item, 'bookmark');
+    ref.read(feedProvider.notifier).trackAction(item, 'react');
+    _fireReact(ref, item.publicId, reactionType, itemKey, overlay);
   }
 
   void _onBookmark(
@@ -213,20 +399,70 @@ class CoupletFeedCard extends ConsumerWidget {
       itemKey: newOverlay,
     };
     ref.read(feedProvider.notifier).trackAction(item, 'bookmark');
+    _fireToggleBookmark(ref, item.publicId, item.lang ?? 'ur', itemKey, overlay);
   }
 
-  void _onShare(WidgetRef ref) {
-    ref.read(feedProvider.notifier).trackAction(item, 'share');
+  Future<void> _fireReact(
+    WidgetRef ref,
+    String publicId,
+    String reactionType,
+    String itemKey,
+    FeedEngagementOverlay? previousOverlay,
+  ) async {
+    try {
+      await ref.read(reactionActionProvider.notifier).react(
+            targetType: 'couplets',
+            publicId: publicId,
+            reactionType: reactionType,
+          );
+    } catch (_) {
+      ref.read(feedEngagementProvider.notifier).state = {
+        ...ref.read(feedEngagementProvider),
+        itemKey: previousOverlay ?? const FeedEngagementOverlay(),
+      };
+    }
   }
 
-  Color _reasonColor(String reason) {
-    return switch (reason) {
-      'TRENDING' => Colors.orange,
-      'PERSONALIZED' => AppColors.primary,
-      'DISCOVERY' => AppColors.info,
-      'CURATED' => AppColors.secondary,
-      _ => AppColors.textSecondaryLight,
-    };
+  Future<void> _fireToggleBookmark(
+    WidgetRef ref,
+    String publicId,
+    String lang,
+    String itemKey,
+    FeedEngagementOverlay? previousOverlay,
+  ) async {
+    try {
+      await ref.read(coupletActionProvider.notifier).toggleBookmark(publicId, lang: lang);
+    } catch (_) {
+      ref.read(feedEngagementProvider.notifier).state = {
+        ...ref.read(feedEngagementProvider),
+        itemKey: previousOverlay ?? const FeedEngagementOverlay(),
+      };
+    }
+  }
+
+  void _onShare(BuildContext context, WidgetRef ref) {
+    final verses = data.versesTextArabic;
+    if (verses == null || verses.isEmpty) return;
+    final poet = data.poetName ?? '';
+    final text = poet.isNotEmpty ? '$verses\n\n— $poet' : verses;
+    Share.shareWithResult(text).then((result) {
+      if (result.status == ShareResultStatus.success) {
+        ref.read(feedProvider.notifier).trackAction(item, 'share');
+      }
+    });
+  }
+
+  Map<String, int>? _parseReactionsByType(Map<String, dynamic>? reactions) {
+    if (reactions == null) return null;
+    final byType = reactions['byType'];
+    if (byType == null) return null;
+    return Map<String, int>.from(byType as Map);
+  }
+
+  String? _formatEra(int? birthYear, int? deathYear) {
+    if (birthYear == null || birthYear == 0) return null;
+    if (deathYear == null || deathYear == 0) return '$birthYear';
+    return '$birthYear \u2013 $deathYear';
   }
 
   String _reasonLabel(String reason) {
@@ -235,7 +471,40 @@ class CoupletFeedCard extends ConsumerWidget {
       'PERSONALIZED' => 'For You',
       'DISCOVERY' => 'Discover',
       'CURATED' => 'Curated',
+      'FOLLOWING' => 'Following',
+      'TIME_CAPSULE' => 'Memory',
       _ => reason,
     };
+  }
+
+  Color _cardColor(bool isDark) {
+    return isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
+  }
+}
+
+/// Copy button widget for use as an extra action in the engagement row.
+class _CopyButton extends StatelessWidget {
+  final VoidCallback onTap;
+  final bool isDark;
+
+  const _CopyButton({required this.onTap, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: 8,
+        ),
+        child: Icon(
+          Icons.copy_outlined,
+          size: AppSpacing.feedEngagementIconSize,
+          color: isDark ? AppColors.engagementIconDark : AppColors.engagementIcon,
+        ),
+      ),
+    );
   }
 }

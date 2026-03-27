@@ -18,6 +18,10 @@ _$DiscoverBundleImpl _$$DiscoverBundleImplFromJson(Map<String, dynamic> json) =>
           json['featuredPoets'] as Map<String, dynamic>),
       categories:
           ContentSection.fromJson(json['categories'] as Map<String, dynamic>),
+      trendingHashtags: (json['trendingHashtags'] as List<dynamic>?)
+              ?.map((e) => HashtagDto.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
       language: json['language'] as String,
       personalized: json['personalized'] as bool? ?? false,
       timestamp: (json['timestamp'] as num?)?.toInt(),
@@ -31,6 +35,7 @@ Map<String, dynamic> _$$DiscoverBundleImplToJson(
       'recommended': instance.recommended,
       'featuredPoets': instance.featuredPoets,
       'categories': instance.categories,
+      'trendingHashtags': instance.trendingHashtags,
       'language': instance.language,
       'personalized': instance.personalized,
       'timestamp': instance.timestamp,

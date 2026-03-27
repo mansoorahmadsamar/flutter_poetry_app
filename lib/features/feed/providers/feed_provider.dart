@@ -60,6 +60,12 @@ class FeedNotifier extends StateNotifier<FeedState> {
   /// Scroll listener can fire multiple times before Riverpod state propagates.
   bool _fetchLock = false;
 
+  /// Client-side dedup: tracks seen item keys within a session.
+  final Set<String> _seenItemKeys = {};
+
+  /// Guard for auto-advance on empty first page — prevents infinite retry loops.
+  bool _autoAdvanceAttempted = false;
+
   FeedNotifier({
     required FeedService feedService,
     required String lang,
@@ -78,6 +84,8 @@ class FeedNotifier extends StateNotifier<FeedState> {
     // Flush events from previous session
     await _flushEvents();
     _tracker.reset();
+    _seenItemKeys.clear();
+    _autoAdvanceAttempted = false;
 
     // Clear optimistic engagement overlay on refresh
     _ref.read(feedEngagementProvider.notifier).state = {};
@@ -86,8 +94,48 @@ class FeedNotifier extends StateNotifier<FeedState> {
 
     try {
       final response = await _feedService.getFeed(lang: _lang);
+      final newItems = _dedup(response.items);
+
+      // Auto-advance: if first page returns empty but has a cursor, try once more
+      if (newItems.isEmpty &&
+          response.nextCursor != null &&
+          !_autoAdvanceAttempted) {
+        _autoAdvanceAttempted = true;
+        state = FeedState(
+          nextCursor: response.nextCursor,
+          sessionId: response.sessionId,
+          hasMore: true,
+          isLoading: true,
+          isInitial: false,
+        );
+        // Fetch next page automatically
+        try {
+          final retry = await _feedService.getFeed(
+            lang: _lang,
+            cursor: response.nextCursor,
+          );
+          final retryItems = _dedup(retry.items);
+          state = FeedState(
+            items: retryItems,
+            nextCursor: retry.nextCursor,
+            sessionId: retry.sessionId,
+            hasMore: retry.hasMore,
+            isInitial: false,
+          );
+        } catch (_) {
+          // Auto-advance failed — show empty state
+          state = FeedState(
+            nextCursor: response.nextCursor,
+            sessionId: response.sessionId,
+            hasMore: true,
+            isInitial: false,
+          );
+        }
+        return;
+      }
+
       state = FeedState(
-        items: response.items,
+        items: newItems,
         nextCursor: response.nextCursor,
         sessionId: response.sessionId,
         hasMore: response.hasMore,
@@ -115,8 +163,9 @@ class FeedNotifier extends StateNotifier<FeedState> {
         lang: _lang,
         cursor: state.nextCursor,
       );
+      final newItems = _dedup(response.items);
       state = state.copyWith(
-        items: [...state.items, ...response.items],
+        items: [...state.items, ...newItems],
         nextCursor: () => response.nextCursor,
         sessionId: () => response.sessionId,
         hasMore: response.hasMore,
@@ -140,8 +189,64 @@ class FeedNotifier extends StateNotifier<FeedState> {
     }
   }
 
-  /// Pull-to-refresh alias.
+  /// Filter out items already seen in this session.
+  List<FeedItem> _dedup(List<FeedItem> items) {
+    final result = <FeedItem>[];
+    for (final item in items) {
+      final key = '${item.type}:${item.publicId}';
+      if (_seenItemKeys.add(key)) {
+        result.add(item);
+      }
+    }
+    return result;
+  }
+
+  /// Pull-to-refresh alias (full reset).
   Future<void> refresh() => loadFirstPage();
+
+  /// Smart refresh: fetch new items since last cursor and prepend them.
+  /// Returns the number of new items added.
+  Future<int> smartRefresh() async {
+    // No cursor yet — fall back to full reload
+    if (state.nextCursor == null) {
+      await loadFirstPage();
+      return 0;
+    }
+
+    await _flushEvents();
+
+    try {
+      final response = await _feedService.getFeed(
+        lang: _lang,
+        cursor: state.nextCursor,
+        refresh: true,
+      );
+      final newItems = _dedup(response.items);
+      if (newItems.isEmpty) return 0;
+
+      state = state.copyWith(
+        items: [...newItems, ...state.items],
+        nextCursor: () => response.nextCursor ?? state.nextCursor,
+        sessionId: () =>
+            response.sessionId.isNotEmpty ? response.sessionId : state.sessionId,
+        hasMore: response.hasMore,
+      );
+      return response.newCount ?? newItems.length;
+    } catch (_) {
+      // Smart refresh should not show errors — silently fail
+      return 0;
+    }
+  }
+
+  /// Remove an item from the feed and send a hide event.
+  void hideItem(FeedItem item) {
+    trackAction(item, 'hide');
+    state = state.copyWith(
+      items: state.items
+          .where((i) => i.publicId != item.publicId)
+          .toList(),
+    );
+  }
 
   /// Track item becoming visible in viewport.
   void onItemVisible(FeedItem item) {

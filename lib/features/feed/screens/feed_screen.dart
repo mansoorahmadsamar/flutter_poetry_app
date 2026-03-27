@@ -68,7 +68,18 @@ class FeedScreenState extends ConsumerState<FeedScreen>
 
     return Scaffold(
       body: RefreshIndicator(
-        onRefresh: () => ref.read(feedProvider.notifier).refresh(),
+        onRefresh: () async {
+          final count =
+              await ref.read(feedProvider.notifier).smartRefresh();
+          if (count > 0 && context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('$count new items'),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
+        },
         color: AppColors.primary,
         child: CustomScrollView(
           controller: scrollController,
@@ -81,6 +92,20 @@ class FeedScreenState extends ConsumerState<FeedScreen>
                   onPressed: () {
                     // TODO: Show notifications
                   },
+                ),
+                PopupMenuButton<String>(
+                  onSelected: (value) {
+                    if (value == 'reset') {
+                      ref.read(feedProvider.notifier).loadFirstPage();
+                      scrollToTop();
+                    }
+                  },
+                  itemBuilder: (_) => const [
+                    PopupMenuItem(
+                      value: 'reset',
+                      child: Text('Reset Feed'),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -101,16 +126,24 @@ class FeedScreenState extends ConsumerState<FeedScreen>
                   isDark: isDark,
                 ),
               )
+            else if (state.items.isEmpty && !state.isLoading)
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: _EmptyFeed(
+                  onRefresh: () =>
+                      ref.read(feedProvider.notifier).loadFirstPage(),
+                  isDark: isDark,
+                ),
+              )
             else
               SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
-                    // Feed items
                     if (index < state.items.length) {
                       return FeedItemBuilder(item: state.items[index]);
                     }
 
-                    // Footer (index == items.length)
+                    // Footer
                     if (state.isLoadingMore) {
                       return const _LoadingMore();
                     }
@@ -137,6 +170,69 @@ class FeedScreenState extends ConsumerState<FeedScreen>
   }
 }
 
+class _EmptyFeed extends StatelessWidget {
+  final VoidCallback onRefresh;
+  final bool isDark;
+
+  const _EmptyFeed({required this.onRefresh, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.xl),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.auto_stories_outlined,
+              size: AppSpacing.xxxl,
+              color: isDark
+                  ? AppColors.textSecondaryDark
+                  : AppColors.textSecondaryLight,
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              'No poems available yet',
+              style: textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: isDark
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimaryLight,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              'Pull down to refresh or check back later.',
+              style: textTheme.bodyMedium?.copyWith(
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondaryLight,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            ElevatedButton.icon(
+              onPressed: onRefresh,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Refresh'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _ErrorView extends StatelessWidget {
   final String error;
   final VoidCallback onRetry;
@@ -150,6 +246,8 @@ class _ErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
@@ -158,7 +256,7 @@ class _ErrorView extends StatelessWidget {
           children: [
             Icon(
               Icons.cloud_off_outlined,
-              size: 56,
+              size: AppSpacing.xxxl,
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondaryLight,
@@ -166,8 +264,7 @@ class _ErrorView extends StatelessWidget {
             const SizedBox(height: AppSpacing.md),
             Text(
               'Could not load feed',
-              style: TextStyle(
-                fontSize: 17,
+              style: textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: isDark
                     ? AppColors.textPrimaryDark
@@ -177,8 +274,7 @@ class _ErrorView extends StatelessWidget {
             const SizedBox(height: AppSpacing.sm),
             Text(
               'Check your connection and try again.',
-              style: TextStyle(
-                fontSize: 14,
+              style: textTheme.bodyMedium?.copyWith(
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondaryLight,
@@ -214,8 +310,8 @@ class _LoadingMore extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
       child: Center(
         child: SizedBox(
-          width: 24,
-          height: 24,
+          width: AppSpacing.iconMd,
+          height: AppSpacing.iconMd,
           child: CircularProgressIndicator(
             strokeWidth: 2.5,
             valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
@@ -239,14 +335,15 @@ class _InlineRetry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
         children: [
           Text(
             'Failed to load more',
-            style: TextStyle(
-              fontSize: 13,
+            style: textTheme.bodySmall?.copyWith(
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondaryLight,
@@ -255,7 +352,7 @@ class _InlineRetry extends StatelessWidget {
           const SizedBox(height: AppSpacing.sm),
           TextButton.icon(
             onPressed: onRetry,
-            icon: const Icon(Icons.refresh, size: 18),
+            icon: Icon(Icons.refresh, size: AppSpacing.iconSm),
             label: const Text('Tap to retry'),
             style: TextButton.styleFrom(
               foregroundColor: AppColors.primary,
@@ -279,8 +376,7 @@ class _EndOfFeed extends StatelessWidget {
       child: Center(
         child: Text(
           'You\'re all caught up!',
-          style: TextStyle(
-            fontSize: 13,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
             color: isDark
                 ? AppColors.textSecondaryDark
                 : AppColors.textSecondaryLight,

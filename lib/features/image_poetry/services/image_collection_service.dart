@@ -177,11 +177,12 @@ class ImageCollectionService {
     return apiResponse.data!['isLiked'] as bool? ?? false;
   }
 
-  /// Record a share event for a poetry image
-  /// Returns the updated share count
-  Future<int> recordShare(String imageId) async {
+  /// Record a share event for a poetry image.
+  /// Returns `{shareCount, shareText, shareImageUrl}`.
+  Future<Map<String, dynamic>> recordShare(String imageId, {String lang = 'ur'}) async {
     final response = await _dio.post(
       '/api/poetry-images/$imageId/share',
+      queryParameters: {'lang': lang},
     );
 
     final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
@@ -193,7 +194,7 @@ class ImageCollectionService {
       throw Exception(apiResponse.message ?? 'Failed to record share');
     }
 
-    return apiResponse.data!['shareCount'] as int? ?? 0;
+    return apiResponse.data!;
   }
 
   /// Get full engagement status for a poetry image in one call
