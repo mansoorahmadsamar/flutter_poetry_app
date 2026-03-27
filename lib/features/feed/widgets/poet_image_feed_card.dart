@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
+import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/features/image_poetry/providers/image_bookmark_providers.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/reaction_providers.dart';
@@ -33,6 +34,7 @@ class PoetImageFeedCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isUrdu = item.lang == 'ur';
+    final isAppUrdu = ref.watch(selectedLanguageProvider) == 'ur';
     final itemKey = '${item.type}:${item.publicId}';
     final overlay = ref.watch(feedEngagementProvider)[itemKey];
 
@@ -67,38 +69,7 @@ class PoetImageFeedCard extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildHeader(context, isDark, isUrdu),
-                  // "From a poet you follow" / "You saved this before"
-                  if (item.reason == 'FOLLOWING') ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      'From a poet you follow',
-                      style: GoogleFonts.roboto(
-                        fontSize: 11,
-                        color: isDark ? const Color(0xFF64B5F6) : const Color(0xFF1565C0),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                  if (item.reason == 'TIME_CAPSULE') ...[
-                    const SizedBox(height: 4),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.bookmark, size: 13,
-                            color: isDark ? const Color(0xFFFFB74D) : const Color(0xFFE65100)),
-                        const SizedBox(width: 4),
-                        Text(
-                          'You saved this before',
-                          style: GoogleFonts.roboto(
-                            fontSize: 11,
-                            color: isDark ? const Color(0xFFFFB74D) : const Color(0xFFE65100),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                  _buildHeader(context, isDark, isUrdu, isAppUrdu),
                 ],
               ),
             ),
@@ -191,7 +162,7 @@ class PoetImageFeedCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, bool isDark, bool isUrdu) {
+  Widget _buildHeader(BuildContext context, bool isDark, bool isUrdu, bool isAppUrdu) {
     return Row(
       children: [
         // Poet avatar
@@ -264,6 +235,56 @@ class PoetImageFeedCard extends ConsumerWidget {
                       color: isDark
                           ? AppColors.textSecondaryDark
                           : AppColors.textSecondaryLight,
+                    ),
+                  ),
+                if (item.reason == 'FOLLOWING')
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text(
+                      (isUrdu || isAppUrdu) ? 'آپ کے پسندیدہ شاعر کی طرف سے' : 'From a poet you follow',
+                      style: (isUrdu || isAppUrdu)
+                          ? TextStyle(
+                              fontFamily: AppTypography.urduFontFamily,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: isDark ? AppColors.primaryLight : AppColors.primary,
+                              height: 1.5,
+                            )
+                          : GoogleFonts.roboto(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: isDark ? AppColors.primaryLight : AppColors.primary,
+                            ),
+                      textDirection: (isUrdu || isAppUrdu) ? TextDirection.rtl : TextDirection.ltr,
+                    ),
+                  ),
+                if (item.reason == 'TIME_CAPSULE')
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.bookmark, size: 12,
+                            color: isDark ? AppColors.secondaryLight : AppColors.secondary),
+                        const SizedBox(width: 3),
+                        Text(
+                          (isUrdu || isAppUrdu) ? 'آپ نے پہلے محفوظ کیا تھا' : 'You saved this before',
+                          style: (isUrdu || isAppUrdu)
+                              ? TextStyle(
+                                  fontFamily: AppTypography.urduFontFamily,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  color: isDark ? AppColors.secondaryLight : AppColors.secondary,
+                                  height: 1.5,
+                                )
+                              : GoogleFonts.roboto(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                  color: isDark ? AppColors.secondaryLight : AppColors.secondary,
+                                ),
+                          textDirection: (isUrdu || isAppUrdu) ? TextDirection.rtl : TextDirection.ltr,
+                        ),
+                      ],
                     ),
                   ),
               ],

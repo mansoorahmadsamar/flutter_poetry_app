@@ -88,38 +88,6 @@ class PoemFeedCard extends ConsumerWidget {
                 children: [
                   _buildHeader(context, isDark, isUrdu, isAppUrdu),
 
-                  // "From a poet you follow" / "You saved this before"
-                  if (item.reason == 'FOLLOWING') ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      isAppUrdu ? 'آپ کے پسندیدہ شاعر کی طرف سے' : 'From a poet you follow',
-                      style: GoogleFonts.roboto(
-                        fontSize: 11,
-                        color: isDark ? const Color(0xFF64B5F6) : const Color(0xFF1565C0),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                  if (item.reason == 'TIME_CAPSULE') ...[
-                    const SizedBox(height: 4),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.bookmark, size: 13,
-                            color: isDark ? const Color(0xFFFFB74D) : const Color(0xFFE65100)),
-                        const SizedBox(width: 4),
-                        Text(
-                          isAppUrdu ? 'آپ نے پہلے محفوظ کیا تھا' : 'You saved this before',
-                          style: GoogleFonts.roboto(
-                            fontSize: 11,
-                            color: isDark ? const Color(0xFFFFB74D) : const Color(0xFFE65100),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-
                   const SizedBox(height: AppSpacing.feedSectionGap),
 
                   // Social proof
@@ -151,56 +119,36 @@ class PoemFeedCard extends ConsumerWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
 
-                  // Excerpt — auto-expand removes maxLines to show full first verse
+                  // Couplets in a tinted container
                   if (data.excerpt != null) ...[
                     const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      data.excerpt!,
-                      style: isUrdu
-                          ? AppTypography.urduVerseStyle.copyWith(
-                              fontSize: 21,
-                              color: isDark
-                                  ? AppColors.textPrimaryDark
-                                  : AppColors.textPrimaryLight,
-                              height: 2.2,
-                            )
-                          : Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: isDark
-                                    ? AppColors.textSecondaryDark
-                                    : AppColors.textSecondaryLight,
-                              ),
-                      textDirection:
-                          isUrdu ? TextDirection.rtl : TextDirection.ltr,
-                      textAlign: TextAlign.center,
-                      maxLines: 4,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    _buildCoupletsBlock(context, data.excerpt!, isDark, isUrdu),
                   ],
 
                   // "Read more" CTA
-                  const SizedBox(height: AppSpacing.sm),
+                  const SizedBox(height: AppSpacing.md),
                   Align(
                     alignment: Alignment.center,
                     child: GestureDetector(
                       onTap: () => _onTap(context, ref),
                       child: Text(
                         isAppUrdu
-                            ? 'مزید پڑھیے'
+                            ? 'مزید پڑھیے  ←'
                             : data.poetryType?.toUpperCase() == 'GHAZAL'
                                 ? 'Read full ghazal →'
                                 : 'Read full poem →',
                         style: isAppUrdu
                             ? TextStyle(
                                 fontFamily: AppTypography.urduFontFamily,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.feedAccent,
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                                color: isDark ? AppColors.primaryLight : AppColors.primary,
                                 height: 1.6,
                               )
                             : GoogleFonts.roboto(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.feedAccent,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: isDark ? AppColors.primaryLight : AppColors.primary,
                               ),
                         textDirection:
                             isAppUrdu ? TextDirection.rtl : TextDirection.ltr,
@@ -315,6 +263,58 @@ class PoemFeedCard extends ConsumerWidget {
                       color: isDark
                           ? AppColors.textSecondaryDark
                           : AppColors.textSecondaryLight,
+                    ),
+                  ),
+                // Social reason — below poet info
+                // Use Nastaleeq when content or app is Urdu
+                if (item.reason == 'FOLLOWING')
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text(
+                      (isUrdu || isAppUrdu) ? 'آپ کے پسندیدہ شاعر کی طرف سے' : 'From a poet you follow',
+                      style: (isUrdu || isAppUrdu)
+                          ? TextStyle(
+                              fontFamily: AppTypography.urduFontFamily,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: isDark ? AppColors.primaryLight : AppColors.primary,
+                              height: 1.5,
+                            )
+                          : GoogleFonts.roboto(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: isDark ? AppColors.primaryLight : AppColors.primary,
+                            ),
+                      textDirection: (isUrdu || isAppUrdu) ? TextDirection.rtl : TextDirection.ltr,
+                    ),
+                  ),
+                if (item.reason == 'TIME_CAPSULE')
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.bookmark, size: 12,
+                            color: isDark ? AppColors.secondaryLight : AppColors.secondary),
+                        const SizedBox(width: 3),
+                        Text(
+                          (isUrdu || isAppUrdu) ? 'آپ نے پہلے محفوظ کیا تھا' : 'You saved this before',
+                          style: (isUrdu || isAppUrdu)
+                              ? TextStyle(
+                                  fontFamily: AppTypography.urduFontFamily,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  color: isDark ? AppColors.secondaryLight : AppColors.secondary,
+                                  height: 1.5,
+                                )
+                              : GoogleFonts.roboto(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                  color: isDark ? AppColors.secondaryLight : AppColors.secondary,
+                                ),
+                          textDirection: (isUrdu || isAppUrdu) ? TextDirection.rtl : TextDirection.ltr,
+                        ),
+                      ],
                     ),
                   ),
               ],
@@ -471,6 +471,78 @@ class PoemFeedCard extends ConsumerWidget {
 
   Color _cardColor(bool isDark) {
     return isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
+  }
+
+  /// Splits the excerpt into lines, groups them as couplets (2 lines each),
+  /// and renders at least 2 couplets inside a tinted container.
+  /// Each verse auto-scales to fit on a single line — larger font for short
+  /// verses, smaller for long ones.
+  Widget _buildCoupletsBlock(
+    BuildContext context,
+    String excerpt,
+    bool isDark,
+    bool isUrdu,
+  ) {
+    // Split into non-empty lines
+    final lines = excerpt
+        .split('\n')
+        .map((l) => l.trim())
+        .where((l) => l.isNotEmpty)
+        .toList();
+
+    if (lines.isEmpty) return const SizedBox.shrink();
+
+    // Show at least 2 couplets (4 lines) when available
+    final maxLines = (lines.length >= 4) ? 4 : lines.length;
+    final visibleLines = lines.sublist(0, maxLines);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm + 4,
+      ),
+      decoration: BoxDecoration(
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.04)
+            : AppColors.primary.withValues(alpha: 0.04),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+      ),
+      child: Column(
+        children: [
+          for (int i = 0; i < visibleLines.length; i++) ...[
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                visibleLines[i],
+                style: isUrdu
+                    ? AppTypography.urduVerseStyle.copyWith(
+                        fontSize: 21,
+                        color: isDark
+                            ? AppColors.textPrimaryDark
+                            : AppColors.textPrimaryLight,
+                        height: 1.8,
+                      )
+                    : Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontSize: 17,
+                          color: isDark
+                              ? AppColors.textPrimaryDark
+                              : AppColors.textPrimaryLight,
+                          fontStyle: FontStyle.italic,
+                          height: 1.6,
+                        ),
+                textDirection: isUrdu ? TextDirection.rtl : TextDirection.ltr,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+              ),
+            ),
+            // Small gap within couplet, larger between couplets
+            if (i < visibleLines.length - 1)
+              SizedBox(height: (i % 2 == 1) ? 10 : 2),
+          ],
+        ],
+      ),
+    );
   }
 
   Map<String, int>? _parseReactionsByType(Map<String, dynamic>? reactions) {

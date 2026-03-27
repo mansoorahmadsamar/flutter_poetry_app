@@ -66,38 +66,6 @@ class CoupletFeedCard extends ConsumerWidget {
             children: [
               _buildHeader(context, isDark, isUrdu, isAppUrdu),
 
-              // "From a poet you follow" / "You saved this before"
-              if (item.reason == 'FOLLOWING') ...[
-                const SizedBox(height: 4),
-                Text(
-                  isAppUrdu ? 'آپ کے پسندیدہ شاعر کی طرف سے' : 'From a poet you follow',
-                  style: GoogleFonts.roboto(
-                    fontSize: 11,
-                    color: isDark ? const Color(0xFF64B5F6) : const Color(0xFF1565C0),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-              if (item.reason == 'TIME_CAPSULE') ...[
-                const SizedBox(height: 4),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.bookmark, size: 13,
-                        color: isDark ? const Color(0xFFFFB74D) : const Color(0xFFE65100)),
-                    const SizedBox(width: 4),
-                    Text(
-                      isAppUrdu ? 'آپ نے پہلے محفوظ کیا تھا' : 'You saved this before',
-                      style: GoogleFonts.roboto(
-                        fontSize: 11,
-                        color: isDark ? const Color(0xFFFFB74D) : const Color(0xFFE65100),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-
               const SizedBox(height: AppSpacing.feedSectionGap),
 
               // Social proof
@@ -141,25 +109,25 @@ class CoupletFeedCard extends ConsumerWidget {
 
               // "Open poem →" CTA
               if (data.poemPublicId != null) ...[
-                const SizedBox(height: AppSpacing.sm),
+                const SizedBox(height: AppSpacing.md),
                 Align(
                   alignment: Alignment.center,
                   child: GestureDetector(
                     onTap: () => _onTap(context, ref),
                     child: Text(
-                      isAppUrdu ? 'مزید پڑھیے' : 'Open poem →',
+                      isAppUrdu ? 'مزید پڑھیے  ←' : 'Open poem →',
                       style: isAppUrdu
                           ? TextStyle(
                               fontFamily: AppTypography.urduFontFamily,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.feedAccent,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                              color: isDark ? AppColors.primaryLight : AppColors.primary,
                               height: 1.6,
                             )
                           : GoogleFonts.roboto(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.feedAccent,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: isDark ? AppColors.primaryLight : AppColors.primary,
                             ),
                       textDirection:
                           isAppUrdu ? TextDirection.rtl : TextDirection.ltr,
@@ -279,6 +247,56 @@ class CoupletFeedCard extends ConsumerWidget {
                       color: isDark
                           ? AppColors.textSecondaryDark
                           : AppColors.textSecondaryLight,
+                    ),
+                  ),
+                if (item.reason == 'FOLLOWING')
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text(
+                      (isUrdu || isAppUrdu) ? 'آپ کے پسندیدہ شاعر کی طرف سے' : 'From a poet you follow',
+                      style: (isUrdu || isAppUrdu)
+                          ? TextStyle(
+                              fontFamily: AppTypography.urduFontFamily,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: isDark ? AppColors.primaryLight : AppColors.primary,
+                              height: 1.5,
+                            )
+                          : GoogleFonts.roboto(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: isDark ? AppColors.primaryLight : AppColors.primary,
+                            ),
+                      textDirection: (isUrdu || isAppUrdu) ? TextDirection.rtl : TextDirection.ltr,
+                    ),
+                  ),
+                if (item.reason == 'TIME_CAPSULE')
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.bookmark, size: 12,
+                            color: isDark ? AppColors.secondaryLight : AppColors.secondary),
+                        const SizedBox(width: 3),
+                        Text(
+                          (isUrdu || isAppUrdu) ? 'آپ نے پہلے محفوظ کیا تھا' : 'You saved this before',
+                          style: (isUrdu || isAppUrdu)
+                              ? TextStyle(
+                                  fontFamily: AppTypography.urduFontFamily,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  color: isDark ? AppColors.secondaryLight : AppColors.secondary,
+                                  height: 1.5,
+                                )
+                              : GoogleFonts.roboto(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                  color: isDark ? AppColors.secondaryLight : AppColors.secondary,
+                                ),
+                          textDirection: (isUrdu || isAppUrdu) ? TextDirection.rtl : TextDirection.ltr,
+                        ),
+                      ],
                     ),
                   ),
               ],
