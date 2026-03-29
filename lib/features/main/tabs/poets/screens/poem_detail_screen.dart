@@ -1,11 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
+import 'package:flutter_poetry_app/features/engagement/providers/bookmark_providers.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/reaction_providers.dart';
+import 'package:flutter_poetry_app/features/engagement/widgets/reaction_button.dart';
 import '../models/poem_model.dart';
 import '../models/couplet_model.dart';
 import '../providers/poem_providers.dart';
@@ -305,31 +308,25 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
 
   // ────────────────────────────────────────────────────────────
   // Poem-level engagement bar
-  // Aggregates across all couplets + poem-level reactions
   // ────────────────────────────────────────────────────────────
 
   Widget _buildPoemEngagementBar(BuildContext context, PoemModel poem, List<CoupletModel>? couplets) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Aggregate totals across all couplets
-    int totalReactions = 0;
-    int totalSaves = 0;
-    int totalShares = 0;
+    // ── Aggregate across poem + all couplets ──
+    int totalSaves = poem.shareCount; // poem-level shares counted here
+    int totalShares = poem.shareCount;
     Map<String, int> aggregatedByType = {};
 
-    // Poem-level reactions
-    final poemTotal = (poem.reactions?['total'] as int?) ?? 0;
-    totalReactions += poemTotal;
+    // poem-level reactions
     if (poem.reactions?['byType'] != null) {
       final byType = Map<String, int>.from(poem.reactions!['byType'] as Map);
       byType.forEach((k, v) => aggregatedByType[k] = (aggregatedByType[k] ?? 0) + v);
     }
 
-    // Couplet-level aggregation
+    // couplet-level aggregation
     if (couplets != null) {
       for (final c in couplets) {
-        final ct = (c.reactions?['total'] as int?) ?? 0;
-        totalReactions += ct;
         totalSaves += c.bookmarkCount;
         totalShares += c.shareCount;
         if (c.reactions?['byType'] != null) {
@@ -339,33 +336,36 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
       }
     }
 
-    // Also add poem-level saves/shares
-    totalSaves += (poem.isBookmarkedByCurrentUser == true ? 1 : 0);
-    totalShares += poem.shareCount;
+    final totalReactions = aggregatedByType.values.fold(0, (s, v) => s + v);
 
-    final reactionTypesAsync = ref.watch(reactionTypesProvider);
-    final reactionTypes = reactionTypesAsync.valueOrNull ?? [];
+    final reactionTypes = ref.watch(reactionTypesProvider).valueOrNull ?? [];
 
-    // Top 3 reaction emoji by count
+    // ── Pick top-3, break ties randomly ──
     List<MapEntry<String, int>> topReactions = [];
     if (aggregatedByType.isNotEmpty) {
-      topReactions = aggregatedByType.entries.toList()
-        ..sort((a, b) => b.value.compareTo(a.value));
-      if (topReactions.length > 3) topReactions = topReactions.take(3).toList();
+      final sorted = aggregatedByType.entries.toList()
+        ..sort((a, b) {
+          final cmp = b.value.compareTo(a.value);
+          if (cmp != 0) return cmp;
+          // tie-break: stable random via hashCode so it doesn't flicker
+          return a.key.hashCode.compareTo(b.key.hashCode);
+        });
+      topReactions = sorted.take(3).toList();
     }
 
+    final isBookmarked = poem.isBookmarkedByCurrentUser ?? false;
+    final userReaction = poem.reactions?['userReaction'] as String?;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : Colors.white,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(
-          color: isDark ? AppColors.borderDark : AppColors.borderLight,
-        ),
+        border: Border.all(color: isDark ? AppColors.borderDark : AppColors.borderLight),
       ),
       child: Column(
         children: [
-          // Section label
+          // ── Section label ──
           Text(
             'غزل کا خلاصہ',
             style: TextStyle(
@@ -375,58 +375,57 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
               height: 1.6,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
 
-          // Reactions row
-          if (totalReactions > 0 || topReactions.isNotEmpty) ...[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Top reactions with individual counts
-                ...topReactions.map((e) {
-                  final rt = reactionTypes.isNotEmpty
-                      ? reactionTypes.firstWhere(
-                          (r) => r.key == e.key,
-                          orElse: () => reactionTypes.first,
-                        )
-                      : null;
-                  final emoji = rt?.emoji ?? '❤️';
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(emoji, style: const TextStyle(fontSize: 22)),
-                        const SizedBox(height: 2),
-                        Text(
-                          _fmt(e.value),
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: Colors.grey.shade500,
-                            fontWeight: FontWeight.w600,
+          // ── Reaction summary row ──
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: topReactions.isNotEmpty
+                ? topReactions.map((e) {
+                    final rt = reactionTypes.isNotEmpty
+                        ? reactionTypes.firstWhere(
+                            (r) => r.key == e.key,
+                            orElse: () => reactionTypes.first,
+                          )
+                        : null;
+                    final emoji = rt?.emoji ?? '❤️';
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(emoji, style: const TextStyle(fontSize: 24)),
+                          const SizedBox(height: 3),
+                          Text(
+                            _fmt(e.value),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey.shade500,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  );
-                }),
-                // If no byType data but we have a total
-                if (topReactions.isEmpty && totalReactions > 0) ...[
-                  const Text('❤️', style: TextStyle(fontSize: 22)),
-                  const SizedBox(width: 6),
-                  Text(
-                    _fmt(totalReactions),
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-                  ),
-                ],
-              ],
+                        ],
+                      ),
+                    );
+                  }).toList()
+                // No reactions yet — show placeholder heart without count
+                : [const Text('❤️', style: TextStyle(fontSize: 24))],
+          ),
+
+          // Total count below emoji row (only when > 0)
+          if (totalReactions > 0) ...[
+            const SizedBox(height: 4),
+            Text(
+              '${_fmt(totalReactions)} ردعمل',
+              style: TextStyle(fontSize: 11, color: Colors.grey.shade400),
             ),
-            const SizedBox(height: 10),
-            const Divider(height: 1, thickness: 0.5, color: AppColors.dividerLight),
-            const SizedBox(height: 10),
           ],
 
-          // Saves • Views • Shares
+          const SizedBox(height: 12),
+          const Divider(height: 1, thickness: 0.5, color: AppColors.dividerLight),
+          const SizedBox(height: 10),
+
+          // ── Stats row: views · saves · shares ──
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -435,6 +434,71 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
               _statItem(Icons.bookmark_border, _fmt(totalSaves), isDark),
               _dividerDot(isDark),
               _statItem(Icons.share_outlined, _fmt(totalShares), isDark),
+            ],
+          ),
+
+          const SizedBox(height: 12),
+          const Divider(height: 1, thickness: 0.5, color: AppColors.dividerLight),
+          const SizedBox(height: 8),
+
+          // ── Poem-level actions: React · Save · Share ──
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              // React to whole poem
+              ReactionButton(
+                userReaction: userReaction,
+                totalCount: (poem.reactions?['total'] as int?) ?? 0,
+                reactionsByType: poem.reactions?['byType'] != null
+                    ? Map<String, int>.from(poem.reactions!['byType'] as Map)
+                    : null,
+                size: ReactionButtonSize.compact,
+                onReact: (reactionType) async {
+                  try {
+                    await ref.read(reactionActionProvider.notifier).react(
+                          targetType: 'poems',
+                          publicId: poem.publicId,
+                          reactionType: reactionType,
+                        );
+                  } catch (_) {}
+                },
+              ),
+
+              // Save / bookmark poem
+              InkWell(
+                onTap: () async {
+                  try {
+                    await ref.read(bookmarkActionProvider.notifier)
+                        .toggleBookmark(poem.publicId, lang: _selectedScript);
+                  } catch (_) {}
+                },
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  child: Icon(
+                    isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+                    size: 22,
+                    color: isBookmarked ? AppColors.primary : AppColors.textSecondaryLight,
+                  ),
+                ),
+              ),
+
+              // Share poem
+              InkWell(
+                onTap: () => showModalBottomSheet(
+                  context: context,
+                  builder: (_) => _PoemShareSheet(poem: poem),
+                ),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  child: Icon(
+                    Icons.share_outlined,
+                    size: 22,
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+              ),
             ],
           ),
         ],
@@ -497,6 +561,120 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
             ElevatedButton(
               onPressed: () => Navigator.pop(context),
               child: const Text('Go Back'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Poem-level share sheet
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _PoemShareSheet extends StatelessWidget {
+  final PoemModel poem;
+
+  const _PoemShareSheet({required this.poem});
+
+  @override
+  Widget build(BuildContext context) {
+    final title = poem.title ?? poem.contents.firstOrNull?.title ?? '';
+    final excerpt = poem.excerpt ?? poem.contents.firstOrNull?.fullText.split('\n').take(4).join('\n') ?? '';
+    final shareText = title.isNotEmpty ? '$title\n\n$excerpt' : excerpt;
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 36,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'شعر شیئر کریں',
+              style: TextStyle(
+                fontFamily: _nastaleeq,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _ShareOption(
+              icon: Icons.copy_outlined,
+              label: 'متن کاپی کریں',
+              onTap: () {
+                Navigator.pop(context);
+                // Copy poem text to clipboard
+                final clipboardData = ClipboardData(text: shareText);
+                Clipboard.setData(clipboardData);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('کاپی ہو گیا'),
+                    duration: Duration(seconds: 1),
+                  ),
+                );
+              },
+            ),
+            _ShareOption(
+              icon: Icons.image_outlined,
+              label: 'تصویر کے طور پر شیئر کریں',
+              onTap: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('جلد آ رہا ہے'),
+                    duration: Duration(seconds: 1),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ShareOption extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _ShareOption({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        child: Row(
+          children: [
+            Icon(icon, size: 22, color: AppColors.primary),
+            const SizedBox(width: 16),
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: _nastaleeq,
+                fontSize: 16,
+                color: AppColors.textPrimaryLight,
+              ),
             ),
           ],
         ),
