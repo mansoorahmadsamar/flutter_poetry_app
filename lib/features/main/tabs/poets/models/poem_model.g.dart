@@ -6,6 +6,60 @@ part of 'poem_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+_$PoetSummaryModelImpl _$$PoetSummaryModelImplFromJson(
+        Map<String, dynamic> json) =>
+    _$PoetSummaryModelImpl(
+      publicId: json['publicId'] as String,
+      name: json['name'] as String,
+      shortBio: json['shortBio'] as String?,
+      birthYear: (json['birthYear'] as num?)?.toInt(),
+      deathYear: (json['deathYear'] as num?)?.toInt(),
+      profileImageUrl: json['profileImageUrl'] as String?,
+      gender: json['gender'] as String?,
+      era: json['era'] as String?,
+      poemCount: (json['poemCount'] as num?)?.toInt(),
+      viewCount: (json['viewCount'] as num?)?.toInt(),
+      isFeatured: json['isFeatured'] as bool?,
+      isTrending: json['isTrending'] as bool?,
+      birthPlace: json['birthPlace'] as String?,
+      country: json['country'] as String?,
+      countryFlag: json['countryFlag'] as String?,
+      countryFlagUrl: json['countryFlagUrl'] as String?,
+      isActive: json['isActive'] as bool?,
+      topTags: (json['topTags'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      tagSlugs: (json['tagSlugs'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+    );
+
+Map<String, dynamic> _$$PoetSummaryModelImplToJson(
+        _$PoetSummaryModelImpl instance) =>
+    <String, dynamic>{
+      'publicId': instance.publicId,
+      'name': instance.name,
+      'shortBio': instance.shortBio,
+      'birthYear': instance.birthYear,
+      'deathYear': instance.deathYear,
+      'profileImageUrl': instance.profileImageUrl,
+      'gender': instance.gender,
+      'era': instance.era,
+      'poemCount': instance.poemCount,
+      'viewCount': instance.viewCount,
+      'isFeatured': instance.isFeatured,
+      'isTrending': instance.isTrending,
+      'birthPlace': instance.birthPlace,
+      'country': instance.country,
+      'countryFlag': instance.countryFlag,
+      'countryFlagUrl': instance.countryFlagUrl,
+      'isActive': instance.isActive,
+      'topTags': instance.topTags,
+      'tagSlugs': instance.tagSlugs,
+    };
+
 _$PoemModelImpl _$$PoemModelImplFromJson(Map<String, dynamic> json) =>
     _$PoemModelImpl(
       publicId: json['publicId'] as String,
@@ -61,6 +115,13 @@ _$PoemModelImpl _$$PoemModelImplFromJson(Map<String, dynamic> json) =>
       title: json['title'] as String?,
       excerpt: json['excerpt'] as String?,
       reactions: json['reactions'] as Map<String, dynamic>?,
+      poet: json['poet'] == null
+          ? null
+          : PoetSummaryModel.fromJson(json['poet'] as Map<String, dynamic>),
+      couplets: (json['couplets'] as List<dynamic>?)
+              ?.map((e) => CoupletModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$$PoemModelImplToJson(_$PoemModelImpl instance) =>
@@ -101,6 +162,8 @@ Map<String, dynamic> _$$PoemModelImplToJson(_$PoemModelImpl instance) =>
       'title': instance.title,
       'excerpt': instance.excerpt,
       'reactions': instance.reactions,
+      'poet': instance.poet,
+      'couplets': instance.couplets,
     };
 
 _$PoemContentModelImpl _$$PoemContentModelImplFromJson(

@@ -29,9 +29,9 @@ mixin _$CoupletModel {
   int get bookmarkCount => throw _privateConstructorUsedError;
   int get shareCount => throw _privateConstructorUsedError;
   @JsonKey(name: 'isLiked')
-  bool get isLikedByCurrentUser => throw _privateConstructorUsedError;
+  bool? get isLikedByCurrentUser => throw _privateConstructorUsedError;
   @JsonKey(name: 'isBookmarked')
-  bool get isBookmarkedByCurrentUser => throw _privateConstructorUsedError;
+  bool? get isBookmarkedByCurrentUser => throw _privateConstructorUsedError;
   List<String> get tagSlugs => throw _privateConstructorUsedError;
   DateTime? get createdAt =>
       throw _privateConstructorUsedError; // Reactions system (Section 19)
@@ -58,8 +58,8 @@ abstract class $CoupletModelCopyWith<$Res> {
       int likeCount,
       int bookmarkCount,
       int shareCount,
-      @JsonKey(name: 'isLiked') bool isLikedByCurrentUser,
-      @JsonKey(name: 'isBookmarked') bool isBookmarkedByCurrentUser,
+      @JsonKey(name: 'isLiked') bool? isLikedByCurrentUser,
+      @JsonKey(name: 'isBookmarked') bool? isBookmarkedByCurrentUser,
       List<String> tagSlugs,
       DateTime? createdAt,
       Map<String, dynamic>? reactions});
@@ -86,8 +86,8 @@ class _$CoupletModelCopyWithImpl<$Res, $Val extends CoupletModel>
     Object? likeCount = null,
     Object? bookmarkCount = null,
     Object? shareCount = null,
-    Object? isLikedByCurrentUser = null,
-    Object? isBookmarkedByCurrentUser = null,
+    Object? isLikedByCurrentUser = freezed,
+    Object? isBookmarkedByCurrentUser = freezed,
     Object? tagSlugs = null,
     Object? createdAt = freezed,
     Object? reactions = freezed,
@@ -125,14 +125,14 @@ class _$CoupletModelCopyWithImpl<$Res, $Val extends CoupletModel>
           ? _value.shareCount
           : shareCount // ignore: cast_nullable_to_non_nullable
               as int,
-      isLikedByCurrentUser: null == isLikedByCurrentUser
+      isLikedByCurrentUser: freezed == isLikedByCurrentUser
           ? _value.isLikedByCurrentUser
           : isLikedByCurrentUser // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isBookmarkedByCurrentUser: null == isBookmarkedByCurrentUser
+              as bool?,
+      isBookmarkedByCurrentUser: freezed == isBookmarkedByCurrentUser
           ? _value.isBookmarkedByCurrentUser
           : isBookmarkedByCurrentUser // ignore: cast_nullable_to_non_nullable
-              as bool,
+              as bool?,
       tagSlugs: null == tagSlugs
           ? _value.tagSlugs
           : tagSlugs // ignore: cast_nullable_to_non_nullable
@@ -166,8 +166,8 @@ abstract class _$$CoupletModelImplCopyWith<$Res>
       int likeCount,
       int bookmarkCount,
       int shareCount,
-      @JsonKey(name: 'isLiked') bool isLikedByCurrentUser,
-      @JsonKey(name: 'isBookmarked') bool isBookmarkedByCurrentUser,
+      @JsonKey(name: 'isLiked') bool? isLikedByCurrentUser,
+      @JsonKey(name: 'isBookmarked') bool? isBookmarkedByCurrentUser,
       List<String> tagSlugs,
       DateTime? createdAt,
       Map<String, dynamic>? reactions});
@@ -192,8 +192,8 @@ class __$$CoupletModelImplCopyWithImpl<$Res>
     Object? likeCount = null,
     Object? bookmarkCount = null,
     Object? shareCount = null,
-    Object? isLikedByCurrentUser = null,
-    Object? isBookmarkedByCurrentUser = null,
+    Object? isLikedByCurrentUser = freezed,
+    Object? isBookmarkedByCurrentUser = freezed,
     Object? tagSlugs = null,
     Object? createdAt = freezed,
     Object? reactions = freezed,
@@ -231,14 +231,14 @@ class __$$CoupletModelImplCopyWithImpl<$Res>
           ? _value.shareCount
           : shareCount // ignore: cast_nullable_to_non_nullable
               as int,
-      isLikedByCurrentUser: null == isLikedByCurrentUser
+      isLikedByCurrentUser: freezed == isLikedByCurrentUser
           ? _value.isLikedByCurrentUser
           : isLikedByCurrentUser // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isBookmarkedByCurrentUser: null == isBookmarkedByCurrentUser
+              as bool?,
+      isBookmarkedByCurrentUser: freezed == isBookmarkedByCurrentUser
           ? _value.isBookmarkedByCurrentUser
           : isBookmarkedByCurrentUser // ignore: cast_nullable_to_non_nullable
-              as bool,
+              as bool?,
       tagSlugs: null == tagSlugs
           ? _value._tagSlugs
           : tagSlugs // ignore: cast_nullable_to_non_nullable
@@ -267,8 +267,8 @@ class _$CoupletModelImpl implements _CoupletModel {
       this.likeCount = 0,
       this.bookmarkCount = 0,
       this.shareCount = 0,
-      @JsonKey(name: 'isLiked') required this.isLikedByCurrentUser,
-      @JsonKey(name: 'isBookmarked') required this.isBookmarkedByCurrentUser,
+      @JsonKey(name: 'isLiked') this.isLikedByCurrentUser,
+      @JsonKey(name: 'isBookmarked') this.isBookmarkedByCurrentUser,
       final List<String> tagSlugs = const [],
       this.createdAt,
       final Map<String, dynamic>? reactions})
@@ -306,10 +306,10 @@ class _$CoupletModelImpl implements _CoupletModel {
   final int shareCount;
   @override
   @JsonKey(name: 'isLiked')
-  final bool isLikedByCurrentUser;
+  final bool? isLikedByCurrentUser;
   @override
   @JsonKey(name: 'isBookmarked')
-  final bool isBookmarkedByCurrentUser;
+  final bool? isBookmarkedByCurrentUser;
   final List<String> _tagSlugs;
   @override
   @JsonKey()
@@ -412,9 +412,8 @@ abstract class _CoupletModel implements CoupletModel {
       final int likeCount,
       final int bookmarkCount,
       final int shareCount,
-      @JsonKey(name: 'isLiked') required final bool isLikedByCurrentUser,
-      @JsonKey(name: 'isBookmarked')
-      required final bool isBookmarkedByCurrentUser,
+      @JsonKey(name: 'isLiked') final bool? isLikedByCurrentUser,
+      @JsonKey(name: 'isBookmarked') final bool? isBookmarkedByCurrentUser,
       final List<String> tagSlugs,
       final DateTime? createdAt,
       final Map<String, dynamic>? reactions}) = _$CoupletModelImpl;
@@ -440,10 +439,10 @@ abstract class _CoupletModel implements CoupletModel {
   int get shareCount;
   @override
   @JsonKey(name: 'isLiked')
-  bool get isLikedByCurrentUser;
+  bool? get isLikedByCurrentUser;
   @override
   @JsonKey(name: 'isBookmarked')
-  bool get isBookmarkedByCurrentUser;
+  bool? get isBookmarkedByCurrentUser;
   @override
   List<String> get tagSlugs;
   @override
@@ -481,9 +480,9 @@ mixin _$CoupletDetailResponse {
   int get bookmarkCount => throw _privateConstructorUsedError;
   int get shareCount => throw _privateConstructorUsedError;
   @JsonKey(name: 'isLiked')
-  bool get isLikedByCurrentUser => throw _privateConstructorUsedError;
+  bool? get isLikedByCurrentUser => throw _privateConstructorUsedError;
   @JsonKey(name: 'isBookmarked')
-  bool get isBookmarkedByCurrentUser => throw _privateConstructorUsedError;
+  bool? get isBookmarkedByCurrentUser => throw _privateConstructorUsedError;
   List<String> get tagSlugs => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get updatedAt =>
@@ -518,8 +517,8 @@ abstract class $CoupletDetailResponseCopyWith<$Res> {
       int likeCount,
       int bookmarkCount,
       int shareCount,
-      @JsonKey(name: 'isLiked') bool isLikedByCurrentUser,
-      @JsonKey(name: 'isBookmarked') bool isBookmarkedByCurrentUser,
+      @JsonKey(name: 'isLiked') bool? isLikedByCurrentUser,
+      @JsonKey(name: 'isBookmarked') bool? isBookmarkedByCurrentUser,
       List<String> tagSlugs,
       DateTime? createdAt,
       DateTime? updatedAt,
@@ -555,8 +554,8 @@ class _$CoupletDetailResponseCopyWithImpl<$Res,
     Object? likeCount = null,
     Object? bookmarkCount = null,
     Object? shareCount = null,
-    Object? isLikedByCurrentUser = null,
-    Object? isBookmarkedByCurrentUser = null,
+    Object? isLikedByCurrentUser = freezed,
+    Object? isBookmarkedByCurrentUser = freezed,
     Object? tagSlugs = null,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
@@ -623,14 +622,14 @@ class _$CoupletDetailResponseCopyWithImpl<$Res,
           ? _value.shareCount
           : shareCount // ignore: cast_nullable_to_non_nullable
               as int,
-      isLikedByCurrentUser: null == isLikedByCurrentUser
+      isLikedByCurrentUser: freezed == isLikedByCurrentUser
           ? _value.isLikedByCurrentUser
           : isLikedByCurrentUser // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isBookmarkedByCurrentUser: null == isBookmarkedByCurrentUser
+              as bool?,
+      isBookmarkedByCurrentUser: freezed == isBookmarkedByCurrentUser
           ? _value.isBookmarkedByCurrentUser
           : isBookmarkedByCurrentUser // ignore: cast_nullable_to_non_nullable
-              as bool,
+              as bool?,
       tagSlugs: null == tagSlugs
           ? _value.tagSlugs
           : tagSlugs // ignore: cast_nullable_to_non_nullable
@@ -676,8 +675,8 @@ abstract class _$$CoupletDetailResponseImplCopyWith<$Res>
       int likeCount,
       int bookmarkCount,
       int shareCount,
-      @JsonKey(name: 'isLiked') bool isLikedByCurrentUser,
-      @JsonKey(name: 'isBookmarked') bool isBookmarkedByCurrentUser,
+      @JsonKey(name: 'isLiked') bool? isLikedByCurrentUser,
+      @JsonKey(name: 'isBookmarked') bool? isBookmarkedByCurrentUser,
       List<String> tagSlugs,
       DateTime? createdAt,
       DateTime? updatedAt,
@@ -711,8 +710,8 @@ class __$$CoupletDetailResponseImplCopyWithImpl<$Res>
     Object? likeCount = null,
     Object? bookmarkCount = null,
     Object? shareCount = null,
-    Object? isLikedByCurrentUser = null,
-    Object? isBookmarkedByCurrentUser = null,
+    Object? isLikedByCurrentUser = freezed,
+    Object? isBookmarkedByCurrentUser = freezed,
     Object? tagSlugs = null,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
@@ -779,14 +778,14 @@ class __$$CoupletDetailResponseImplCopyWithImpl<$Res>
           ? _value.shareCount
           : shareCount // ignore: cast_nullable_to_non_nullable
               as int,
-      isLikedByCurrentUser: null == isLikedByCurrentUser
+      isLikedByCurrentUser: freezed == isLikedByCurrentUser
           ? _value.isLikedByCurrentUser
           : isLikedByCurrentUser // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isBookmarkedByCurrentUser: null == isBookmarkedByCurrentUser
+              as bool?,
+      isBookmarkedByCurrentUser: freezed == isBookmarkedByCurrentUser
           ? _value.isBookmarkedByCurrentUser
           : isBookmarkedByCurrentUser // ignore: cast_nullable_to_non_nullable
-              as bool,
+              as bool?,
       tagSlugs: null == tagSlugs
           ? _value._tagSlugs
           : tagSlugs // ignore: cast_nullable_to_non_nullable
@@ -826,8 +825,8 @@ class _$CoupletDetailResponseImpl implements _CoupletDetailResponse {
       this.likeCount = 0,
       this.bookmarkCount = 0,
       this.shareCount = 0,
-      @JsonKey(name: 'isLiked') required this.isLikedByCurrentUser,
-      @JsonKey(name: 'isBookmarked') required this.isBookmarkedByCurrentUser,
+      @JsonKey(name: 'isLiked') this.isLikedByCurrentUser,
+      @JsonKey(name: 'isBookmarked') this.isBookmarkedByCurrentUser,
       final List<String> tagSlugs = const [],
       this.createdAt,
       this.updatedAt,
@@ -883,10 +882,10 @@ class _$CoupletDetailResponseImpl implements _CoupletDetailResponse {
   final int shareCount;
   @override
   @JsonKey(name: 'isLiked')
-  final bool isLikedByCurrentUser;
+  final bool? isLikedByCurrentUser;
   @override
   @JsonKey(name: 'isBookmarked')
-  final bool isBookmarkedByCurrentUser;
+  final bool? isBookmarkedByCurrentUser;
   final List<String> _tagSlugs;
   @override
   @JsonKey()
@@ -1024,9 +1023,8 @@ abstract class _CoupletDetailResponse implements CoupletDetailResponse {
       final int likeCount,
       final int bookmarkCount,
       final int shareCount,
-      @JsonKey(name: 'isLiked') required final bool isLikedByCurrentUser,
-      @JsonKey(name: 'isBookmarked')
-      required final bool isBookmarkedByCurrentUser,
+      @JsonKey(name: 'isLiked') final bool? isLikedByCurrentUser,
+      @JsonKey(name: 'isBookmarked') final bool? isBookmarkedByCurrentUser,
       final List<String> tagSlugs,
       final DateTime? createdAt,
       final DateTime? updatedAt,
@@ -1067,10 +1065,10 @@ abstract class _CoupletDetailResponse implements CoupletDetailResponse {
   int get shareCount;
   @override
   @JsonKey(name: 'isLiked')
-  bool get isLikedByCurrentUser;
+  bool? get isLikedByCurrentUser;
   @override
   @JsonKey(name: 'isBookmarked')
-  bool get isBookmarkedByCurrentUser;
+  bool? get isBookmarkedByCurrentUser;
   @override
   List<String> get tagSlugs;
   @override
@@ -1111,9 +1109,9 @@ mixin _$BookmarkedCoupletResponse {
   int get likeCount => throw _privateConstructorUsedError;
   int get bookmarkCount => throw _privateConstructorUsedError;
   @JsonKey(name: 'isLiked')
-  bool get isLikedByCurrentUser => throw _privateConstructorUsedError;
+  bool? get isLikedByCurrentUser => throw _privateConstructorUsedError;
   @JsonKey(name: 'isBookmarked')
-  bool get isBookmarkedByCurrentUser => throw _privateConstructorUsedError;
+  bool? get isBookmarkedByCurrentUser => throw _privateConstructorUsedError;
   List<String> get tagSlugs => throw _privateConstructorUsedError;
   DateTime? get bookmarkedAt => throw _privateConstructorUsedError;
 
@@ -1145,8 +1143,8 @@ abstract class $BookmarkedCoupletResponseCopyWith<$Res> {
       String? poetProfileImageUrl,
       int likeCount,
       int bookmarkCount,
-      @JsonKey(name: 'isLiked') bool isLikedByCurrentUser,
-      @JsonKey(name: 'isBookmarked') bool isBookmarkedByCurrentUser,
+      @JsonKey(name: 'isLiked') bool? isLikedByCurrentUser,
+      @JsonKey(name: 'isBookmarked') bool? isBookmarkedByCurrentUser,
       List<String> tagSlugs,
       DateTime? bookmarkedAt});
 }
@@ -1180,8 +1178,8 @@ class _$BookmarkedCoupletResponseCopyWithImpl<$Res,
     Object? poetProfileImageUrl = freezed,
     Object? likeCount = null,
     Object? bookmarkCount = null,
-    Object? isLikedByCurrentUser = null,
-    Object? isBookmarkedByCurrentUser = null,
+    Object? isLikedByCurrentUser = freezed,
+    Object? isBookmarkedByCurrentUser = freezed,
     Object? tagSlugs = null,
     Object? bookmarkedAt = freezed,
   }) {
@@ -1246,14 +1244,14 @@ class _$BookmarkedCoupletResponseCopyWithImpl<$Res,
           ? _value.bookmarkCount
           : bookmarkCount // ignore: cast_nullable_to_non_nullable
               as int,
-      isLikedByCurrentUser: null == isLikedByCurrentUser
+      isLikedByCurrentUser: freezed == isLikedByCurrentUser
           ? _value.isLikedByCurrentUser
           : isLikedByCurrentUser // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isBookmarkedByCurrentUser: null == isBookmarkedByCurrentUser
+              as bool?,
+      isBookmarkedByCurrentUser: freezed == isBookmarkedByCurrentUser
           ? _value.isBookmarkedByCurrentUser
           : isBookmarkedByCurrentUser // ignore: cast_nullable_to_non_nullable
-              as bool,
+              as bool?,
       tagSlugs: null == tagSlugs
           ? _value.tagSlugs
           : tagSlugs // ignore: cast_nullable_to_non_nullable
@@ -1291,8 +1289,8 @@ abstract class _$$BookmarkedCoupletResponseImplCopyWith<$Res>
       String? poetProfileImageUrl,
       int likeCount,
       int bookmarkCount,
-      @JsonKey(name: 'isLiked') bool isLikedByCurrentUser,
-      @JsonKey(name: 'isBookmarked') bool isBookmarkedByCurrentUser,
+      @JsonKey(name: 'isLiked') bool? isLikedByCurrentUser,
+      @JsonKey(name: 'isBookmarked') bool? isBookmarkedByCurrentUser,
       List<String> tagSlugs,
       DateTime? bookmarkedAt});
 }
@@ -1325,8 +1323,8 @@ class __$$BookmarkedCoupletResponseImplCopyWithImpl<$Res>
     Object? poetProfileImageUrl = freezed,
     Object? likeCount = null,
     Object? bookmarkCount = null,
-    Object? isLikedByCurrentUser = null,
-    Object? isBookmarkedByCurrentUser = null,
+    Object? isLikedByCurrentUser = freezed,
+    Object? isBookmarkedByCurrentUser = freezed,
     Object? tagSlugs = null,
     Object? bookmarkedAt = freezed,
   }) {
@@ -1391,14 +1389,14 @@ class __$$BookmarkedCoupletResponseImplCopyWithImpl<$Res>
           ? _value.bookmarkCount
           : bookmarkCount // ignore: cast_nullable_to_non_nullable
               as int,
-      isLikedByCurrentUser: null == isLikedByCurrentUser
+      isLikedByCurrentUser: freezed == isLikedByCurrentUser
           ? _value.isLikedByCurrentUser
           : isLikedByCurrentUser // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isBookmarkedByCurrentUser: null == isBookmarkedByCurrentUser
+              as bool?,
+      isBookmarkedByCurrentUser: freezed == isBookmarkedByCurrentUser
           ? _value.isBookmarkedByCurrentUser
           : isBookmarkedByCurrentUser // ignore: cast_nullable_to_non_nullable
-              as bool,
+              as bool?,
       tagSlugs: null == tagSlugs
           ? _value._tagSlugs
           : tagSlugs // ignore: cast_nullable_to_non_nullable
@@ -1430,8 +1428,8 @@ class _$BookmarkedCoupletResponseImpl implements _BookmarkedCoupletResponse {
       this.poetProfileImageUrl,
       this.likeCount = 0,
       this.bookmarkCount = 0,
-      @JsonKey(name: 'isLiked') required this.isLikedByCurrentUser,
-      @JsonKey(name: 'isBookmarked') required this.isBookmarkedByCurrentUser,
+      @JsonKey(name: 'isLiked') this.isLikedByCurrentUser,
+      @JsonKey(name: 'isBookmarked') this.isBookmarkedByCurrentUser,
       final List<String> tagSlugs = const [],
       this.bookmarkedAt})
       : _verses = verses,
@@ -1483,10 +1481,10 @@ class _$BookmarkedCoupletResponseImpl implements _BookmarkedCoupletResponse {
   final int bookmarkCount;
   @override
   @JsonKey(name: 'isLiked')
-  final bool isLikedByCurrentUser;
+  final bool? isLikedByCurrentUser;
   @override
   @JsonKey(name: 'isBookmarked')
-  final bool isBookmarkedByCurrentUser;
+  final bool? isBookmarkedByCurrentUser;
   final List<String> _tagSlugs;
   @override
   @JsonKey()
@@ -1605,9 +1603,8 @@ abstract class _BookmarkedCoupletResponse implements BookmarkedCoupletResponse {
       final String? poetProfileImageUrl,
       final int likeCount,
       final int bookmarkCount,
-      @JsonKey(name: 'isLiked') required final bool isLikedByCurrentUser,
-      @JsonKey(name: 'isBookmarked')
-      required final bool isBookmarkedByCurrentUser,
+      @JsonKey(name: 'isLiked') final bool? isLikedByCurrentUser,
+      @JsonKey(name: 'isBookmarked') final bool? isBookmarkedByCurrentUser,
       final List<String> tagSlugs,
       final DateTime? bookmarkedAt}) = _$BookmarkedCoupletResponseImpl;
 
@@ -1646,10 +1643,10 @@ abstract class _BookmarkedCoupletResponse implements BookmarkedCoupletResponse {
   int get bookmarkCount;
   @override
   @JsonKey(name: 'isLiked')
-  bool get isLikedByCurrentUser;
+  bool? get isLikedByCurrentUser;
   @override
   @JsonKey(name: 'isBookmarked')
-  bool get isBookmarkedByCurrentUser;
+  bool? get isBookmarkedByCurrentUser;
   @override
   List<String> get tagSlugs;
   @override

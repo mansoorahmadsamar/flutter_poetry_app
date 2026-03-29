@@ -6,8 +6,7 @@ import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/core/widgets/localized_text.dart';
-import 'package:flutter_poetry_app/features/engagement/providers/couplet_providers.dart';
-import '../models/couplet_model.dart';
+import 'package:flutter_poetry_app/features/engagement/providers/reaction_providers.dart';
 import '../models/poem_model.dart';
 import '../providers/poem_providers.dart';
 import '../widgets/poem_more_from_poet_section.dart';
@@ -26,12 +25,8 @@ class PoemDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
-  // Used for reading card rendering and "more from poet" section.
-  // Always 'ur' for now — no toggle exposed to user.
   String _selectedScript = 'ur';
   bool _scriptInitialized = false;
-
-  // Which sher block is currently highlighted. null = none.
   int? _selectedSherIndex;
 
   @override
@@ -85,13 +80,9 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
   // ────────────────────────────────────────────────────────────
 
   Widget _buildContent(BuildContext context, PoemModel poem) {
-    final coupletsAsync = ref.watch(coupletsProvider(poem.publicId));
-
-    final couplets = coupletsAsync.when(
-      data: (c) => c,
-      loading: () => null,
-      error: (_, __) => const <CoupletModel>[],
-    );
+    // Use embedded couplets from v1.6.0 response — no separate provider needed.
+    // null = no couplets at all (trigger fullText fallback in reading card)
+    final couplets = poem.couplets.isNotEmpty ? poem.couplets : null;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 32),
@@ -113,7 +104,7 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
           ),
           const SizedBox(height: 16),
 
-          // 3. Compact stats row
+          // 3. Stats + reactions row
           _buildStatsRow(context, poem),
           const SizedBox(height: 20),
 
@@ -131,16 +122,28 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
   }
 
   // ────────────────────────────────────────────────────────────
-  // Poet hero header
+  // Poet hero header — uses v1.6.0 embedded poet object
   // ────────────────────────────────────────────────────────────
 
   Widget _buildPoetHeader(BuildContext context, PoemModel poem) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final hasImage = poem.poetProfileImageUrl != null &&
-        poem.poetProfileImageUrl!.isNotEmpty &&
-        poem.poetProfileImageUrl != '-';
-    final initials = _poetInitials(poem.poetName);
-    final typeLabel = poem.poetryTypeName ?? poem.poetryTypeUrduName ?? poem.poetryType;
+    final poet = poem.poet;
+
+    // Avatar source — prefer embedded poet.profileImageUrl
+    final imageUrl = poet?.profileImageUrl ?? poem.poetProfileImageUrl;
+    final hasImage = imageUrl != null && imageUrl.isNotEmpty && imageUrl != '-';
+    final initials = _poetInitials(poet?.name ?? poem.poetName);
+
+    // Sub-info line: era • years
+    final eraLabel = _eraLabel(poet?.era);
+    final years = _yearsLabel(poet?.birthYear, poet?.deathYear);
+    final subParts = [if (eraLabel != null) eraLabel, if (years != null) years];
+    final subLine = subParts.isNotEmpty ? subParts.join('  •  ') : null;
+
+    // Tags + poem count bottom row
+    final topTags = poet?.topTags ?? [];
+    final poemCount = poet?.poemCount;
+    final showBottomRow = topTags.isNotEmpty || poemCount != null;
 
     return Container(
       decoration: BoxDecoration(
@@ -157,59 +160,124 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        onTap: () => context.push('/main/poets/${poem.poetPublicId}'),
+        onTap: () => context.push('/main/poets/${poet?.publicId ?? poem.poetPublicId}'),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Avatar
-              CircleAvatar(
-                radius: 22,
-                backgroundColor: AppColors.primary,
-                child: ClipOval(
-                  child: hasImage
-                      ? CachedNetworkImage(
-                          imageUrl: poem.poetProfileImageUrl!,
-                          width: 44,
-                          height: 44,
-                          fit: BoxFit.cover,
-                          errorWidget: (_, __, ___) => _initialsWidget(initials),
-                        )
-                      : _initialsWidget(initials),
-                ),
-              ),
-              const SizedBox(width: 12),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Avatar
+                  CircleAvatar(
+                    radius: 24,
+                    backgroundColor: AppColors.primary,
+                    child: ClipOval(
+                      child: hasImage
+                          ? CachedNetworkImage(
+                              imageUrl: imageUrl,
+                              width: 48,
+                              height: 48,
+                              fit: BoxFit.cover,
+                              errorWidget: (_, __, ___) => _initialsWidget(initials),
+                            )
+                          : _initialsWidget(initials),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
 
-              // Name + type badge
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
+                  // Name + meta
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: LocalizedText(
+                                poet?.name ?? poem.poetName,
+                                style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+                              ),
+                            ),
+                            if (poet?.countryFlag != null) ...[
+                              const SizedBox(width: 6),
+                              Text(poet!.countryFlag!, style: const TextStyle(fontSize: 18)),
+                            ],
+                          ],
+                        ),
+                        if (subLine != null) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            subLine,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey.shade600,
+                              height: 1.3,
+                            ),
+                          ),
+                        ],
+                        if (poet != null && poet.shortBio != null && poet.shortBio!.isNotEmpty) ...[
+                          const SizedBox(height: 3),
+                          Text(
+                            poet.shortBio!,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey.shade500,
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+
+                  const Icon(Icons.chevron_right, size: 16, color: Colors.grey),
+                ],
+              ),
+
+              // Tags + poem count row
+              if (showBottomRow) ...[
+                const SizedBox(height: 10),
+                const Divider(height: 1, thickness: 0.5, color: AppColors.dividerLight),
+                const SizedBox(height: 8),
+                Row(
                   children: [
-                    LocalizedText(
-                      poem.poetName,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(height: 3),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.09),
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
+                    ...topTags.take(3).map((tag) => _tagChip(tag, isDark)),
+                    const Spacer(),
+                    if (poemCount != null)
+                      Text(
+                        '$poemCount نظمیں',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                      child: LocalizedText(
-                        typeLabel,
-                        style: const TextStyle(fontSize: 11, color: AppColors.primary),
-                      ),
-                    ),
                   ],
                 ),
-              ),
-
-              const Icon(Icons.chevron_right, size: 16, color: Colors.grey),
+              ],
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _tagChip(String tag, bool isDark) {
+    return Container(
+      margin: const EdgeInsets.only(right: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
+      ),
+      child: Text(
+        tag,
+        style: const TextStyle(fontSize: 11, color: AppColors.primary),
       ),
     );
   }
@@ -234,27 +302,96 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
     return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
   }
 
+  String? _eraLabel(String? era) => switch (era) {
+    'CLASSICAL' => 'کلاسیکی',
+    'MODERN' => 'جدید',
+    'CONTEMPORARY' => 'معاصر',
+    'SUFI' => 'صوفی',
+    'MEDIEVAL' => 'قرون وسطیٰ',
+    'ROMANTIC' => 'رومانوی',
+    _ => era,
+  };
+
+  String? _yearsLabel(int? birth, int? death) {
+    if (birth == null) return null;
+    if (death != null) return '$birth–$death';
+    return '$birth–';
+  }
+
   // ────────────────────────────────────────────────────────────
-  // Compact stats row
+  // Stats + reactions row
   // ────────────────────────────────────────────────────────────
 
   Widget _buildStatsRow(BuildContext context, PoemModel poem) {
-    final isLiked = poem.isLikedByCurrentUser ?? false;
-    final parts = [
-      '${_fmt(poem.viewCount)} views',
-      '${_fmt(poem.likeCount)} likes',
-      '${_fmt(poem.commentCount ?? 0)} comments',
-      '${_fmt(poem.shareCount)} shares',
-    ];
+    final reactionsMap = poem.reactions;
+    final total = (reactionsMap?['total'] as int?) ?? 0;
+    final byType = reactionsMap?['byType'] != null
+        ? Map<String, int>.from(reactionsMap!['byType'] as Map)
+        : null;
 
-    return Text(
-      parts.join('  •  '),
-      textAlign: TextAlign.center,
-      style: TextStyle(
-        fontSize: 12,
-        color: isLiked ? AppColors.feedLiked.withValues(alpha: 0.85) : Colors.grey,
-        height: 1.4,
-      ),
+    return Column(
+      children: [
+        if (total > 0) _buildReactionSummary(context, total, byType),
+        const SizedBox(height: 6),
+        Text(
+          '${_fmt(poem.viewCount)} مناظر  •  ${_fmt(poem.shareCount)} شیئر',
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 11, color: Colors.grey, height: 1.4),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildReactionSummary(BuildContext context, int total, Map<String, int>? byType) {
+    final reactionTypesAsync = ref.watch(reactionTypesProvider);
+    final reactionTypes = reactionTypesAsync.valueOrNull ?? [];
+
+    // Top 3 emoji by count
+    List<String> topEmoji = [];
+    if (byType != null && byType.isNotEmpty && reactionTypes.isNotEmpty) {
+      final sorted = byType.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+      topEmoji = sorted.take(3).map((e) {
+        return reactionTypes.firstWhere(
+          (r) => r.key == e.key,
+          orElse: () => reactionTypes.first,
+        ).emoji;
+      }).toList();
+    }
+    if (topEmoji.isEmpty) topEmoji = ['❤️'];
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(
+          width: topEmoji.length * 20.0 + 4,
+          height: 28,
+          child: Stack(
+            children: [
+              for (int i = 0; i < topEmoji.length; i++)
+                Positioned(
+                  left: i * 16.0,
+                  child: Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 1.5),
+                    ),
+                    child: Center(
+                      child: Text(topEmoji[i], style: const TextStyle(fontSize: 12)),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          '${_fmt(total)} ردعمل',
+          style: const TextStyle(fontSize: 12, color: Colors.grey),
+        ),
+      ],
     );
   }
 
@@ -294,5 +431,5 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
       ),
     );
   }
-
 }
+

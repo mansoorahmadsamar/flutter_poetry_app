@@ -14,6 +14,556 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
+PoetSummaryModel _$PoetSummaryModelFromJson(Map<String, dynamic> json) {
+  return _PoetSummaryModel.fromJson(json);
+}
+
+/// @nodoc
+mixin _$PoetSummaryModel {
+  String get publicId => throw _privateConstructorUsedError;
+  String get name => throw _privateConstructorUsedError;
+  String? get shortBio => throw _privateConstructorUsedError;
+  int? get birthYear => throw _privateConstructorUsedError;
+  int? get deathYear => throw _privateConstructorUsedError;
+  String? get profileImageUrl => throw _privateConstructorUsedError;
+  String? get gender => throw _privateConstructorUsedError;
+  String? get era => throw _privateConstructorUsedError;
+  int? get poemCount => throw _privateConstructorUsedError;
+  int? get viewCount => throw _privateConstructorUsedError;
+  bool? get isFeatured => throw _privateConstructorUsedError;
+  bool? get isTrending => throw _privateConstructorUsedError;
+  String? get birthPlace => throw _privateConstructorUsedError;
+  String? get country => throw _privateConstructorUsedError;
+  String? get countryFlag => throw _privateConstructorUsedError;
+  String? get countryFlagUrl => throw _privateConstructorUsedError;
+  bool? get isActive => throw _privateConstructorUsedError;
+  List<String> get topTags => throw _privateConstructorUsedError;
+  List<String> get tagSlugs => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $PoetSummaryModelCopyWith<PoetSummaryModel> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $PoetSummaryModelCopyWith<$Res> {
+  factory $PoetSummaryModelCopyWith(
+          PoetSummaryModel value, $Res Function(PoetSummaryModel) then) =
+      _$PoetSummaryModelCopyWithImpl<$Res, PoetSummaryModel>;
+  @useResult
+  $Res call(
+      {String publicId,
+      String name,
+      String? shortBio,
+      int? birthYear,
+      int? deathYear,
+      String? profileImageUrl,
+      String? gender,
+      String? era,
+      int? poemCount,
+      int? viewCount,
+      bool? isFeatured,
+      bool? isTrending,
+      String? birthPlace,
+      String? country,
+      String? countryFlag,
+      String? countryFlagUrl,
+      bool? isActive,
+      List<String> topTags,
+      List<String> tagSlugs});
+}
+
+/// @nodoc
+class _$PoetSummaryModelCopyWithImpl<$Res, $Val extends PoetSummaryModel>
+    implements $PoetSummaryModelCopyWith<$Res> {
+  _$PoetSummaryModelCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? publicId = null,
+    Object? name = null,
+    Object? shortBio = freezed,
+    Object? birthYear = freezed,
+    Object? deathYear = freezed,
+    Object? profileImageUrl = freezed,
+    Object? gender = freezed,
+    Object? era = freezed,
+    Object? poemCount = freezed,
+    Object? viewCount = freezed,
+    Object? isFeatured = freezed,
+    Object? isTrending = freezed,
+    Object? birthPlace = freezed,
+    Object? country = freezed,
+    Object? countryFlag = freezed,
+    Object? countryFlagUrl = freezed,
+    Object? isActive = freezed,
+    Object? topTags = null,
+    Object? tagSlugs = null,
+  }) {
+    return _then(_value.copyWith(
+      publicId: null == publicId
+          ? _value.publicId
+          : publicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      shortBio: freezed == shortBio
+          ? _value.shortBio
+          : shortBio // ignore: cast_nullable_to_non_nullable
+              as String?,
+      birthYear: freezed == birthYear
+          ? _value.birthYear
+          : birthYear // ignore: cast_nullable_to_non_nullable
+              as int?,
+      deathYear: freezed == deathYear
+          ? _value.deathYear
+          : deathYear // ignore: cast_nullable_to_non_nullable
+              as int?,
+      profileImageUrl: freezed == profileImageUrl
+          ? _value.profileImageUrl
+          : profileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      gender: freezed == gender
+          ? _value.gender
+          : gender // ignore: cast_nullable_to_non_nullable
+              as String?,
+      era: freezed == era
+          ? _value.era
+          : era // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poemCount: freezed == poemCount
+          ? _value.poemCount
+          : poemCount // ignore: cast_nullable_to_non_nullable
+              as int?,
+      viewCount: freezed == viewCount
+          ? _value.viewCount
+          : viewCount // ignore: cast_nullable_to_non_nullable
+              as int?,
+      isFeatured: freezed == isFeatured
+          ? _value.isFeatured
+          : isFeatured // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      isTrending: freezed == isTrending
+          ? _value.isTrending
+          : isTrending // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      birthPlace: freezed == birthPlace
+          ? _value.birthPlace
+          : birthPlace // ignore: cast_nullable_to_non_nullable
+              as String?,
+      country: freezed == country
+          ? _value.country
+          : country // ignore: cast_nullable_to_non_nullable
+              as String?,
+      countryFlag: freezed == countryFlag
+          ? _value.countryFlag
+          : countryFlag // ignore: cast_nullable_to_non_nullable
+              as String?,
+      countryFlagUrl: freezed == countryFlagUrl
+          ? _value.countryFlagUrl
+          : countryFlagUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isActive: freezed == isActive
+          ? _value.isActive
+          : isActive // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      topTags: null == topTags
+          ? _value.topTags
+          : topTags // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      tagSlugs: null == tagSlugs
+          ? _value.tagSlugs
+          : tagSlugs // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$PoetSummaryModelImplCopyWith<$Res>
+    implements $PoetSummaryModelCopyWith<$Res> {
+  factory _$$PoetSummaryModelImplCopyWith(_$PoetSummaryModelImpl value,
+          $Res Function(_$PoetSummaryModelImpl) then) =
+      __$$PoetSummaryModelImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String publicId,
+      String name,
+      String? shortBio,
+      int? birthYear,
+      int? deathYear,
+      String? profileImageUrl,
+      String? gender,
+      String? era,
+      int? poemCount,
+      int? viewCount,
+      bool? isFeatured,
+      bool? isTrending,
+      String? birthPlace,
+      String? country,
+      String? countryFlag,
+      String? countryFlagUrl,
+      bool? isActive,
+      List<String> topTags,
+      List<String> tagSlugs});
+}
+
+/// @nodoc
+class __$$PoetSummaryModelImplCopyWithImpl<$Res>
+    extends _$PoetSummaryModelCopyWithImpl<$Res, _$PoetSummaryModelImpl>
+    implements _$$PoetSummaryModelImplCopyWith<$Res> {
+  __$$PoetSummaryModelImplCopyWithImpl(_$PoetSummaryModelImpl _value,
+      $Res Function(_$PoetSummaryModelImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? publicId = null,
+    Object? name = null,
+    Object? shortBio = freezed,
+    Object? birthYear = freezed,
+    Object? deathYear = freezed,
+    Object? profileImageUrl = freezed,
+    Object? gender = freezed,
+    Object? era = freezed,
+    Object? poemCount = freezed,
+    Object? viewCount = freezed,
+    Object? isFeatured = freezed,
+    Object? isTrending = freezed,
+    Object? birthPlace = freezed,
+    Object? country = freezed,
+    Object? countryFlag = freezed,
+    Object? countryFlagUrl = freezed,
+    Object? isActive = freezed,
+    Object? topTags = null,
+    Object? tagSlugs = null,
+  }) {
+    return _then(_$PoetSummaryModelImpl(
+      publicId: null == publicId
+          ? _value.publicId
+          : publicId // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      shortBio: freezed == shortBio
+          ? _value.shortBio
+          : shortBio // ignore: cast_nullable_to_non_nullable
+              as String?,
+      birthYear: freezed == birthYear
+          ? _value.birthYear
+          : birthYear // ignore: cast_nullable_to_non_nullable
+              as int?,
+      deathYear: freezed == deathYear
+          ? _value.deathYear
+          : deathYear // ignore: cast_nullable_to_non_nullable
+              as int?,
+      profileImageUrl: freezed == profileImageUrl
+          ? _value.profileImageUrl
+          : profileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      gender: freezed == gender
+          ? _value.gender
+          : gender // ignore: cast_nullable_to_non_nullable
+              as String?,
+      era: freezed == era
+          ? _value.era
+          : era // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poemCount: freezed == poemCount
+          ? _value.poemCount
+          : poemCount // ignore: cast_nullable_to_non_nullable
+              as int?,
+      viewCount: freezed == viewCount
+          ? _value.viewCount
+          : viewCount // ignore: cast_nullable_to_non_nullable
+              as int?,
+      isFeatured: freezed == isFeatured
+          ? _value.isFeatured
+          : isFeatured // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      isTrending: freezed == isTrending
+          ? _value.isTrending
+          : isTrending // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      birthPlace: freezed == birthPlace
+          ? _value.birthPlace
+          : birthPlace // ignore: cast_nullable_to_non_nullable
+              as String?,
+      country: freezed == country
+          ? _value.country
+          : country // ignore: cast_nullable_to_non_nullable
+              as String?,
+      countryFlag: freezed == countryFlag
+          ? _value.countryFlag
+          : countryFlag // ignore: cast_nullable_to_non_nullable
+              as String?,
+      countryFlagUrl: freezed == countryFlagUrl
+          ? _value.countryFlagUrl
+          : countryFlagUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isActive: freezed == isActive
+          ? _value.isActive
+          : isActive // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      topTags: null == topTags
+          ? _value._topTags
+          : topTags // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      tagSlugs: null == tagSlugs
+          ? _value._tagSlugs
+          : tagSlugs // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$PoetSummaryModelImpl implements _PoetSummaryModel {
+  const _$PoetSummaryModelImpl(
+      {required this.publicId,
+      required this.name,
+      this.shortBio,
+      this.birthYear,
+      this.deathYear,
+      this.profileImageUrl,
+      this.gender,
+      this.era,
+      this.poemCount,
+      this.viewCount,
+      this.isFeatured,
+      this.isTrending,
+      this.birthPlace,
+      this.country,
+      this.countryFlag,
+      this.countryFlagUrl,
+      this.isActive,
+      final List<String> topTags = const [],
+      final List<String> tagSlugs = const []})
+      : _topTags = topTags,
+        _tagSlugs = tagSlugs;
+
+  factory _$PoetSummaryModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$PoetSummaryModelImplFromJson(json);
+
+  @override
+  final String publicId;
+  @override
+  final String name;
+  @override
+  final String? shortBio;
+  @override
+  final int? birthYear;
+  @override
+  final int? deathYear;
+  @override
+  final String? profileImageUrl;
+  @override
+  final String? gender;
+  @override
+  final String? era;
+  @override
+  final int? poemCount;
+  @override
+  final int? viewCount;
+  @override
+  final bool? isFeatured;
+  @override
+  final bool? isTrending;
+  @override
+  final String? birthPlace;
+  @override
+  final String? country;
+  @override
+  final String? countryFlag;
+  @override
+  final String? countryFlagUrl;
+  @override
+  final bool? isActive;
+  final List<String> _topTags;
+  @override
+  @JsonKey()
+  List<String> get topTags {
+    if (_topTags is EqualUnmodifiableListView) return _topTags;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_topTags);
+  }
+
+  final List<String> _tagSlugs;
+  @override
+  @JsonKey()
+  List<String> get tagSlugs {
+    if (_tagSlugs is EqualUnmodifiableListView) return _tagSlugs;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_tagSlugs);
+  }
+
+  @override
+  String toString() {
+    return 'PoetSummaryModel(publicId: $publicId, name: $name, shortBio: $shortBio, birthYear: $birthYear, deathYear: $deathYear, profileImageUrl: $profileImageUrl, gender: $gender, era: $era, poemCount: $poemCount, viewCount: $viewCount, isFeatured: $isFeatured, isTrending: $isTrending, birthPlace: $birthPlace, country: $country, countryFlag: $countryFlag, countryFlagUrl: $countryFlagUrl, isActive: $isActive, topTags: $topTags, tagSlugs: $tagSlugs)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$PoetSummaryModelImpl &&
+            (identical(other.publicId, publicId) ||
+                other.publicId == publicId) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.shortBio, shortBio) ||
+                other.shortBio == shortBio) &&
+            (identical(other.birthYear, birthYear) ||
+                other.birthYear == birthYear) &&
+            (identical(other.deathYear, deathYear) ||
+                other.deathYear == deathYear) &&
+            (identical(other.profileImageUrl, profileImageUrl) ||
+                other.profileImageUrl == profileImageUrl) &&
+            (identical(other.gender, gender) || other.gender == gender) &&
+            (identical(other.era, era) || other.era == era) &&
+            (identical(other.poemCount, poemCount) ||
+                other.poemCount == poemCount) &&
+            (identical(other.viewCount, viewCount) ||
+                other.viewCount == viewCount) &&
+            (identical(other.isFeatured, isFeatured) ||
+                other.isFeatured == isFeatured) &&
+            (identical(other.isTrending, isTrending) ||
+                other.isTrending == isTrending) &&
+            (identical(other.birthPlace, birthPlace) ||
+                other.birthPlace == birthPlace) &&
+            (identical(other.country, country) || other.country == country) &&
+            (identical(other.countryFlag, countryFlag) ||
+                other.countryFlag == countryFlag) &&
+            (identical(other.countryFlagUrl, countryFlagUrl) ||
+                other.countryFlagUrl == countryFlagUrl) &&
+            (identical(other.isActive, isActive) ||
+                other.isActive == isActive) &&
+            const DeepCollectionEquality().equals(other._topTags, _topTags) &&
+            const DeepCollectionEquality().equals(other._tagSlugs, _tagSlugs));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        publicId,
+        name,
+        shortBio,
+        birthYear,
+        deathYear,
+        profileImageUrl,
+        gender,
+        era,
+        poemCount,
+        viewCount,
+        isFeatured,
+        isTrending,
+        birthPlace,
+        country,
+        countryFlag,
+        countryFlagUrl,
+        isActive,
+        const DeepCollectionEquality().hash(_topTags),
+        const DeepCollectionEquality().hash(_tagSlugs)
+      ]);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$PoetSummaryModelImplCopyWith<_$PoetSummaryModelImpl> get copyWith =>
+      __$$PoetSummaryModelImplCopyWithImpl<_$PoetSummaryModelImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$PoetSummaryModelImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _PoetSummaryModel implements PoetSummaryModel {
+  const factory _PoetSummaryModel(
+      {required final String publicId,
+      required final String name,
+      final String? shortBio,
+      final int? birthYear,
+      final int? deathYear,
+      final String? profileImageUrl,
+      final String? gender,
+      final String? era,
+      final int? poemCount,
+      final int? viewCount,
+      final bool? isFeatured,
+      final bool? isTrending,
+      final String? birthPlace,
+      final String? country,
+      final String? countryFlag,
+      final String? countryFlagUrl,
+      final bool? isActive,
+      final List<String> topTags,
+      final List<String> tagSlugs}) = _$PoetSummaryModelImpl;
+
+  factory _PoetSummaryModel.fromJson(Map<String, dynamic> json) =
+      _$PoetSummaryModelImpl.fromJson;
+
+  @override
+  String get publicId;
+  @override
+  String get name;
+  @override
+  String? get shortBio;
+  @override
+  int? get birthYear;
+  @override
+  int? get deathYear;
+  @override
+  String? get profileImageUrl;
+  @override
+  String? get gender;
+  @override
+  String? get era;
+  @override
+  int? get poemCount;
+  @override
+  int? get viewCount;
+  @override
+  bool? get isFeatured;
+  @override
+  bool? get isTrending;
+  @override
+  String? get birthPlace;
+  @override
+  String? get country;
+  @override
+  String? get countryFlag;
+  @override
+  String? get countryFlagUrl;
+  @override
+  bool? get isActive;
+  @override
+  List<String> get topTags;
+  @override
+  List<String> get tagSlugs;
+  @override
+  @JsonKey(ignore: true)
+  _$$PoetSummaryModelImplCopyWith<_$PoetSummaryModelImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 PoemModel _$PoemModelFromJson(Map<String, dynamic> json) {
   return _PoemModel.fromJson(json);
 }
@@ -58,7 +608,10 @@ mixin _$PoemModel {
   String? get title => throw _privateConstructorUsedError;
   String? get excerpt =>
       throw _privateConstructorUsedError; // Reactions system (Section 19)
-  Map<String, dynamic>? get reactions => throw _privateConstructorUsedError;
+  Map<String, dynamic>? get reactions =>
+      throw _privateConstructorUsedError; // v1.6.0: full poet card + embedded couplets
+  PoetSummaryModel? get poet => throw _privateConstructorUsedError;
+  List<CoupletModel> get couplets => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -107,9 +660,12 @@ abstract class $PoemModelCopyWith<$Res> {
       PoemContentModel? originalContent,
       String? title,
       String? excerpt,
-      Map<String, dynamic>? reactions});
+      Map<String, dynamic>? reactions,
+      PoetSummaryModel? poet,
+      List<CoupletModel> couplets});
 
   $PoemContentModelCopyWith<$Res>? get originalContent;
+  $PoetSummaryModelCopyWith<$Res>? get poet;
 }
 
 /// @nodoc
@@ -161,6 +717,8 @@ class _$PoemModelCopyWithImpl<$Res, $Val extends PoemModel>
     Object? title = freezed,
     Object? excerpt = freezed,
     Object? reactions = freezed,
+    Object? poet = freezed,
+    Object? couplets = null,
   }) {
     return _then(_value.copyWith(
       publicId: null == publicId
@@ -307,6 +865,14 @@ class _$PoemModelCopyWithImpl<$Res, $Val extends PoemModel>
           ? _value.reactions
           : reactions // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>?,
+      poet: freezed == poet
+          ? _value.poet
+          : poet // ignore: cast_nullable_to_non_nullable
+              as PoetSummaryModel?,
+      couplets: null == couplets
+          ? _value.couplets
+          : couplets // ignore: cast_nullable_to_non_nullable
+              as List<CoupletModel>,
     ) as $Val);
   }
 
@@ -319,6 +885,18 @@ class _$PoemModelCopyWithImpl<$Res, $Val extends PoemModel>
 
     return $PoemContentModelCopyWith<$Res>(_value.originalContent!, (value) {
       return _then(_value.copyWith(originalContent: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $PoetSummaryModelCopyWith<$Res>? get poet {
+    if (_value.poet == null) {
+      return null;
+    }
+
+    return $PoetSummaryModelCopyWith<$Res>(_value.poet!, (value) {
+      return _then(_value.copyWith(poet: value) as $Val);
     });
   }
 }
@@ -367,10 +945,14 @@ abstract class _$$PoemModelImplCopyWith<$Res>
       PoemContentModel? originalContent,
       String? title,
       String? excerpt,
-      Map<String, dynamic>? reactions});
+      Map<String, dynamic>? reactions,
+      PoetSummaryModel? poet,
+      List<CoupletModel> couplets});
 
   @override
   $PoemContentModelCopyWith<$Res>? get originalContent;
+  @override
+  $PoetSummaryModelCopyWith<$Res>? get poet;
 }
 
 /// @nodoc
@@ -420,6 +1002,8 @@ class __$$PoemModelImplCopyWithImpl<$Res>
     Object? title = freezed,
     Object? excerpt = freezed,
     Object? reactions = freezed,
+    Object? poet = freezed,
+    Object? couplets = null,
   }) {
     return _then(_$PoemModelImpl(
       publicId: null == publicId
@@ -566,6 +1150,14 @@ class __$$PoemModelImplCopyWithImpl<$Res>
           ? _value._reactions
           : reactions // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>?,
+      poet: freezed == poet
+          ? _value.poet
+          : poet // ignore: cast_nullable_to_non_nullable
+              as PoetSummaryModel?,
+      couplets: null == couplets
+          ? _value._couplets
+          : couplets // ignore: cast_nullable_to_non_nullable
+              as List<CoupletModel>,
     ));
   }
 }
@@ -609,10 +1201,13 @@ class _$PoemModelImpl implements _PoemModel {
       this.originalContent,
       this.title,
       this.excerpt,
-      final Map<String, dynamic>? reactions})
+      final Map<String, dynamic>? reactions,
+      this.poet,
+      final List<CoupletModel> couplets = const []})
       : _tags = tags,
         _contents = contents,
-        _reactions = reactions;
+        _reactions = reactions,
+        _couplets = couplets;
 
   factory _$PoemModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$PoemModelImplFromJson(json);
@@ -720,9 +1315,21 @@ class _$PoemModelImpl implements _PoemModel {
     return EqualUnmodifiableMapView(value);
   }
 
+// v1.6.0: full poet card + embedded couplets
+  @override
+  final PoetSummaryModel? poet;
+  final List<CoupletModel> _couplets;
+  @override
+  @JsonKey()
+  List<CoupletModel> get couplets {
+    if (_couplets is EqualUnmodifiableListView) return _couplets;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_couplets);
+  }
+
   @override
   String toString() {
-    return 'PoemModel(publicId: $publicId, poetPublicId: $poetPublicId, poetName: $poetName, poetProfileImageUrl: $poetProfileImageUrl, categoryPublicId: $categoryPublicId, categoryName: $categoryName, poetryType: $poetryType, poetryTypeName: $poetryTypeName, poetryTypeUrduName: $poetryTypeUrduName, poetryTypeEnglishName: $poetryTypeEnglishName, contentType: $contentType, requiresStructuredParsing: $requiresStructuredParsing, imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, yearWritten: $yearWritten, source: $source, license: $license, uploadedByUsername: $uploadedByUsername, isPublic: $isPublic, isFeatured: $isFeatured, viewCount: $viewCount, likeCount: $likeCount, shareCount: $shareCount, isLikedByCurrentUser: $isLikedByCurrentUser, isBookmarkedByCurrentUser: $isBookmarkedByCurrentUser, commentCount: $commentCount, createdAt: $createdAt, updatedAt: $updatedAt, bookmarkedAt: $bookmarkedAt, likedAt: $likedAt, tags: $tags, contents: $contents, originalContent: $originalContent, title: $title, excerpt: $excerpt, reactions: $reactions)';
+    return 'PoemModel(publicId: $publicId, poetPublicId: $poetPublicId, poetName: $poetName, poetProfileImageUrl: $poetProfileImageUrl, categoryPublicId: $categoryPublicId, categoryName: $categoryName, poetryType: $poetryType, poetryTypeName: $poetryTypeName, poetryTypeUrduName: $poetryTypeUrduName, poetryTypeEnglishName: $poetryTypeEnglishName, contentType: $contentType, requiresStructuredParsing: $requiresStructuredParsing, imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, yearWritten: $yearWritten, source: $source, license: $license, uploadedByUsername: $uploadedByUsername, isPublic: $isPublic, isFeatured: $isFeatured, viewCount: $viewCount, likeCount: $likeCount, shareCount: $shareCount, isLikedByCurrentUser: $isLikedByCurrentUser, isBookmarkedByCurrentUser: $isBookmarkedByCurrentUser, commentCount: $commentCount, createdAt: $createdAt, updatedAt: $updatedAt, bookmarkedAt: $bookmarkedAt, likedAt: $likedAt, tags: $tags, contents: $contents, originalContent: $originalContent, title: $title, excerpt: $excerpt, reactions: $reactions, poet: $poet, couplets: $couplets)';
   }
 
   @override
@@ -796,7 +1403,9 @@ class _$PoemModelImpl implements _PoemModel {
             (identical(other.title, title) || other.title == title) &&
             (identical(other.excerpt, excerpt) || other.excerpt == excerpt) &&
             const DeepCollectionEquality()
-                .equals(other._reactions, _reactions));
+                .equals(other._reactions, _reactions) &&
+            (identical(other.poet, poet) || other.poet == poet) &&
+            const DeepCollectionEquality().equals(other._couplets, _couplets));
   }
 
   @JsonKey(ignore: true)
@@ -838,7 +1447,9 @@ class _$PoemModelImpl implements _PoemModel {
         originalContent,
         title,
         excerpt,
-        const DeepCollectionEquality().hash(_reactions)
+        const DeepCollectionEquality().hash(_reactions),
+        poet,
+        const DeepCollectionEquality().hash(_couplets)
       ]);
 
   @JsonKey(ignore: true)
@@ -892,7 +1503,9 @@ abstract class _PoemModel implements PoemModel {
       final PoemContentModel? originalContent,
       final String? title,
       final String? excerpt,
-      final Map<String, dynamic>? reactions}) = _$PoemModelImpl;
+      final Map<String, dynamic>? reactions,
+      final PoetSummaryModel? poet,
+      final List<CoupletModel> couplets}) = _$PoemModelImpl;
 
   factory _PoemModel.fromJson(Map<String, dynamic> json) =
       _$PoemModelImpl.fromJson;
@@ -970,6 +1583,10 @@ abstract class _PoemModel implements PoemModel {
   String? get excerpt;
   @override // Reactions system (Section 19)
   Map<String, dynamic>? get reactions;
+  @override // v1.6.0: full poet card + embedded couplets
+  PoetSummaryModel? get poet;
+  @override
+  List<CoupletModel> get couplets;
   @override
   @JsonKey(ignore: true)
   _$$PoemModelImplCopyWith<_$PoemModelImpl> get copyWith =>

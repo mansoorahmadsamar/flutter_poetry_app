@@ -1,8 +1,37 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:collection/collection.dart';
+import 'couplet_model.dart';
 
 part 'poem_model.freezed.dart';
 part 'poem_model.g.dart';
+
+@freezed
+class PoetSummaryModel with _$PoetSummaryModel {
+  const factory PoetSummaryModel({
+    required String publicId,
+    required String name,
+    String? shortBio,
+    int? birthYear,
+    int? deathYear,
+    String? profileImageUrl,
+    String? gender,
+    String? era,
+    int? poemCount,
+    int? viewCount,
+    bool? isFeatured,
+    bool? isTrending,
+    String? birthPlace,
+    String? country,
+    String? countryFlag,
+    String? countryFlagUrl,
+    bool? isActive,
+    @Default([]) List<String> topTags,
+    @Default([]) List<String> tagSlugs,
+  }) = _PoetSummaryModel;
+
+  factory PoetSummaryModel.fromJson(Map<String, dynamic> json) =>
+      _$PoetSummaryModelFromJson(json);
+}
 
 @freezed
 class PoemModel with _$PoemModel {
@@ -45,6 +74,9 @@ class PoemModel with _$PoemModel {
     String? excerpt,
     // Reactions system (Section 19)
     Map<String, dynamic>? reactions,
+    // v1.6.0: full poet card + embedded couplets
+    PoetSummaryModel? poet,
+    @Default([]) List<CoupletModel> couplets,
   }) = _PoemModel;
 
   factory PoemModel.fromJson(Map<String, dynamic> json) =>

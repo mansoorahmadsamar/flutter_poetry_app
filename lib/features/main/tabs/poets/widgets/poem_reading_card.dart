@@ -3,7 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
-import 'package:flutter_poetry_app/features/engagement/providers/like_providers.dart';
+import 'package:flutter_poetry_app/features/engagement/providers/couplet_providers.dart';
+import 'package:flutter_poetry_app/features/engagement/providers/reaction_providers.dart';
+import 'package:flutter_poetry_app/features/engagement/widgets/reaction_button.dart';
+import 'package:flutter_poetry_app/features/image_poetry/widgets/share_options_sheet.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/couplet_model.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.dart';
 
@@ -130,37 +133,59 @@ class PoemReadingCard extends ConsumerWidget {
     return couplet.verses.map((v) => _verseLine(v.text)).toList();
   }
 
-  /// Clean ❤️ / Save / Share tray shown under a selected API couplet.
+  /// Full action tray: ReactionButton + Bookmark + Share
   Widget _buildCoupletActionTray(BuildContext context, WidgetRef ref, CoupletModel couplet) {
-    final isLiked = couplet.isLikedByCurrentUser;
-    final isBookmarked = couplet.isBookmarkedByCurrentUser;
+    final isBookmarked = couplet.isBookmarkedByCurrentUser ?? false;
+    final userReaction = couplet.reactions?['userReaction'] as String?;
+    final totalReactions = (couplet.reactions?['total'] as int?) ?? 0;
+    final reactionsByType = couplet.reactions?['byType'] != null
+        ? Map<String, int>.from(couplet.reactions!['byType'] as Map)
+        : null;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _trayButton(
-          icon: isLiked ? Icons.favorite : Icons.favorite_border,
-          color: isLiked ? AppColors.feedLiked : AppColors.textSecondaryLight,
-          label: couplet.likeCount > 0 ? '${couplet.likeCount}' : 'Like',
-          onPressed: () async {
+        // A. Reaction button — tap=LOVE toggle, long-press=emoji picker
+        ReactionButton(
+          userReaction: userReaction,
+          totalCount: totalReactions,
+          reactionsByType: reactionsByType,
+          size: ReactionButtonSize.compact,
+          onReact: (reactionType) async {
             try {
-              await ref.read(likeActionProvider.notifier).toggleLike(poem.publicId);
+              await ref.read(reactionActionProvider.notifier).react(
+                targetType: 'couplets',
+                publicId: couplet.publicId,
+                reactionType: reactionType,
+              );
             } catch (_) {}
           },
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 4),
+
+        // B. Bookmark
         _trayButton(
           icon: isBookmarked ? Icons.bookmark : Icons.bookmark_border,
           color: isBookmarked ? AppColors.primary : AppColors.textSecondaryLight,
-          label: 'Save',
-          onPressed: () {},
+          label: couplet.bookmarkCount > 0 ? '${couplet.bookmarkCount}' : 'محفوظ',
+          onPressed: () async {
+            try {
+              await ref.read(coupletActionProvider.notifier)
+                  .toggleBookmark(couplet.publicId, lang: selectedScript);
+            } catch (_) {}
+          },
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 4),
+
+        // C. Share — opens ShareOptionsSheet
         _trayButton(
           icon: Icons.share_outlined,
           color: AppColors.textSecondaryLight,
-          label: 'Share',
-          onPressed: () {},
+          label: couplet.shareCount > 0 ? '${couplet.shareCount}' : 'شیئر',
+          onPressed: () => showModalBottomSheet(
+            context: context,
+            builder: (_) => ShareOptionsSheet(coupletId: couplet.publicId),
+          ),
         ),
       ],
     );
@@ -209,7 +234,11 @@ class PoemReadingCard extends ConsumerWidget {
 
   Widget _buildParsedSherBlock(BuildContext context, WidgetRef ref, int index, String sherText) {
     final isSelected = selectedSherIndex == index;
-    final isLiked = poem.isLikedByCurrentUser ?? false;
+    final userReaction = poem.reactions?['userReaction'] as String?;
+    final totalReactions = (poem.reactions?['total'] as int?) ?? 0;
+    final reactionsByType = poem.reactions?['byType'] != null
+        ? Map<String, int>.from(poem.reactions!['byType'] as Map)
+        : null;
 
     return GestureDetector(
       onTap: () => onSherSelected(isSelected ? null : index),
@@ -225,26 +254,29 @@ class PoemReadingCard extends ConsumerWidget {
           children: [
             ..._sherLines(sherText),
 
-            // Action tray when selected — poem-level like + copy + share
+            // Action tray when selected — poem-level reaction + copy + share
             if (isSelected) ...[
               const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  IconButton(
-                    visualDensity: VisualDensity.compact,
-                    icon: Icon(
-                      isLiked ? Icons.favorite : Icons.favorite_border,
-                      size: 20,
-                      color: isLiked ? AppColors.feedLiked : AppColors.textSecondaryLight,
-                    ),
-                    onPressed: () async {
+                  // Poem-level reaction button
+                  ReactionButton(
+                    userReaction: userReaction,
+                    totalCount: totalReactions,
+                    reactionsByType: reactionsByType,
+                    size: ReactionButtonSize.compact,
+                    onReact: (reactionType) async {
                       try {
-                        await ref.read(likeActionProvider.notifier).toggleLike(poem.publicId);
+                        await ref.read(reactionActionProvider.notifier).react(
+                          targetType: 'poems',
+                          publicId: poem.publicId,
+                          reactionType: reactionType,
+                        );
                       } catch (_) {
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Failed to like poem')),
+                            const SnackBar(content: Text('Failed to react')),
                           );
                         }
                       }
@@ -267,7 +299,14 @@ class PoemReadingCard extends ConsumerWidget {
                     visualDensity: VisualDensity.compact,
                     icon: const Icon(Icons.share_outlined, size: 20, color: AppColors.textSecondaryLight),
                     onPressed: () {
-                      // TODO: share sher text
+                      // No couplet ID available for free-verse — share raw text via clipboard
+                      Clipboard.setData(ClipboardData(text: sherText));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('شعر کاپی ہو گیا'),
+                          duration: Duration(seconds: 1),
+                        ),
+                      );
                     },
                   ),
                 ],

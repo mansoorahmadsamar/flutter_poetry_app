@@ -21,7 +21,7 @@ class CoupletEngagementButtons extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isBookmarked = couplet.isBookmarkedByCurrentUser;
+    final isBookmarked = couplet.isBookmarkedByCurrentUser ?? false;
 
     // Parse user reaction from couplet's reactions map
     final String? userReaction = _getUserReaction(couplet.reactions);
@@ -83,7 +83,7 @@ class CoupletEngagementButtons extends ConsumerWidget {
   }
 
   Future<void> _handleBookmark(BuildContext context, WidgetRef ref) async {
-    final isBookmarked = couplet.isBookmarkedByCurrentUser;
+    final isBookmarked = couplet.isBookmarkedByCurrentUser ?? false;
     final currentLang = ref.read(selectedLanguageProvider);
 
     try {
@@ -99,7 +99,7 @@ class CoupletEngagementButtons extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              enrichedCouplet.isBookmarkedByCurrentUser
+              (enrichedCouplet.isBookmarkedByCurrentUser ?? false)
                   ? 'Couplet bookmarked'
                   : 'Couplet removed from bookmarks',
             ),
