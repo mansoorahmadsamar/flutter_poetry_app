@@ -12,19 +12,9 @@ import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.da
 
 const String _urduFontFamily = 'Jameel Noori Nastaleeq';
 
-/// Single reading surface for a poem.
-///
-/// Handles three states:
-/// - [couplets] == null → loading spinner
-/// - [couplets].isNotEmpty → real API couplets, one block per CoupletModel
-/// - [couplets].isEmpty → fallback: parse fullText by \n\n into sher blocks
-///
-/// Script rendering is driven by [selectedScript], independent of the global
-/// selectedLanguageProvider, so it works correctly when the user toggles scripts
-/// on this screen without mutating global state.
 class PoemReadingCard extends ConsumerWidget {
   final PoemModel poem;
-  final List<CoupletModel>? couplets; // null = loading, empty = use fullText
+  final List<CoupletModel>? couplets;
   final String selectedScript;
   final int? selectedSherIndex;
   final ValueChanged<int?> onSherSelected;
@@ -42,18 +32,15 @@ class PoemReadingCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bool useCouplets = couplets != null && couplets!.isNotEmpty;
-
-    // Resolve content for the selected script
     final content = poem.getContentForLanguage(selectedScript);
-
-    // Parse shers from fullText when no API couplets available
-    final List<String> parsedShers = (!useCouplets && content != null && content.fullText.isNotEmpty)
-        ? _parseShers(content.fullText)
-        : [];
+    final List<String> parsedShers =
+        (!useCouplets && content != null && content.fullText.isNotEmpty)
+            ? _parseShers(content.fullText)
+            : [];
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : AppColors.verseBackground,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -64,7 +51,7 @@ class PoemReadingCard extends ConsumerWidget {
       child: couplets == null
           ? _buildLoading()
           : useCouplets
-              ? _buildCoupletList(context, ref, isDark)
+              ? _buildCoupletList(context, ref)
               : parsedShers.isNotEmpty
                   ? _buildParsedSherList(context, ref, parsedShers)
                   : _buildRawText(context, content?.fullText ?? ''),
@@ -75,10 +62,7 @@ class PoemReadingCard extends ConsumerWidget {
     return const SizedBox(
       height: 120,
       child: Center(
-        child: CircularProgressIndicator(
-          color: AppColors.primary,
-          strokeWidth: 2,
-        ),
+        child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2),
       ),
     );
   }
@@ -87,43 +71,79 @@ class PoemReadingCard extends ConsumerWidget {
   // API couplets path
   // ────────────────────────────────────────────────────────────
 
-  Widget _buildCoupletList(BuildContext context, WidgetRef ref, bool isDark) {
+  Widget _buildCoupletList(BuildContext context, WidgetRef ref) {
     final items = <Widget>[];
     for (int i = 0; i < couplets!.length; i++) {
       items.add(_buildCoupletBlock(context, ref, i, couplets![i]));
-      if (i < couplets!.length - 1) {
-        items.add(_sherDivider());
-      }
+      if (i < couplets!.length - 1) items.add(_sherDivider());
     }
     return Column(children: items);
   }
 
-  Widget _buildCoupletBlock(BuildContext context, WidgetRef ref, int index, CoupletModel couplet) {
+  Widget _buildCoupletBlock(
+      BuildContext context, WidgetRef ref, int index, CoupletModel couplet) {
     final isSelected = selectedSherIndex == index;
+    final typeCode = couplet.coupletType; // MATLA | MAQTA | REGULAR | etc.
+    final showLabel = typeCode == 'MATLA' || typeCode == 'MAQTA';
+    final label = typeCode == 'MATLA' ? 'مطلع' : 'مقطع';
 
     return GestureDetector(
       onTap: () => onSherSelected(isSelected ? null : index),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withValues(alpha: 0.07) : Colors.transparent,
+          color: isSelected
+              ? AppColors.primary.withValues(alpha: 0.07)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: Stack(
           children: [
-            // Couplet type label — subtle, inline-start
-            if (couplet.coupletTypeName != null)
-              _buildTypeLabel(couplet.coupletTypeName!),
+            // Verse lines — full width, centered
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Top padding when label is present so it doesn't overlap
+                if (showLabel) const SizedBox(height: 4),
+                ..._versesFor(couplet),
+                if (isSelected) ...[
+                  const SizedBox(height: 8),
+                  _buildCoupletActionTray(context, ref, couplet),
+                ],
+              ],
+            ),
 
-            ..._versesFor(couplet),
-
-            if (isSelected) ...[
-              const SizedBox(height: 8),
-              _buildCoupletActionTray(context, ref, couplet),
-            ],
+            // Label pinned to top-right
+            if (showLabel)
+              Positioned(
+                top: 0,
+                right: 0,
+                child: _buildCoupletTypeTag(label),
+              ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCoupletTypeTag(String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: AppColors.secondary.withValues(alpha: 0.15),
+        borderRadius: const BorderRadius.only(
+          topRight: Radius.circular(6),
+          bottomLeft: Radius.circular(6),
+        ),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontFamily: _urduFontFamily,
+          fontSize: 11,
+          color: AppColors.secondary,
+          height: 1.5,
         ),
       ),
     );
@@ -133,8 +153,12 @@ class PoemReadingCard extends ConsumerWidget {
     return couplet.verses.map((v) => _verseLine(v.text)).toList();
   }
 
-  /// Full action tray: ReactionButton + Bookmark + Share
-  Widget _buildCoupletActionTray(BuildContext context, WidgetRef ref, CoupletModel couplet) {
+  // ────────────────────────────────────────────────────────────
+  // Couplet action tray — top 3 reactions with counts + icon-only bookmark/share
+  // ────────────────────────────────────────────────────────────
+
+  Widget _buildCoupletActionTray(
+      BuildContext context, WidgetRef ref, CoupletModel couplet) {
     final isBookmarked = couplet.isBookmarkedByCurrentUser ?? false;
     final userReaction = couplet.reactions?['userReaction'] as String?;
     final totalReactions = (couplet.reactions?['total'] as int?) ?? 0;
@@ -142,77 +166,119 @@ class PoemReadingCard extends ConsumerWidget {
         ? Map<String, int>.from(couplet.reactions!['byType'] as Map)
         : null;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        // A. Reaction button — tap=LOVE toggle, long-press=emoji picker
-        ReactionButton(
-          userReaction: userReaction,
-          totalCount: totalReactions,
-          reactionsByType: reactionsByType,
-          size: ReactionButtonSize.compact,
-          onReact: (reactionType) async {
-            try {
-              await ref.read(reactionActionProvider.notifier).react(
-                targetType: 'couplets',
-                publicId: couplet.publicId,
-                reactionType: reactionType,
-              );
-            } catch (_) {}
-          },
-        ),
-        const SizedBox(width: 4),
+    final reactionTypes = ref.watch(reactionTypesProvider).valueOrNull ?? [];
 
-        // B. Bookmark
-        _trayButton(
-          icon: isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-          color: isBookmarked ? AppColors.primary : AppColors.textSecondaryLight,
-          label: couplet.bookmarkCount > 0 ? '${couplet.bookmarkCount}' : 'محفوظ',
-          onPressed: () async {
-            try {
-              await ref.read(coupletActionProvider.notifier)
-                  .toggleBookmark(couplet.publicId, lang: selectedScript);
-            } catch (_) {}
-          },
-        ),
-        const SizedBox(width: 4),
+    // Build top-3 reaction entries sorted by count
+    List<MapEntry<String, int>> topReactions = [];
+    if (reactionsByType != null && reactionsByType.isNotEmpty) {
+      topReactions = reactionsByType.entries.toList()
+        ..sort((a, b) => b.value.compareTo(a.value));
+      if (topReactions.length > 3) topReactions = topReactions.take(3).toList();
+    }
 
-        // C. Share — opens ShareOptionsSheet
-        _trayButton(
-          icon: Icons.share_outlined,
-          color: AppColors.textSecondaryLight,
-          label: couplet.shareCount > 0 ? '${couplet.shareCount}' : 'شیئر',
-          onPressed: () => showModalBottomSheet(
-            context: context,
-            builder: (_) => ShareOptionsSheet(coupletId: couplet.publicId),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Reaction button (tap=LOVE toggle, long-press=picker)
+          ReactionButton(
+            userReaction: userReaction,
+            totalCount: totalReactions,
+            reactionsByType: reactionsByType,
+            size: ReactionButtonSize.compact,
+            onReact: (reactionType) async {
+              try {
+                await ref.read(reactionActionProvider.notifier).react(
+                      targetType: 'couplets',
+                      publicId: couplet.publicId,
+                      reactionType: reactionType,
+                    );
+              } catch (_) {}
+            },
           ),
-        ),
-      ],
+
+          // Individual top-3 reaction emoji+count chips
+          if (topReactions.isNotEmpty) ...[
+            const SizedBox(width: 6),
+            ...topReactions.map((e) {
+              final rt = reactionTypes.isNotEmpty
+                  ? reactionTypes.firstWhere(
+                      (r) => r.key == e.key,
+                      orElse: () => reactionTypes.first,
+                    )
+                  : null;
+              final emoji = rt?.emoji ?? '❤️';
+              return _reactionChip(emoji, e.value);
+            }),
+          ],
+
+          const Spacer(),
+
+          // Bookmark — icon only
+          _iconTrayButton(
+            icon: isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+            color: isBookmarked ? AppColors.primary : AppColors.textSecondaryLight,
+            onPressed: () async {
+              try {
+                await ref
+                    .read(coupletActionProvider.notifier)
+                    .toggleBookmark(couplet.publicId, lang: selectedScript);
+              } catch (_) {}
+            },
+          ),
+
+          // Share — icon only
+          _iconTrayButton(
+            icon: Icons.share_outlined,
+            color: AppColors.textSecondaryLight,
+            onPressed: () => showModalBottomSheet(
+              context: context,
+              builder: (_) => ShareOptionsSheet(coupletId: couplet.publicId),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _trayButton({
+  Widget _reactionChip(String emoji, int count) {
+    return Container(
+      margin: const EdgeInsets.only(right: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(emoji, style: const TextStyle(fontSize: 13)),
+          const SizedBox(width: 3),
+          Text(
+            _fmtCount(count),
+            style: const TextStyle(
+              fontSize: 11,
+              color: AppColors.textSecondaryLight,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _iconTrayButton({
     required IconData icon,
     required Color color,
-    required String label,
     required VoidCallback onPressed,
   }) {
     return InkWell(
       onTap: onPressed,
       borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 18, color: color),
-            const SizedBox(width: 4),
-            Text(
-              label,
-              style: TextStyle(fontSize: 12, color: color),
-            ),
-          ],
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        child: Icon(icon, size: 19, color: color),
       ),
     );
   }
@@ -221,18 +287,18 @@ class PoemReadingCard extends ConsumerWidget {
   // Parsed shers path (fullText split by \n\n)
   // ────────────────────────────────────────────────────────────
 
-  Widget _buildParsedSherList(BuildContext context, WidgetRef ref, List<String> shers) {
+  Widget _buildParsedSherList(
+      BuildContext context, WidgetRef ref, List<String> shers) {
     final items = <Widget>[];
     for (int i = 0; i < shers.length; i++) {
       items.add(_buildParsedSherBlock(context, ref, i, shers[i]));
-      if (i < shers.length - 1) {
-        items.add(_sherDivider());
-      }
+      if (i < shers.length - 1) items.add(_sherDivider());
     }
     return Column(children: items);
   }
 
-  Widget _buildParsedSherBlock(BuildContext context, WidgetRef ref, int index, String sherText) {
+  Widget _buildParsedSherBlock(
+      BuildContext context, WidgetRef ref, int index, String sherText) {
     final isSelected = selectedSherIndex == index;
     final userReaction = poem.reactions?['userReaction'] as String?;
     final totalReactions = (poem.reactions?['total'] as int?) ?? 0;
@@ -244,23 +310,22 @@ class PoemReadingCard extends ConsumerWidget {
       onTap: () => onSherSelected(isSelected ? null : index),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withValues(alpha: 0.07) : Colors.transparent,
+          color: isSelected
+              ? AppColors.primary.withValues(alpha: 0.07)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             ..._sherLines(sherText),
-
-            // Action tray when selected — poem-level reaction + copy + share
             if (isSelected) ...[
               const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Poem-level reaction button
                   ReactionButton(
                     userReaction: userReaction,
                     totalCount: totalReactions,
@@ -269,10 +334,10 @@ class PoemReadingCard extends ConsumerWidget {
                     onReact: (reactionType) async {
                       try {
                         await ref.read(reactionActionProvider.notifier).react(
-                          targetType: 'poems',
-                          publicId: poem.publicId,
-                          reactionType: reactionType,
-                        );
+                              targetType: 'poems',
+                              publicId: poem.publicId,
+                              reactionType: reactionType,
+                            );
                       } catch (_) {
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -282,24 +347,23 @@ class PoemReadingCard extends ConsumerWidget {
                       }
                     },
                   ),
-                  IconButton(
-                    visualDensity: VisualDensity.compact,
-                    icon: const Icon(Icons.copy_outlined, size: 20, color: AppColors.textSecondaryLight),
+                  _iconTrayButton(
+                    icon: Icons.copy_outlined,
+                    color: AppColors.textSecondaryLight,
                     onPressed: () {
                       Clipboard.setData(ClipboardData(text: sherText));
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Copied to clipboard'),
+                          content: Text('کاپی ہو گیا'),
                           duration: Duration(seconds: 1),
                         ),
                       );
                     },
                   ),
-                  IconButton(
-                    visualDensity: VisualDensity.compact,
-                    icon: const Icon(Icons.share_outlined, size: 20, color: AppColors.textSecondaryLight),
+                  _iconTrayButton(
+                    icon: Icons.share_outlined,
+                    color: AppColors.textSecondaryLight,
                     onPressed: () {
-                      // No couplet ID available for free-verse — share raw text via clipboard
                       Clipboard.setData(ClipboardData(text: sherText));
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
@@ -319,12 +383,16 @@ class PoemReadingCard extends ConsumerWidget {
   }
 
   List<Widget> _sherLines(String block) {
-    final lines = block.split('\n').map((l) => l.trim()).where((l) => l.isNotEmpty).toList();
+    final lines = block
+        .split('\n')
+        .map((l) => l.trim())
+        .where((l) => l.isNotEmpty)
+        .toList();
     return lines.map((line) => _verseLine(line)).toList();
   }
 
   // ────────────────────────────────────────────────────────────
-  // Raw text fallback (single block, no \n\n separators)
+  // Raw text fallback
   // ────────────────────────────────────────────────────────────
 
   Widget _buildRawText(BuildContext context, String text) {
@@ -337,55 +405,33 @@ class PoemReadingCard extends ConsumerWidget {
 
   Widget _verseLine(String text) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
+      padding: const EdgeInsets.symmetric(vertical: 3),
       child: _scriptText(text, _verseStyle()),
-    );
-  }
-
-  Widget _buildTypeLabel(String label) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Text(
-        label,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontSize: 9,
-          letterSpacing: 0.4,
-          color: AppColors.textSecondaryLight.withValues(alpha: 0.55),
-        ),
-      ),
     );
   }
 
   Widget _sherDivider() {
     return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 8),
-      child: Divider(
-        height: 1,
-        color: AppColors.dividerLight,
-        thickness: 0.5,
-      ),
+      padding: EdgeInsets.symmetric(vertical: 6),
+      child: Divider(height: 1, color: AppColors.dividerLight, thickness: 0.5),
     );
   }
 
-  /// Renders text with script-aware font and direction, bypassing LocalizedText
-  /// which reads the global selectedLanguageProvider (would be out of sync with
-  /// the screen-local _selectedScript).
   Widget _scriptText(String text, TextStyle style) {
     final isUrdu = selectedScript == 'ur';
     return Text(
       text,
       style: isUrdu ? style.copyWith(fontFamily: _urduFontFamily) : style,
       textDirection: isUrdu ? TextDirection.rtl : TextDirection.ltr,
-      textAlign: TextAlign.center,
+      textAlign: isUrdu ? TextAlign.justify : TextAlign.center,
     );
   }
 
   TextStyle _verseStyle() {
     if (selectedScript == 'ur') {
       return const TextStyle(
-        fontSize: 26,
-        height: 2.0,
+        fontSize: 25,
+        height: 1.9,
         fontWeight: FontWeight.w400,
       );
     }
@@ -402,5 +448,11 @@ class PoemReadingCard extends ConsumerWidget {
         .map((block) => block.trim())
         .where((block) => block.isNotEmpty)
         .toList();
+  }
+
+  static String _fmtCount(int n) {
+    if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(1)}M';
+    if (n >= 1000) return '${(n / 1000).toStringAsFixed(1)}K';
+    return '$n';
   }
 }
