@@ -1,18 +1,17 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
-import 'package:flutter_poetry_app/core/widgets/localized_text.dart';
+import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
-import 'package:flutter_poetry_app/core/widgets/standard_app_bar.dart';
+import 'package:flutter_poetry_app/core/widgets/localized_text.dart';
+import 'package:flutter_poetry_app/features/engagement/providers/couplet_providers.dart';
+import '../models/couplet_model.dart';
 import '../models/poem_model.dart';
 import '../providers/poem_providers.dart';
-import '../providers/poet_providers.dart';
-import '../widgets/couplet_card.dart';
-import 'package:flutter_poetry_app/features/engagement/providers/like_providers.dart';
-import 'package:flutter_poetry_app/features/engagement/providers/bookmark_providers.dart';
-import 'package:flutter_poetry_app/features/engagement/providers/couplet_providers.dart';
+import '../widgets/poem_more_from_poet_section.dart';
+import '../widgets/poem_reading_card.dart';
 
 class PoemDetailScreen extends ConsumerStatefulWidget {
   final String publicId;
@@ -27,498 +26,268 @@ class PoemDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
+  // Used for reading card rendering and "more from poet" section.
+  // Always 'ur' for now — no toggle exposed to user.
+  String _selectedScript = 'ur';
+  bool _scriptInitialized = false;
+
+  // Which sher block is currently highlighted. null = none.
+  int? _selectedSherIndex;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_scriptInitialized) {
+      _selectedScript = ref.read(selectedLanguageProvider);
+      _scriptInitialized = true;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final poemAsync = ref.watch(poemDetailProvider(widget.publicId));
-    final isUrdu = ref.watch(selectedLanguageProvider) == 'ur';
 
     return Scaffold(
       appBar: poemAsync.maybeWhen(
-        data: (poem) => StandardAppBar(
-          title: poem.getDisplayTitle(isUrdu ? 'ur' : 'en'),
+        data: (poem) => AppBar(
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          iconTheme: const IconThemeData(color: Colors.white),
+          elevation: 0,
+          title: Text(
+            poem.getDisplayTitle(_selectedScript),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.share),
-              onPressed: () {/* TODO: Share */},
-            ),
-            IconButton(
-              icon: const Icon(Icons.more_vert),
-              onPressed: () {/* TODO: More options */},
-            ),
+            IconButton(icon: const Icon(Icons.share_outlined, size: 22), onPressed: () {}),
           ],
         ),
-        orElse: () => const StandardAppBar(title: 'Loading...'),
+        orElse: () => AppBar(
+          backgroundColor: AppColors.primary,
+          elevation: 0,
+        ),
       ),
       body: poemAsync.when(
-        data: (poem) => _buildContent(context, ref, poem, isUrdu),
-        loading: () => Center(child: CircularProgressIndicator()),
+        data: (poem) => _buildContent(context, poem),
+        loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => _buildError(context, error),
       ),
     );
   }
 
-  Widget _buildContent(
-    BuildContext context,
-    WidgetRef ref,
-    PoemModel poem,
-    bool isUrdu,
-  ) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+  // ────────────────────────────────────────────────────────────
+  // Main scrollable body
+  // ────────────────────────────────────────────────────────────
+
+  Widget _buildContent(BuildContext context, PoemModel poem) {
     final coupletsAsync = ref.watch(coupletsProvider(poem.publicId));
 
+    final couplets = coupletsAsync.when(
+      data: (c) => c,
+      loading: () => null,
+      error: (_, __) => const <CoupletModel>[],
+    );
+
     return SingleChildScrollView(
-      padding: EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Poet info card
-          Card(
-            child: InkWell(
-              onTap: () => context.push('/main/poets/${poem.poetPublicId}'),
-              child: Padding(
-                padding: EdgeInsets.all(AppSpacing.md),
-                child: Row(
+          // 1. Poet hero header
+          _buildPoetHeader(context, poem),
+          const SizedBox(height: 16),
+
+          // 2. Poem reading surface
+          PoemReadingCard(
+            key: ValueKey(_selectedScript),
+            poem: poem,
+            couplets: couplets,
+            selectedScript: _selectedScript,
+            selectedSherIndex: _selectedSherIndex,
+            onSherSelected: (i) => setState(() => _selectedSherIndex = i),
+          ),
+          const SizedBox(height: 16),
+
+          // 3. Compact stats row
+          _buildStatsRow(context, poem),
+          const SizedBox(height: 20),
+
+          // 4. More from this poet
+          PoemMoreFromPoetSection(
+            poetPublicId: poem.poetPublicId,
+            poetName: poem.poetName,
+            poetryType: poem.poetryType,
+            currentPoemPublicId: poem.publicId,
+            selectedScript: _selectedScript,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ────────────────────────────────────────────────────────────
+  // Poet hero header
+  // ────────────────────────────────────────────────────────────
+
+  Widget _buildPoetHeader(BuildContext context, PoemModel poem) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final hasImage = poem.poetProfileImageUrl != null &&
+        poem.poetProfileImageUrl!.isNotEmpty &&
+        poem.poetProfileImageUrl != '-';
+    final initials = _poetInitials(poem.poetName);
+    final typeLabel = poem.poetryTypeName ?? poem.poetryTypeUrduName ?? poem.poetryType;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceDark : Colors.white,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        border: Border.all(color: isDark ? AppColors.borderDark : AppColors.borderLight),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.20 : 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        onTap: () => context.push('/main/poets/${poem.poetPublicId}'),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          child: Row(
+            children: [
+              // Avatar
+              CircleAvatar(
+                radius: 22,
+                backgroundColor: AppColors.primary,
+                child: ClipOval(
+                  child: hasImage
+                      ? CachedNetworkImage(
+                          imageUrl: poem.poetProfileImageUrl!,
+                          width: 44,
+                          height: 44,
+                          fit: BoxFit.cover,
+                          errorWidget: (_, __, ___) => _initialsWidget(initials),
+                        )
+                      : _initialsWidget(initials),
+                ),
+              ),
+              const SizedBox(width: 12),
+
+              // Name + type badge
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    CircleAvatar(
-                      child: Icon(Icons.person),
+                    LocalizedText(
+                      poem.poetName,
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                     ),
-                    SizedBox(width: AppSpacing.md),
-                    Expanded(
+                    const SizedBox(height: 3),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.09),
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
+                      ),
                       child: LocalizedText(
-                        poem.poetName,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        typeLabel,
+                        style: const TextStyle(fontSize: 11, color: AppColors.primary),
                       ),
                     ),
-                    Icon(Icons.arrow_forward_ios, size: 16),
                   ],
                 ),
               ),
-            ),
-          ),
-          SizedBox(height: AppSpacing.lg),
 
-          // Poem content - display as couplets or fallback to full text
-          coupletsAsync.when(
-            data: (couplets) {
-              if (couplets.isEmpty) {
-                // Fallback to full text if no couplets available
-                return Container(
-                  padding: EdgeInsets.all(AppSpacing.xl),
-                  decoration: BoxDecoration(
-                    color: isDark ? Colors.grey[800] : AppColors.verseBackground,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                  ),
-                  child: LocalizedText(
-                    poem.getDisplayText(isUrdu ? 'ur' : 'en'),
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w400,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                );
-              }
-
-              // Display couplets
-              return Column(
-                children: [
-                  ...couplets.map((couplet) => CoupletCard(
-                        couplet: couplet,
-                        poemPublicId: poem.publicId,
-                      )),
-                  SizedBox(height: AppSpacing.lg),
-                ],
-              );
-            },
-            loading: () => Container(
-              padding: EdgeInsets.all(AppSpacing.xl),
-              child: const Center(child: CircularProgressIndicator()),
-            ),
-            error: (error, stack) {
-              // Fallback to full text on error
-              return Container(
-                padding: EdgeInsets.all(AppSpacing.xl),
-                decoration: BoxDecoration(
-                  color: isDark ? Colors.grey[800] : AppColors.verseBackground,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                ),
-                child: LocalizedText(
-                  poem.getDisplayText(isUrdu ? 'ur' : 'en'),
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w400,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              );
-            },
-          ),
-
-          SizedBox(height: AppSpacing.lg),
-
-          // Interaction buttons
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildLikeButton(context, ref, poem),
-              _buildBookmarkButton(context, ref, poem),
-              _buildActionButton(
-                context,
-                icon: Icons.share,
-                label: 'Share',
-                onPressed: () {
-                  // TODO: Implement share functionality in Phase 2
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Share feature coming soon!')),
-                  );
-                },
-              ),
+              const Icon(Icons.chevron_right, size: 16, color: Colors.grey),
             ],
           ),
-
-          SizedBox(height: AppSpacing.md),
-
-          // Engagement statistics
-          _buildEngagementStats(context, poem),
-
-          SizedBox(height: AppSpacing.lg),
-
-          // Tags section
-          if (poem.tags.isNotEmpty) ...[
-            _buildTagsSection(context, poem.tags),
-            SizedBox(height: AppSpacing.lg),
-          ],
-
-          // Detailed metadata
-          Card(
-            child: Padding(
-              padding: EdgeInsets.all(AppSpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Details',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  SizedBox(height: AppSpacing.md),
-                  _buildDetailRow(
-                    context,
-                    'Poetry Type',
-                    poem.poetryTypeName ?? poem.poetryTypeUrduName ?? poem.poetryType,
-                  ),
-                  _buildDetailRow(
-                    context,
-                    'Language',
-                    poem.getContentForLanguage(isUrdu ? 'ur' : 'en')?.languageName ?? 'Urdu',
-                  ),
-                  if (poem.yearWritten != null)
-                    _buildDetailRow(
-                      context,
-                      'Year Written',
-                      '${poem.yearWritten}',
-                    ),
-                  if (poem.categoryName != null && poem.categoryName != '-')
-                    _buildDetailRow(
-                      context,
-                      'Category',
-                      poem.categoryName!,
-                    ),
-                ],
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildTagsSection(BuildContext context, List<TagModel> tags) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-          child: Text(
-            'Poet Tags',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: Colors.grey,
-            ),
-          ),
-        ),
-        SizedBox(height: AppSpacing.sm),
-        Wrap(
-          spacing: AppSpacing.sm,
-          runSpacing: AppSpacing.sm,
-          children: tags.map((tag) => _buildTagChip(tag)).toList(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTagChip(TagModel tag) {
-    final chipColor = tag.color != null
-        ? _parseColor(tag.color!)
-        : _generateColorForTag(tag.name);
-
-    return Chip(
-      label: Text(
-        tag.name,
-        style: TextStyle(
+  Widget _initialsWidget(String initials) {
+    return Center(
+      child: Text(
+        initials,
+        style: const TextStyle(
           color: Colors.white,
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
         ),
       ),
-      backgroundColor: chipColor,
-      visualDensity: VisualDensity.compact,
     );
   }
 
-  Color _parseColor(String colorString) {
-    if (colorString.startsWith('#')) {
-      return Color(int.parse(colorString.substring(1), radix: 16) + 0xFF000000);
-    }
-    return Colors.blue;
+  String _poetInitials(String name) {
+    final parts = name.trim().split(RegExp(r'\s+'));
+    if (parts.isEmpty) return '?';
+    if (parts.length == 1) return parts[0][0].toUpperCase();
+    return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
   }
 
-  Color _generateColorForTag(String tagName) {
-    final hash = tagName.hashCode;
-    final hue = (hash % 360).toDouble();
-    return HSLColor.fromAHSL(1.0, hue, 0.6, 0.5).toColor();
-  }
+  // ────────────────────────────────────────────────────────────
+  // Compact stats row
+  // ────────────────────────────────────────────────────────────
 
-  Widget _buildActionButton(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    int? count,
-    required VoidCallback onPressed,
-  }) {
-    return Column(
-      children: [
-        IconButton(
-          icon: Icon(icon, size: 28),
-          onPressed: onPressed,
-        ),
-        Text(
-          count != null ? '$count' : label,
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildLikeButton(BuildContext context, WidgetRef ref, PoemModel poem) {
+  Widget _buildStatsRow(BuildContext context, PoemModel poem) {
     final isLiked = poem.isLikedByCurrentUser ?? false;
+    final parts = [
+      '${_fmt(poem.viewCount)} views',
+      '${_fmt(poem.likeCount)} likes',
+      '${_fmt(poem.commentCount ?? 0)} comments',
+      '${_fmt(poem.shareCount)} shares',
+    ];
 
-    return Column(
-      children: [
-        IconButton(
-          icon: Icon(
-            isLiked ? Icons.favorite : Icons.favorite_border,
-            size: 28,
-            color: isLiked ? Colors.red : null,
-          ),
-          onPressed: () async {
-            try {
-              await ref.read(likeActionProvider.notifier).toggleLike(widget.publicId);
-            } catch (e) {
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Failed to ${isLiked ? 'unlike' : 'like'} poem'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            }
-          },
-        ),
-        Text(
-          '${poem.likeCount}',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBookmarkButton(BuildContext context, WidgetRef ref, PoemModel poem) {
-    final isBookmarked = poem.isBookmarkedByCurrentUser ?? false;
-    final currentLang = ref.watch(selectedLanguageProvider);
-
-    return Column(
-      children: [
-        IconButton(
-          icon: Icon(
-            isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-            size: 28,
-            color: isBookmarked ? AppColors.primary : null,
-          ),
-          onPressed: () async {
-            try {
-              final enrichedPoem = await ref.read(bookmarkActionProvider.notifier).toggleBookmark(
-                widget.publicId,
-                lang: currentLang,
-              );
-
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text((enrichedPoem.isBookmarkedByCurrentUser ?? false) ? 'Added to bookmarks' : 'Removed from bookmarks'),
-                    backgroundColor: Colors.green,
-                    duration: const Duration(seconds: 2),
-                  ),
-                );
-              }
-            } catch (e) {
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Failed to ${isBookmarked ? 'remove' : 'add'} bookmark'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            }
-          },
-        ),
-        Text(
-          'Save',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildEngagementStats(BuildContext context, PoemModel poem) {
-    return Card(
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg,
-          vertical: AppSpacing.md,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildStatItem(
-              context,
-              icon: Icons.visibility,
-              label: 'Views',
-              count: poem.viewCount,
-            ),
-            _buildStatItem(
-              context,
-              icon: Icons.favorite,
-              label: 'Likes',
-              count: poem.likeCount,
-              isActive: poem.isLikedByCurrentUser ?? false,
-            ),
-            _buildStatItem(
-              context,
-              icon: Icons.comment,
-              label: 'Comments',
-              count: poem.commentCount ?? 0,
-            ),
-            _buildStatItem(
-              context,
-              icon: Icons.share,
-              label: 'Shares',
-              count: poem.shareCount,
-            ),
-          ],
-        ),
+    return Text(
+      parts.join('  •  '),
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: 12,
+        color: isLiked ? AppColors.feedLiked.withValues(alpha: 0.85) : Colors.grey,
+        height: 1.4,
       ),
     );
   }
 
-  Widget _buildStatItem(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required int count,
-    bool isActive = false,
-  }) {
-    final color = isActive ? Colors.red : Colors.grey;
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 24, color: color),
-        SizedBox(height: 4),
-        Text(
-          _formatCount(count),
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-        ),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey,
-          ),
-        ),
-      ],
-    );
+  String _fmt(int n) {
+    if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(1)}M';
+    if (n >= 1000) return '${(n / 1000).toStringAsFixed(1)}K';
+    return '$n';
   }
 
-  String _formatCount(int count) {
-    if (count >= 1000000) {
-      return '${(count / 1000000).toStringAsFixed(1)}M';
-    } else if (count >= 1000) {
-      return '${(count / 1000).toStringAsFixed(1)}K';
-    }
-    return count.toString();
-  }
-
-  Widget _buildDetailRow(BuildContext context, String label, String value) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: AppSpacing.sm),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.grey,
-            ),
-          ),
-          Text(
-            value,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // ────────────────────────────────────────────────────────────
+  // Error state
+  // ────────────────────────────────────────────────────────────
 
   Widget _buildError(BuildContext context, Object error) {
     return Center(
       child: Padding(
-        padding: EdgeInsets.all(AppSpacing.lg),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: Colors.red),
-            SizedBox(height: AppSpacing.lg),
-            Text('Failed to load poem'),
-            SizedBox(height: AppSpacing.md),
+            const Icon(Icons.error_outline, size: 56, color: Colors.red),
+            const SizedBox(height: AppSpacing.lg),
+            const Text('Failed to load poem'),
+            const SizedBox(height: AppSpacing.md),
             Text(
               error.toString(),
               style: Theme.of(context).textTheme.bodySmall,
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: AppSpacing.lg),
             ElevatedButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Go Back'),
+              child: const Text('Go Back'),
             ),
           ],
         ),
