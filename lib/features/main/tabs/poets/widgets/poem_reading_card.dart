@@ -9,6 +9,7 @@ import 'package:flutter_poetry_app/features/engagement/widgets/reaction_button.d
 import 'package:flutter_poetry_app/features/image_poetry/widgets/share_options_sheet.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/couplet_model.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.dart';
+import 'package:flutter_poetry_app/features/main/tabs/poets/providers/poem_providers.dart';
 
 const String _urduFontFamily = 'Jameel Noori Nastaleeq';
 
@@ -54,7 +55,7 @@ class PoemReadingCard extends ConsumerWidget {
               ? _buildCoupletList(context, ref)
               : parsedShers.isNotEmpty
                   ? _buildParsedSherList(context, ref, parsedShers)
-                  : _buildRawText(context, content?.fullText ?? ''),
+                  : _buildRawText(content?.fullText ?? ''),
     );
   }
 
@@ -83,9 +84,10 @@ class PoemReadingCard extends ConsumerWidget {
   Widget _buildCoupletBlock(
       BuildContext context, WidgetRef ref, int index, CoupletModel couplet) {
     final isSelected = selectedSherIndex == index;
-    final typeCode = couplet.coupletType; // MATLA | MAQTA | REGULAR | etc.
+    final typeCode = couplet.coupletType;
     final showLabel = typeCode == 'MATLA' || typeCode == 'MAQTA';
     final label = typeCode == 'MATLA' ? 'مطلع' : 'مقطع';
+    final verses = couplet.verses;
 
     return GestureDetector(
       onTap: () => onSherSelected(isSelected ? null : index),
@@ -98,31 +100,60 @@ class PoemReadingCard extends ConsumerWidget {
               : Colors.transparent,
           borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
         ),
-        child: Stack(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Verse lines — full width, centered
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Top padding when label is present so it doesn't overlap
-                if (showLabel) const SizedBox(height: 4),
-                ..._versesFor(couplet),
-                if (isSelected) ...[
-                  const SizedBox(height: 8),
-                  _buildCoupletActionTray(context, ref, couplet),
-                ],
-              ],
-            ),
+            // First verse line — with optional label on the right
+            if (verses.isNotEmpty)
+              _firstVerseLine(verses[0].text, showLabel ? label : null),
 
-            // Label pinned to top-right
-            if (showLabel)
-              Positioned(
-                top: 0,
-                right: 0,
-                child: _buildCoupletTypeTag(label),
-              ),
+            // Remaining verse lines — centered normally
+            ...verses.skip(1).map((v) => _verseLine(v.text)),
+
+            if (isSelected) ...[
+              const SizedBox(height: 8),
+              _buildCoupletActionTray(context, ref, couplet),
+            ],
           ],
         ),
+      ),
+    );
+  }
+
+  /// First verse line with the maqta/matla label on the right margin,
+  /// text centered in the remaining space.
+  Widget _firstVerseLine(String text, String? label) {
+    final isUrdu = selectedScript == 'ur';
+    final style = _verseStyle();
+    final textWidget = Expanded(
+      child: Text(
+        text,
+        style: isUrdu ? style.copyWith(fontFamily: _urduFontFamily) : style,
+        textDirection: isUrdu ? TextDirection.rtl : TextDirection.ltr,
+        textAlign: TextAlign.center,
+      ),
+    );
+
+    if (label == null) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 3),
+        child: Row(children: [textWidget]),
+      );
+    }
+
+    // RTL layout: label floats to the right visually (which is the "start"
+    // side in Arabic/Urdu text). We place it to the left in widget tree so
+    // it appears on the right side of the verse line on screen.
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Label badge — stays at right margin (visual right = widget left in RTL)
+          _buildCoupletTypeTag(label),
+          const SizedBox(width: 6),
+          textWidget,
+        ],
       ),
     );
   }
@@ -132,10 +163,7 @@ class PoemReadingCard extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: AppColors.secondary.withValues(alpha: 0.15),
-        borderRadius: const BorderRadius.only(
-          topRight: Radius.circular(6),
-          bottomLeft: Radius.circular(6),
-        ),
+        borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
         label,
@@ -149,12 +177,9 @@ class PoemReadingCard extends ConsumerWidget {
     );
   }
 
-  List<Widget> _versesFor(CoupletModel couplet) {
-    return couplet.verses.map((v) => _verseLine(v.text)).toList();
-  }
-
   // ────────────────────────────────────────────────────────────
-  // Couplet action tray — top 3 reactions with counts + icon-only bookmark/share
+  // Couplet action tray
+  // Top-3 reactions with counts + icon-only bookmark/share
   // ────────────────────────────────────────────────────────────
 
   Widget _buildCoupletActionTray(
@@ -168,7 +193,6 @@ class PoemReadingCard extends ConsumerWidget {
 
     final reactionTypes = ref.watch(reactionTypesProvider).valueOrNull ?? [];
 
-    // Build top-3 reaction entries sorted by count
     List<MapEntry<String, int>> topReactions = [];
     if (reactionsByType != null && reactionsByType.isNotEmpty) {
       topReactions = reactionsByType.entries.toList()
@@ -181,7 +205,9 @@ class PoemReadingCard extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Reaction button (tap=LOVE toggle, long-press=picker)
+          // Reaction button — tap=LOVE toggle, long-press=picker
+          // After reacting, invalidate poemDetailProvider so embedded
+          // couplet reaction state refreshes.
           ReactionButton(
             userReaction: userReaction,
             totalCount: totalReactions,
@@ -194,13 +220,15 @@ class PoemReadingCard extends ConsumerWidget {
                       publicId: couplet.publicId,
                       reactionType: reactionType,
                     );
+                // Refresh the poem so embedded couplet reactions update
+                ref.invalidate(poemDetailProvider(poem.publicId));
               } catch (_) {}
             },
           ),
 
-          // Individual top-3 reaction emoji+count chips
+          // Top-3 reaction chips
           if (topReactions.isNotEmpty) ...[
-            const SizedBox(width: 6),
+            const SizedBox(width: 4),
             ...topReactions.map((e) {
               final rt = reactionTypes.isNotEmpty
                   ? reactionTypes.firstWhere(
@@ -208,14 +236,13 @@ class PoemReadingCard extends ConsumerWidget {
                       orElse: () => reactionTypes.first,
                     )
                   : null;
-              final emoji = rt?.emoji ?? '❤️';
-              return _reactionChip(emoji, e.value);
+              return _reactionChip(rt?.emoji ?? '❤️', e.value);
             }),
           ],
 
           const Spacer(),
 
-          // Bookmark — icon only
+          // Bookmark icon only
           _iconTrayButton(
             icon: isBookmarked ? Icons.bookmark : Icons.bookmark_border,
             color: isBookmarked ? AppColors.primary : AppColors.textSecondaryLight,
@@ -224,11 +251,12 @@ class PoemReadingCard extends ConsumerWidget {
                 await ref
                     .read(coupletActionProvider.notifier)
                     .toggleBookmark(couplet.publicId, lang: selectedScript);
+                ref.invalidate(poemDetailProvider(poem.publicId));
               } catch (_) {}
             },
           ),
 
-          // Share — icon only
+          // Share icon only
           _iconTrayButton(
             icon: Icons.share_outlined,
             color: AppColors.textSecondaryLight,
@@ -338,6 +366,7 @@ class PoemReadingCard extends ConsumerWidget {
                               publicId: poem.publicId,
                               reactionType: reactionType,
                             );
+                        ref.invalidate(poemDetailProvider(poem.publicId));
                       } catch (_) {
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -395,7 +424,7 @@ class PoemReadingCard extends ConsumerWidget {
   // Raw text fallback
   // ────────────────────────────────────────────────────────────
 
-  Widget _buildRawText(BuildContext context, String text) {
+  Widget _buildRawText(String text) {
     return _scriptText(text, _verseStyle());
   }
 
@@ -423,7 +452,7 @@ class PoemReadingCard extends ConsumerWidget {
       text,
       style: isUrdu ? style.copyWith(fontFamily: _urduFontFamily) : style,
       textDirection: isUrdu ? TextDirection.rtl : TextDirection.ltr,
-      textAlign: isUrdu ? TextAlign.justify : TextAlign.center,
+      textAlign: TextAlign.center,
     );
   }
 
