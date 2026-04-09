@@ -16,6 +16,10 @@ class FeedEngagementOverlay {
   /// Optimistic delta for total reaction count (+1 / -1 / 0).
   final int reactionCountDelta;
 
+  /// Optimistic reaction breakdown by type, updated after user reacts.
+  /// null = no optimistic override, use server data.
+  final Map<String, int>? reactionsByType;
+
   const FeedEngagementOverlay({
     this.isLiked,
     this.isBookmarked,
@@ -24,6 +28,7 @@ class FeedEngagementOverlay {
     this.bookmarkCountDelta = 0,
     this.userReaction,
     this.reactionCountDelta = 0,
+    this.reactionsByType,
   });
 
   FeedEngagementOverlay copyWith({
@@ -34,6 +39,7 @@ class FeedEngagementOverlay {
     int? bookmarkCountDelta,
     String? Function()? userReaction,
     int? reactionCountDelta,
+    Map<String, int>? Function()? reactionsByType,
   }) {
     return FeedEngagementOverlay(
       isLiked: isLiked ?? this.isLiked,
@@ -43,6 +49,7 @@ class FeedEngagementOverlay {
       bookmarkCountDelta: bookmarkCountDelta ?? this.bookmarkCountDelta,
       userReaction: userReaction != null ? userReaction() : this.userReaction,
       reactionCountDelta: reactionCountDelta ?? this.reactionCountDelta,
+      reactionsByType: reactionsByType != null ? reactionsByType() : this.reactionsByType,
     );
   }
 }
