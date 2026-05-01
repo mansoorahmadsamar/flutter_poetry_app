@@ -55,7 +55,18 @@
       "Bash(git -C /Users/mansoorahmadsamar/Documents/Development/flutter-projects/flutter_poetry_app log --oneline -5)",
       "Bash(git -C /Users/mansoorahmadsamar/Documents/Development/flutter-projects/flutter_poetry_app add lib/features/main/tabs/poets/screens/poets_list_screen.dart lib/features/main/tabs/poets/widgets/poet_card.dart lib/features/main/tabs/poets/widgets/poet_horizontal_card.dart lib/features/main/tabs/poets/widgets/poets_horizontal_section.dart lib/features/main/tabs/poets/providers/poets_discovery_provider.dart lib/features/main/tabs/poets/providers/poets_discovery_provider.freezed.dart lib/features/main/tabs/poets/models/poet_model.dart lib/features/main/tabs/poets/models/poet_model.freezed.dart lib/features/main/tabs/poets/models/poet_model.g.dart lib/features/main/tabs/poets/services/poet_service.dart lib/features/main/tabs/poets/providers/poet_search_pagination_provider.dart lib/features/main/tabs/poets/providers/follow_providers.dart lib/features/main/tabs/poets/widgets/follow_button.dart lib/features/main/tabs/poets/widgets/hero_featured_poet_card.dart lib/features/main/tabs/poets/widgets/poetry_category_icons.dart lib/features/search/screens/poets_search_screen.dart lib/features/search/widgets/search_results_grid.dart pubspec.yaml android/app/build.gradle.kts FLUTTER_API_DOCUMENTATION.md)",
       "Bash(git -C:*)",
-      "Bash(adb shell pm list packages:*)"
+      "Bash(adb shell pm list packages:*)",
+      "WebSearch",
+      "Bash(adb shell:*)",
+      "Bash($HOME/Library/Android/sdk/platform-tools/adb devices:*)",
+      "Bash(ADB=$HOME/Library/Android/sdk/platform-tools/adb)",
+      "Bash($ADB -s emulator-5554 shell pm list packages)",
+      "Bash($ADB -s emulator-5554 shell \"df -h /data\")",
+      "Bash($ADB -s emulator-5554 shell \"pm trim-caches 2G\")",
+      "Bash($ADB -s emulator-5554 shell \"rm -rf /data/local/tmp/*\")",
+      "Bash($ADB -s emulator-5554 shell \"pm trim-caches 5G\")",
+      "Bash(git status:*)",
+      "Bash(grep -E \"\\\\.dart$\")"
     ],
     "deny": [],
     "ask": []

@@ -1,7 +1,7 @@
 # Poetry Backend API - Flutter Mobile App Documentation
 
-**Version:** 1.3.0
-**Last Updated:** February 28, 2026
+**Version:** 1.7.0
+**Last Updated:** March 30, 2026
 **Base URL (Production):** `https://api.poetry.com`
 **Base URL (Development):** `https://dev-api.poetry.com`
 **Base URL (Local):** `http://localhost:8081`
@@ -10,7 +10,98 @@
 
 ## Recent Updates (December 2025 - March 2026)
 
-### Personalized Feed ("For You" Tab) ⭐ NEW (February 2026)
+### Poem Detail: Clean Response + Live Reaction Counts ⭐ BREAKING (March 30, 2026)
+
+**What changed in `GET /api/poems/{publicId}`:**
+
+| Change | Before | After |
+|---|---|---|
+| `isLikedByCurrentUser` field | ✅ present | ❌ **removed** — use `reactions.userReaction != null` |
+| `couplets[n].isLiked` field | ✅ present | ❌ **removed** — use `couplets[n].reactions.userReaction != null` |
+| `contents` array | All 3 languages always | **Filtered to requested `?lang=`** — `?lang=ur` returns only Urdu content |
+| `reactions.total` / `reactions.byType` | Always `0` / `null` (stale denormalized) | ✅ **Live counts from DB** |
+| Duplicate contents bug | ×3 duplicates per language | ✅ Fixed — each content appears once |
+
+**Migration:**
+```dart
+// Before
+final liked = poem.isLikedByCurrentUser == true;
+final coupletLiked = couplet.isLiked == true;
+
+// After
+final liked = poem.reactions.userReaction != null;
+final coupletLiked = couplet.reactions.userReaction != null;
+```
+
+**`?lang=` now filters `contents[]`:**
+- `?lang=ur` → only `[{languageCode: "ur", script: "ARABIC", ...}]`
+- `?lang=en` → only `[{languageCode: "en", script: "ROMAN", ...}]`
+- No `lang` param → all 3 language variants returned (original behavior)
+
+**Couplets are unchanged** — `couplets[]` always contains Urdu/ARABIC verses regardless of `?lang=`. Only `contents[]` is filtered.
+
+---
+
+### Poem Detail: Full Poet Card + Per-Couplet Engagement ⭐ NEW (March 29, 2026)
+
+**What's New in `GET /api/poems/{publicId}`:**
+- **Full poet profile card** — `data.poet` now contains the complete `PoetSummaryResponse` object: profile image, short bio, birth/death years, poem count, view count, gender, era, country with flag emoji + CDN URL, featured/trending flags, and tag slugs. The flat `poetName` / `poetPublicId` fields are still present for backward compatibility.
+- **Per-couplet engagement data** — `data.couplets` array is now populated for all structured poetry types (`requiresStructuredParsing: true`, e.g. GHAZAL). Each couplet includes:
+  - `reactions.total` + `reactions.byType` (live counts from DB)
+  - `reactions.userReaction` — which of the 10 reactions the authenticated user has left (`null` for anonymous)
+  - `isBookmarked` — `true`/`false`/`null` (null = anonymous user)
+  - `likeCount`, `bookmarkCount`, `shareCount`
+  - `verses` — the two verse lines of the couplet
+  - `coupletType` — MATLA / MAQTA / REGULAR with localized `coupletTypeName`
+
+**Performance:** Couplet engagement uses 3 batch queries regardless of couplet count (user reactions, live reaction counts, bookmarks) — no N+1.
+
+**Breaking Changes:** None at this point. Fields were additive. See March 30, 2026 entry for breaking changes.
+
+**See updated Section 4.2 for the complete response shape.**
+
+---
+
+### Unified Reactions System (Replaces Likes) ⭐ NEW (March 2026)
+
+**What's New:**
+- **10 culturally-relevant reaction types** including Urdu mushaira reactions: WAH_WAH, SUBHAN_ALLAH, MAZA_AA_GAYA, KYA_BAAT_HAI + universal reactions: LOVE, FIRE, SAD, DEEP, RELATABLE, BEAUTIFUL
+- **Unified API**: Single `POST /api/{targetType}/{publicId}/react` endpoint works for poems, couplets, poet images, and generated images
+- **Toggle behavior**: Same reaction = remove, different reaction = change, no reaction = add
+- **Rich reaction data**: Every content response now includes `reactions: { total, byType, userReaction }` breakdown
+- **Backward compatible**: Old `/like` endpoints still work (send LOVE reaction internally). `likeCount` field preserved. `isLiked` has been removed — use `reactions.userReaction != null` instead.
+- **Reaction types endpoint**: `GET /api/reactions/types` returns all 10 types with emoji, Urdu label, and English label
+
+**Breaking Changes:** `isLiked` and `isLikedByCurrentUser` removed (March 30, 2026). Use `reactions.userReaction != null` instead.
+
+**Migration recommended:** Update Flutter to use the new reaction endpoints and display reaction picker instead of simple like button.
+
+**See Section 19 for full documentation.**
+
+---
+
+### Feed Engine v2 — 9 Behavior-Design Improvements ⭐ NEW (March 2026)
+
+**What's New:**
+- ✅ **Following Feed Source**: Content from followed poets now appears in feed with `reason: "FOLLOWING"` (20% weight, capped at 40% of page)
+- ✅ **Engagement Velocity Scoring**: Recent viral content now outranks old high-count content. Items created in last 24h with rapid engagement get boosted
+- ✅ **Negative Signal Learning**: `skip_fast` and `hide` events now persistently reduce a poet's content in the user's feed across sessions
+- ✅ **Variable Rewards (Delighter)**: Unexpected "hidden gem" content injected at positions 8-12 to prevent feed predictability
+- ✅ **Display Hints (reserved)**: FeedItem fields `displayMode`, `primaryAction`, `autoExpandFirstVerse` are defined but **not currently sent** — reserved for future Flutter integration. When enabled, they will drive content-type-specific card rendering
+- ✅ **Session Momentum**: Feed scoring weights shift as users scroll deeper (WARMUP → EXPLORATION → DEEP phases)
+- ✅ **Social Proof Layer**: New `socialContext` object on FeedItem with `trendingLabel`, `velocityLabel`, `totalReactions` — only appears on items with 10+ likes (null for low-engagement content)
+- ✅ **Smart Pull-to-Refresh**: New `refresh=true` param returns only new items without reshuffling the feed. New `newCount` field in response
+- ✅ **Content Exhaustion Prevention**: After 200+ items viewed, hidden gem sources and time capsule sources (resurfaced bookmarks) activate progressively
+
+**Breaking Changes:** None. All changes are additive. Existing Flutter code works without modification.
+
+**New fields to handle:** See updated Section 17.3 for `socialContext`, `newCount`. Display hint fields (`displayMode`, `primaryAction`, `autoExpandFirstVerse`) are reserved and not currently sent.
+
+**See Section 17 for full documentation.**
+
+---
+
+### Personalized Feed ("For You" Tab) (February 2026)
 
 **What's New:**
 - ✅ **Infinite-scroll personalized feed**: `GET /api/feed?lang=ur&cursor=<cursor>&limit=20`
@@ -204,7 +295,11 @@ A single, consolidated API that provides access to all bookmark types (poems, co
   - [5.3.1 Search Poems](#531-search-poems)
   - [5.3.2 Search Verses](#532-search-verses)
 - [5.4 Poem Details](#54-poem-details)
-  - [5.4.1 Get Poem by ID](#541-get-poem-by-id)
+  - [5.4.1 Get Poem by ID](#541-get-poem-by-id) ⭐ UPDATED
+  - [5.4.1.1 Field Reference — poet Object](#4211-field-reference--poet-object)
+  - [5.4.1.2 Field Reference — couplets Array](#4212-field-reference--couplets-array)
+  - [5.4.1.3 Reacting to a Couplet](#4213-flutter--reacting-to-a-couplet)
+  - [5.4.1.4 Dart Model Additions](#4214-flutter--dart-model-additions)
   - [5.4.2 Get Poem Content](#542-get-poem-content)
 - [5.5 Engagement](#55-engagement)
   - [5.5.1 Like Poem](#551-like-poem)
@@ -360,10 +455,12 @@ A single, consolidated API that provides access to all bookmark types (poems, co
 - [16.4 AppContentResponse — Field Reference](#164-appcontentresponse--field-reference)
 - [16.5 Flutter Implementation Guide](#165-flutter-implementation-guide)
 
-### 17. Personalized Feed ("For You" Tab) ⭐ NEW
+### 17. Personalized Feed ("For You" Tab) ⭐ UPDATED
 - [17.1 Overview](#171-overview-personalized-feed)
 - [17.2 Get Feed Page](#172-get-feed-page)
 - [17.3 FeedItem — Field Reference](#173-feeditem--field-reference)
+- [17.3a Display Hints](#173a-display-hints)
+- [17.3b Social Context](#173b-social-context)
 - [17.4 Content Type Data Fields](#174-content-type-data-fields)
   - [17.4.1 COUPLET](#1741-couplet-contentdata)
   - [17.4.2 POEM](#1742-poem-contentdata)
@@ -372,6 +469,41 @@ A single, consolidated API that provides access to all bookmark types (poems, co
 - [17.5 Report Feed Events (POST /api/events/batch)](#175-report-feed-events)
 - [17.6 Cursor Pagination Guide](#176-cursor-pagination-guide)
 - [17.7 Flutter Implementation Guide](#177-flutter-implementation-guide)
+
+### 18. Hashtags & Discovery ⭐ NEW
+- [18.1 Tags vs Hashtags](#181-tags-vs-hashtags)
+- [18.2 All Hashtags (Paginated List)](#182-all-hashtags-paginated-list)
+- [18.3 Trending Hashtags](#183-trending-hashtags)
+- [18.4 Hashtag Stats](#184-hashtag-stats)
+- [18.5 Single Hashtag Metadata](#185-single-hashtag-metadata)
+- [18.6 Poems by Hashtag](#186-poems-by-hashtag)
+- [18.7 Couplets by Hashtag](#187-couplets-by-hashtag)
+- [18.8 Images by Hashtag](#188-images-by-hashtag)
+- [18.9 Poets by Hashtag](#189-poets-by-hashtag)
+- [18.10 Books by Hashtag](#1810-books-by-hashtag)
+- [18.11 Videos by Hashtag](#1811-videos-by-hashtag)
+- [18.12 Filter Search by Hashtag](#1812-filter-search-by-hashtag)
+- [18.13 HashtagDto Reference](#1813-hashtagdto-reference)
+- [18.11 Flutter Implementation Guide](#1811-flutter-implementation-guide)
+
+### 19. Unified Reactions System ⭐ NEW
+- [19.1 Overview — Reactions vs Likes](#191-overview--reactions-vs-likes)
+- [19.2 Available Reaction Types](#192-available-reaction-types)
+- [19.3 Get Reaction Types (Public)](#193-get-reaction-types-public)
+- [19.4 React to Content](#194-react-to-content)
+- [19.5 Remove Reaction](#195-remove-reaction)
+- [19.6 Reaction Data in Responses](#196-reaction-data-in-responses)
+  - [19.6.1 ReactionSummaryDto Reference](#1961-reactionsummarydto-reference)
+  - [19.6.2 Poems](#1962-poems)
+  - [19.6.3 Couplets](#1963-couplets)
+  - [19.6.4 Poet Images](#1964-poet-images)
+  - [19.6.5 Feed Items](#1965-feed-items)
+- [19.7 Backward Compatibility](#197-backward-compatibility)
+- [19.8 Flutter Implementation Guide](#198-flutter-implementation-guide)
+  - [19.8.1 Reaction Picker Widget](#1981-reaction-picker-widget)
+  - [19.8.2 Reaction Summary Display](#1982-reaction-summary-display)
+  - [19.8.3 API Service Integration](#1983-api-service-integration)
+  - [19.8.4 Migration from Likes](#1984-migration-from-likes)
 
 ### Appendix
 - [A. Flutter Code Examples](#appendix-a-flutter-code-examples)
@@ -1501,101 +1633,491 @@ Authorization: Bearer <access_token>
 
 ---
 
-### 4.2 Get Poem by ID
+### 4.2 Get Poem by ID ⭐ UPDATED (March 30, 2026)
 
-**Endpoint:** `GET /api/poems/{publicId}`
+**Endpoint:** `GET /api/poems/{publicId}?lang=ur`
 
-**Authentication Required:** Yes
+**Authentication Required:** No (anonymous works; pass token to get personalized `reactions.userReaction` and `isBookmarkedByCurrentUser`)
 
 **Request Headers:**
 ```
-Authorization: Bearer <access_token>
+Authorization: Bearer <access_token>   // optional — omit for anonymous
 ```
 
 **Path Parameters:**
 - `publicId`: Public ID of the poem
 
-**Example:** `GET /api/poems/poem_xyz789`
+**Query Parameters:**
+- `lang` (optional): `ur` | `en` | `hi` — filters `contents[]` to that language AND localizes poet name, poetry type name (default: all languages)
 
-**Success Response (200):**
+**Example:** `GET /api/poems/25c9e91e-e432-4e9c-ad94-ff67e2e1a4c2?lang=ur`
+
+**Field history:**
+| Field | v1.5 | v1.6 (Mar 29) | v1.7 (Mar 30) |
+|---|---|---|---|
+| `poet` | ❌ | ✅ Full `PoetSummaryResponse` | ✅ unchanged |
+| `couplets[]` | ❌ | ✅ per-couplet reactions | ✅ unchanged |
+| `isLikedByCurrentUser` | ✅ | ✅ | ❌ **removed** |
+| `couplets[n].isLiked` | ❌ | ✅ | ❌ **removed** |
+| `reactions.total/byType` | 0 / null (stale) | 0 / null (stale) | ✅ **live counts** |
+| `contents[]` | all 3 langs | all 3 langs | **filtered to `?lang=`** |
+
+---
+
+**Success Response (200) — `GET /api/poems/{publicId}?lang=ur` (authenticated):**
 ```json
 {
   "success": true,
   "message": "Poem retrieved successfully",
   "data": {
-    "publicId": "poem_xyz789",
-    "createdAt": "2024-01-15T14:30:00",
-    "updatedAt": "2024-01-15T14:30:00",
-    "poetPublicId": "poet_abc123",
-    "poetName": "علامہ اقبال",
-    "categoryPublicId": "cat_def456",
-    "categoryName": "نظم",
+
+    "publicId": "25c9e91e-e432-4e9c-ad94-ff67e2e1a4c2",
+    "createdAt": "2026-01-24T03:55:17.648335",
+    "updatedAt": "2026-03-30T01:53:06.634544",
+
+    "poetPublicId": "744f7569-610f-40ea-ba65-50f7cee93c3b",
+    "poetName": "فیض احمد فیض",
+
+    "poet": {
+      "publicId": "744f7569-610f-40ea-ba65-50f7cee93c3b",
+      "name": "فیض احمد فیض",
+      "shortBio": "فیض احمد فیض (1911–1984) پاکستان کے عظیم ترقی پسند شاعر تھے۔ ان کی شاعری میں محبت، سیاسی شعور اور انسانی حقوق کا بیان ملتا ہے۔",
+      "birthYear": 1911,
+      "deathYear": 1984,
+      "profileImageUrl": "https://rekhta.pc.cdn.bitgravity.com//images/shayar/round/faiz-ahmed-faiz.png",
+      "gender": "MALE",
+      "era": "MODERN",
+      "poemCount": 174,
+      "viewCount": 48320,
+      "isFeatured": true,
+      "isTrending": false,
+      "birthPlace": "نارووال",
+      "country": "پاکستان",
+      "countryFlag": "🇵🇰",
+      "countryFlagUrl": "https://flagcdn.com/w40/pk.png",
+      "isActive": true,
+      "topTags": ["ترقی پسند", "سیاسی", "رومانوی"],
+      "tagSlugs": ["taraqqi-pasand", "siyasi", "romanvi"]
+    },
+
+    "categoryPublicId": "-",
+    "categoryName": "-",
+
     "poetryType": "GHAZAL",
-    "poetryTypeUrduName": "غزل",
-    "poetryTypeEnglishName": "Ghazal",
+    "poetryTypeName": "غزل",
     "requiresStructuredParsing": true,
+
     "contentType": "TEXT",
-    "imageUrl": null,
-    "thumbnailUrl": null,
-    "yearWritten": 1850,
-    "source": "دیوانِ غالب",
-    "license": "Public Domain",
-    "uploadedByUsername": "admin",
+    "imageUrl": "-",
+    "thumbnailUrl": "-",
+
+    "yearWritten": 0,
+    "source": "https://www.rekhta.org/ghazals/qand-e-dahan-kuchh-is-se-ziyaada-faiz-ahmad-faiz-ghazals?lang=ur",
+    "license": "public_domain",
+    "uploadedByUsername": "-",
+
     "isPublic": true,
-    "isFeatured": true,
-    "viewCount": 1524,
-    "likeCount": 456,
-    "tags": [
-      {
-        "publicId": "tag_001",
-        "urduName": "عشق",
-        "englishName": "Love"
-      }
-    ],
+    "isFeatured": false,
+
+    "viewCount": 142,
+    "likeCount": 17,
+    "commentCount": 3,
+    "shareCount": 8,
+
+    // reactions.total and byType are LIVE counts from the reactions table.
+    // userReaction = the authenticated user's current reaction key, null if none.
+    "reactions": {
+      "total": 17,
+      "byType": {
+        "LOVE": 7,
+        "WAH_WAH": 5,
+        "SUBHAN_ALLAH": 3,
+        "FIRE": 2
+      },
+      "userReaction": "WAH_WAH"
+    },
+
+    // isLikedByCurrentUser REMOVED — use reactions.userReaction != null
+    "isBookmarkedByCurrentUser": false,
+
+    "tagSlugs": ["ishq", "ghazal", "taraqqi-pasand"],
+
+    // contents[] contains ONLY the ?lang=ur entry when lang=ur is requested.
+    // For lang=en → only ROMAN entry. No lang param → all 3 languages.
     "contents": [
       {
-        "publicId": "content_001",
+        "publicId": "731171bf-d13a-4654-a4fa-edc718599326",
         "languageCode": "ur",
         "languageName": "Urdu",
         "languageNativeName": "اردو",
         "script": "ARABIC",
         "scriptUrduName": "عربی",
-        "scriptEnglishName": "Arabic",
+        "scriptEnglishName": "ARABIC",
         "scriptDirection": "rtl",
-        "title": "دل ہی تو ہے",
-        "fullText": "دل ہی تو ہے نہ سنگ و خشت\nدرد سے بھر نہ آئے کیوں...",
+        "title": "قند دہن کچھ اس سے زیادہ",
+        "fullText": "قند دہن کچھ اس سے زیادہ\nلطف سخن کچھ اس سے زیادہ\n\nفصل خزاں میں لطف بہاراں\nبرگ سمن کچھ اس سے زیادہ\n\nیاد کرتے ہیں تمہیں آج بھی اہل دل\nمرگ ناگاہ پہ ماتم کچھ اس سے زیادہ",
         "isOriginal": true,
-        "translatedBy": null,
-        "notes": null,
+        "translatedBy": "-",
+        "notes": "-",
+        "verses": [],
+        "totalVerses": 0,
+        "totalCouplets": 0
+      }
+    ],
+
+    // originalContent mirrors the first isOriginal=true entry in contents[].
+    "originalContent": {
+      "publicId": "731171bf-d13a-4654-a4fa-edc718599326",
+      "languageCode": "ur",
+      "languageName": "Urdu",
+      "languageNativeName": "اردو",
+      "script": "ARABIC",
+      "scriptUrduName": "عربی",
+      "scriptEnglishName": "ARABIC",
+      "scriptDirection": "rtl",
+      "title": "قند دہن کچھ اس سے زیادہ",
+      "fullText": "قند دہن کچھ اس سے زیادہ\nلطف سخن کچھ اس سے زیادہ\n\n...",
+      "isOriginal": true,
+      "translatedBy": "-",
+      "notes": "-",
+      "verses": [],
+      "totalVerses": 0,
+      "totalCouplets": 0
+    },
+
+    // couplets[] is ALWAYS Urdu/ARABIC verses regardless of ?lang= filter.
+    // Only populated when requiresStructuredParsing = true (GHAZAL, RUBAI, etc.)
+    // reactions.userReaction = null for anonymous users or no reaction.
+    // isLiked REMOVED — use reactions.userReaction != null
+    "couplets": [
+      {
+        "publicId": "94c0993e-9cb4-4bc5-adef-9219702a4307",
+        "coupletNumber": 1,
+        "coupletType": "MATLA",
+        "coupletTypeName": "مطلع",
+        "likeCount": 9,
+        "bookmarkCount": 4,
+        "shareCount": 2,
+        "reactions": {
+          "total": 9,
+          "byType": {
+            "WAH_WAH": 5,
+            "LOVE": 3,
+            "SUBHAN_ALLAH": 1
+          },
+          "userReaction": "WAH_WAH"
+        },
+        "isBookmarked": false,
         "verses": [
           {
-            "publicId": "verse_001",
+            "publicId": "c1ecc2b6-aae3-41a9-a4c8-8e2cc247aad8",
             "verseNumber": 1,
             "coupletNumber": 1,
             "verseType": "MATLA",
-            "verseText": "دل ہی تو ہے نہ سنگ و خشت",
-            "romanizedText": "Dil hi to hai na sang-o-khisht",
-            "translation": "It's only a heart, not stone and brick"
+            "verseText": "قند دہن کچھ اس سے زیادہ",
+            "romanizedText": "qand dahan kuchh us se ziyada",
+            "translation": "-"
           },
           {
-            "publicId": "verse_002",
+            "publicId": "a69f4039-29b3-4789-aa46-0f811ef254f6",
             "verseNumber": 2,
             "coupletNumber": 1,
             "verseType": "MATLA",
-            "verseText": "درد سے بھر نہ آئے کیوں",
-            "romanizedText": "Dard se bhar na aaye kyon",
-            "translation": "Why shouldn't it fill with pain"
+            "verseText": "لطف سخن کچھ اس سے زیادہ",
+            "romanizedText": "lutf sukhan kuchh us se ziyada",
+            "translation": "-"
           }
         ],
-        "totalVerses": 14,
-        "totalCouplets": 7
+        "tagSlugs": null,
+        "createdAt": "2026-01-24T03:55:17.648335"
+      },
+      {
+        "publicId": "a82b2d9f-01ac-41bd-81f2-123564979093",
+        "coupletNumber": 2,
+        "coupletType": "REGULAR",
+        "coupletTypeName": "عام شعر",
+        "likeCount": 5,
+        "bookmarkCount": 2,
+        "shareCount": 1,
+        "reactions": {
+          "total": 5,
+          "byType": {
+            "BEAUTIFUL": 3,
+            "LOVE": 2
+          },
+          "userReaction": null
+        },
+        "isBookmarked": true,
+        "verses": [
+          {
+            "publicId": "5a94a537-bd69-408d-8701-29253c9f31f7",
+            "verseNumber": 3,
+            "coupletNumber": 2,
+            "verseType": "REGULAR",
+            "verseText": "فصل خزاں میں لطف بہاراں",
+            "romanizedText": "fasl-e-khazan mein lutf-e-baharan",
+            "translation": "-"
+          },
+          {
+            "publicId": "26b017bc-0085-400b-ad4c-877b9bb04677",
+            "verseNumber": 4,
+            "coupletNumber": 2,
+            "verseType": "REGULAR",
+            "verseText": "برگ سمن کچھ اس سے زیادہ",
+            "romanizedText": "barg saman kuchh us se ziyada",
+            "translation": "-"
+          }
+        ],
+        "tagSlugs": null,
+        "createdAt": "2026-01-24T03:55:17.648335"
+      },
+      {
+        "publicId": "52f63e50-22f1-4b10-82a4-bf6bb83ab3b2",
+        "coupletNumber": 3,
+        "coupletType": "MAQTA",
+        "coupletTypeName": "مقطع",
+        "likeCount": 3,
+        "bookmarkCount": 1,
+        "shareCount": 0,
+        "reactions": {
+          "total": 3,
+          "byType": {
+            "FIRE": 2,
+            "WAH_WAH": 1
+          },
+          "userReaction": "FIRE"
+        },
+        "isBookmarked": false,
+        "verses": [
+          {
+            "publicId": "6fc38af6-0d3d-4e53-9d6b-304fe3ea762c",
+            "verseNumber": 5,
+            "coupletNumber": 3,
+            "verseType": "MAQTA",
+            "verseText": "یاد کرتے ہیں تمہیں آج بھی اہل دل",
+            "romanizedText": "yaad karte hain tumhein aaj bhi ahl-e-dil",
+            "translation": "-"
+          },
+          {
+            "publicId": "c40c59af-99e8-48ee-9263-1260eb216b22",
+            "verseNumber": 6,
+            "coupletNumber": 3,
+            "verseType": "MAQTA",
+            "verseText": "مرگ ناگاہ پہ ماتم کچھ اس سے زیادہ",
+            "romanizedText": "marg-e-nagah pe matam kuchh us se ziyada",
+            "translation": "-"
+          }
+        ],
+        "tagSlugs": null,
+        "createdAt": "2026-01-24T03:55:17.648335"
       }
     ]
   }
 }
 ```
 
-**Note:** View count is automatically incremented when fetching a poem.
+---
+
+#### 4.2.1 Field Reference — `poet` Object
+
+The `poet` field is a full `PoetSummaryResponse`. All fields may be `null` if data is not yet populated.
+
+| Field | Type | Description |
+|---|---|---|
+| `publicId` | String | Poet's public UUID |
+| `name` | String | Poet's name in requested `?lang=` |
+| `shortBio` | String? | Short biography in requested `?lang=` |
+| `birthYear` | Int? | Birth year (null if unknown) |
+| `deathYear` | Int? | Death year (null if still living or unknown) |
+| `profileImageUrl` | String? | CDN URL to profile photo (null if no image) |
+| `gender` | String? | `MALE` \| `FEMALE` \| `OTHER` |
+| `era` | String? | `CLASSICAL` \| `MODERN` \| `CONTEMPORARY` \| `MEDIEVAL` \| `ROMANTIC` \| `SUFI` |
+| `poemCount` | Int? | Total poems by this poet in the database |
+| `viewCount` | Int? | Total profile views |
+| `isFeatured` | Bool? | Whether curator-featured |
+| `isTrending` | Bool? | Whether currently trending |
+| `birthPlace` | String? | Birth city name in requested `?lang=` |
+| `country` | String? | Country name in requested `?lang=` |
+| `countryFlag` | String? | Unicode flag emoji e.g. `"🇵🇰"` |
+| `countryFlagUrl` | String? | CDN flag image URL e.g. `"https://flagcdn.com/w40/pk.png"` |
+| `isActive` | Bool | `true` unless poet record is soft-deleted |
+| `topTags` | List\<String\> | Up to 3 tag names for display |
+| `tagSlugs` | List\<String\> | All tag slugs for navigation |
+
+**Flutter usage — poet card:**
+```dart
+// Show poet profile card below the poem header
+if (poem.poet != null) {
+  PoetCard(
+    imageUrl: poem.poet!.profileImageUrl,
+    name: poem.poet!.name,
+    shortBio: poem.poet!.shortBio,
+    birthYear: poem.poet!.birthYear,
+    deathYear: poem.poet!.deathYear,
+    poemCount: poem.poet!.poemCount,
+    countryFlag: poem.poet!.countryFlag,
+    onTap: () => Navigator.push(PoetDetailScreen(poem.poet!.publicId)),
+  )
+}
+```
+
+---
+
+#### 4.2.2 Field Reference — `couplets[]` Array
+
+Each element in `couplets` is a `CoupletDto`. The array is **only populated when `requiresStructuredParsing = true`** (GHAZAL and other structured types). It is an empty array `[]` for NAZAM, AZAD_NAZAM, and other free-verse types.
+
+| Field | Type | Description |
+|---|---|---|
+| `publicId` | String | Couplet's unique public UUID — use for react/bookmark calls |
+| `coupletNumber` | Int | 1-indexed position in the poem |
+| `coupletType` | String | `MATLA` \| `MAQTA` \| `REGULAR` \| `CHORUS` \| `REFRAIN` |
+| `coupletTypeName` | String | Urdu label: `مطلع` / `مقطع` / `شعر` |
+| `likeCount` | Int | Total LOVE reactions (legacy field, mirrors totalReactionCount for LOVE type) |
+| `bookmarkCount` | Int | Total bookmarks |
+| `shareCount` | Int | Total shares |
+| `reactions.total` | Int | Live total reactions across all 10 types |
+| `reactions.byType` | Map\<String,Int\>? | Live breakdown by reaction type; `null` when total = 0 |
+| `reactions.userReaction` | String? | Authenticated user's reaction key, e.g. `"WAH_WAH"`; `null` if unauthenticated or no reaction. **Use this instead of the removed `isLiked` field.** |
+| `isBookmarked` | Bool? | `true` if user has bookmarked this couplet; `null` for anonymous |
+| `verses` | List\<VerseDto\> | The two verse lines of the couplet (ordered by verseNumber) |
+| `createdAt` | DateTime | When the couplet record was created |
+
+**`coupletType` display guide:**
+| Value | Urdu | Display treatment |
+|---|---|---|
+| `MATLA` | مطلع | Opening couplet — both lines rhyme. Highlight with subtle badge. |
+| `MAQTA` | مقطع | Closing couplet — contains poet's pen name (takhallus). Highlight. |
+| `REGULAR` | شعر | Standard couplet. No badge needed. |
+| `CHORUS` | نعرہ | Refrain/chorus (Nazam). |
+| `REFRAIN` | ردیف | Repeated ending pattern. |
+
+---
+
+#### 4.2.3 Flutter — Reacting to a Couplet
+
+Use the unified reactions endpoint. The `publicId` from `couplets[n].publicId` is the target.
+
+```dart
+// React to couplet
+POST /api/couplets/{coupletPublicId}/react
+Body: { "reactionType": "WAH_WAH" }
+
+// Remove reaction (same reactionType as current = toggle off)
+POST /api/couplets/{coupletPublicId}/react
+Body: { "reactionType": "WAH_WAH" }  // same type → removes it
+
+// Bookmark/unbookmark couplet
+POST /api/couplets/{coupletPublicId}/bookmark?lang=ur
+```
+
+After reacting, update the local couplet state from the reaction response without re-fetching the full poem.
+
+---
+
+#### 4.2.4 Flutter — Dart Model Additions
+
+```dart
+class PoemDetailResponse {
+  // ... existing fields ...
+
+  final PoetSummaryResponse? poet;           // full poet card
+  final List<CoupletDto> couplets;           // per-couplet engagement
+  // isLikedByCurrentUser REMOVED — use reactions.userReaction != null
+  final bool? isBookmarkedByCurrentUser;
+  final ReactionSummaryDto reactions;        // live counts from DB
+}
+
+class PoetSummaryResponse {
+  final String publicId;
+  final String name;
+  final String? shortBio;
+  final int? birthYear;
+  final int? deathYear;
+  final String? profileImageUrl;
+  final String? gender;
+  final String? era;
+  final int? poemCount;
+  final int? viewCount;
+  final bool? isFeatured;
+  final bool? isTrending;
+  final String? birthPlace;
+  final String? country;
+  final String? countryFlag;
+  final String? countryFlagUrl;
+  final bool? isActive;
+  final List<String> topTags;
+  final List<String> tagSlugs;
+
+  factory PoetSummaryResponse.fromJson(Map<String, dynamic> json) => PoetSummaryResponse(
+    publicId: json['publicId'] as String,
+    name: json['name'] as String? ?? '',
+    shortBio: json['shortBio'] as String?,
+    birthYear: json['birthYear'] as int?,
+    deathYear: json['deathYear'] as int?,
+    profileImageUrl: json['profileImageUrl'] as String?,
+    gender: json['gender'] as String?,
+    era: json['era'] as String?,
+    poemCount: json['poemCount'] as int?,
+    viewCount: json['viewCount'] as int?,
+    isFeatured: json['isFeatured'] as bool?,
+    isTrending: json['isTrending'] as bool?,
+    birthPlace: json['birthPlace'] as String?,
+    country: json['country'] as String?,
+    countryFlag: json['countryFlag'] as String?,
+    countryFlagUrl: json['countryFlagUrl'] as String?,
+    isActive: json['isActive'] as bool?,
+    topTags: (json['topTags'] as List<dynamic>?)?.cast<String>() ?? [],
+    tagSlugs: (json['tagSlugs'] as List<dynamic>?)?.cast<String>() ?? [],
+  );
+}
+
+class CoupletDto {
+  final String publicId;
+  final int coupletNumber;
+  final String coupletType;         // MATLA | MAQTA | REGULAR | CHORUS | REFRAIN
+  final String? coupletTypeName;    // Urdu label
+  final int likeCount;
+  final int bookmarkCount;
+  final int shareCount;
+  final ReactionSummaryDto reactions; // .userReaction replaces the old isLiked field
+  // isLiked REMOVED — use reactions.userReaction != null
+  final bool? isBookmarked;         // null = anonymous
+  final List<VerseDto> verses;
+  final List<String>? tagSlugs;
+  final DateTime createdAt;
+
+  // Convenience getter — true if user has left any reaction
+  bool get isReacted => reactions.userReaction != null;
+
+  factory CoupletDto.fromJson(Map<String, dynamic> json) => CoupletDto(
+    publicId: json['publicId'] as String,
+    coupletNumber: json['coupletNumber'] as int,
+    coupletType: json['coupletType'] as String,
+    coupletTypeName: json['coupletTypeName'] as String?,
+    likeCount: json['likeCount'] as int? ?? 0,
+    bookmarkCount: json['bookmarkCount'] as int? ?? 0,
+    shareCount: json['shareCount'] as int? ?? 0,
+    reactions: ReactionSummaryDto.fromJson(json['reactions'] as Map<String, dynamic>),
+    isBookmarked: json['isBookmarked'] as bool?,
+    verses: (json['verses'] as List<dynamic>?)
+        ?.map((v) => VerseDto.fromJson(v as Map<String, dynamic>))
+        .toList() ?? [],
+    tagSlugs: (json['tagSlugs'] as List<dynamic>?)?.cast<String>(),
+    createdAt: DateTime.parse(json['createdAt'] as String),
+  );
+}
+```
+
+---
+
+**Notes:**
+- View count is automatically incremented when fetching a poem.
+- `?lang=ur` filters `contents[]` to only the Urdu entry AND localizes `poetryTypeName`, poet `name`, `shortBio`, `birthPlace`, `country`. Omit `lang` to receive all 3 language variants in `contents[]`.
+- `couplets[]` always contains Urdu/ARABIC verse text regardless of `?lang=`. The `romanizedText` field on each verse provides the Roman transliteration.
+- `reactions.total` and `reactions.byType` are **live counts** queried directly from the reactions table — never stale.
+- `isLikedByCurrentUser` is removed. Check `reactions.userReaction != null` to know if the user has reacted.
+- `poet` is `null` only in the rare case the poet entity could not be loaded; handle gracefully in Flutter.
 
 ---
 
@@ -7018,6 +7540,7 @@ Same format as Unified Search — includes `totalPoems`, `hasMorePoems`, `curren
 - `poet` (optional) - Filter by poet public ID
 - `poem` (optional) - Filter by poem public ID
 - `category` (optional) - Filter by category public ID
+- `tags` (optional, repeatable) - Filter by hashtag slugs (AND logic — all must be present). E.g. `tags=ishq&tags=ghazal`
 - `sort` (optional, default: `relevance`) - Sort order
   - `relevance` - Best match based on BM25 scoring
   - `likes` - Most liked couplets
@@ -7491,6 +8014,30 @@ curl -H "Authorization: Bearer eyJhbGci..." \
       ],
       "totalCount": 8
     },
+    "trendingHashtags": [
+      {
+        "slug": "ishq",
+        "name": "عشق",
+        "color": "#E91E63",
+        "languageCode": "ur",
+        "tagType": "THEME",
+        "coupletCount": 1240,
+        "poemCount": 320,
+        "imageCount": 45,
+        "totalUsage": 1605
+      },
+      {
+        "slug": "ghazal",
+        "name": "غزل",
+        "color": "#9C27B0",
+        "languageCode": "ur",
+        "tagType": "POEM_GENRE",
+        "coupletCount": 980,
+        "poemCount": 510,
+        "imageCount": 12,
+        "totalUsage": 1502
+      }
+    ],
     "language": "ur",
     "personalized": true,
     "timestamp": 1738961505210
@@ -7507,6 +8054,7 @@ curl -H "Authorization: Bearer eyJhbGci..." \
    - Trending content for guests
 4. **featuredPoets** - Mix of featured + trending poets (6 items)
 5. **categories** - Top 8 categories
+6. **trendingHashtags** - Top 10 hashtags ranked by couplet usage (see [Section 18](#18-hashtags-discovery))
 
 **Unified ContentCardDto Format:**
 
@@ -8206,15 +8754,21 @@ curl -X DELETE "http://localhost:9200/search_queries"
 
 ---
 
-### 11.2 Tags
+### 11.2 Tags (Admin Reference Library)
 
-**Get All:** `GET /api/tags`
+> **Tags vs Hashtags** — There are two related but distinct systems:
+> - **Tags** (this section) are admin-curated reference entries with metadata (color, type, language). They define the canonical vocabulary. There are currently ~108 admin tags.
+> - **Hashtags** (see [Section 18](#18-hashtags-discovery)) are the free-form slugs stored on content (`tagSlugs` field on poems, couplets, images). Any slug used on content automatically becomes a discoverable hashtag page — like Instagram. Hashtags are the public-facing system Flutter uses for discovery.
+
+**Get All Tags (admin reference):** `GET /api/tags`
 
 **By Type:** `GET /api/tags/type/{type}` (ERA, POET_CATEGORY, POEM_GENRE, etc.)
 
 **By Slug:** `GET /api/tags/slug/{slug}`
 
 **By ID:** `GET /api/tags/{publicId}`
+
+For hashtag discovery (trending, per-slug content pages), see **[Section 18: Hashtags](#18-hashtags-discovery)**.
 
 ---
 
@@ -8943,6 +9497,25 @@ class Couplet {
 
 ## Appendix C: Changelog
 
+### March 20, 2026 — Feed Engine v2 (9 Improvements)
+- **Following Feed Source** — Content from followed poets now surfaces in feed with `reason: "FOLLOWING"`. New `sourceId: "poet_following"` with 20% default weight, capped at 40% of any page to ensure source diversity
+- **Engagement Velocity Scoring** — Recent content with rapid engagement outranks old high-count content. Items created in last 24h with any engagement get significant score boost
+- **Negative Signal Learning** — `skip_fast` and `hide` events now persist as `UserContentPreference` entities. Poet content score is gradually reduced (-0.1 per skip, -1.0 on hide). Preferences decay 10% weekly
+- **Variable Rewards (Delighter Source)** — New `sourceId: "delighter"` injects hidden gem content at positions 8-12 in the feed to prevent predictability
+- **Display Hints (reserved, not yet sent)** — FeedItem fields `displayMode`, `primaryAction`, `autoExpandFirstVerse`, `previewDurationMs` are defined in the schema but not currently populated. They will be enabled in a future release when Flutter cards are ready to consume them
+- **Session Momentum** — Scoring weights shift by page: WARMUP (page 1: 60% personalization), EXPLORATION (pages 2-3: balanced), DEEP (page 4+: 50% personalization). Streak breaker places high-confidence item at last position of each page
+- **Social Proof Layer** — New `socialContext` object on FeedItem with `trendingLabel` ("Popular"/"Rising"), `velocityLabel` ("Trending now"/"Shared 5x this week"), `totalReactions`. **Only appears on items with 10+ likes** — null for low-engagement content
+- **Smart Pull-to-Refresh** — New `refresh=true` query parameter returns only new items without reshuffling. Session stays the same. New `newCount` field in FeedResponse (only present when `refresh=true`)
+- **Content Exhaustion Prevention** — New sources `deep_cuts` (activates at 200+ items viewed) and `time_capsule` (activates at 500+ items, resurfaces old bookmarks with `reason: "TIME_CAPSULE"`)
+- **Per-source diversity cap** — No single source can fill more than 40% of a feed page, ensuring a healthy mix of trending, following, discovery, and image content
+- **New query param**: `GET /api/feed?refresh=true` — smart pull-to-refresh
+- **New FeedItem field**: `socialContext` (only on items with 10+ likes)
+- **New FeedResponse field**: `newCount` (only present when `refresh=true`)
+- **Reserved FeedItem fields (not yet sent)**: `displayMode`, `primaryAction`, `autoExpandFirstVerse`, `previewDurationMs`
+- **New reason values**: `FOLLOWING`, `TIME_CAPSULE`
+- **Updated Flutter models**: `FeedResponse`, `FeedItem`, new `SocialContext` class
+- **No breaking changes** — all additions are backward-compatible (new fields are nullable)
+
 ### March 2026
 - **Feed `POET_IMAGE` — consistent poet fields** — `poetName`, `poetProfileImageUrl`, `poetBirthYear`, `poetDeathYear`, and `bookmarkCount` added to `POET_IMAGE` `contentData`. `lang` field is now populated (was previously `null`). All four feed item types now return the same set of poet identity fields.
 
@@ -9250,10 +9823,16 @@ The feed is an infinite-scroll, personalized stream of mixed poetry content. It 
 **Key Design Points:**
 - **Authentication required** — every request needs a valid JWT `Authorization: Bearer <token>` header
 - **Cursor-based pagination** — pass the `nextCursor` from the previous response as the `cursor` param on the next request
-- **Pull-to-refresh = omit the cursor** — sending no cursor starts a new session with fresh ordering
+- **Pull-to-refresh = `refresh=true`** — keeps existing session, returns only new items (no reshuffle). Omit cursor entirely to start a brand new session
 - **No duplicates within a session** — items shown on page 1 are excluded from page 2+
 - **Mixed content types** — one response contains couplets, poems, poet spotlights, and images
+- **Following content** — content from followed poets surfaces with `reason: "FOLLOWING"` (20% weight, max 40% of page)
 - **Events improve personalization** — send `POST /api/events/batch` after each page to make the next page smarter
+- **Negative signal learning** — `skip_fast` and `hide` events persistently reduce unwanted poet content across sessions
+- **Social proof** — FeedItem includes `socialContext` with trending labels and reaction counts (only on items with 10+ likes)
+- **Display hints (reserved)** — `displayMode`, `primaryAction`, `autoExpandFirstVerse` fields are defined but not currently sent; reserved for future Flutter integration
+- **Session momentum** — scoring weights shift as the user scrolls deeper (familiar content first, then exploration, then hyper-personalized)
+- **Content exhaustion prevention** — after 200+ items, hidden gem poets and resurfaced bookmarks activate
 - **Strict language filtering** — `COUPLET` and `POEM` items are strictly filtered to the requested `lang`; items with no content in that language are silently dropped. `POET_IMAGE` items are not filtered by language but do use `lang` to return `poetName` in the correct language
 
 ---
@@ -9271,8 +9850,9 @@ Fetch the next page of the personalized feed.
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `lang` | String | No | `ur` | Content language: `ur`, `en`, `hi`, `fa`, `ar`, `pa` |
-| `cursor` | String | No | — | Opaque cursor from previous response. Omit for first page or pull-to-refresh |
+| `cursor` | String | No | — | Opaque cursor from previous response. Omit for first page or full reset |
 | `limit` | Integer | No | `20` | Items per page (max: 20) |
+| `refresh` | Boolean | No | `false` | **Smart pull-to-refresh mode.** When `true` with an existing cursor, returns only new items without reshuffling the feed. Session stays the same. Response includes `newCount`. See Section 17.6 |
 
 **Debug Header** (development only):
 - `X-Feed-Debug: true` — adds `debugInfo` to the response (sources used, cache hit, build time)
@@ -9299,8 +9879,8 @@ Authorization: Bearer <jwt>
       {
         "type": "COUPLET",
         "publicId": "couplet_abc123",
-        "reason": "TRENDING",
-        "sourceId": "couplet_trending_7d",
+        "reason": "FOLLOWING",
+        "sourceId": "poet_following",
         "lang": "ur",
         "contentData": {
           "versesTextArabic": "ہزاروں خواہشیں ایسی کہ ہر خواہش پہ دم نکلے\nبہت نکلے مرے ارمان لیکن پھر بھی کم نکلے",
@@ -9314,12 +9894,16 @@ Authorization: Bearer <jwt>
           "likeCount": 1823,
           "shareCount": 441,
           "bookmarkCount": 287
+        },
+        "socialContext": {
+          "totalReactions": 1823,
+          "trendingLabel": "Popular"
         }
       },
       {
         "type": "POEM",
         "publicId": "poem_def456",
-        "reason": "PERSONALIZED",
+        "reason": "TRENDING",
         "sourceId": "poem_trending_7d",
         "lang": "ur",
         "contentData": {
@@ -9334,6 +9918,11 @@ Authorization: Bearer <jwt>
           "likeCount": 456,
           "viewCount": 12340,
           "thumbnailUrl": null
+        },
+        "socialContext": {
+          "totalReactions": 456,
+          "trendingLabel": "Popular",
+          "velocityLabel": "Trending now"
         }
       },
       {
@@ -9361,6 +9950,10 @@ Authorization: Bearer <jwt>
             "likeCount": 42,
             "script": "ARABIC"
           }
+        },
+        "socialContext": {
+          "totalReactions": 4201,
+          "trendingLabel": "Followed by 4201+ readers"
         }
       },
       {
@@ -9381,6 +9974,10 @@ Authorization: Bearer <jwt>
           "poetBirthYear": 1797,
           "poetDeathYear": 1869,
           "poetName": "مرزا غالب"
+        },
+        "socialContext": {
+          "totalReactions": 312,
+          "trendingLabel": "Popular"
         }
       }
     ],
@@ -9412,6 +10009,7 @@ A missing, expired, or tampered cursor is silently ignored — the server starts
 - The cursor is opaque (Base64-encoded HMAC-signed JSON) — treat it as a string, never parse it.
 - An invalid or tampered cursor is silently treated as a new session (no error returned).
 - `isPersonalized: false` means the feed ran in guest mode (only trending content, no personalization) — this should not happen as auth is required, but handle it defensively.
+- **NEW:** `newCount` — only present when `refresh=true` was used. Indicates how many genuinely new items were returned. **Omitted entirely** (not present in JSON) on normal pagination requests.
 
 ---
 
@@ -9419,14 +10017,93 @@ A missing, expired, or tampered cursor is silently ignored — the server starts
 
 Every item in the `items` array has these top-level fields:
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `type` | String | Content type: `COUPLET`, `POEM`, `POET_SPOTLIGHT`, `POET_IMAGE` |
-| `publicId` | String | The public ID of the content item |
-| `reason` | String | Why this item was included: `TRENDING`, `PERSONALIZED`, `DISCOVERY`, `CURATED` |
-| `sourceId` | String | Internal source identifier (e.g., `couplet_trending_7d`) — useful for A/B analytics |
-| `lang` | String | Language of the content (`ur`, `en`, `hi`, …). Always set for all types including `POET_IMAGE` (used to return `poetName` in the correct language) |
-| `contentData` | Object | Type-specific fields — see Section 17.4 |
+| Field | Type | Nullable | Description |
+|-------|------|----------|-------------|
+| `type` | String | No | Content type: `COUPLET`, `POEM`, `POET_SPOTLIGHT`, `POET_IMAGE` |
+| `publicId` | String | No | The public ID of the content item |
+| `reason` | String | No | Why this item was included: `TRENDING`, `PERSONALIZED`, `DISCOVERY`, `CURATED`, `FOLLOWING`, `TIME_CAPSULE` |
+| `sourceId` | String | No | Internal source identifier (e.g., `couplet_trending_7d`, `poet_following`, `delighter`, `deep_cuts`, `time_capsule`) — useful for A/B analytics |
+| `lang` | String | No | Language of the content (`ur`, `en`, `hi`, …). Always set for all types |
+| `contentData` | Object | No | Type-specific fields — see Section 17.4 |
+| `socialContext` | Object | Yes | **NEW.** Social proof data. Only present on items with 10+ likes. `null` (omitted) for low-engagement items. See Section 17.3b |
+| `displayMode` | String | Yes | **RESERVED.** Not currently sent. Will contain UI layout hint: `"compact"` or `"expanded"` when enabled |
+| `primaryAction` | String | Yes | **RESERVED.** Not currently sent. Will contain CTA hint: `"react"`, `"read_more"`, `"follow"`, `"share"` when enabled |
+| `autoExpandFirstVerse` | Boolean | Yes | **RESERVED.** Not currently sent. Will be `true` for POEM items when enabled |
+| `previewDurationMs` | Integer | Yes | **RESERVED.** Not currently sent. For future audio auto-play duration |
+
+**New `reason` values (March 2026):**
+- `FOLLOWING` — content from a poet the user follows. Highest priority source
+- `TIME_CAPSULE` — resurfaced bookmark ("You saved this 2 months ago"). Only appears after extensive scrolling (500+ items viewed)
+
+**New `sourceId` values (March 2026):**
+| sourceId | Description | When Active |
+|----------|-------------|-------------|
+| `poet_following` | Couplets/poems from followed poets | When user follows at least 1 poet |
+| `delighter` | Hidden gem — unexpected quality content | Always (low weight, injected strategically) |
+| `deep_cuts` | Undiscovered poets with quality content | After 200+ items viewed in session |
+| `time_capsule` | Resurfaced old bookmarks | After 500+ items viewed in session |
+
+---
+
+### 17.3a Display Hints (Reserved — Not Currently Sent)
+
+> **Note:** These fields are defined in the schema and Flutter models but are **not currently populated** by the backend. They will always be `null` (omitted from JSON) until a future release enables them. Parse them defensively in your models but do not rely on them yet.
+
+When enabled in a future release, they will contain:
+
+| `displayMode` | Used by | Description |
+|---------------|---------|-------------|
+| `"compact"` | COUPLET, POET_SPOTLIGHT | Small card layout — shows content inline without expanding |
+| `"expanded"` | POEM, POET_IMAGE | Larger card — shows more content, image-forward |
+
+| `primaryAction` | Used by | Suggested CTA |
+|-----------------|---------|---------------|
+| `"react"` | COUPLET | Show heart/wah-wah reaction button prominently |
+| `"read_more"` | POEM | Show "Read Full Poem" button |
+| `"follow"` | POET_SPOTLIGHT | Show "Follow" button prominently |
+| `"share"` | POET_IMAGE | Show share button prominently |
+
+| Field | When Set | Purpose |
+|-------|----------|---------|
+| `autoExpandFirstVerse: true` | POEM items only | Show the matla (opening couplet) of the poem expanded by default |
+
+**Flutter: define the fields but don't use them yet:**
+```dart
+// These fields are parsed from JSON but will always be null until backend enables them
+final String? displayMode;          // future: "compact" | "expanded"
+final String? primaryAction;        // future: "react" | "read_more" | "follow" | "share"
+final bool? autoExpandFirstVerse;   // future: true for POEM
+```
+
+---
+
+### 17.3b Social Context
+
+The `socialContext` object provides social proof data to make the feed feel alive. It is **`null` (omitted from JSON) for items with fewer than 10 likes**. Most items in a new platform will not have socialContext — it activates as engagement grows.
+
+| Field | Type | Nullable | Description |
+|-------|------|----------|-------------|
+| `reactedByNames` | String[] | Yes | First 2-3 names of users who reacted (reserved for future — currently `null`) |
+| `totalReactions` | Integer | Yes | Total like count. `null` if 0 |
+| `trendingLabel` | String | Yes | Badge text: `"Popular"` (100+ likes), `"Rising"` (50+ likes), or poet-specific like `"Followed by 500+ readers"` |
+| `velocityLabel` | String | Yes | Recency signal: `"Trending now"` (created < 24h, 10+ likes) or `"Shared 5x this week"` |
+| `activityLabel` | String | Yes | Social signal (reserved for future — currently `null`): `"3 people you follow reacted"` |
+
+**Flutter rendering guidance:**
+- Show `trendingLabel` as a badge/chip on the card (e.g., colored pill with "Popular")
+- Show `velocityLabel` as a subtle line below the content (e.g., flame icon + "Trending now")
+- Both are `null` for most items — only render when present
+- `socialContext` itself is `null` for low-engagement items — always null-check before accessing fields
+
+```dart
+if (item.socialContext != null) {
+  if (item.socialContext!.trendingLabel != null) {
+    // Show badge: "Popular", "Rising", "Followed by 500+ readers"
+  }
+  if (item.socialContext!.velocityLabel != null) {
+    // Show: 🔥 "Trending now"
+  }
+}
 
 ---
 
@@ -9676,10 +10353,42 @@ Authorization: Bearer <jwt>
 - `itemCount: 0` with `hasMore: true` means cross-session seen history temporarily covered all candidates — pass `nextCursor` as-is and fresh items will appear on the next page.
 - There is no `hasMore == false` end signal. Never stop polling based on `hasMore`; stop only when the user leaves the feed screen.
 
-#### Pull-to-Refresh
+#### Pull-to-Refresh (Smart — Recommended) ⭐ NEW
+Use `refresh=true` with the existing cursor to get only new items without losing the user's place:
+```
+GET /api/feed?lang=ur&cursor=<existingCursor>&refresh=true
+Authorization: Bearer <jwt>
+```
+- Session stays the same (same seed, same seen set)
+- Only items created since the last fetch are returned
+- Response includes `newCount` — the number of genuinely new items
+- **Prepend** new items to the top of your list (don't replace)
+- Keep using the new `nextCursor` for subsequent pagination
+
+```dart
+Future<void> smartRefresh() async {
+  final response = await api.getFeed(
+    lang: lang,
+    cursor: _nextCursor,  // keep existing cursor
+    refresh: true,
+  );
+  if (response != null && response.items.isNotEmpty) {
+    _items.insertAll(0, response.items);  // prepend to top
+    _nextCursor = response.nextCursor;
+    notifyListeners();
+  }
+}
+```
+
+#### Pull-to-Refresh (Full Reset — Legacy)
+To completely reshuffle the feed (new session, new ordering):
 - Clear your local cursor (`nextCursor = null`)
 - Send `GET /api/feed?lang=ur` with no cursor
 - Replace the entire item list with the new response
+
+**When to use which:**
+- **Smart refresh** (`refresh=true`): User pulls to check for new content. Fast, preserves context
+- **Full reset** (no cursor): User explicitly wants a fresh experience, or cold app start
 
 ---
 
@@ -9695,6 +10404,7 @@ class FeedResponse {
   final bool isPersonalized;
   final String sessionId;
   final int itemCount;
+  final int? newCount;        // NEW: only set on refresh=true — number of genuinely new items
 
   FeedResponse({
     required this.items,
@@ -9703,6 +10413,7 @@ class FeedResponse {
     required this.isPersonalized,
     required this.sessionId,
     required this.itemCount,
+    this.newCount,
   });
 
   factory FeedResponse.fromJson(Map<String, dynamic> json) {
@@ -9715,6 +10426,7 @@ class FeedResponse {
       isPersonalized: json['isPersonalized'] ?? false,
       sessionId: json['sessionId'] ?? '',
       itemCount: json['itemCount'] ?? 0,
+      newCount: json['newCount'],
     );
   }
 }
@@ -9722,10 +10434,19 @@ class FeedResponse {
 class FeedItem {
   final String type;        // COUPLET | POEM | POET_SPOTLIGHT | POET_IMAGE
   final String publicId;
-  final String reason;      // TRENDING | PERSONALIZED | DISCOVERY | CURATED
+  final String reason;      // TRENDING | PERSONALIZED | DISCOVERY | CURATED | FOLLOWING | TIME_CAPSULE
   final String sourceId;
   final String? lang;
   final Map<String, dynamic> contentData;
+
+  // Social proof (v2) — only present on items with 10+ likes
+  final SocialContext? socialContext;
+
+  // Display hints (RESERVED — not currently sent by backend, always null for now)
+  final String? displayMode;          // future: "compact" | "expanded"
+  final String? primaryAction;        // future: "react" | "read_more" | "follow" | "share"
+  final bool? autoExpandFirstVerse;   // future: true for POEM — show matla expanded
+  final int? previewDurationMs;       // future: audio auto-play duration
 
   FeedItem({
     required this.type,
@@ -9734,6 +10455,11 @@ class FeedItem {
     required this.sourceId,
     this.lang,
     required this.contentData,
+    this.socialContext,
+    this.displayMode,
+    this.primaryAction,
+    this.autoExpandFirstVerse,
+    this.previewDurationMs,
   });
 
   factory FeedItem.fromJson(Map<String, dynamic> json) {
@@ -9744,6 +10470,42 @@ class FeedItem {
       sourceId: json['sourceId'] ?? '',
       lang: json['lang'],
       contentData: Map<String, dynamic>.from(json['contentData'] ?? {}),
+      socialContext: json['socialContext'] != null
+          ? SocialContext.fromJson(json['socialContext'])
+          : null,
+      // Reserved fields — not currently sent by backend, always null for now
+      displayMode: json['displayMode'],
+      primaryAction: json['primaryAction'],
+      autoExpandFirstVerse: json['autoExpandFirstVerse'],
+      previewDurationMs: json['previewDurationMs'],
+    );
+  }
+}
+
+class SocialContext {
+  final List<String>? reactedByNames;
+  final int? totalReactions;
+  final String? trendingLabel;
+  final String? velocityLabel;
+  final String? activityLabel;
+
+  SocialContext({
+    this.reactedByNames,
+    this.totalReactions,
+    this.trendingLabel,
+    this.velocityLabel,
+    this.activityLabel,
+  });
+
+  factory SocialContext.fromJson(Map<String, dynamic> json) {
+    return SocialContext(
+      reactedByNames: json['reactedByNames'] != null
+          ? List<String>.from(json['reactedByNames'])
+          : null,
+      totalReactions: json['totalReactions'],
+      trendingLabel: json['trendingLabel'],
+      velocityLabel: json['velocityLabel'],
+      activityLabel: json['activityLabel'],
     );
   }
 }
@@ -9789,11 +10551,13 @@ class FeedApiService {
     String lang = 'ur',
     String? cursor,
     int limit = 20,
+    bool refresh = false,
   }) async {
     final uri = Uri.parse('$baseUrl/api/feed').replace(queryParameters: {
       'lang': lang,
       'limit': '$limit',
       if (cursor != null) 'cursor': cursor,
+      if (refresh) 'refresh': 'true',
     });
 
     final response = await http.get(uri, headers: {
@@ -9854,7 +10618,7 @@ class FeedController extends ChangeNotifier {
 
   FeedController({required this.api, this.lang = 'ur'});
 
-  /// Load first page (call on init or pull-to-refresh)
+  /// Load first page (call on init or full reset)
   Future<void> loadFirstPage() async {
     await _flushEvents();           // flush events from previous session
     _items = [];
@@ -9863,6 +10627,26 @@ class FeedController extends ChangeNotifier {
     _hasMore = true;
     _error = false;
     await _loadPage();
+  }
+
+  /// Smart pull-to-refresh — returns only new items, preserves session context
+  Future<void> smartRefresh() async {
+    if (_nextCursor == null) {
+      // No existing session — fall back to full reset
+      await loadFirstPage();
+      return;
+    }
+    final response = await api.getFeed(
+      lang: lang,
+      cursor: _nextCursor,
+      refresh: true,
+    );
+    if (response != null && response.items.isNotEmpty) {
+      _items.insertAll(0, response.items); // prepend new items to top
+      _nextCursor = response.nextCursor;
+      _sessionId = response.sessionId;
+      notifyListeners();
+    }
   }
 
   /// Load next page (call when user scrolls near bottom)
@@ -9996,7 +10780,7 @@ Widget buildFeedItem(FeedItem item) {
   }
 }
 
-// Example: Couplet card
+// Example: Couplet card with social proof + following badge
 class CoupletFeedCard extends StatelessWidget {
   final FeedItem item;
   const CoupletFeedCard({required this.item});
@@ -10010,6 +10794,21 @@ class CoupletFeedCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Social proof badge (only present on items with 10+ likes)
+            if (item.socialContext?.trendingLabel != null)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.amber.shade100,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(item.socialContext!.trendingLabel!,
+                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+              ),
+            // "Following" reason badge (v2)
+            if (item.reason == 'FOLLOWING')
+              const Text('From a poet you follow',
+                  style: TextStyle(fontSize: 11, color: Colors.blue)),
             if (data['versesTextArabic'] != null)
               Text(data['versesTextArabic'],
                   style: const TextStyle(fontSize: 20, fontFamily: 'NotoNastaliqUrdu')),
@@ -10020,6 +10819,10 @@ class CoupletFeedCard extends StatelessWidget {
             if (data['poetName'] != null)
               Text('— ${data['poetName']}',
                   style: const TextStyle(fontStyle: FontStyle.italic)),
+            // Velocity label (only on trending content with recent engagement)
+            if (item.socialContext?.velocityLabel != null)
+              Text('${item.socialContext!.velocityLabel!}',
+                  style: TextStyle(fontSize: 12, color: Colors.orange.shade700)),
             Row(
               children: [
                 const Icon(Icons.favorite_border, size: 16),
@@ -10072,7 +10875,7 @@ class _FeedScreenState extends State<FeedScreen> {
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) => RefreshIndicator(
-        onRefresh: _controller.loadFirstPage,
+        onRefresh: _controller.smartRefresh, // smart refresh (preserves session)
         child: ListView.builder(
           controller: _scrollController,
           itemCount: _controller.items.length + 1,
@@ -10125,13 +10928,1504 @@ class _FeedScreenState extends State<FeedScreen> {
 
 ---
 
+---
+
+## 18. Hashtags & Discovery {#18-hashtags-discovery}
+
+### 18.1 Tags vs Hashtags
+
+The platform has two related but distinct systems:
+
+| Concept | Tags | Hashtags |
+|---------|------|----------|
+| **What it is** | Admin-curated reference library (~108 entries) | Free-form slugs stored on content |
+| **Who creates them** | Admin portal only | Created automatically when slugs are added to poems, images, etc. |
+| **Where stored** | `tags` DB table | `tagSlugs` JSON array on `poems`, `couplets`, `poet_images`, `poets`, `poet_books`, `poet_videos` |
+| **Purpose** | Canonical vocabulary, filtering in admin | Public discovery pages (like Instagram hashtags) |
+| **API** | `/api/tags/**` | `/api/hashtags/**` |
+
+**Key insight:** When an admin tags a poem with slug `"ishq"`, that slug automatically becomes a hashtag page at `GET /api/hashtags/ishq/poems`. No separate hashtag creation needed — it's emergent from the content tagging system.
+
+Couplets inherit `tagSlugs` from their parent poem. All `CoupletDto` and `CoupletDetailResponse` objects now include a `tagSlugs` field.
+
+---
+
+### 18.2 All Hashtags (Paginated List) {#182-all-hashtags-paginated-list}
+
+**Endpoint:** `GET /api/hashtags?page=0&size=20&search=ishq&sort=totalUsage,desc`
+
+**Authentication:** Not required
+
+**Description:** Paginated, searchable, filterable list of all distinct hashtags. Use this for a hashtag browser/directory screen. Unlike the trending endpoint, this covers **all** hashtags with full pagination.
+
+**Query Parameters:**
+- `page` (optional, default: `0`) - Page number (zero-based)
+- `size` (optional, default: `20`, max: `100`) - Results per page
+- `search` (optional) - Partial match on slug OR display name
+- `sort` (optional, default: `totalUsage,desc`) - Sort field + direction
+  - `totalUsage,desc` — most used overall (default)
+  - `poemCount,desc` — most used on poems
+  - `imageCount,desc` — most used on images
+  - `poetCount,desc` — most used on poets
+  - `bookCount,desc` — most used on books
+  - `videoCount,desc` — most used on videos
+  - `slug,asc` — alphabetical
+  - `name,asc` — alphabetical by display name
+- `languageCode` (optional) - Only hashtags with a matching admin Tag in this language (`ur`, `en`, `hi`)
+- `tagType` (optional) - Only hashtags with a matching admin Tag of this type (`THEME`, `POEM_GENRE`, `ERA`, `MOOD`, etc.)
+
+> **Note:** `coupletCount` is not in the list response (not scalable per-slug from ES). Use `GET /api/hashtags/{slug}` for full counts including couplets.
+
+**Example:**
+```bash
+curl "http://localhost:8081/api/hashtags?page=0&size=20&search=ishq&sort=totalUsage,desc"
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Found 320 hashtags",
+  "data": {
+    "content": [
+      {
+        "slug": "ishq",
+        "name": "عشق",
+        "color": "#E91E63",
+        "languageCode": "ur",
+        "tagType": "THEME",
+        "poemCount": 320,
+        "imageCount": 45,
+        "totalUsage": 365
+      },
+      {
+        "slug": "dillagi",
+        "name": "dillagi",
+        "poemCount": 80,
+        "imageCount": 12,
+        "totalUsage": 92
+      }
+    ],
+    "totalElements": 320,
+    "totalPages": 16,
+    "number": 0,
+    "size": 20,
+    "first": true,
+    "last": false,
+    "empty": false
+  }
+}
+```
+
+---
+
+### 18.3 Trending Hashtags {#183-trending-hashtags}
+
+**Endpoint:** `GET /api/hashtags/trending?limit=20`
+
+**Authentication:** Not required
+
+**Description:** Returns the most-used hashtags ranked by couplet count (via Elasticsearch aggregation). Falls back to poem tag counts if ES is unavailable.
+
+**Query Parameters:**
+- `limit` (optional, default: `20`, max: `50`) - Number of hashtags to return
+
+**Example:**
+```bash
+curl "http://localhost:8081/api/hashtags/trending?limit=10"
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Found 10 trending hashtags",
+  "data": [
+    {
+      "slug": "ishq",
+      "name": "عشق",
+      "color": "#E91E63",
+      "languageCode": "ur",
+      "tagType": "THEME",
+      "coupletCount": 1240,
+      "poemCount": null,
+      "imageCount": null,
+      "totalUsage": 1240
+    },
+    {
+      "slug": "ghazal",
+      "name": "غزل",
+      "color": "#9C27B0",
+      "languageCode": "ur",
+      "tagType": "POEM_GENRE",
+      "coupletCount": 980,
+      "poemCount": null,
+      "imageCount": null,
+      "totalUsage": 980
+    }
+  ]
+}
+```
+
+> **Note:** The trending endpoint ranks by `coupletCount` only. Use `/api/hashtags/{slug}` to get full counts across all content types.
+
+---
+
+### 18.4 Hashtag Stats {#184-hashtag-stats}
+
+**Endpoint:** `GET /api/hashtags/stats?topLimit=10`
+
+**Authentication:** Not required
+
+**Description:** Platform-wide hashtag statistics. Useful for an analytics or admin overview.
+
+**Query Parameters:**
+- `topLimit` (optional, default: `10`, max: `50`) - Number of top hashtags to include
+
+**Example:**
+```bash
+curl "http://localhost:8081/api/hashtags/stats"
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Hashtag statistics",
+  "data": {
+    "totalDistinctHashtags": 320,
+    "totalPoemTagUsage": 4820,
+    "totalImageTagUsage": 1205,
+    "adminTagCount": 108,
+    "topHashtags": [
+      {
+        "slug": "ishq",
+        "name": "عشق",
+        "color": "#E91E63",
+        "languageCode": "ur",
+        "tagType": "THEME",
+        "coupletCount": 1240,
+        "poemCount": null,
+        "imageCount": null,
+        "totalUsage": 1240
+      }
+    ]
+  }
+}
+```
+
+---
+
+### 18.5 Single Hashtag Metadata {#185-single-hashtag-metadata}
+
+**Endpoint:** `GET /api/hashtags/{slug}`
+
+**Authentication:** Not required
+
+**Description:** Full metadata for a single hashtag — counts across poems, couplets, and images. Use this to render a hashtag page header.
+
+**Path Parameters:**
+- `slug` - The hashtag slug (e.g., `ishq`, `ghazal`, `mohabbat`)
+
+**Example:**
+```bash
+curl "http://localhost:8081/api/hashtags/ishq"
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Hashtag: #ishq",
+  "data": {
+    "slug": "ishq",
+    "name": "عشق",
+    "color": "#E91E63",
+    "languageCode": "ur",
+    "tagType": "THEME",
+    "coupletCount": 1240,
+    "poemCount": 320,
+    "imageCount": 45,
+    "totalUsage": 1605
+  }
+}
+```
+
+> **Tip:** If the slug does not have a matching admin `Tag` entry, `name` defaults to the slug itself, and `color`, `languageCode`, `tagType` will be `null`.
+
+---
+
+### 18.6 Poems by Hashtag {#186-poems-by-hashtag}
+
+**Endpoint:** `GET /api/hashtags/{slug}/poems?lang=ur&page=0&size=10`
+
+**Authentication:** Not required
+
+**Description:** Paginated list of poems tagged with this hashtag, ordered by engagement (share count + like count).
+
+**Path Parameters:**
+- `slug` - Hashtag slug
+
+**Query Parameters:**
+- `lang` (optional, default: `ur`) - Language code for poem content (ur, en, hi)
+- `page` (optional, default: `0`) - Page number
+- `size` (optional, default: `10`, max: `50`) - Results per page
+
+**Example:**
+```bash
+curl "http://localhost:8081/api/hashtags/ishq/poems?lang=ur&page=0&size=10"
+```
+
+**Response:** Same as `PoemDetailResponse` paginated — see Section 5 for field reference.
+
+---
+
+### 18.7 Couplets by Hashtag {#187-couplets-by-hashtag}
+
+**Endpoint:** `GET /api/hashtags/{slug}/couplets?lang=ur&page=0&size=10`
+
+**Authentication:** Not required
+
+**Description:** Paginated list of couplets tagged with this hashtag (via Elasticsearch). Falls back to empty page if ES is unavailable.
+
+**Path Parameters:**
+- `slug` - Hashtag slug
+
+**Query Parameters:**
+- `lang` (optional, default: `ur`) - Language code for verse text
+- `page` (optional, default: `0`) - Page number
+- `size` (optional, default: `10`, max: `50`) - Results per page
+
+**Example:**
+```bash
+curl "http://localhost:8081/api/hashtags/ishq/couplets?lang=ur&page=0&size=20"
+```
+
+**Response:** Paginated `CoupletDto` — see Section 6 for field reference. Each couplet now includes `tagSlugs`.
+
+---
+
+### 18.8 Images by Hashtag {#188-images-by-hashtag}
+
+**Endpoint:** `GET /api/hashtags/{slug}/images?page=0&size=20`
+
+**Authentication:** Not required
+
+**Description:** Paginated list of poet gallery images (POETRY type) tagged with this hashtag, ordered by engagement.
+
+**Path Parameters:**
+- `slug` - Hashtag slug
+
+**Query Parameters:**
+- `page` (optional, default: `0`) - Page number
+- `size` (optional, default: `20`, max: `50`) - Results per page
+
+**Example:**
+```bash
+curl "http://localhost:8081/api/hashtags/ishq/images?page=0&size=20"
+```
+
+**Response:** Paginated `PoetImageDto` — includes `tagSlugs`, `likeCount`, `bookmarkCount`, `shareCount`.
+
+---
+
+### 18.9 Poets by Hashtag {#189-poets-by-hashtag}
+
+**Endpoint:** `GET /api/hashtags/{slug}/poets?lang=ur&page=0&size=20`
+
+**Authentication:** Not required
+
+**Description:** Paginated list of poets tagged with this hashtag slug (via `tagSlugs` JSONB field on poets), ordered by follower count then poem count.
+
+**Path Parameters:**
+- `slug` - Hashtag slug
+
+**Query Parameters:**
+- `lang` (optional, default: `ur`) - Language code for poet name/bio
+- `page` (optional, default: `0`) - Page number
+- `size` (optional, default: `20`, max: `50`) - Results per page
+
+**Example:**
+```bash
+curl "http://localhost:8081/api/hashtags/classical/poets?lang=ur&page=0&size=20"
+```
+
+**Response:** Paginated `PoetSummaryResponse` — same structure as poet list endpoints (Section 3).
+
+---
+
+### 18.10 Books by Hashtag {#1810-books-by-hashtag}
+
+**Endpoint:** `GET /api/hashtags/{slug}/books?page=0&size=20`
+
+**Authentication:** Not required
+
+**Description:** Paginated list of poet books tagged with this hashtag slug, ordered by creation date descending.
+
+**Path Parameters:**
+- `slug` - Hashtag slug
+
+**Query Parameters:**
+- `page` (optional, default: `0`) - Page number
+- `size` (optional, default: `20`, max: `50`) - Results per page
+
+**Example:**
+```bash
+curl "http://localhost:8081/api/hashtags/classical/books?page=0&size=20"
+```
+
+**Response:** Paginated `PoetBookDto` — same structure as book list endpoints (Section 3).
+
+---
+
+### 18.11 Videos by Hashtag {#1811-videos-by-hashtag}
+
+**Endpoint:** `GET /api/hashtags/{slug}/videos?page=0&size=20`
+
+**Authentication:** Not required
+
+**Description:** Paginated list of poet videos tagged with this hashtag slug, ordered by creation date descending.
+
+**Path Parameters:**
+- `slug` - Hashtag slug
+
+**Query Parameters:**
+- `page` (optional, default: `0`) - Page number
+- `size` (optional, default: `20`, max: `50`) - Results per page
+
+**Example:**
+```bash
+curl "http://localhost:8081/api/hashtags/classical/videos?page=0&size=20"
+```
+
+**Response:** Paginated `PoetVideoDto` — same structure as video list endpoints (Section 3).
+
+---
+
+### 18.12 Filter Search by Hashtag {#1812-filter-search-by-hashtag}
+
+Both the couplet search and poem search endpoints support filtering by hashtag slugs.
+
+**Couplet Search with hashtag filter:**
+```bash
+# Couplets about "ishq" AND "ghazal"
+GET /api/search/couplets?q=*&tags=ishq&tags=ghazal&sort=likes&lang=ur
+```
+
+**Poem Search with hashtag filter (via PoemSearchRequest body or query params):**
+```bash
+# Poems tagged with "mohabbat"
+GET /api/search/poems?q=*&tagSlugs=mohabbat
+```
+
+**Filter logic:** All provided slugs must be present on the content (AND logic). This matches how multi-tag filtering works on content platforms.
+
+---
+
+### 18.13 HashtagDto Reference {#1813-hashtagdto-reference}
+
+All hashtag endpoints return `HashtagDto` objects with this structure:
+
+```typescript
+interface HashtagDto {
+  slug: string;           // URL-safe slug (e.g. "ishq")
+  name: string | null;   // Display name — from admin Tag if exists, else the slug itself
+  color: string | null;  // Hex color for UI pill (e.g. "#E91E63") — null if no admin Tag
+  languageCode: string | null; // Primary language of this tag (ur, en, hi) — null if no admin Tag
+  tagType: string | null; // One of: THEME, POEM_GENRE, ERA, POET_CATEGORY, MOOD, LANGUAGE — null if no admin Tag
+  coupletCount: number | null; // Count of couplets with this tag
+  poemCount: number | null;    // Count of poems with this tag
+  imageCount: number | null;   // Count of poet images with this tag
+  poetCount: number | null;    // Count of poets with this tag
+  bookCount: number | null;    // Count of poet books with this tag
+  videoCount: number | null;   // Count of poet videos with this tag
+  totalUsage: number;          // Sum of all content counts (poem + couplet + image + poet + book + video)
+}
+```
+
+> **Null fields:** Fields sourced from the admin `Tag` table (`color`, `languageCode`, `tagType`) will be `null` for hashtags that have no matching admin entry. The `name` field falls back to the slug string. Thanks to `@JsonInclude(NON_NULL)`, null fields are omitted from the response.
+
+---
+
+### 18.14 Flutter Implementation Guide {#1814-flutter-implementation-guide}
+
+#### Hashtag Pill Widget
+
+```dart
+/// Renders a single hashtag pill. Tapping navigates to the hashtag page.
+class HashtagPill extends StatelessWidget {
+  final HashtagDto hashtag;
+  const HashtagPill({required this.hashtag, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = hashtag.color != null
+        ? Color(int.parse(hashtag.color!.replaceAll('#', '0xFF')))
+        : Theme.of(context).colorScheme.primary;
+
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => HashtagPage(slug: hashtag.slug),
+        ),
+      ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: color.withOpacity(0.4)),
+        ),
+        child: Text(
+          '#${hashtag.name ?? hashtag.slug}',
+          style: TextStyle(color: color, fontWeight: FontWeight.w600),
+        ),
+      ),
+    );
+  }
+}
+```
+
+#### Hashtag Page (content tabs)
+
+```dart
+/// Full hashtag page with poems/couplets/images tabs.
+class HashtagPage extends StatefulWidget {
+  final String slug;
+  const HashtagPage({required this.slug, super.key});
+  @override
+  State<HashtagPage> createState() => _HashtagPageState();
+}
+
+class _HashtagPageState extends State<HashtagPage> with SingleTickerProviderStateMixin {
+  late TabController _tab;
+  HashtagDto? _meta;
+
+  @override
+  void initState() {
+    super.initState();
+    _tab = TabController(length: 6, vsync: this); // poems, couplets, images, poets, books, videos
+    _loadMeta();
+  }
+
+  Future<void> _loadMeta() async {
+    final res = await http.get(Uri.parse('/api/hashtags/${widget.slug}'));
+    if (res.statusCode == 200) {
+      setState(() => _meta = HashtagDto.fromJson(jsonDecode(res.body)['data']));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('#${_meta?.name ?? widget.slug}'),
+        bottom: TabBar(
+          controller: _tab,
+          tabs: [
+            Tab(text: 'Couplets ${_meta != null ? "(${_meta!.coupletCount})" : ""}'),
+            Tab(text: 'Poems ${_meta != null ? "(${_meta!.poemCount})" : ""}'),
+            Tab(text: 'Images ${_meta != null ? "(${_meta!.imageCount})" : ""}'),
+          ],
+        ),
+      ),
+      body: TabBarView(
+        controller: _tab,
+        children: [
+          HashtagCoupletsTab(slug: widget.slug),
+          HashtagPoemsTab(slug: widget.slug),
+          HashtagImagesTab(slug: widget.slug),
+        ],
+      ),
+    );
+  }
+}
+```
+
+#### Trending Hashtags on Discover Screen
+
+```dart
+// In discover screen, after loading the bundle:
+// bundle.trendingHashtags is already included in GET /api/discover response
+
+Widget _buildHashtagSection(List<HashtagDto> hashtags) {
+  return SizedBox(
+    height: 40,
+    child: ListView.separated(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      itemCount: hashtags.length,
+      separatorBuilder: (_, __) => const SizedBox(width: 8),
+      itemBuilder: (_, i) => HashtagPill(hashtag: hashtags[i]),
+    ),
+  );
+}
+```
+
+---
+
+## 19. Unified Reactions System {#19-unified-reactions-system}
+
+### 19.1 Overview — Reactions vs Likes
+
+The reactions system **replaces** the old binary like/unlike with 10 expressive reaction types inspired by Urdu mushaira culture. Users can now react with WAH_WAH, SUBHAN_ALLAH, and more — making engagement richer and more culturally authentic.
+
+**Key Concepts:**
+- **One reaction per user per content** — a user can have only one active reaction on any piece of content
+- **Toggle behavior** — tapping the same reaction removes it; tapping a different one changes it
+- **Unified API** — one endpoint works for all content types (poems, couplets, poet images, generated images)
+- **Backward compatible** — old `/like` endpoints still work, `likeCount`/`isLiked` fields preserved
+
+**Target Content Types:**
+
+| Path Segment | Target Type | Description |
+|---|---|---|
+| `poems` | POEM | Full poems |
+| `couplets` | COUPLET | Individual couplets (sher) |
+| `poetry-images` | POET_IMAGE | Poet gallery images |
+| `generated-images` | GENERATED_IMAGE | User-created poetry images |
+
+---
+
+### 19.2 Available Reaction Types
+
+| Key | Emoji | Urdu Label | English Label | When to Use |
+|---|---|---|---|---|
+| `LOVE` | ❤️ | پسند | Love | Default/general appreciation |
+| `WAH_WAH` | 👏 | واہ واہ | Wah Wah | Classic mushaira response — "bravo!" |
+| `SUBHAN_ALLAH` | 🤲 | سبحان اللہ | Subhan Allah | When poetry feels divine/sublime |
+| `MAZA_AA_GAYA` | 🤩 | مزا آ گیا | Maza Aa Gaya | Thoroughly enjoyed — pure delight |
+| `KYA_BAAT_HAI` | 💯 | کیا بات ہے | Kya Baat Hai | Impressive craft/wordplay |
+| `FIRE` | 🔥 | لاجواب | Fire | Powerful/hard-hitting verse |
+| `SAD` | 😢 | دل ٹوٹ گیا | Sad | Moved to tears/melancholy |
+| `DEEP` | 🤔 | گہری بات | Deep | Thought-provoking/philosophical |
+| `RELATABLE` | 🥹 | دل کی بات | Relatable | "This is my story" |
+| `BEAUTIFUL` | ✨ | خوبصورت | Beautiful | Aesthetic beauty of words |
+
+---
+
+### 19.3 Get Reaction Types (Public)
+
+**Endpoint:** `GET /api/reactions/types`
+
+**Authentication:** Not required (public endpoint)
+
+**Description:** Returns all available reaction types with emoji and multilingual labels. Cache this response — it rarely changes.
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Reaction types retrieved",
+  "data": [
+    {
+      "key": "LOVE",
+      "emoji": "❤️",
+      "urduLabel": "پسند",
+      "englishLabel": "Love"
+    },
+    {
+      "key": "WAH_WAH",
+      "emoji": "👏",
+      "urduLabel": "واہ واہ",
+      "englishLabel": "Wah Wah"
+    },
+    {
+      "key": "SUBHAN_ALLAH",
+      "emoji": "🤲",
+      "urduLabel": "سبحان اللہ",
+      "englishLabel": "Subhan Allah"
+    },
+    {
+      "key": "MAZA_AA_GAYA",
+      "emoji": "🤩",
+      "urduLabel": "مزا آ گیا",
+      "englishLabel": "Maza Aa Gaya"
+    },
+    {
+      "key": "KYA_BAAT_HAI",
+      "emoji": "💯",
+      "urduLabel": "کیا بات ہے",
+      "englishLabel": "Kya Baat Hai"
+    },
+    {
+      "key": "FIRE",
+      "emoji": "🔥",
+      "urduLabel": "لاجواب",
+      "englishLabel": "Fire"
+    },
+    {
+      "key": "SAD",
+      "emoji": "😢",
+      "urduLabel": "دل ٹوٹ گیا",
+      "englishLabel": "Sad"
+    },
+    {
+      "key": "DEEP",
+      "emoji": "🤔",
+      "urduLabel": "گہری بات",
+      "englishLabel": "Deep"
+    },
+    {
+      "key": "RELATABLE",
+      "emoji": "🥹",
+      "urduLabel": "دل کی بات",
+      "englishLabel": "Relatable"
+    },
+    {
+      "key": "BEAUTIFUL",
+      "emoji": "✨",
+      "urduLabel": "خوبصورت",
+      "englishLabel": "Beautiful"
+    }
+  ]
+}
+```
+
+**Flutter Usage:**
+```dart
+// Fetch once at app start and cache
+final response = await dio.get('/api/reactions/types');
+final reactionTypes = (response.data['data'] as List)
+    .map((e) => ReactionType.fromJson(e))
+    .toList();
+```
+
+---
+
+### 19.4 React to Content
+
+**Endpoint:** `POST /api/{targetType}/{publicId}/react`
+
+**Authentication:** Required (Bearer token)
+
+**Path Parameters:**
+
+| Parameter | Type | Description |
+|---|---|---|
+| `targetType` | String | One of: `poems`, `couplets`, `poetry-images`, `generated-images` |
+| `publicId` | String | Public ID of the content item |
+
+**Request Body:**
+```json
+{
+  "reactionType": "WAH_WAH"
+}
+```
+
+**Valid `reactionType` values:** `LOVE`, `WAH_WAH`, `SUBHAN_ALLAH`, `MAZA_AA_GAYA`, `KYA_BAAT_HAI`, `FIRE`, `SAD`, `DEEP`, `RELATABLE`, `BEAUTIFUL`
+
+**Behavior:**
+
+| Current State | Action | Result |
+|---|---|---|
+| No reaction exists | Send `WAH_WAH` | Reaction added |
+| User has `WAH_WAH` | Send `WAH_WAH` | Reaction **removed** (toggle off) |
+| User has `LOVE` | Send `WAH_WAH` | Reaction **changed** to WAH_WAH |
+
+**Response — Reaction Added (200):**
+```json
+{
+  "success": true,
+  "message": "Reaction added",
+  "data": {
+    "userReaction": "WAH_WAH",
+    "totalReactionCount": 143,
+    "reactionCounts": null,
+    "message": "Reaction added"
+  }
+}
+```
+
+**Response — Reaction Changed (200):**
+```json
+{
+  "success": true,
+  "message": "Reaction changed",
+  "data": {
+    "userReaction": "FIRE",
+    "totalReactionCount": 143,
+    "reactionCounts": null,
+    "message": "Reaction changed"
+  }
+}
+```
+
+**Response — Reaction Removed / Toggle Off (200):**
+```json
+{
+  "success": true,
+  "message": "Reaction removed",
+  "data": {
+    "userReaction": null,
+    "totalReactionCount": 142,
+    "reactionCounts": null,
+    "message": "Reaction removed"
+  }
+}
+```
+
+**Error — Not Authenticated (401):**
+```json
+{
+  "success": false,
+  "message": "Authentication required"
+}
+```
+
+**Error — Invalid Target Type (400):**
+```json
+{
+  "success": false,
+  "message": "Invalid target type: unknown-type"
+}
+```
+
+**Examples:**
+
+```bash
+# React to a poem with WAH_WAH
+curl -X POST http://localhost:8081/api/poems/abc-123/react \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"reactionType": "WAH_WAH"}'
+
+# React to a couplet with SUBHAN_ALLAH
+curl -X POST http://localhost:8081/api/couplets/def-456/react \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"reactionType": "SUBHAN_ALLAH"}'
+
+# React to a poet image with FIRE
+curl -X POST http://localhost:8081/api/poetry-images/ghi-789/react \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"reactionType": "FIRE"}'
+
+# React to a generated image with BEAUTIFUL
+curl -X POST http://localhost:8081/api/generated-images/jkl-012/react \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"reactionType": "BEAUTIFUL"}'
+```
+
+---
+
+### 19.5 Remove Reaction
+
+**Endpoint:** `DELETE /api/{targetType}/{publicId}/react`
+
+**Authentication:** Required (Bearer token)
+
+**Description:** Explicitly removes the user's reaction from a content item. This is an alternative to the toggle behavior in the POST endpoint.
+
+**Path Parameters:** Same as Section 19.4.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Reaction removed",
+  "data": {
+    "userReaction": null,
+    "totalReactionCount": 142,
+    "reactionCounts": null,
+    "message": "Reaction removed"
+  }
+}
+```
+
+**Example:**
+```bash
+curl -X DELETE http://localhost:8081/api/poems/abc-123/react \
+  -H "Authorization: Bearer <token>"
+```
+
+---
+
+### 19.6 Reaction Data in Responses
+
+All content DTOs now include a `reactions` field alongside the existing `likeCount`/`isLiked` fields.
+
+#### 19.6.1 ReactionSummaryDto Reference
+
+| Field | Type | Nullable | Description |
+|---|---|---|---|
+| `total` | Integer | No | Total number of reactions across all types |
+| `byType` | Map<String, Integer> | Yes | Reaction counts grouped by type. `null` if no reactions |
+| `userReaction` | String | Yes | Current user's reaction type. `null` if not reacted or not authenticated |
+
+**Example:**
+```json
+{
+  "total": 342,
+  "byType": {
+    "LOVE": 156,
+    "WAH_WAH": 89,
+    "FIRE": 45,
+    "SUBHAN_ALLAH": 22,
+    "MAZA_AA_GAYA": 15,
+    "SAD": 10,
+    "DEEP": 5
+  },
+  "userReaction": "WAH_WAH"
+}
+```
+
+**When no reactions exist:**
+```json
+{
+  "total": 0,
+  "byType": null,
+  "userReaction": null
+}
+```
+
+#### 19.6.2 Poems
+
+Both `PoemDetailResponse` and `PoemSummaryResponse` now include the `reactions` field:
+
+```json
+{
+  "publicId": "abc-123",
+  "title": "غزل",
+  "poetName": "مرزا غالب",
+  "viewCount": 1250,
+  "likeCount": 342,
+  "commentCount": 15,
+  "shareCount": 28,
+  "reactions": {
+    "total": 342,
+    "byType": {
+      "LOVE": 156,
+      "WAH_WAH": 89,
+      "FIRE": 45,
+      "SUBHAN_ALLAH": 22,
+      "KYA_BAAT_HAI": 15,
+      "BEAUTIFUL": 10,
+      "DEEP": 5
+    },
+    "userReaction": "WAH_WAH"
+  },
+  "isLikedByCurrentUser": true,
+  "isBookmarkedByCurrentUser": false,
+  "contents": [...]
+}
+```
+
+> **Note:** `likeCount` now equals `totalReactionCount` (not just LOVE count). `isLikedByCurrentUser` is `true` if the user has ANY reaction (not just LOVE).
+
+#### 19.6.3 Couplets
+
+Both `CoupletDto` and `CoupletDetailResponse` include the `reactions` field:
+
+```json
+{
+  "publicId": "def-456",
+  "coupletNumber": 1,
+  "coupletType": "MATLA",
+  "verses": [
+    {"verseText": "دل ہی تو ہے نہ سنگ و خشت درد سے بھر نہ آئے کیوں"},
+    {"verseText": "روئیں گے ہم ہزار بار کوئی ہمیں ستائے کیوں"}
+  ],
+  "likeCount": 89,
+  "bookmarkCount": 34,
+  "shareCount": 12,
+  "reactions": {
+    "total": 89,
+    "byType": {
+      "LOVE": 45,
+      "WAH_WAH": 22,
+      "DEEP": 12,
+      "SAD": 10
+    },
+    "userReaction": "DEEP"
+  },
+  "isLiked": true,
+  "isBookmarked": false
+}
+```
+
+#### 19.6.4 Poet Images
+
+`PoetImageDto` and the status endpoint both include reactions:
+
+```json
+{
+  "publicId": "ghi-789",
+  "imageUrl": "https://cdn.example.com/images/ghalib-1.jpg",
+  "contentText": "دل ہی تو ہے نہ سنگ و خشت",
+  "likeCount": 56,
+  "bookmarkCount": 18,
+  "shareCount": 7,
+  "reactions": {
+    "total": 56,
+    "byType": {
+      "LOVE": 30,
+      "BEAUTIFUL": 15,
+      "WAH_WAH": 11
+    },
+    "userReaction": null
+  },
+  "isLiked": false,
+  "isBookmarked": true
+}
+```
+
+#### 19.6.5 Feed Items
+
+Feed items include reactions in the `contentData` map:
+
+```json
+{
+  "type": "COUPLET",
+  "publicId": "def-456",
+  "reason": "TRENDING",
+  "contentData": {
+    "verses": [...],
+    "poetName": "مرزا غالب",
+    "poetPublicId": "poet-123",
+    "likeCount": 89,
+    "shareCount": 12,
+    "bookmarkCount": 34,
+    "reactions": {
+      "total": 89,
+      "byType": {
+        "LOVE": 45,
+        "WAH_WAH": 22,
+        "DEEP": 12,
+        "SAD": 10
+      }
+    }
+  },
+  "socialContext": {
+    "totalReactions": 89,
+    "trendingLabel": "Popular"
+  }
+}
+```
+
+> **Note:** Feed item reactions now include `userReaction` for authenticated users. The feed batch-fetches user reactions efficiently (one query per content type). For anonymous users, `userReaction` will be absent from the response.
+
+---
+
+### 19.7 Backward Compatibility
+
+The old like endpoints continue to work and internally send a `LOVE` reaction:
+
+| Old Endpoint | Still Works? | Internal Behavior |
+|---|---|---|
+| `POST /api/poems/{id}/like` | Yes | Calls `react(LOVE)` — toggles LOVE reaction |
+| `POST /api/couplets/{id}/like` | Yes | Calls `react(LOVE)` — toggles LOVE reaction |
+| `POST /api/poetry-images/{id}/like` | Yes | Calls `react(LOVE)` — toggles LOVE reaction |
+| `GET /api/poems/{id}/status` | Yes | `liked: true` if user has ANY reaction |
+
+**DTO backward compatibility:**
+
+| Old Field | Still Present? | New Meaning |
+|---|---|---|
+| `likeCount` | Yes | Now equals `totalReactionCount` (all reaction types) |
+| `isLiked` / `isLikedByCurrentUser` | Yes | `true` if user has ANY reaction (not just LOVE) |
+| `reactions` | New field | Full breakdown with `total`, `byType`, `userReaction` |
+
+**Migration timeline:**
+- **Phase 1 (current):** Both old and new APIs work. Existing Flutter code is unaffected.
+- **Phase 2 (future):** Old `/like` endpoints will be deprecated. `likeCount` and `isLiked` fields will be removed from DTOs.
+
+---
+
+### 19.8 Flutter Implementation Guide
+
+#### 19.8.1 Reaction Picker Widget
+
+```dart
+/// Model class for reaction types (from GET /api/reactions/types)
+class ReactionType {
+  final String key;
+  final String emoji;
+  final String urduLabel;
+  final String englishLabel;
+
+  const ReactionType({
+    required this.key,
+    required this.emoji,
+    required this.urduLabel,
+    required this.englishLabel,
+  });
+
+  factory ReactionType.fromJson(Map<String, dynamic> json) => ReactionType(
+    key: json['key'],
+    emoji: json['emoji'],
+    urduLabel: json['urduLabel'],
+    englishLabel: json['englishLabel'],
+  );
+}
+
+/// Reaction picker — shows on long-press of the reaction button
+class ReactionPicker extends StatelessWidget {
+  final List<ReactionType> reactionTypes;
+  final String? currentReaction;
+  final ValueChanged<String> onReactionSelected;
+
+  const ReactionPicker({
+    super.key,
+    required this.reactionTypes,
+    this.currentReaction,
+    required this.onReactionSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: reactionTypes.map((type) {
+          final isSelected = currentReaction == type.key;
+          return GestureDetector(
+            onTap: () => onReactionSelected(type.key),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? Theme.of(context).primaryColor.withOpacity(0.15)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    type.emoji,
+                    style: TextStyle(fontSize: isSelected ? 32 : 24),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    type.urduLabel,  // or type.englishLabel based on app locale
+                    style: TextStyle(
+                      fontSize: 9,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
+```
+
+**Usage — Long-press to show picker, tap to quick-react:**
+```dart
+class ReactionButton extends StatefulWidget {
+  final String targetType;  // "poems", "couplets", etc.
+  final String publicId;
+  final String? currentReaction;
+  final int totalReactions;
+  final Map<String, int>? reactionsByType;
+
+  const ReactionButton({
+    super.key,
+    required this.targetType,
+    required this.publicId,
+    this.currentReaction,
+    this.totalReactions = 0,
+    this.reactionsByType,
+  });
+
+  @override
+  State<ReactionButton> createState() => _ReactionButtonState();
+}
+
+class _ReactionButtonState extends State<ReactionButton> {
+  String? _currentReaction;
+  int _totalReactions = 0;
+  OverlayEntry? _pickerOverlay;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentReaction = widget.currentReaction;
+    _totalReactions = widget.totalReactions;
+  }
+
+  Future<void> _react(String reactionType) async {
+    _pickerOverlay?.remove();
+    _pickerOverlay = null;
+
+    // Optimistic UI update
+    setState(() {
+      if (_currentReaction == reactionType) {
+        // Toggle off
+        _currentReaction = null;
+        _totalReactions--;
+      } else {
+        if (_currentReaction == null) _totalReactions++;
+        _currentReaction = reactionType;
+      }
+    });
+
+    try {
+      final response = await dio.post(
+        '/api/${widget.targetType}/${widget.publicId}/react',
+        data: {'reactionType': reactionType},
+      );
+      final data = response.data['data'];
+      setState(() {
+        _currentReaction = data['userReaction'];
+        _totalReactions = data['totalReactionCount'];
+      });
+    } catch (e) {
+      // Revert optimistic update
+      setState(() {
+        _currentReaction = widget.currentReaction;
+        _totalReactions = widget.totalReactions;
+      });
+    }
+  }
+
+  void _showPicker(BuildContext context) {
+    // Show the reaction picker overlay near this button
+    final renderBox = context.findRenderObject() as RenderBox;
+    final offset = renderBox.localToGlobal(Offset.zero);
+
+    _pickerOverlay = OverlayEntry(
+      builder: (context) => Positioned(
+        left: offset.dx - 20,
+        top: offset.dy - 80,
+        child: ReactionPicker(
+          reactionTypes: ReactionTypesCache.types,  // cached from API
+          currentReaction: _currentReaction,
+          onReactionSelected: _react,
+        ),
+      ),
+    );
+    Overlay.of(context).insert(_pickerOverlay!);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final emoji = _currentReaction != null
+        ? ReactionTypesCache.emojiFor(_currentReaction!)
+        : '❤️';
+
+    return GestureDetector(
+      onTap: () => _react(_currentReaction ?? 'LOVE'),  // Quick tap = toggle LOVE
+      onLongPress: () => _showPicker(context),           // Long press = show picker
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(emoji, style: const TextStyle(fontSize: 20)),
+          const SizedBox(width: 4),
+          Text(
+            _totalReactions > 0 ? '$_totalReactions' : '',
+            style: TextStyle(
+              color: _currentReaction != null
+                  ? Theme.of(context).primaryColor
+                  : Colors.grey,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+#### 19.8.2 Reaction Summary Display
+
+Display grouped reactions under content (like Facebook/LinkedIn):
+
+```dart
+/// Shows: ❤️👏🔥 342
+class ReactionSummaryBar extends StatelessWidget {
+  final int total;
+  final Map<String, int>? byType;
+
+  const ReactionSummaryBar({
+    super.key,
+    required this.total,
+    this.byType,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (total == 0) return const SizedBox.shrink();
+
+    // Get top 3 reaction types by count
+    final sorted = (byType?.entries.toList() ?? [])
+      ..sort((a, b) => b.value.compareTo(a.value));
+    final topEmojis = sorted.take(3).map((e) {
+      return ReactionTypesCache.emojiFor(e.key);
+    }).toList();
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Overlapping emoji badges
+        SizedBox(
+          width: topEmojis.length * 18.0,
+          height: 24,
+          child: Stack(
+            children: [
+              for (int i = 0; i < topEmojis.length; i++)
+                Positioned(
+                  left: i * 14.0,
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 1.5),
+                    ),
+                    child: Text(topEmojis[i], style: const TextStyle(fontSize: 12)),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          _formatCount(total),
+          style: const TextStyle(color: Colors.grey, fontSize: 13),
+        ),
+      ],
+    );
+  }
+
+  String _formatCount(int count) {
+    if (count >= 1000000) return '${(count / 1000000).toStringAsFixed(1)}M';
+    if (count >= 1000) return '${(count / 1000).toStringAsFixed(1)}K';
+    return count.toString();
+  }
+}
+```
+
+#### 19.8.3 API Service Integration
+
+```dart
+class ReactionService {
+  final Dio _dio;
+
+  ReactionService(this._dio);
+
+  /// React to content. Returns updated reaction state.
+  Future<ReactionResponse> react({
+    required String targetType,  // "poems", "couplets", "poetry-images", "generated-images"
+    required String publicId,
+    required String reactionType,
+  }) async {
+    final response = await _dio.post(
+      '/api/$targetType/$publicId/react',
+      data: {'reactionType': reactionType},
+    );
+    return ReactionResponse.fromJson(response.data['data']);
+  }
+
+  /// Remove reaction from content.
+  Future<ReactionResponse> removeReaction({
+    required String targetType,
+    required String publicId,
+  }) async {
+    final response = await _dio.delete(
+      '/api/$targetType/$publicId/react',
+    );
+    return ReactionResponse.fromJson(response.data['data']);
+  }
+
+  /// Fetch available reaction types (cache this!)
+  Future<List<ReactionType>> getReactionTypes() async {
+    final response = await _dio.get('/api/reactions/types');
+    return (response.data['data'] as List)
+        .map((e) => ReactionType.fromJson(e))
+        .toList();
+  }
+}
+
+/// Response model
+class ReactionResponse {
+  final String? userReaction;
+  final int totalReactionCount;
+  final Map<String, int>? reactionCounts;
+  final String message;
+
+  ReactionResponse({
+    this.userReaction,
+    required this.totalReactionCount,
+    this.reactionCounts,
+    required this.message,
+  });
+
+  factory ReactionResponse.fromJson(Map<String, dynamic> json) {
+    return ReactionResponse(
+      userReaction: json['userReaction'],
+      totalReactionCount: json['totalReactionCount'] ?? 0,
+      reactionCounts: json['reactionCounts'] != null
+          ? Map<String, int>.from(json['reactionCounts'])
+          : null,
+      message: json['message'] ?? '',
+    );
+  }
+}
+
+/// Reaction summary model (parsed from content DTOs)
+class ReactionSummary {
+  final int total;
+  final Map<String, int>? byType;
+  final String? userReaction;
+
+  ReactionSummary({required this.total, this.byType, this.userReaction});
+
+  factory ReactionSummary.fromJson(Map<String, dynamic>? json) {
+    if (json == null) return ReactionSummary(total: 0);
+    return ReactionSummary(
+      total: json['total'] ?? 0,
+      byType: json['byType'] != null
+          ? Map<String, int>.from(json['byType'])
+          : null,
+      userReaction: json['userReaction'],
+    );
+  }
+
+  bool get hasUserReacted => userReaction != null;
+}
+```
+
+#### 19.8.4 Migration from Likes
+
+**Step 1: Cache reaction types at app start**
+```dart
+// In your app initialization (e.g., main.dart or splash screen)
+await ReactionTypesCache.initialize(reactionService);
+```
+
+**Step 2: Update your content models to parse the `reactions` field**
+```dart
+// Before (old like system):
+class PoemModel {
+  final int likeCount;
+  final bool isLiked;
+  // ...
+}
+
+// After (reactions system):
+class PoemModel {
+  final int likeCount;           // Still available (= total reactions)
+  final bool isLiked;            // Still available (= has any reaction)
+  final ReactionSummary? reactions;  // NEW: full breakdown
+  // ...
+
+  factory PoemModel.fromJson(Map<String, dynamic> json) {
+    return PoemModel(
+      likeCount: json['likeCount'] ?? 0,
+      isLiked: json['isLikedByCurrentUser'] ?? false,
+      reactions: json['reactions'] != null
+          ? ReactionSummary.fromJson(json['reactions'])
+          : null,
+    );
+  }
+}
+```
+
+**Step 3: Replace like button with reaction button**
+```dart
+// Before:
+IconButton(
+  icon: Icon(isLiked ? Icons.favorite : Icons.favorite_border),
+  onPressed: () => toggleLike(poemId),
+)
+
+// After:
+ReactionButton(
+  targetType: 'poems',
+  publicId: poem.publicId,
+  currentReaction: poem.reactions?.userReaction,
+  totalReactions: poem.reactions?.total ?? poem.likeCount,
+  reactionsByType: poem.reactions?.byType,
+)
+```
+
+**Step 4: Replace like count display with reaction summary**
+```dart
+// Before:
+Text('${poem.likeCount} likes')
+
+// After:
+ReactionSummaryBar(
+  total: poem.reactions?.total ?? poem.likeCount,
+  byType: poem.reactions?.byType,
+)
+```
+
+**Step 5: Update feed item parsing**
+```dart
+// Feed items have reactions in contentData:
+final reactions = feedItem['contentData']['reactions'];
+if (reactions != null) {
+  final total = reactions['total'] as int;
+  final byType = Map<String, int>.from(reactions['byType'] ?? {});
+  // Use for display
+}
+```
+
+---
+
+**Reaction Types Cache Helper:**
+```dart
+class ReactionTypesCache {
+  static List<ReactionType> types = [];
+
+  static Future<void> initialize(ReactionService service) async {
+    types = await service.getReactionTypes();
+  }
+
+  static String emojiFor(String key) {
+    return types.firstWhere(
+      (t) => t.key == key,
+      orElse: () => const ReactionType(
+        key: 'LOVE', emoji: '❤️', urduLabel: 'پسند', englishLabel: 'Love',
+      ),
+    ).emoji;
+  }
+
+  static String labelFor(String key, {bool urdu = true}) {
+    final type = types.firstWhere(
+      (t) => t.key == key,
+      orElse: () => const ReactionType(
+        key: 'LOVE', emoji: '❤️', urduLabel: 'پسند', englishLabel: 'Love',
+      ),
+    );
+    return urdu ? type.urduLabel : type.englishLabel;
+  }
+}
+```
+
+---
+
 ## Support & Feedback
 
 For issues or questions:
 - GitHub: https://github.com/your-repo/issues
 - Email: support@poetry.com
 
-**Documentation Version:** 1.3.0
-**Last Updated:** February 28, 2026
+**Documentation Version:** 1.4.0
+**Last Updated:** March 7, 2026
 
 ---
