@@ -66,6 +66,14 @@ abstract class AppColors {
   static const Color reactionPickerBg = Color(0xFFFFFFFF); // White pill background
   static const Color reactionPickerBgDark = Color(0xFF3A3A3A); // Dark mode picker
   static const Color reactionSelectedBg = Color(0x1F1B4D3E); // 12% primary for selected emoji
+
+  // Sukhan poet-mode tokens (from Sukhan design system)
+  static const Color greenSoft = Color(0xFFE3ECE6); // chip/hover tint on green
+  static const Color goldSoft = Color(0xFFF0E6D0); // banner/callout tint on gold
+  static const Color paperSurface = Color(0xFFFAFAED); // elevated paper for cards
+  static const Color paperDeep = Color(0xFFEFEFD6); // deeper paper for dividers
+  static const Color hairline = Color(0xFFD8D8C8); // ornament/dashed dividers
+  static const Color inkSubtle = Color(0xFF8A8A7A); // tertiary text
 }
 
 /// Poetic Green Theme Colors

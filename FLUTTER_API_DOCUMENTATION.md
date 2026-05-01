@@ -12419,6 +12419,807 @@ class ReactionTypesCache {
 
 ---
 
+## 20. User↔Poet Identity (Claim Your Profile) ⭐ NEW (April 2026) {#20-user-poet-identity}
+
+### 20.1 Concept Overview
+
+Sukhan now lets any signed-in user become a **publishing poet** without merging the User and Poet entities. Two flows are supported:
+
+| Flow | When | Outcome |
+|---|---|---|
+| **Create own poet profile** | The user is a living poet, not yet on Sukhan | Auto-VERIFIED. New `Poet` row created. User immediately gains `ROLE_POET`. |
+| **Claim existing poet** | The user is the same person as one of the historical scraped poets (rare — most are deceased) OR an heir/estate holder | Status becomes `PENDING`. Awaits admin review. On approval: VERIFIED + `ROLE_POET`. |
+
+**Identity rules (locked):**
+- **One poet per user.** A user can own at most one Poet at any time. A pending claim counts as ownership.
+- **Most historical poets stay admin-managed** (`owner_user_id = NULL`) — Ghalib, Meer, Iqbal etc. are not claimable in practice; the pathway is reserved for legitimate identity matches.
+- **Public attribution:** any future post/poem the user publishes will be attributed to the Poet persona, not the User account.
+
+### 20.2 Claim Status Values
+
+| Value | Meaning |
+|---|---|
+| `UNCLAIMED` | Default state for all scraped historical poets. |
+| `PENDING` | A user has submitted a claim and is waiting on admin moderation. |
+| `VERIFIED` | Confirmed owner. The user account is now bonded to this Poet. |
+| `REJECTED` | Admin rejected the claim. User can resubmit with new proof. |
+
+### 20.3 Create My Own Poet Profile
+
+**Endpoint:**
+```
+POST /api/me/poet-profile
+Authorization: Bearer <user JWT>
+Content-Type: application/json
+```
+
+**Request body:**
+```json
+{
+  "primaryLanguageCode": "ur",
+  "name": "Mansoor Ahmad",
+  "penName": "Mansoor",
+  "biography": "Karachi-based poet; ghazal and nazm.",
+  "shortBio": "Ghazal poet from Karachi",
+  "slug": "mansoor-ahmad"
+}
+```
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `primaryLanguageCode` | string | ✅ | One of: `ur`, `en`, `hi`, `fa`, `ar`, `pa` |
+| `name` | string (≤500) | ✅ | Display name in the primary language |
+| `penName` | string (≤500) | ❌ | Takhallus / pen name |
+| `biography` | string | ❌ | Full bio (long-form) |
+| `shortBio` | string (≤500) | ❌ | One-line bio for cards |
+| `slug` | string (≤100) | ❌ | URL slug. Auto-derived from `name` if omitted; collision-safe (hash suffix added) |
+
+**Response 201:**
+```json
+{
+  "success": true,
+  "message": "Poet profile created",
+  "data": {
+    "publicId": "afe7a8da-2557-4eb6-9824-bd8238332a1b",
+    "name": "Mansoor Ahmad",
+    "shortBio": "Ghazal poet from Karachi",
+    "era": "EMERGING",
+    "primaryLanguageCode": "ur",
+    "primaryLanguageName": "Urdu",
+    "isVerified": false,
+    "viewCount": 1,
+    "followerCount": 0,
+    "claimStatus": "VERIFIED",
+    "ownerUserId": 42
+    // ... full PoetProfileResponse shape (same as GET /api/poets/{publicId}/profile)
+  }
+}
+```
+
+**Side effects on success:**
+- New `Poet` row created with `claim_status = VERIFIED`, `owner_user_id = current user id`, `era = EMERGING`
+- `ROLE_POET` granted to the user — they will need to **re-login** for the new role to appear in their JWT
+- The user is now visible as a poet on the platform (search, discover, etc.)
+
+**Error responses:**
+| HTTP | When | `message` |
+|---|---|---|
+| 400 | Missing required fields, language code unknown | Validation error per Spring conventions |
+| 409 | User already owns a poet profile | `"User already owns a poet profile: {publicId}"` |
+
+### 20.4 Get My Poet Profile
+
+**Endpoint:**
+```
+GET /api/me/poet-profile?lang=ur
+Authorization: Bearer <user JWT>
+```
+
+**Query params:**
+| Field | Default | Description |
+|---|---|---|
+| `lang` | `ur` | Language code for localized fields (`ur`, `en`, `hi`) |
+
+**Response 200:** same `PoetProfileResponse` shape as section 5.3 (Poet Profile Endpoints).
+
+**Response 404:** user has not created/claimed a poet yet.
+```json
+{ "success": false, "message": "You have not created a poet profile yet" }
+```
+
+### 20.5 Claim an Existing Poet
+
+**Endpoint:**
+```
+POST /api/poets/{publicId}/claim
+Authorization: Bearer <user JWT>
+Content-Type: application/json
+```
+
+`{publicId}` = the poet's publicId (e.g. obtained from search or poet listing).
+
+**Request body:**
+```json
+{
+  "proofUrl": "https://twitter.com/handle/status/1234567890"
+}
+```
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `proofUrl` | string (≤500) | ✅ | Public URL proving identity — verified social handle, video selfie link, identity document hosted on a private link, etc. |
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Claim submitted; pending admin review",
+  "data": {
+    "publicId": "910b91e2-f5b4-48e0-b047-325b4147b2f2",
+    "claimStatus": "PENDING",
+    "claimedAt": "2026-04-28T00:50:19.762399"
+  }
+}
+```
+
+**Error responses:**
+| HTTP | When | `message` |
+|---|---|---|
+| 404 | Poet `{publicId}` not found | `"Poet not found: {publicId}"` |
+| 409 | User already owns/claimed a poet | `"User already owns a poet profile; cannot claim another"` |
+| 409 | Poet already claimed by someone else | `"Poet is already claimed"` |
+
+### 20.6 Flutter Implementation Guide
+
+#### Data model (Dart)
+
+```dart
+enum PoetClaimStatus { UNCLAIMED, PENDING, VERIFIED, REJECTED }
+
+class CreatePoetProfileRequest {
+  final String primaryLanguageCode; // 'ur' | 'en' | 'hi' | ...
+  final String name;
+  final String? penName;
+  final String? biography;
+  final String? shortBio;
+  final String? slug;
+  // toJson() ...
+}
+
+class ClaimPoetRequest {
+  final String proofUrl;
+  Map<String, dynamic> toJson() => {'proofUrl': proofUrl};
+}
+```
+
+#### Service stub
+
+```dart
+class IdentityApi {
+  final Dio _dio;
+  IdentityApi(this._dio);
+
+  Future<PoetProfile> createMyPoetProfile(CreatePoetProfileRequest req) async {
+    final r = await _dio.post('/api/me/poet-profile', data: req.toJson());
+    return PoetProfile.fromJson(r.data['data']);
+  }
+
+  Future<PoetProfile?> getMyPoetProfile({String lang = 'ur'}) async {
+    try {
+      final r = await _dio.get('/api/me/poet-profile',
+          queryParameters: {'lang': lang});
+      return PoetProfile.fromJson(r.data['data']);
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) return null;
+      rethrow;
+    }
+  }
+
+  Future<void> claimPoet(String poetPublicId, String proofUrl) async {
+    await _dio.post('/api/poets/$poetPublicId/claim',
+        data: {'proofUrl': proofUrl});
+  }
+}
+```
+
+#### Suggested UX flows
+
+**Onboarding "Are you a poet?" flow:**
+1. After signup, ask: "Do you write poetry?" → if yes, show two options:
+   - **"Create my poet page"** → form (name, penName, primary language, short bio) → `POST /api/me/poet-profile` → success screen with "Visit my poet page"
+   - **"I'm an existing poet on Sukhan"** → search by name → user picks a Poet → proof-URL input → `POST /api/poets/{publicId}/claim` → "Submitted — we'll review within 48h"
+2. After **VERIFIED** (poll `GET /api/me/poet-profile` or surface via push later), unlock "Publish a poem" UI.
+
+**Profile screen — three states:**
+- No owned poet → "Become a poet" CTA → flow above
+- Poet `claimStatus = PENDING` → banner: "Your claim is pending review"
+- Poet `claimStatus = VERIFIED` → standard poet-profile screen plus an "Edit my poet" button
+
+**Don't forget to refresh the JWT** after a successful create or admin-approve event so the new `ROLE_POET` claim appears (the user must logout/login or call your refresh-token endpoint).
+
+---
+
+### 20.7 Edit My Poet Profile ⭐ NEW (PR #4)
+
+**Endpoint:**
+```
+PUT /api/me/poet-profile?lang=ur
+Authorization: Bearer <user JWT>
+Content-Type: application/json
+```
+
+All fields are **optional** — only the fields you send are touched. `null` or omitted = leave unchanged.
+
+**Request body:**
+```json
+{
+  "name": "Mansoor Ahmad",
+  "penName": "Mansoor",
+  "biography": "Long-form bio...",
+  "shortBio": "Ghazal poet from Karachi",
+  "era": "CONTEMPORARY",
+  "gender": "MALE",
+  "birthYear": 1990,
+  "deathYear": null,
+  "birthDate": "1990-06-15",
+  "deathDate": null
+}
+```
+
+| Field | Type | Notes |
+|---|---|---|
+| `name` | string (≤500) | Localized — writes to `poet_details.name` for the poet's primary language |
+| `penName` | string (≤500) | Localized |
+| `biography` | string | Localized — long-form |
+| `shortBio` | string (≤500) | Localized — one-line for cards |
+| `era` | enum | `CLASSICAL` / `MODERN` / `CONTEMPORARY` / `EMERGING` |
+| `gender` | enum | `MALE` / `FEMALE` / `OTHER` |
+| `birthYear`, `deathYear` | int | Year only |
+| `birthDate`, `deathDate` | ISO date | Optional precision |
+
+**Response 200:** full `PoetProfileResponse` (same shape as `GET /api/me/poet-profile`) with all updated values applied. Returns the **localized** version for the `lang` query param (defaults to `ur`).
+
+**Errors:**
+| HTTP | When |
+|---|---|
+| 400 | Validation error (e.g. `shortBio > 500`) |
+| 404 | User does not own a poet profile |
+
+---
+
+### 20.8 My Image Gallery — CRUD ⭐ NEW (PR #4)
+
+All endpoints below resolve the caller's poet from `user.ownedPoet` — **no `{publicId}` in the path**. Cross-user attempts (touching an image owned by a different poet) return `403 Forbidden`.
+
+#### 20.8.1 List My Images
+
+```
+GET /api/me/poet/images?type=PROFILE
+Authorization: Bearer <user JWT>
+```
+
+Optional `type` filter: `PROFILE` / `BANNER` / `GALLERY` / `PORTRAIT` / `HISTORICAL` / `EVENT` / `POETRY` / `OTHER`. Soft-deleted images are excluded.
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Images retrieved",
+  "data": [
+    {
+      "publicId": "909c4912-45f6-4720-a945-ccc253080248",
+      "imageUrl": "https://d20k90pcdbo704.cloudfront.net/poets/mansoor/profile/profile-xyz.jpg",
+      "thumbnailUrl": "https://d20k90pcdbo704.cloudfront.net/...",
+      "caption": "Studio portrait",
+      "altText": "Mansoor",
+      "displayOrder": 1,
+      "isProfileImage": true,
+      "imageType": "PROFILE",
+      "likeCount": 0,
+      "bookmarkCount": 0,
+      "shareCount": 0
+    }
+  ]
+}
+```
+
+#### 20.8.2 Add Image by URL
+
+Use this when the image is already hosted somewhere (you only need to register it).
+
+```
+POST /api/me/poet/images
+Authorization: Bearer <user JWT>
+Content-Type: application/json
+```
+
+```json
+{
+  "imageUrl": "https://example.com/portrait.jpg",
+  "thumbnailUrl": "https://example.com/portrait_thumb.jpg",
+  "caption": "Studio portrait",
+  "altText": "Mansoor in studio",
+  "imageType": "PROFILE",
+  "isProfileImage": true,
+  "displayOrder": 1
+}
+```
+
+**Response 201:** `PoetImageDto` (same shape as 20.8.1 entries). Setting `isProfileImage: true` automatically demotes any prior PROFILE on the same poet to `false`.
+
+#### 20.8.3 Upload Image File (multipart)
+
+Pushes the file to S3, generates a thumbnail for `PROFILE`/`GALLERY`, and creates the `poet_images` row.
+
+```
+POST /api/me/poet/images/upload
+Authorization: Bearer <user JWT>
+Content-Type: multipart/form-data
+```
+
+**Form fields:**
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `file` | file | ✅ | JPEG/PNG/WebP only |
+| `imageType` | enum | optional (default `GALLERY`) | See list above |
+| `isProfileImage` | bool | optional (default false) | If true, demotes prior PROFILE |
+| `caption`, `altText` | string | optional | |
+| `displayOrder` | int | optional | |
+| `contentText`, `tagSlugs[]`, `categoryId`, `languageCode` | misc | optional | For poetry-overlay images |
+
+**Response 201:** `PoetImageDto` with the resolved CloudFront URLs.
+
+```dart
+// Dart upload example
+Future<PoetImageDto> uploadMyImage(File file, {required ImageType type, bool profile = false}) async {
+  final form = FormData.fromMap({
+    'file': await MultipartFile.fromFile(file.path),
+    'imageType': type.name,
+    'isProfileImage': profile,
+  });
+  final r = await _dio.post('/api/me/poet/images/upload', data: form);
+  return PoetImageDto.fromJson(r.data['data']);
+}
+```
+
+#### 20.8.4 Update Image Metadata
+
+```
+PUT /api/me/poet/images/{publicId}
+Authorization: Bearer <user JWT>
+Content-Type: application/json
+```
+
+All fields optional; `null`/omitted = leave unchanged.
+
+```json
+{
+  "caption": "Updated caption",
+  "altText": "Updated alt",
+  "displayOrder": 2,
+  "imageType": "PROFILE",
+  "isProfileImage": true
+}
+```
+
+**Response 200:** updated `PoetImageDto`.
+
+**Errors:**
+| HTTP | When |
+|---|---|
+| 404 | Image not found, OR caller does not own a poet |
+| 403 | Image belongs to a different poet (cross-user attempt) |
+
+#### 20.8.5 Delete Image
+
+```
+DELETE /api/me/poet/images/{publicId}
+Authorization: Bearer <user JWT>
+```
+
+Soft-delete only — sets `is_deleted=true` so the image disappears from gallery responses. Same 404/403 errors as update.
+
+---
+
+### 20.9 Suggested Profile-Edit UX
+
+```
+Profile screen
+├── [Edit profile] → form with fields:
+│   ├── Name (localized, primary lang)
+│   ├── Pen name
+│   ├── Short bio (1-line, max 500)
+│   ├── Biography (long-form)
+│   ├── Era (dropdown)
+│   ├── Gender (dropdown)
+│   └── Birth year / date
+│   → PUT /api/me/poet-profile  (only changed fields in body)
+│
+├── [Manage images] → gallery grid:
+│   ├── (per image) [Edit caption] [Set as profile] [Delete]
+│   │   → PUT or DELETE /api/me/poet/images/{publicId}
+│   └── [+ Add image]:
+│       ├── [Pick from gallery]  → upload via /upload (multipart)
+│       └── [Paste URL]          → POST /api/me/poet/images
+```
+
+**Profile-image promotion behavior**: setting `isProfileImage: true` on any image automatically clears the flag on the previous one — UI doesn't need to do this manually.
+
+---
+
+### 20.10 Compose & Manage My Poems ⭐ NEW (PR #5)
+
+All poem endpoints below are scoped to `user.ownedPoet`. No `poetId` in the body — it's inferred server-side.
+
+#### 20.10.1 List My Poems
+
+```
+GET /api/me/poet/poems?page=0&size=20&sortBy=date
+Authorization: Bearer <token>
+```
+
+| `sortBy` | Description |
+|---|---|
+| `date` (default) | Newest first |
+| `likes` | Most liked first |
+| `views` | Most viewed first |
+
+Includes **both public and private** poems (unlike the public `/api/poets/{id}/poems` which hides private ones). Returns paginated `PoemSummaryResponse` with `viewCount`, `likeCount`, `commentCount`, `shareCount`, `isPublic`.
+
+#### 20.10.2 Compose a Poem
+
+```
+POST /api/me/poet/poems
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+```json
+{
+  "title": "میری پہلی غزل",
+  "content": "دل کی بات کہنا ہے\nیہی میرا ارادہ ہے",
+  "poetryType": "GHAZAL",
+  "languageCode": "ur",
+  "script": "ARABIC",
+  "categoryId": "optional-category-public-id",
+  "tagSlugs": ["ghazal", "ishq"],
+  "yearWritten": 2026,
+  "isPublic": true
+}
+```
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `title` | string | ✅ | |
+| `content` | string | ✅ | Full text in the specified script |
+| `poetryType` | enum | ✅ | `GHAZAL`, `NAZAM`, `AZAD_NAZAM`, `RUBAI`, `QASIDA`, `MARSIYA`, `NAAT`, `HAMD`, `QATTA`, `VERSE`, `MASNAVI`, etc. |
+| `languageCode` | string | default `ur` | `ur`, `en`, `hi`, `fa`, `ar`, `pa` |
+| `script` | enum | default `ARABIC` | `ARABIC`, `ROMAN`, `DEVANAGARI`, `LATIN` |
+| `isPublic` | bool | default `true` | `false` = draft mode (visible only to poet) |
+
+**Response 201:** full `PoemDetailResponse`. Side effects:
+- If Urdu Arabic script: Roman + Devanagari transliterations are auto-generated async
+- If `GHAZAL` or other structured type: verse/couplet parsing runs automatically
+- Poem is indexed to Elasticsearch immediately
+
+**Error responses:**
+| HTTP | When |
+|---|---|
+| 404 | User does not own a poet profile |
+| 409 | Duplicate poem (same title + poet + language + script) |
+
+#### 20.10.3 Edit My Poem
+
+```
+PUT /api/me/poet/poems/{publicId}
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+All fields optional. `poetId` is ignored if supplied (ownership is fixed).
+
+```json
+{
+  "isPublic": false,
+  "yearWritten": 2025,
+  "poetryType": "NAZAM",
+  "tagSlugs": ["nazm", "watan"]
+}
+```
+
+**Response 200:** updated `PoemDetailResponse`. **Response 403:** poem belongs to a different poet.
+
+#### 20.10.4 Delete My Poem
+
+```
+DELETE /api/me/poet/poems/{publicId}
+Authorization: Bearer <token>
+```
+
+Soft-delete only. Removes from Elasticsearch. **Response 200 / 403 / 404**.
+
+#### 20.10.5 Security Note
+
+`POST /api/poems/add-poem` (the older bulk-upload endpoint) now also validates ownership: if the target poet has `claimStatus = VERIFIED` and is owned by a different user, non-admin callers receive `403 Forbidden`. Admins (`MANAGE_POEMS` permission) are exempt.
+
+---
+
+### 20.11 Facts Management ⭐ NEW (PR #6)
+
+```
+GET    /api/me/poet/facts
+POST   /api/me/poet/facts
+DELETE /api/me/poet/facts/{publicId}
+```
+All require `Authorization: Bearer <token>`.
+
+**GET** — returns list of `PoetFactDto` (all languages):
+```json
+[
+  {
+    "publicId": "abc123",
+    "fact": "یہ ایک مشہور شاعر ہیں",
+    "languageCode": "ur",
+    "languageName": "Urdu",
+    "displayOrder": 1,
+    "factGroupId": "uuid-linking-translations"
+  }
+]
+```
+
+**POST body:**
+```json
+{
+  "fact": "یہ ایک حقیقت ہے",
+  "languageCode": "ur",
+  "displayOrder": 1
+}
+```
+**Response 201** on success.
+
+**DELETE** — soft-delete by `publicId`. **403** if fact belongs to another poet.
+
+---
+
+### 20.12 Multi-Language Profile Translations ⭐ NEW (PR #7)
+
+Lets a poet manage localized bios in multiple languages independently of their primary language profile.
+
+#### 20.12.1 List Translations
+
+```
+GET /api/me/poet/translations
+Authorization: Bearer <token>
+```
+
+```json
+{
+  "data": [
+    {
+      "languageCode": "ur",
+      "languageName": "Urdu",
+      "name": "منصور احمد",
+      "penName": "منصور",
+      "hasShortBio": false,
+      "hasBiography": false,
+      "isPrimary": true
+    },
+    {
+      "languageCode": "en",
+      "languageName": "English",
+      "name": "Mansoor Ahmad",
+      "penName": null,
+      "hasShortBio": true,
+      "hasBiography": false,
+      "isPrimary": false
+    }
+  ]
+}
+```
+
+Use `hasBiography: false` to show "Add English bio →" prompts in Flutter UI.
+
+#### 20.12.2 Add a New Language Translation
+
+```
+POST /api/me/poet/translations
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+```json
+{
+  "languageCode": "en",
+  "name": "Mansoor Ahmad",
+  "penName": "Mansoor",
+  "shortBio": "Urdu poet from Karachi",
+  "biography": "Long-form English biography..."
+}
+```
+
+**Response 201** on success. **409** if translation for that language already exists — use PUT to update.
+
+#### 20.12.3 Update Existing Translation
+
+```
+PUT /api/me/poet/translations/{langCode}
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+All fields optional (null = leave unchanged). `langCode` path param: `ur`, `en`, `hi`, `fa`, etc.
+
+```json
+{
+  "shortBio": "Updated one-liner",
+  "biography": "Updated long bio"
+}
+```
+
+**Response 200** / **404** if that language hasn't been added yet (use POST first).
+
+#### 20.12.4 Multi-Language Update Semantics
+
+| What you update | Where it goes |
+|---|---|
+| `PUT /api/me/poet-profile` fields (name, bio) | **Primary language only** |
+| `PUT /api/me/poet/translations/en` | English translation only |
+| `era`, `gender`, `birthYear` | All languages (stored on `poets` table) |
+
+---
+
+### 20.13 Books Self-Serve Upload ⭐ NEW (PR #8)
+
+```
+GET    /api/me/poet/books
+POST   /api/me/poet/books                         (multipart or JSON)
+PUT    /api/me/poet/books/{publicId}
+DELETE /api/me/poet/books/{publicId}
+POST   /api/me/poet/books/{publicId}/upload-pdf   (multipart)
+POST   /api/me/poet/books/{publicId}/upload-epub  (multipart)
+POST   /api/me/poet/books/{publicId}/upload-cover (multipart)
+```
+
+#### 20.13.1 Create a Book
+
+Send as multipart form-data (supports optional simultaneous file upload):
+
+```
+POST /api/me/poet/books
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+
+title          = "Kulliyat e Mansoor"        (required)
+yearPublished  = 2026
+description    = "My first diwan"
+publisher      = "Sukhan Press"
+languageCode   = ur
+file           = <pdf binary>               (optional)
+fileType       = PDF                        (required if file present: PDF | EPUB)
+```
+
+**Response 201:**
+```json
+{
+  "success": true,
+  "message": "Book created with file",
+  "data": {
+    "bookTitle": "Kulliyat e Mansoor",
+    "hasPdf": true,
+    "hasEpub": false,
+    "isDownloadable": true,
+    "pdfUrl": "https://d20k90pcdbo704.cloudfront.net/books/..."
+  }
+}
+```
+
+#### 20.13.2 Upload Files to Existing Book
+
+```dart
+// Upload PDF
+final form = FormData.fromMap({
+  'file': await MultipartFile.fromFile(pdfPath, contentType: MediaType.parse('application/pdf')),
+});
+await _dio.post('/api/me/poet/books/$bookPublicId/upload-pdf', data: form);
+
+// Upload cover image
+final form = FormData.fromMap({
+  'file': await MultipartFile.fromFile(imagePath),
+});
+await _dio.post('/api/me/poet/books/$bookPublicId/upload-cover', data: form);
+```
+
+All file upload endpoints return `BookFileUploadResponse` with `pdfUrl`, `epubUrl`, `hasPdf`, `hasEpub`, `isDownloadable`. **403** if book belongs to different poet.
+
+---
+
+### 20.14 Creator Analytics Dashboard ⭐ NEW (PR #9)
+
+Single endpoint — returns all key metrics for a creator's dashboard in one call.
+
+```
+GET /api/me/poet/analytics
+Authorization: Bearer <token>
+```
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "data": {
+    "followerCount": 142,
+    "profileViews": 3891,
+    "poemCount": 47,
+    "totalPoemViews": 28450,
+    "totalPoemLikes": 1203,
+    "totalPoemBookmarks": 876,
+    "totalImageLikes": 234,
+    "topPoems": [
+      {
+        "publicId": "abc123",
+        "title": "دل کی بات",
+        "poetryType": "GHAZAL",
+        "viewCount": 1840,
+        "likeCount": 312,
+        "shareCount": 45,
+        "createdAt": "2026-04-01T10:30:00"
+      }
+    ]
+  }
+}
+```
+
+**`topPoems`** — up to 5 poems sorted by `likeCount` descending. Full `PoemSummaryResponse` shape.
+
+**Response 404** if user has no owned poet profile.
+
+```dart
+class PoetAnalytics {
+  final int followerCount;
+  final int profileViews;
+  final int poemCount;
+  final int totalPoemViews;
+  final int totalPoemLikes;
+  final int totalPoemBookmarks;
+  final int totalImageLikes;
+  final List<PoemSummary> topPoems;
+
+  factory PoetAnalytics.fromJson(Map<String, dynamic> j) => PoetAnalytics(
+    followerCount:       j['followerCount']       ?? 0,
+    profileViews:        j['profileViews']        ?? 0,
+    poemCount:           j['poemCount']           ?? 0,
+    totalPoemViews:      j['totalPoemViews']      ?? 0,
+    totalPoemLikes:      j['totalPoemLikes']      ?? 0,
+    totalPoemBookmarks:  j['totalPoemBookmarks']  ?? 0,
+    totalImageLikes:     j['totalImageLikes']     ?? 0,
+    topPoems:            (j['topPoems'] as List? ?? [])
+                           .map((p) => PoemSummary.fromJson(p)).toList(),
+  );
+}
+```
+
+---
+
+### 20.15 Complete Creator Workflow Summary
+
+```
+User becomes a poet (§20.3 or §20.5 + admin approve)
+    ↓
+Edit profile (§20.7) + add translations (§20.12)
+    ↓
+Upload gallery images (§20.8)
+    ↓
+Compose poems (§20.10.2) — auto-transliterated, instant publish
+    ↓
+Add facts (§20.11) + upload books with PDF/EPUB (§20.13)
+    ↓
+Check analytics dashboard (§20.14)
+
+All writes: 401 if unauthenticated, 404 if no owned poet, 403 if resource belongs to another poet.
+```
+
+---
+
 ## Support & Feedback
 
 For issues or questions:

@@ -5,6 +5,17 @@ import '../../features/auth/login_screen.dart';
 import '../../features/main/main_screen.dart';
 import '../../features/main/tabs/poets/screens/poet_detail_screen.dart';
 import '../../features/main/tabs/poets/screens/poem_detail_screen.dart';
+import '../../features/main/tabs/creator/screens/become_poet_intro_screen.dart';
+import '../../features/main/tabs/creator/screens/new_poet_form_screen.dart';
+import '../../features/main/tabs/creator/screens/claim_poet_search_screen.dart';
+import '../../features/main/tabs/creator/screens/claim_poet_submit_screen.dart';
+import '../../features/main/tabs/creator/screens/creator_dashboard_screen.dart';
+import '../../features/main/tabs/creator/screens/compose_poem_screen.dart';
+import '../../features/main/tabs/creator/screens/edit_poem_screen.dart';
+import '../../features/main/tabs/creator/screens/edit_profile_screen.dart';
+import '../../features/main/tabs/creator/screens/manage_translations_screen.dart';
+import '../../features/main/tabs/creator/screens/manage_facts_screen.dart';
+import '../../features/main/tabs/creator/screens/upload_book_screen.dart';
 import '../../features/search/screens/poets_search_screen.dart';
 import '../../features/search/screens/app_search_screen.dart';
 import '../../features/search/screens/category_results_screen.dart';
@@ -91,6 +102,74 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => PoemDetailScreen(
               publicId: state.pathParameters['publicId']!,
             ),
+          ),
+          // ── Poet Mode (creator onboarding + dashboard) ──
+          GoRoute(
+            path: 'become-poet',
+            name: 'become-poet',
+            builder: (context, state) => const BecomePoetIntroScreen(),
+            routes: [
+              GoRoute(
+                path: 'new',
+                name: 'become-poet-new',
+                builder: (context, state) => const NewPoetFormScreen(),
+              ),
+              GoRoute(
+                path: 'claim',
+                name: 'become-poet-claim',
+                builder: (context, state) => const ClaimPoetSearchScreen(),
+                routes: [
+                  GoRoute(
+                    path: ':publicId',
+                    name: 'become-poet-claim-submit',
+                    builder: (context, state) => ClaimPoetSubmitScreen(
+                      publicId: state.pathParameters['publicId']!,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          GoRoute(
+            path: 'creator',
+            name: 'creator-dashboard',
+            builder: (context, state) => const CreatorDashboardScreen(),
+            routes: [
+              GoRoute(
+                path: 'compose',
+                name: 'creator-compose',
+                builder: (context, state) => const ComposePoemScreen(),
+              ),
+              GoRoute(
+                path: 'poems/:publicId/edit',
+                name: 'creator-poem-edit',
+                builder: (context, state) => EditPoemScreen(
+                  publicId: state.pathParameters['publicId']!,
+                ),
+              ),
+              GoRoute(
+                path: 'profile/edit',
+                name: 'creator-profile-edit',
+                builder: (context, state) => const EditProfileScreen(),
+              ),
+              GoRoute(
+                path: 'translations/:lang',
+                name: 'creator-translations',
+                builder: (context, state) => ManageTranslationsScreen(
+                  initialLang: state.pathParameters['lang'] ?? 'en',
+                ),
+              ),
+              GoRoute(
+                path: 'books/new',
+                name: 'creator-book-new',
+                builder: (context, state) => const UploadBookScreen(),
+              ),
+              GoRoute(
+                path: 'facts',
+                name: 'creator-facts',
+                builder: (context, state) => const ManageFactsScreen(),
+              ),
+            ],
           ),
         ],
       ),

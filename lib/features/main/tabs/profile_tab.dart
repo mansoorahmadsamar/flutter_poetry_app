@@ -6,6 +6,11 @@ import '../../../core/design_system/app_colors.dart';
 import '../../../core/providers/user_provider.dart';
 import '../../../core/providers/language_provider.dart';
 import '../../../core/widgets/standard_app_bar.dart';
+import 'creator/models/claim_status.dart';
+import 'creator/providers/creator_providers.dart';
+import 'creator/screens/creator_dashboard_screen.dart';
+import 'creator/widgets/become_poet_card.dart';
+import 'creator/widgets/claim_status_banner.dart';
 import 'profile/providers/app_content_providers.dart';
 import 'profile/screens/app_content_detail_screen.dart';
 
@@ -53,6 +58,15 @@ class ProfileTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
     final userProfile = ref.watch(userProfileProvider);
+    final ownedPoetAsync = ref.watch(ownedPoetProvider);
+
+    // If the user has a verified owned poet, render the creator dashboard
+    // in place of the standard profile/settings UI. The dashboard owns
+    // its own scrolling shell.
+    final ownedPoet = ownedPoetAsync.valueOrNull;
+    if (ownedPoet != null && ownedPoet.claimStatus == ClaimStatus.verified) {
+      return const CreatorDashboardScreen();
+    }
 
     return CustomScrollView(
       slivers: [
@@ -65,7 +79,22 @@ class ProfileTab extends ConsumerWidget {
         SliverToBoxAdapter(
           child: Column(
             children: [
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
+
+              // Become-a-poet entry — shown when user has no ownedPoet.
+              if (ownedPoet == null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: const BecomePoetCard(),
+                )
+              else if (ownedPoet.claimStatus == ClaimStatus.pending ||
+                  ownedPoet.claimStatus == ClaimStatus.rejected)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: ClaimStatusBanner(poet: ownedPoet),
+                ),
+
+              const SizedBox(height: 8),
 
               // Profile header card with user info
               userProfile.when(

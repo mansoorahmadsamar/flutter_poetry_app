@@ -15,6 +15,7 @@ import '../models/couplet_model.dart';
 import '../providers/poem_providers.dart';
 import '../widgets/poem_more_from_poet_section.dart';
 import '../widgets/poem_reading_card.dart';
+import '../../creator/providers/creator_providers.dart';
 
 const String _nastaleeq = 'Jameel Noori Nastaleeq';
 
@@ -100,6 +101,7 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _buildPoetHeader(context, poem),
+          _buildClaimHint(context, poem),
           const SizedBox(height: 12),
           PoemReadingCard(
             key: ValueKey(_selectedScript),
@@ -120,6 +122,74 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
             selectedScript: _selectedScript,
           ),
         ],
+      ),
+    );
+  }
+
+  /// "Is this you? Claim this page" hint — shown only when the viewer
+  /// has no ownedPoet (so creators don't see noise on their own poems).
+  /// Tapping deep-links to the claim flow for this poem's poet.
+  Widget _buildClaimHint(BuildContext context, PoemModel poem) {
+    final ownedPoet = ref.watch(ownedPoetProvider).valueOrNull;
+    if (ownedPoet != null) return const SizedBox.shrink();
+    final poetPublicId = poem.poet?.publicId ?? poem.poetPublicId;
+    if (poetPublicId.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 10, bottom: 2),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () =>
+              context.push('/main/become-poet/claim/$poetPublicId'),
+          child: Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: AppColors.paperSurface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.secondary),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.edit_note,
+                    size: 14, color: AppColors.secondaryDark),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Is this you?',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimaryLight,
+                        ),
+                      ),
+                      const SizedBox(height: 1),
+                      Text(
+                        'Claim this page to manage your verses',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontStyle: FontStyle.italic,
+                          color: AppColors.textSecondaryLight,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Text('›',
+                    style: TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 14,
+                      color: AppColors.secondary,
+                    )),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
