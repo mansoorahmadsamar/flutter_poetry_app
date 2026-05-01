@@ -8,6 +8,7 @@ import 'package:flutter_poetry_app/core/widgets/sukhan/portrait.dart';
 import 'package:flutter_poetry_app/core/widgets/sukhan/sukhan_chip.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/providers/poet_providers.dart';
 import '../providers/creator_providers.dart';
+import '../utils/api_error_messages.dart';
 
 /// Submit proof URL + optional note for an existing-poet claim.
 /// Loads the target poet's profile to render the "claiming" header card.
@@ -56,7 +57,7 @@ class _ClaimPoetSubmitScreenState extends ConsumerState<ClaimPoetSubmitScreen> {
             ),
             error: (e, _) => Padding(
               padding: const EdgeInsets.all(16),
-              child: Text('Could not load poet: $e',
+              child: Text("Couldn't load poet info — please try again.",
                   style: SukhanText.italic(
                     size: 12,
                     color: AppColors.error,
@@ -241,7 +242,7 @@ class _ClaimPoetSubmitScreenState extends ConsumerState<ClaimPoetSubmitScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not submit: $e')),
+        SnackBar(content: Text(friendlyApiMessage(e, CreatorAction.claimPoet))),
       );
     } finally {
       if (mounted) setState(() => _submitting = false);

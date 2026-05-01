@@ -10,6 +10,7 @@ import 'package:flutter_poetry_app/core/widgets/sukhan/sukhan_chip.dart';
 import '../models/creator_poem_model.dart';
 import '../providers/creator_poems_provider.dart';
 import '../providers/creator_providers.dart';
+import '../utils/api_error_messages.dart';
 
 enum ComposeVariant { metaVisible, distractionFree, sherHelper }
 
@@ -198,7 +199,9 @@ class _ComposePoemScreenState extends ConsumerState<ComposePoemScreen> {
         ),
       );
     } catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text('Could not publish: $e')));
+      messenger.showSnackBar(SnackBar(
+        content: Text(friendlyApiMessage(e, CreatorAction.composePoem)),
+      ));
     } finally {
       if (mounted) setState(() => _publishing = false);
     }

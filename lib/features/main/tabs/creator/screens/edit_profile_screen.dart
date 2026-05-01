@@ -8,6 +8,7 @@ import 'package:flutter_poetry_app/core/widgets/sukhan/portrait.dart';
 import '../models/creator_translation_model.dart';
 import '../models/owned_poet_model.dart';
 import '../providers/creator_providers.dart';
+import '../utils/api_error_messages.dart';
 
 /// Edit profile + translation manager + facts pencil-to-edit shortcut.
 class EditProfileScreen extends ConsumerStatefulWidget {
@@ -432,29 +433,43 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           'birthYear': int.parse(_yearBornCtrl.text.trim()),
       };
 
-      if (isPrimary) {
-        await svc.updateMyPoetProfile(patch, lang: _editingLang);
-      } else {
-        // Translation update; if it doesn't exist yet, POST it.
-        final exists = translations.any((t) => t.languageCode == _editingLang);
-        if (exists) {
-          await svc.updateTranslation(_editingLang, patch);
+      // Track which action we ran so error copy matches the user's intent.
+      var action = CreatorAction.updatePoetProfile;
+      try {
+        if (isPrimary) {
+          await svc.updateMyPoetProfile(patch, lang: _editingLang);
         } else {
-          await svc.addTranslation(
-            languageCode: _editingLang,
-            name: patch['name'] as String? ?? _editingLang,
-            penName: patch['penName'] as String?,
-            shortBio: patch['shortBio'] as String?,
-            biography: patch['biography'] as String?,
-          );
+          // Translation update; if it doesn't exist yet, POST it.
+          final exists = translations.any((t) => t.languageCode == _editingLang);
+          if (exists) {
+            action = CreatorAction.updateTranslation;
+            await svc.updateTranslation(_editingLang, patch);
+          } else {
+            action = CreatorAction.addTranslation;
+            await svc.addTranslation(
+              languageCode: _editingLang,
+              name: patch['name'] as String? ?? _editingLang,
+              penName: patch['penName'] as String?,
+              shortBio: patch['shortBio'] as String?,
+              biography: patch['biography'] as String?,
+            );
+          }
         }
+      } catch (e) {
+        messenger.showSnackBar(
+          SnackBar(content: Text(friendlyApiMessage(e, action))),
+        );
+        return;
       }
       ref.invalidate(ownedPoetProvider);
       ref.invalidate(creatorTranslationsProvider);
       router.pop();
       messenger.showSnackBar(const SnackBar(content: Text('Profile updated')));
     } catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text('Could not save: $e')));
+      // Outer guard for setup failures (e.g. provider read).
+      messenger.showSnackBar(SnackBar(
+        content: Text(friendlyApiMessage(e, CreatorAction.updatePoetProfile)),
+      ));
     } finally {
       if (mounted) setState(() => _saving = false);
     }

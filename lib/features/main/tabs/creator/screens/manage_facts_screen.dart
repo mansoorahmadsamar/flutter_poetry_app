@@ -6,6 +6,7 @@ import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
 import 'package:flutter_poetry_app/core/widgets/sukhan/sukhan_chip.dart';
 import '../models/creator_translation_model.dart';
 import '../providers/creator_providers.dart';
+import '../utils/api_error_messages.dart';
 
 /// Read-only list of facts with swipe-to-delete + add bottom sheet.
 class ManageFactsScreen extends ConsumerWidget {
@@ -96,7 +97,9 @@ class ManageFactsScreen extends ConsumerWidget {
                     ref.invalidate(creatorFactsProvider);
                   } catch (e) {
                     messenger.showSnackBar(
-                      SnackBar(content: Text('Could not delete: $e')),
+                      SnackBar(
+                        content: Text(friendlyApiMessage(e, CreatorAction.deleteFact)),
+                      ),
                     );
                   }
                 },
@@ -259,7 +262,9 @@ class ManageFactsScreen extends ConsumerWidget {
                           ref.invalidate(creatorFactsProvider);
                         } catch (e) {
                           messenger.showSnackBar(
-                            SnackBar(content: Text('Could not add: $e')),
+                            SnackBar(
+                              content: Text(friendlyApiMessage(e, CreatorAction.addFact)),
+                            ),
                           );
                         }
                       },

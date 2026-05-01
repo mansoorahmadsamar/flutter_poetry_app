@@ -8,6 +8,7 @@ import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
 import 'package:flutter_poetry_app/core/providers/user_provider.dart';
 import '../models/creator_translation_model.dart';
 import '../providers/creator_providers.dart';
+import '../utils/api_error_messages.dart';
 
 /// Form for creating a brand-new poet profile.
 /// On submit: POST /api/me/poet-profile → silent JWT refresh → invalidate
@@ -335,7 +336,9 @@ class _NewPoetFormScreenState extends ConsumerState<NewPoetFormScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not create page: $e')),
+        SnackBar(
+          content: Text(friendlyApiMessage(e, CreatorAction.createPoetProfile)),
+        ),
       );
     } finally {
       if (mounted) setState(() => _submitting = false);

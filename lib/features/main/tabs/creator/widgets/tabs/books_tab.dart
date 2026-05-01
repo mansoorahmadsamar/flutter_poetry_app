@@ -24,7 +24,7 @@ class BooksTab extends ConsumerWidget {
       error: (e, _) => Center(
         child: Padding(
           padding: const EdgeInsets.all(20),
-          child: Text('Could not load books: $e',
+          child: Text("Couldn't load your books — please try again.",
               style: SukhanText.italic(
                 size: 12,
                 color: AppColors.error,

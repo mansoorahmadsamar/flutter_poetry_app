@@ -7,6 +7,7 @@ import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
 import '../../models/creator_image_model.dart';
 import '../../providers/creator_providers.dart';
+import '../../utils/api_error_messages.dart';
 
 /// 3-column gallery grid. Profile image gets a gold ring + "PROFILE" tag.
 /// Last cell is the dashed-gold "+ ADD" upload prompt.
@@ -23,7 +24,7 @@ class GalleryTab extends ConsumerWidget {
       error: (e, _) => Center(
         child: Padding(
           padding: const EdgeInsets.all(20),
-          child: Text('Could not load gallery: $e',
+          child: Text("Couldn't load your gallery — please try again.",
               style: SukhanText.italic(
                 size: 12,
                 color: AppColors.error,
@@ -153,7 +154,9 @@ class GalleryTab extends ConsumerWidget {
       ref.invalidate(creatorImagesProvider(null));
       messenger.showSnackBar(const SnackBar(content: Text('Image uploaded')));
     } catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text('Upload failed: $e')));
+      messenger.showSnackBar(SnackBar(
+        content: Text(friendlyApiMessage(e, CreatorAction.uploadImage)),
+      ));
     }
   }
 
@@ -207,14 +210,18 @@ class GalleryTab extends ConsumerWidget {
         ref.invalidate(creatorImagesProvider(null));
         ref.invalidate(ownedPoetProvider);
       } catch (e) {
-        messenger.showSnackBar(SnackBar(content: Text('Update failed: $e')));
+        messenger.showSnackBar(SnackBar(
+          content: Text(friendlyApiMessage(e, CreatorAction.updateImage)),
+        ));
       }
     } else if (action == 'delete') {
       try {
         await ref.read(creatorServiceProvider).deleteImage(img.publicId);
         ref.invalidate(creatorImagesProvider(null));
       } catch (e) {
-        messenger.showSnackBar(SnackBar(content: Text('Delete failed: $e')));
+        messenger.showSnackBar(SnackBar(
+          content: Text(friendlyApiMessage(e, CreatorAction.deleteImage)),
+        ));
       }
     }
   }

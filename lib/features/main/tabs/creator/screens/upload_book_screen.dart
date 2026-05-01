@@ -8,6 +8,7 @@ import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
 import 'package:flutter_poetry_app/core/widgets/sukhan/sukhan_chip.dart';
 import '../providers/creator_providers.dart';
+import '../utils/api_error_messages.dart';
 
 /// Upload a book — title, year, description, optional PDF/EPUB binary,
 /// optional cover image. Multipart submit to /api/me/poet/books.
@@ -332,7 +333,9 @@ class _UploadBookScreenState extends ConsumerState<UploadBookScreen> {
       router.pop();
       messenger.showSnackBar(const SnackBar(content: Text('Book uploaded')));
     } catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text('Upload failed: $e')));
+      messenger.showSnackBar(SnackBar(
+        content: Text(friendlyApiMessage(e, CreatorAction.uploadBook)),
+      ));
     } finally {
       if (mounted) setState(() => _saving = false);
     }

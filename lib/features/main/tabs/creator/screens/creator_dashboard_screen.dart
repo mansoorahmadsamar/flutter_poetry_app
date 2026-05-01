@@ -46,14 +46,14 @@ class _CreatorDashboardScreenState
                 Icon(Icons.error_outline,
                     size: 48, color: AppColors.error.withValues(alpha: 0.7)),
                 const SizedBox(height: 12),
-                Text('Could not load creator dashboard',
+                Text("Couldn't load your creator dashboard",
                     style: SukhanText.display(
                       size: 16,
                       color: AppColors.textPrimaryLight,
                       weight: FontWeight.w600,
                     )),
                 const SizedBox(height: 8),
-                Text('$e',
+                Text('Pull down to retry, or check your connection.',
                     style: SukhanText.italic(
                       size: 12,
                       color: AppColors.textSecondaryLight,

@@ -8,6 +8,7 @@ import 'package:flutter_poetry_app/core/widgets/sukhan/sukhan_chip.dart';
 import '../models/creator_poem_model.dart';
 import '../providers/creator_poems_provider.dart';
 import '../providers/creator_providers.dart';
+import '../utils/api_error_messages.dart';
 
 /// Edit a poem's metadata. Per the API docs, only `isPublic`,
 /// `yearWritten`, `poetryType`, and `tagSlugs` can be modified — title
@@ -232,7 +233,9 @@ class _EditPoemScreenState extends ConsumerState<EditPoemScreen> {
       router.pop();
       messenger.showSnackBar(const SnackBar(content: Text('Poem updated')));
     } catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text('Could not update: $e')));
+      messenger.showSnackBar(SnackBar(
+        content: Text(friendlyApiMessage(e, CreatorAction.updatePoem)),
+      ));
     } finally {
       if (mounted) setState(() => _saving = false);
     }

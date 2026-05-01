@@ -7,6 +7,7 @@ import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
 import 'package:flutter_poetry_app/core/widgets/sukhan/sukhan_chip.dart';
 import '../../providers/creator_poems_provider.dart';
 import '../../providers/creator_providers.dart';
+import '../../utils/api_error_messages.dart';
 import '../creator_poem_tile.dart';
 
 /// "My Poems" tab content — paginated list with sort dropdown + compose FAB.
@@ -106,7 +107,9 @@ class _MyPoemsTabState extends ConsumerState<MyPoemsTab> {
                       ref.read(creatorPoemsProvider.notifier).replace(updated);
                     } catch (e) {
                       messenger.showSnackBar(
-                        SnackBar(content: Text('Could not update: $e')),
+                        SnackBar(
+                          content: Text(friendlyApiMessage(e, CreatorAction.updatePoem)),
+                        ),
                       );
                     }
                   } else if (action == 'delete') {
@@ -120,7 +123,9 @@ class _MyPoemsTabState extends ConsumerState<MyPoemsTab> {
                       ref.read(creatorPoemsProvider.notifier).remove(poem.publicId);
                     } catch (e) {
                       messenger.showSnackBar(
-                        SnackBar(content: Text('Could not delete: $e')),
+                        SnackBar(
+                          content: Text(friendlyApiMessage(e, CreatorAction.deletePoem)),
+                        ),
                       );
                     }
                   }

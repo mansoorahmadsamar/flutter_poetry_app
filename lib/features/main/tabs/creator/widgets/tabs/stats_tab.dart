@@ -25,7 +25,7 @@ class StatsTab extends ConsumerWidget {
       error: (e, _) => Center(
         child: Padding(
           padding: const EdgeInsets.all(20),
-          child: Text('Could not load stats: $e',
+          child: Text("Couldn't load your stats — please try again.",
               style: SukhanText.italic(size: 12, color: AppColors.error)),
         ),
       ),
