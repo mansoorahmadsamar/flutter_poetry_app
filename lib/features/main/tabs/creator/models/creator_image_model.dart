@@ -1,3 +1,5 @@
+import '_json_helpers.dart';
+
 class CreatorImage {
   const CreatorImage({
     required this.publicId,
@@ -29,9 +31,9 @@ class CreatorImage {
     return CreatorImage(
       publicId: json['publicId'] as String,
       imageUrl: (json['imageUrl'] as String?) ?? '',
-      thumbnailUrl: json['thumbnailUrl'] as String?,
-      caption: json['caption'] as String?,
-      altText: json['altText'] as String?,
+      thumbnailUrl: nullableStr(json['thumbnailUrl']),
+      caption: nullableStr(json['caption']),
+      altText: nullableStr(json['altText']),
       displayOrder: (json['displayOrder'] as num?)?.toInt() ?? 0,
       isProfileImage: json['isProfileImage'] as bool? ?? false,
       imageType: (json['imageType'] as String?) ?? 'GALLERY',

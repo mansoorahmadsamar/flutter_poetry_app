@@ -47,9 +47,17 @@ class _ClaimStatusBannerState extends State<ClaimStatusBanner>
     final isRejected = widget.poet.claimStatus == ClaimStatus.rejected;
     final eyebrow = isRejected ? 'CLAIM REJECTED' : 'CLAIM IN REVIEW';
     final headline = isRejected ? 'Resubmit needed' : 'Verifying';
-    final subtitle = isRejected
-        ? 'Your previous proof was rejected. Try again.'
-        : _submittedAgo(widget.poet.claimedAt);
+
+    // Prefer the admin's rejection reason, fall back to the reviewer note,
+    // then to a generic message. Pending claims show relative submit time.
+    final String subtitle;
+    if (isRejected) {
+      subtitle = widget.poet.claimRejectionReason ??
+          widget.poet.claimReviewerNote ??
+          'Your previous proof was rejected. Try again.';
+    } else {
+      subtitle = _submittedAgo(widget.poet.claimedAt);
+    }
 
     return Padding(
       padding: widget.margin,

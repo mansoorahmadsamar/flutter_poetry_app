@@ -1,3 +1,5 @@
+import '_json_helpers.dart';
+
 class CreatorFact {
   const CreatorFact({
     required this.publicId,
@@ -20,9 +22,9 @@ class CreatorFact {
       publicId: json['publicId'] as String,
       fact: (json['fact'] as String?) ?? '',
       languageCode: (json['languageCode'] as String?) ?? 'ur',
-      languageName: json['languageName'] as String?,
+      languageName: nullableStr(json['languageName']),
       displayOrder: (json['displayOrder'] as num?)?.toInt() ?? 0,
-      factGroupId: json['factGroupId']?.toString(),
+      factGroupId: nullableStr(json['factGroupId']),
     );
   }
 }

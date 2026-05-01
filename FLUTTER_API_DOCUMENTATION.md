@@ -12437,12 +12437,33 @@ Sukhan now lets any signed-in user become a **publishing poet** without merging 
 
 ### 20.2 Claim Status Values
 
-| Value | Meaning |
-|---|---|
-| `UNCLAIMED` | Default state for all scraped historical poets. |
-| `PENDING` | A user has submitted a claim and is waiting on admin moderation. |
-| `VERIFIED` | Confirmed owner. The user account is now bonded to this Poet. |
-| `REJECTED` | Admin rejected the claim. User can resubmit with new proof. |
+| Value | Meaning | UI |
+|---|---|---|
+| `UNCLAIMED` | Default for all scraped historical poets. No owner. | No ownership badge |
+| `PENDING` | Claim submitted, awaiting admin review. | "Claim under review" banner + `claimedAt` relative time |
+| `VERIFIED` | Admin approved (or auto-approved for self-created profiles). | "Verified Owner" badge |
+| `REJECTED` | Admin rejected. User can resubmit with different proof. | "Claim rejected" banner + `claimRejectionReason` + "Resubmit" button |
+
+**`claimStatus` vs `isVerified` — they are orthogonal:**
+
+| | `isVerified = true` | `isVerified = false` |
+|---|---|---|
+| `claimStatus = UNCLAIMED` | Editorial blue-check (e.g. Ghalib — notable, no owner) | Plain historical poet |
+| `claimStatus = VERIFIED` | Owner-verified AND editorially notable | Owner-verified, not yet curated |
+| `claimStatus = PENDING` | Notable poet, ownership under review | Regular claim pending |
+| `claimStatus = REJECTED` | Notable poet, rejected claim | Rejected claim |
+
+**New fields on every `PoetProfileResponse`** (both `GET /api/me/poet-profile` and `GET /api/poets/{id}/profile`):
+
+| Field | Type | Notes |
+|---|---|---|
+| `claimStatus` | string enum | Always present |
+| `claimedAt` | ISO datetime \| `"-"` | Last claim action timestamp |
+| `ownerUserId` | string \| `"-"` | `publicId` of owning User; `"-"` = unclaimed |
+| `claimRejectionReason` | string \| `"-"` | Populated on `REJECTED`; cleared when re-approved |
+| `claimReviewerNote` | string \| `"-"` | Optional note from admin on approve or reject |
+
+> **`"-"` means null/not-set** throughout this API (global Jackson convention). Check with `value != "-"` in Dart.
 
 ### 20.3 Create My Own Poet Profile
 
@@ -12490,8 +12511,10 @@ Content-Type: application/json
     "viewCount": 1,
     "followerCount": 0,
     "claimStatus": "VERIFIED",
-    "ownerUserId": 42
-    // ... full PoetProfileResponse shape (same as GET /api/poets/{publicId}/profile)
+    "claimedAt": "2026-05-01T14:22:00",
+    "ownerUserId": "dd3903f6-935a-48ea-ab36-3a4c85960302",
+    "claimRejectionReason": "-",
+    "claimReviewerNote": "-"
   }
 }
 ```
@@ -12576,6 +12599,90 @@ Content-Type: application/json
 ```dart
 enum PoetClaimStatus { UNCLAIMED, PENDING, VERIFIED, REJECTED }
 
+/// Helper — API returns "-" for null strings (global Jackson convention).
+String? nullableStr(dynamic v) => (v == null || v == '-') ? null : v as String;
+
+class PoetProfileOwnership {
+  final PoetClaimStatus claimStatus;
+  final DateTime? claimedAt;
+  final String? ownerUserId;        // publicId of owning User
+  final String? claimRejectionReason;
+  final String? claimReviewerNote;
+  final bool isVerified;            // editorial badge — independent of claimStatus
+
+  factory PoetProfileOwnership.fromJson(Map<String, dynamic> j) =>
+      PoetProfileOwnership(
+        claimStatus: PoetClaimStatus.values.firstWhere(
+            (e) => e.name == j['claimStatus'],
+            orElse: () => PoetClaimStatus.UNCLAIMED),
+        claimedAt: nullableStr(j['claimedAt']) != null
+            ? DateTime.parse(j['claimedAt']) : null,
+        ownerUserId:           nullableStr(j['ownerUserId']),
+        claimRejectionReason:  nullableStr(j['claimRejectionReason']),
+        claimReviewerNote:     nullableStr(j['claimReviewerNote']),
+        isVerified: j['isVerified'] ?? false,
+      );
+}
+```
+
+#### Rendering claim state banners
+
+```dart
+Widget claimBanner(PoetProfileOwnership ownership, {required VoidCallback onResubmit}) {
+  switch (ownership.claimStatus) {
+    case PoetClaimStatus.PENDING:
+      final ago = _relativeTime(ownership.claimedAt);
+      return InfoBanner(
+        icon: Icons.hourglass_top,
+        color: Colors.orange,
+        text: 'Claim under review · submitted $ago',
+      );
+    case PoetClaimStatus.REJECTED:
+      return InfoBanner(
+        icon: Icons.cancel_outlined,
+        color: Colors.red,
+        text: ownership.claimRejectionReason != null
+            ? 'Claim rejected: ${ownership.claimRejectionReason}'
+            : 'Claim rejected by admin',
+        action: TextButton(onPressed: onResubmit, child: const Text('Resubmit')),
+      );
+    case PoetClaimStatus.VERIFIED:
+      return const SizedBox.shrink(); // No banner for owner — show creator UI
+    case PoetClaimStatus.UNCLAIMED:
+    default:
+      return const SizedBox.shrink();
+  }
+}
+```
+
+#### Verified owner badge vs editorial badge
+
+```dart
+// Editorial badge (isVerified) — shown on public poet pages
+// e.g. Ghalib has isVerified=true, claimStatus=UNCLAIMED
+if (poet.isVerified)
+  const Icon(Icons.verified, color: Colors.blue, size: 16);
+
+// Ownership badge — shown only when VERIFIED owner views their own page
+if (poet.ownership.claimStatus == PoetClaimStatus.VERIFIED &&
+    poet.ownership.ownerUserId == currentUser.publicId)
+  const Icon(Icons.lock_person, color: Colors.green, size: 16);
+```
+
+#### Admin portal — approve/reject with optional notes
+
+```
+POST /api/admin/poet-claims/{publicId}/approve?reviewerNote=Verified+via+LinkedIn
+POST /api/admin/poet-claims/{publicId}/reject?reason=No+sufficient+proof&reviewerNote=Needs+official+ID
+```
+
+`reason` (shown to the user in `claimRejectionReason`) and `reviewerNote` (internal, not shown to user) are both optional query params.
+
+---
+
+#### Original service stubs
+
+```dart
 class CreatePoetProfileRequest {
   final String primaryLanguageCode; // 'ur' | 'en' | 'hi' | ...
   final String name;

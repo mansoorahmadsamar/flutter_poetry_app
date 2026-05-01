@@ -1,3 +1,5 @@
+import '_json_helpers.dart';
+
 class CreatorBook {
   const CreatorBook({
     required this.publicId,
@@ -36,12 +38,12 @@ class CreatorBook {
       publicId: json['publicId'] as String,
       title: (json['title'] as String?) ?? '',
       yearPublished: (json['yearPublished'] as num?)?.toInt(),
-      description: json['description'] as String?,
-      publisher: json['publisher'] as String?,
+      description: nullableStr(json['description']),
+      publisher: nullableStr(json['publisher']),
       languageCode: (json['languageCode'] as String?) ?? 'ur',
-      coverUrl: json['coverUrl'] as String?,
-      pdfUrl: json['pdfUrl'] as String?,
-      epubUrl: json['epubUrl'] as String?,
+      coverUrl: nullableStr(json['coverUrl']),
+      pdfUrl: nullableStr(json['pdfUrl']),
+      epubUrl: nullableStr(json['epubUrl']),
       hasPdf: json['hasPdf'] as bool? ?? false,
       hasEpub: json['hasEpub'] as bool? ?? false,
       isDownloadable: json['isDownloadable'] as bool? ?? false,

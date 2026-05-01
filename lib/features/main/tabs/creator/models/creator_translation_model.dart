@@ -1,3 +1,5 @@
+import '_json_helpers.dart';
+
 class CreatorTranslation {
   const CreatorTranslation({
     required this.languageCode,
@@ -25,10 +27,10 @@ class CreatorTranslation {
     return CreatorTranslation(
       languageCode: (json['languageCode'] as String?) ?? 'ur',
       languageName: (json['languageName'] as String?) ?? 'Urdu',
-      name: json['name'] as String?,
-      penName: json['penName'] as String?,
-      shortBio: json['shortBio'] as String?,
-      biography: json['biography'] as String?,
+      name: nullableStr(json['name']),
+      penName: nullableStr(json['penName']),
+      shortBio: nullableStr(json['shortBio']),
+      biography: nullableStr(json['biography']),
       hasShortBio: json['hasShortBio'] as bool? ?? false,
       hasBiography: json['hasBiography'] as bool? ?? false,
       isPrimary: json['isPrimary'] as bool? ?? false,
