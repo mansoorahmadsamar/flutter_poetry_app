@@ -33,9 +33,10 @@ class CreatorPoem {
   final List<String> tagSlugs;
 
   factory CreatorPoem.fromJson(Map<String, dynamic> json) {
+    final resolvedTitle = _resolveTitle(json);
     return CreatorPoem(
       publicId: json['publicId'] as String,
-      title: (json['title'] as String?) ?? '',
+      title: resolvedTitle,
       poetryType: (json['poetryType'] as String?) ?? 'GHAZAL',
       languageCode: (json['languageCode'] as String?) ?? 'ur',
       script: (json['script'] as String?) ?? 'ARABIC',
@@ -52,6 +53,42 @@ class CreatorPoem {
           : null,
       tagSlugs: (json['tagSlugs'] as List?)?.map((e) => e.toString()).toList() ?? const [],
     );
+  }
+
+  /// Title can arrive at the top level (composed via app) or nested under
+  /// `originalContent.title` / `contents[*].title` for scraped poems.
+  /// Try the top level first, then fall back through the content list.
+  static String _resolveTitle(Map<String, dynamic> json) {
+    final top = (json['title'] as String?)?.trim();
+    if (top != null && top.isNotEmpty) return top;
+
+    final original = json['originalContent'];
+    if (original is Map<String, dynamic>) {
+      final t = (original['title'] as String?)?.trim();
+      if (t != null && t.isNotEmpty) return t;
+    }
+
+    final contents = json['contents'];
+    if (contents is List && contents.isNotEmpty) {
+      // Prefer the Urdu/Arabic-script content if available, else first.
+      Map<String, dynamic>? best;
+      for (final c in contents) {
+        if (c is! Map<String, dynamic>) continue;
+        final t = (c['title'] as String?)?.trim();
+        if (t == null || t.isEmpty) continue;
+        if ((c['languageCode'] as String?) == 'ur' &&
+            (c['script'] as String?) == 'ARABIC') {
+          best = c;
+          break;
+        }
+        best ??= c;
+      }
+      if (best != null) {
+        return ((best['title'] as String?) ?? '').trim();
+      }
+    }
+
+    return '';
   }
 }
 

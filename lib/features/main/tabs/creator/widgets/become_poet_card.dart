@@ -1,11 +1,48 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
 import 'package:flutter_poetry_app/core/widgets/sukhan/corner_frame.dart';
 import 'package:flutter_poetry_app/core/widgets/sukhan/diagonal_hatch.dart';
 import 'package:flutter_poetry_app/core/widgets/sukhan/gold_divider.dart';
+
+/// Feature flag for the entire Poet Mode surface (claim flow + creator
+/// dashboard + compose). Gated for the v1.0 App Store release: the
+/// "Become a Poet" card shows a "Coming Soon" dialog instead of opening
+/// the claim flow, and verified poets are routed to the standard profile
+/// UI instead of the dashboard so reviewers and existing test accounts
+/// see a consistent, polished surface. Flip to `true` once poet mode is
+/// ready to ship.
+const bool kPoetModeEnabled = false;
+
+void _onBecomePoetTap(BuildContext context) {
+  showDialog<void>(
+    context: context,
+    builder: (_) => AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      title: Row(
+        children: [
+          const Icon(Icons.auto_awesome, color: AppColors.primary),
+          const SizedBox(width: 8),
+          const Text('Coming Soon'),
+        ],
+      ),
+      content: const Text(
+        'Poet Mode is on its way. You\'ll soon be able to claim your '
+        'name, share your original verses, and grow a readership '
+        'inside Sukhan. Watch this space — we\'ll let you know the '
+        'moment it\'s ready.',
+      ),
+      actions: [
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(),
+          style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
+          child: const Text('Got it'),
+        ),
+      ],
+    ),
+  );
+}
 
 enum BecomePoetCardVariant { celebratory, quiet, manuscript }
 
@@ -47,7 +84,7 @@ class _Celebratory extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(18),
-          onTap: () => context.push('/main/become-poet'),
+          onTap: () => _onBecomePoetTap(context),
           child: Stack(
             children: [
               Container(
@@ -148,7 +185,7 @@ class _CelebratoryBody extends StatelessWidget {
         Row(
           children: [
             ElevatedButton.icon(
-              onPressed: () => GoRouter.of(context).push('/main/become-poet'),
+              onPressed: () => _onBecomePoetTap(context),
               icon: const Icon(Icons.edit_note, size: 16),
               label: const Text('Become a poet'),
               style: ElevatedButton.styleFrom(
@@ -196,7 +233,7 @@ class _Quiet extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(14),
-          onTap: () => context.push('/main/become-poet'),
+          onTap: () => _onBecomePoetTap(context),
           child: Container(
             decoration: BoxDecoration(
               color: AppColors.surfaceLight,
@@ -278,7 +315,7 @@ class _Manuscript extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(14),
-          onTap: () => context.push('/main/become-poet'),
+          onTap: () => _onBecomePoetTap(context),
           child: CornerFrame(
             inset: 12,
             length: 18,
@@ -325,7 +362,7 @@ class _Manuscript extends StatelessWidget {
                 ),
                 const SizedBox(height: 14),
                 ElevatedButton(
-                  onPressed: () => context.push('/main/become-poet'),
+                  onPressed: () => _onBecomePoetTap(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: AppColors.backgroundLight,

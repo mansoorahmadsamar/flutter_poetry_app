@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop
+      - main
   workflow_dispatch:
     inputs:
       track:
@@ -90,12 +91,27 @@ jobs:
       - name: Decode Play Store service account
         run: echo "${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}" | base64 --decode > ${{ runner.temp }}/play-store-credentials.json
 
+      - name: Resolve Play Store track
+        id: resolve_track
+        run: |
+          # Manual dispatch: honor the chosen track.
+          # Push to main → production. Push to develop (or anything else) → alpha.
+          if [ -n "${{ inputs.track }}" ]; then
+            TRACK="${{ inputs.track }}"
+          elif [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            TRACK="production"
+          else
+            TRACK="alpha"
+          fi
+          echo "track=${TRACK}" >> $GITHUB_OUTPUT
+          echo "🛤  Releasing to track: ${TRACK}"
+
       - name: Upload to Google Play
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJson: ${{ runner.temp }}/play-store-credentials.json
           packageName: com.techhikes.poetry_app
           releaseFiles: build/app/outputs/bundle/release/app-release.aab
-          track: ${{ inputs.track || 'alpha' }}
+          track: ${{ steps.resolve_track.outputs.track }}
           status: completed
           whatsNewDirectory: distribution/whatsnew

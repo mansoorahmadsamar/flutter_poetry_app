@@ -191,6 +191,8 @@ class _ComposePoemScreenState extends ConsumerState<ComposePoemScreen> {
           );
       ref.read(creatorPoemsProvider.notifier).prepend(poem);
       ref.invalidate(creatorAnalyticsProvider);
+      // Refresh hero stats (poemCount, viewCount) on the dashboard.
+      ref.invalidate(ownedPoetProvider);
       if (!mounted) return;
       router.pop();
       messenger.showSnackBar(

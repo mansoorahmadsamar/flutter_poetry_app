@@ -8,7 +8,16 @@
 
 ---
 
-## Recent Updates (December 2025 - March 2026)
+## Recent Updates (December 2025 - May 2026)
+
+### In-App Account Deletion ⭐ NEW (May 7, 2026)
+
+New endpoint `DELETE /api/users/me` for App Store Guideline 5.1.1(v) compliance.
+Body: `{"confirmation":"DELETE"}`. Hard-deletes the user, all personal engagement
+(bookmarks, likes, follows, reactions, notifications, comments) and the Firebase
+user; **retains** uploaded poems, claimed poet personas, and generated poetry
+images by setting their owner FK to `null`. See [§3.4 Delete User Profile](#34-delete-user-profile)
+for the full contract and Flutter integration checklist.
 
 ### Poem Detail: Clean Response + Live Reaction Counts ⭐ BREAKING (March 30, 2026)
 
@@ -1551,6 +1560,127 @@ Content-Type: application/json
   "data": null
 }
 ```
+
+---
+
+### 3.4 Delete User Profile
+
+Hard-deletes the authenticated user's account. Required for App Store submission under
+Guideline 5.1.1(v) — Apple rejects apps that don't offer in-app account deletion.
+
+**Endpoint:** `DELETE /api/users/me`
+
+**Authentication Required:** Yes
+
+**Request Headers:**
+```
+Authorization: Bearer <access_token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "confirmation": "DELETE"
+}
+```
+
+The `confirmation` field is a deliberate-action guard. The server rejects the request
+unless the value is the literal string `"DELETE"`. Pair this with a "Type DELETE to
+confirm" dialog on the client.
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Account deleted",
+  "data": null
+}
+```
+
+**Error Response (400) — missing or wrong confirmation:**
+```json
+{
+  "success": false,
+  "message": "Confirmation must be the literal string \"DELETE\"",
+  "data": null
+}
+```
+
+**Error Response (401) — no/expired token:**
+```json
+{
+  "success": false,
+  "message": "Unauthorized",
+  "data": null
+}
+```
+
+#### What gets deleted vs. retained
+
+**Hard-deleted (rows go away):**
+- The `users` row itself
+- Personal engagement: bookmarks, likes, follows, reactions, content preferences,
+  notifications, image collections, all couplet-level likes/bookmarks/shares,
+  refresh tokens, user interests, engagement activities
+- Comments authored by the user (current schema requires this; see note below)
+
+**Retained but disowned (content stays public, ownership cleared):**
+- Poems uploaded by the user → `uploadedBy` set to `null`
+- Claimed poet persona → `ownerUser` set to `null`, `claimStatus` reset to `UNCLAIMED`
+- Poetry images the user generated → `user` set to `null`
+- Book download history → `user` set to `null` (analytics only)
+
+**Firebase:** the user's Firebase Authentication record is also deleted (best-effort,
+runs after the DB transaction commits). If the Firebase delete fails, the local
+account is still gone.
+
+> **Note on comments:** Comments are currently hard-deleted because `comments.user_id`
+> is `NOT NULL` in the schema. If you later want comment threads to survive account
+> deletion (with the author shown as "[deleted]"), the FK needs a Flyway migration to
+> become nullable.
+
+#### Flutter implementation checklist
+
+1. Add a "Delete Account" item under **Settings → Account**.
+2. Show a confirmation dialog requiring the user to type `DELETE`.
+3. Call `DELETE /api/users/me` with body `{"confirmation":"DELETE"}` and the user's
+   Bearer token.
+4. On 200 success:
+   - Clear local secure storage (JWT, refresh token, cached user profile).
+   - Call `FirebaseAuth.instance.signOut()`.
+   - Navigate to the login/onboarding screen and prevent back-navigation.
+5. On 400/401, surface the server's `message` and stay on the settings screen.
+
+#### Flutter — Dart example
+
+```dart
+Future<void> deleteAccount() async {
+  final response = await dio.delete(
+    '/api/users/me',
+    data: {'confirmation': 'DELETE'},
+    options: Options(headers: {
+      'Authorization': 'Bearer $accessToken',
+      'Content-Type': 'application/json',
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    await secureStorage.deleteAll();
+    await FirebaseAuth.instance.signOut();
+    if (context.mounted) {
+      Navigator.of(context).pushNamedAndRemoveUntil('/login', (_) => false);
+    }
+  } else {
+    throw Exception(response.data['message'] ?? 'Failed to delete account');
+  }
+}
+```
+
+> ⚠️ **Irreversible.** There is no undo and no grace period. Once the 200 response
+> comes back, the account, all personal engagement data, and the Firebase user are
+> gone. Re-registering with the same email creates a brand-new account with no
+> history.
 
 ---
 

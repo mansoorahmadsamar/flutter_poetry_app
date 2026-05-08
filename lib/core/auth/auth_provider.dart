@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -252,5 +253,93 @@ class AuthNotifier extends StateNotifier<AuthState> {
   /// Clear error message
   void clearError() {
     state = state.copyWith(errorMessage: null);
+  }
+
+  /// Permanently delete the authenticated user's account.
+  ///
+  /// Calls `DELETE /api/users/me` with `{"confirmation":"DELETE"}` (App Store
+  /// Guideline 5.1.1(v)). On 200, hard-deletes the user on the backend, then
+  /// clears local session state mirroring [logout].
+  Future<void> deleteAccount() async {
+    _logger.i('');
+    _logger.i('═══════════════════════════════════════════════════════');
+    _logger.i('🗑️  DELETING ACCOUNT');
+    _logger.i('═══════════════════════════════════════════════════════');
+
+    try {
+      state = state.copyWith(isLoading: true, errorMessage: null);
+
+      final dioClient = _ref.read(dioClientProvider);
+      final response = await dioClient.delete<Map<String, dynamic>>(
+        '/api/users/me',
+        data: {'confirmation': 'DELETE'},
+      );
+
+      final body = response.data;
+      final success = response.statusCode == 200 && body?['success'] == true;
+      if (!success) {
+        final message = body?['message']?.toString() ??
+            'Failed to delete account (status ${response.statusCode})';
+        throw Exception(message);
+      }
+
+      _logger.i('✅ Server-side account deletion succeeded');
+
+      _logger.i('   Signing out of Firebase + clearing secure storage...');
+      await _firebaseAuthService.signOut();
+
+      _logger.i('   Clearing SharedPreferences...');
+      try {
+        final prefs = _ref.read(preferencesServiceProvider);
+        await prefs.clearAll();
+      } catch (e) {
+        _logger.w('⚠️  Failed to clear preferences: $e');
+      }
+
+      _logger.i('   Invalidating cached providers...');
+      _ref.invalidate(feedProvider);
+      _ref.invalidate(feedEngagementProvider);
+      _ref.invalidate(discoverProvider);
+      _ref.invalidate(bookmarkedCoupletsProvider);
+      _ref.invalidate(unifiedBookmarksProvider);
+      _ref.invalidate(bookmarkActionProvider);
+      _ref.invalidate(bookmarkSearchProvider);
+      _ref.invalidate(bookmarkSearchHistoryProvider);
+      _ref.invalidate(coupletsProvider);
+      _ref.invalidate(coupletProvider);
+      _ref.invalidate(coupletActionProvider);
+      _ref.invalidate(searchHistoryProvider);
+      _ref.invalidate(searchQueryProvider);
+
+      // Resetting to default AuthState clears tokens and sets isAuthenticated
+      // to false; the GoRouter redirect listening on auth state will send the
+      // user back to /login automatically.
+      state = const AuthState();
+
+      _logger.i('═══════════════════════════════════════════════════════');
+      _logger.i('✅ ACCOUNT DELETED — ALL LOCAL DATA CLEARED');
+      _logger.i('═══════════════════════════════════════════════════════');
+      _logger.i('');
+    } on DioException catch (e) {
+      final serverMessage =
+          (e.response?.data is Map<String, dynamic>
+                  ? (e.response?.data as Map<String, dynamic>)['message']
+                  : null)
+              ?.toString();
+      _logger.e('❌ Delete account failed: ${e.message}');
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage:
+            serverMessage ?? 'Failed to delete account. Please try again.',
+      );
+      rethrow;
+    } catch (e) {
+      _logger.e('❌ Delete account error: $e');
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString(),
+      );
+      rethrow;
+    }
   }
 }

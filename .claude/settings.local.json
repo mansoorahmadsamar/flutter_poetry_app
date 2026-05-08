@@ -72,7 +72,10 @@
       "Bash(tar -tzf /tmp/sukhan-design/design.tar.gz)",
       "Read(//private/tmp/sukhan-design/**)",
       "Bash(tar -xzf design.tar.gz)",
-      "Bash(git checkout *)"
+      "Bash(git checkout *)",
+      "Bash(/Users/mansoorahmadsamar/Library/Android/sdk/platform-tools/adb -s emulator-5554 logcat -d -t 1000)",
+      "Bash(/Users/mansoorahmadsamar/Library/Android/sdk/platform-tools/adb -s emulator-5554 logcat -d -t 3000)",
+      "Bash(/Users/mansoorahmadsamar/Library/Android/sdk/platform-tools/adb -s emulator-5554 logcat -d -t 5000)"
     ],
     "deny": [],
     "ask": []

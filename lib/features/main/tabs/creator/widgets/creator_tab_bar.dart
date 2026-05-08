@@ -66,7 +66,7 @@ class CreatorTabBar extends StatelessWidget implements PreferredSizeWidget {
   static const _tabs = CreatorTab.values;
 
   @override
-  Size get preferredSize => const Size.fromHeight(54);
+  Size get preferredSize => const Size.fromHeight(64);
 
   @override
   Widget build(BuildContext context) {

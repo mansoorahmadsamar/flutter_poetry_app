@@ -36,8 +36,11 @@ class CreatorHero extends StatelessWidget {
                   AppColors.primaryLight,
                 ],
               ),
+              border: Border(
+                bottom: BorderSide(color: AppColors.secondary, width: 1),
+              ),
             ),
-            padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
+            padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
             child: _Body(poet: poet),
           ),
           DiagonalHatchOverlay(
@@ -51,8 +54,8 @@ class CreatorHero extends StatelessWidget {
               '۞',
               style: TextStyle(
                 fontFamily: AppTypography.urduFontFamily,
-                fontSize: 24,
-                color: AppColors.secondaryLight.withValues(alpha: 0.55),
+                fontSize: 26,
+                color: AppColors.secondaryLight.withValues(alpha: 0.78),
                 height: 1,
               ),
             ),

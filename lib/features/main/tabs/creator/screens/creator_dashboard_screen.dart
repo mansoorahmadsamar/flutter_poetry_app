@@ -5,6 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_poetry_app/core/auth/auth_provider.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
+import 'package:flutter_poetry_app/core/providers/language_provider.dart';
+import '../../profile/providers/app_content_providers.dart';
+import '../../profile/screens/app_content_detail_screen.dart';
 import '../models/owned_poet_model.dart';
 import '../providers/creator_providers.dart';
 import '../widgets/creator_hero.dart';
@@ -154,7 +157,61 @@ class _CreatorDashboardScreenState
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (sheetCtx) => SafeArea(
+      builder: (sheetCtx) => _CreatorMenuSheet(
+        onLogout: () async {
+          final router = GoRouter.of(context);
+          Navigator.of(sheetCtx).pop();
+          await ref.read(authProvider.notifier).logout();
+          router.go('/login');
+        },
+        onLanguagePicker: () {
+          Navigator.of(sheetCtx).pop();
+          _showLanguageSheet(context);
+        },
+      ),
+    );
+  }
+
+  void _showLanguageSheet(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.surfaceLight,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => const _CreatorLanguageSheet(),
+    );
+  }
+
+}
+
+/// Bottom-sheet body shown by the dashboard's overflow menu. Watches the
+/// app-content + language providers so the About items load on demand
+/// (the dashboard otherwise skips the profile-tab path that would have
+/// fetched them).
+class _CreatorMenuSheet extends ConsumerWidget {
+  const _CreatorMenuSheet({
+    required this.onLogout,
+    required this.onLanguagePicker,
+  });
+
+  final VoidCallback onLogout;
+  final VoidCallback onLanguagePicker;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final aboutAsync = ref.watch(appContentListProvider);
+    final selectedLang = ref.watch(selectedLanguageNotifierProvider);
+    final availableLangs =
+        ref.watch(availableLanguagesProvider).valueOrNull ?? const [];
+    final selectedLanguageName = availableLangs
+            .where((l) => l.code == selectedLang.code)
+            .map((l) => l.nativeName)
+            .firstOrNull ??
+        selectedLang.code.toUpperCase();
+
+    return SafeArea(
+      child: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(8, 12, 8, 12),
           child: Column(
@@ -169,11 +226,14 @@ class _CreatorDashboardScreenState
                 ),
               ),
               const SizedBox(height: 8),
+
+              // ── Creator actions ──
+              const _SectionLabel(label: 'Creator'),
               ListTile(
                 leading: const Icon(Icons.edit_outlined),
                 title: const Text('Edit profile'),
                 onTap: () {
-                  Navigator.of(sheetCtx).pop();
+                  Navigator.of(context).pop();
                   GoRouter.of(context).push('/main/creator/profile/edit');
                 },
               ),
@@ -181,7 +241,7 @@ class _CreatorDashboardScreenState
                 leading: const Icon(Icons.translate_outlined),
                 title: const Text('Manage translations'),
                 onTap: () {
-                  Navigator.of(sheetCtx).pop();
+                  Navigator.of(context).pop();
                   GoRouter.of(context).push('/main/creator/translations/en');
                 },
               ),
@@ -189,24 +249,239 @@ class _CreatorDashboardScreenState
                 leading: const Icon(Icons.fact_check_outlined),
                 title: const Text('Edit facts'),
                 onTap: () {
-                  Navigator.of(sheetCtx).pop();
+                  Navigator.of(context).pop();
                   GoRouter.of(context).push('/main/creator/facts');
                 },
               ),
+
+              const Divider(height: 1),
+
+              // ── Settings ──
+              const _SectionLabel(label: 'Settings'),
+              ListTile(
+                leading: const Icon(Icons.language),
+                title: const Text('Reading language'),
+                subtitle: Text(
+                  selectedLanguageName,
+                  style: SukhanText.italic(
+                    size: 11,
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+                onTap: onLanguagePicker,
+              ),
+
+              const Divider(height: 1),
+
+              // ── About (dynamic from backend) ──
+              const _SectionLabel(label: 'About'),
+              ...aboutAsync.when(
+                loading: () => const [
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    child: Center(
+                      child: SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+                error: (_, __) => [
+                  ListTile(
+                    leading: const Icon(Icons.info_outline),
+                    title: const Text('About'),
+                    subtitle: Text(
+                      "Couldn't load — pull down to retry.",
+                      style: SukhanText.italic(
+                        size: 11,
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                  ),
+                ],
+                data: (items) {
+                  if (items.isEmpty) {
+                    return const [
+                      ListTile(
+                        leading: Icon(Icons.info_outline),
+                        title: Text('No content available'),
+                      ),
+                    ];
+                  }
+                  return [
+                    for (final item in items)
+                      ListTile(
+                        leading: Icon(_iconForContentKey(item.contentKey)),
+                        title: Text(item.title),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => AppContentDetailScreen(
+                                contentKey: item.contentKey,
+                                title: item.title,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                  ];
+                },
+              ),
+
               const Divider(height: 1),
               ListTile(
                 leading: const Icon(Icons.logout, color: AppColors.error),
                 title: const Text('Log out',
                     style: TextStyle(color: AppColors.error)),
-                onTap: () async {
-                  final router = GoRouter.of(context);
-                  Navigator.of(sheetCtx).pop();
-                  await ref.read(authProvider.notifier).logout();
-                  router.go('/login');
-                },
+                onTap: onLogout,
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  IconData _iconForContentKey(String key) {
+    switch (key) {
+      case 'ABOUT_APP':
+        return Icons.info_outline;
+      case 'PRIVACY_POLICY':
+        return Icons.privacy_tip_outlined;
+      case 'TERMS_OF_SERVICE':
+        return Icons.description_outlined;
+      case 'CONTACT_US':
+        return Icons.contact_mail_outlined;
+      case 'FAQ':
+        return Icons.help_outline;
+      default:
+        return Icons.article_outlined;
+    }
+  }
+}
+
+class _SectionLabel extends StatelessWidget {
+  const _SectionLabel({required this.label});
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 14, 16, 6),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          label.toUpperCase(),
+          style: SukhanText.eyebrow(color: AppColors.secondary),
+        ),
+      ),
+    );
+  }
+}
+
+/// Language picker re-implemented inside the dashboard sheet to avoid
+/// importing the private `_LanguageBottomSheet` from profile_tab.dart.
+class _CreatorLanguageSheet extends ConsumerWidget {
+  const _CreatorLanguageSheet();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final languagesAsync = ref.watch(availableLanguagesProvider);
+    final selected = ref.watch(selectedLanguageNotifierProvider);
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.language, color: AppColors.primary),
+                const SizedBox(width: 12),
+                Text(
+                  'Reading language',
+                  style: SukhanText.display(
+                    size: 18,
+                    color: AppColors.textPrimaryLight,
+                    weight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Pick your preferred language for poetry and UI.',
+              style: SukhanText.italic(
+                size: 12,
+                color: AppColors.textSecondaryLight,
+              ),
+            ),
+            const Divider(height: 24),
+            languagesAsync.when(
+              loading: () => const Padding(
+                padding: EdgeInsets.symmetric(vertical: 24),
+                child: Center(
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                ),
+              ),
+              error: (_, __) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Text(
+                  "Couldn't load languages. Try again later.",
+                  style: SukhanText.italic(
+                    size: 12,
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+              ),
+              data: (langs) => Column(
+                children: langs.map((l) {
+                  final on = l.code == selected.code;
+                  return ListTile(
+                    leading: Text(
+                      l.direction == 'RTL' ? '🌐' : '🌍',
+                      style: const TextStyle(fontSize: 22),
+                    ),
+                    title: Text(
+                      l.name,
+                      style: TextStyle(
+                        fontWeight: on ? FontWeight.w600 : FontWeight.w500,
+                      ),
+                    ),
+                    subtitle: Text(l.nativeName),
+                    trailing: on
+                        ? const Icon(Icons.check_circle,
+                            color: AppColors.primary)
+                        : null,
+                    onTap: () async {
+                      final messenger = ScaffoldMessenger.of(context);
+                      await ref
+                          .read(selectedLanguageNotifierProvider.notifier)
+                          .setLanguage(l.code);
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: Text('Language changed to ${l.name}'),
+                            backgroundColor: AppColors.success,
+                          ),
+                        );
+                      }
+                    },
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
         ),
       ),
     );
