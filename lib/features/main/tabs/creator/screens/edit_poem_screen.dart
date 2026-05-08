@@ -134,7 +134,7 @@ class _EditPoemScreenState extends ConsumerState<EditPoemScreen> {
               borderRadius: BorderRadius.circular(10),
               side: const BorderSide(color: AppColors.dividerLight),
             ),
-            activeThumbColor: AppColors.primary,
+            activeColor: AppColors.primary,
             title: Text(_isPublic ? 'Public' : 'Draft',
                 style: SukhanText.sans(
                   size: 13,
