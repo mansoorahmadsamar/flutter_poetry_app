@@ -6,6 +6,13 @@ import '../../../core/design_system/app_colors.dart';
 import '../../../core/providers/user_provider.dart';
 import '../../../core/providers/language_provider.dart';
 import '../../../core/widgets/standard_app_bar.dart';
+import 'creator/models/claim_status.dart';
+import 'creator/providers/creator_providers.dart';
+import 'creator/screens/creator_dashboard_screen.dart';
+import 'creator/widgets/become_poet_card.dart';
+import 'creator/widgets/claim_status_banner.dart';
+// kPoetModeEnabled lives in become_poet_card.dart and gates the entire
+// poet-mode surface (claim flow + dashboard) for the v1.0 release.
 import 'profile/providers/app_content_providers.dart';
 import 'profile/screens/app_content_detail_screen.dart';
 
@@ -53,6 +60,17 @@ class ProfileTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
     final userProfile = ref.watch(userProfileProvider);
+    final ownedPoetAsync = ref.watch(ownedPoetProvider);
+
+    // If the user has a verified owned poet, render the creator dashboard
+    // in place of the standard profile/settings UI. The dashboard owns
+    // its own scrolling shell. Gated for v1.0 — see kPoetModeEnabled.
+    final ownedPoet = ownedPoetAsync.valueOrNull;
+    if (kPoetModeEnabled &&
+        ownedPoet != null &&
+        ownedPoet.claimStatus == ClaimStatus.verified) {
+      return const CreatorDashboardScreen();
+    }
 
     return CustomScrollView(
       slivers: [
@@ -65,7 +83,30 @@ class ProfileTab extends ConsumerWidget {
         SliverToBoxAdapter(
           child: Column(
             children: [
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
+
+              // Become-a-poet entry. While poet mode is gated for v1.0
+              // (kPoetModeEnabled == false) we always show the teaser
+              // card and suppress the in-flight claim banner — a tap
+              // shows a "Coming Soon" dialog regardless of backend state.
+              if (!kPoetModeEnabled)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: const BecomePoetCard(),
+                )
+              else if (ownedPoet == null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: const BecomePoetCard(),
+                )
+              else if (ownedPoet.claimStatus == ClaimStatus.pending ||
+                  ownedPoet.claimStatus == ClaimStatus.rejected)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: ClaimStatusBanner(poet: ownedPoet),
+                ),
+
+              const SizedBox(height: 8),
 
               // Profile header card with user info
               userProfile.when(
@@ -122,6 +163,9 @@ class ProfileTab extends ConsumerWidget {
                   ),
                 ),
               ),
+              const SizedBox(height: 32),
+
+              _buildDangerZone(context, ref, authState.isLoading),
               const SizedBox(height: 32),
             ],
           ),
@@ -537,6 +581,99 @@ class ProfileTab extends ConsumerWidget {
     }
   }
 
+  /// Danger Zone — irreversible destructive actions (account deletion).
+  /// Required for App Store Guideline 5.1.1(v) compliance.
+  Widget _buildDangerZone(
+    BuildContext context,
+    WidgetRef ref,
+    bool isAuthLoading,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.red.shade300, width: 1.5),
+          borderRadius: BorderRadius.circular(12),
+          color: Colors.red.withValues(alpha: 0.04),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.warning_amber_rounded, color: Colors.red.shade700, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  'Danger Zone',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red.shade700,
+                      ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Permanently delete your account, poems, bookmarks, follows, '
+              'and image collections. This action cannot be undone.',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.grey[700],
+                  ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: isAuthLoading
+                    ? null
+                    : () => _handleDeleteAccount(context, ref),
+                icon: const Icon(Icons.delete_forever_outlined),
+                label: const Text(
+                  'Delete Account',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                ),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  side: BorderSide(color: Colors.red.shade700, width: 1.5),
+                  foregroundColor: Colors.red.shade700,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Show "Type DELETE to confirm" dialog and call deleteAccount() on confirm.
+  Future<void> _handleDeleteAccount(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const _DeleteAccountDialog(),
+    );
+
+    if (confirmed != true || !context.mounted) return;
+
+    try {
+      await ref.read(authProvider.notifier).deleteAccount();
+      // GoRouter redirect will send user to /login automatically once
+      // isAuthenticated flips to false. Nothing else to do here.
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to delete account: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   /// Show language selection bottom sheet
   void _showLanguageBottomSheet(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
@@ -646,6 +783,92 @@ class _LanguageBottomSheet extends ConsumerWidget {
           const SizedBox(height: 16),
         ],
       ),
+    );
+  }
+}
+
+/// Confirmation dialog requiring the user to type "DELETE" before the
+/// account-deletion request is sent. The literal string "DELETE" is also
+/// what the backend expects in the request body.
+class _DeleteAccountDialog extends StatefulWidget {
+  const _DeleteAccountDialog();
+
+  @override
+  State<_DeleteAccountDialog> createState() => _DeleteAccountDialogState();
+}
+
+class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
+  final _controller = TextEditingController();
+  bool _canDelete = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(() {
+      final next = _controller.text.trim() == 'DELETE';
+      if (next != _canDelete) {
+        setState(() => _canDelete = next);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Row(
+        children: [
+          Icon(Icons.warning_amber_rounded, color: Colors.red.shade700),
+          const SizedBox(width: 8),
+          const Text('Delete Account?'),
+        ],
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'This will permanently delete your account, poems, bookmarks, '
+            'follows, and image collections. This cannot be undone.',
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Type DELETE to confirm:',
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _controller,
+            autofocus: true,
+            textCapitalization: TextCapitalization.characters,
+            decoration: InputDecoration(
+              hintText: 'DELETE',
+              border: const OutlineInputBorder(),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.red.shade700, width: 2),
+              ),
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: _canDelete ? () => Navigator.of(context).pop(true) : null,
+          style: FilledButton.styleFrom(
+            backgroundColor: Colors.red.shade700,
+          ),
+          child: const Text('Delete Account'),
+        ),
+      ],
     );
   }
 }

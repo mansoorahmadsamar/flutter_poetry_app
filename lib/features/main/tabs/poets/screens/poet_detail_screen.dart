@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/poet_providers.dart';
 import '../widgets/poet_overview_tab.dart';
@@ -15,6 +16,8 @@ import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/core/widgets/localized_text.dart';
 import 'package:flutter_poetry_app/core/widgets/standard_app_bar.dart';
+import 'package:flutter_poetry_app/core/widgets/sukhan/verified_mark.dart';
+import '../../creator/providers/creator_providers.dart';
 
 class PoetDetailScreen extends ConsumerStatefulWidget {
   final String publicId;
@@ -300,27 +303,44 @@ class _PoetDetailScreenState extends ConsumerState<PoetDetailScreen>
                     ),
                     if (poetProfile.isVerified) ...[
                       const SizedBox(width: 6),
-                      Container(
-                        padding: const EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          color: AppColors.secondary,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.check,
-                          size: 14,
-                          color: Colors.white,
-                        ),
-                      ),
+                      const VerifiedMark(size: 18),
                     ],
                   ],
                 ),
               ),
               const SizedBox(width: 10),
-              FollowButton(
-                publicId: poetProfile.publicId,
-                compact: true,
-              ),
+              Builder(builder: (ctx) {
+                final ownedPoet = ref.watch(ownedPoetProvider).valueOrNull;
+                final isSelf = ownedPoet != null &&
+                    ownedPoet.publicId == poetProfile.publicId;
+                if (isSelf) {
+                  return ElevatedButton.icon(
+                    onPressed: () =>
+                        GoRouter.of(ctx).push('/main/creator/profile/edit'),
+                    icon: const Icon(Icons.edit_note, size: 14),
+                    label: const Text('Edit profile'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.secondary,
+                      foregroundColor: AppColors.backgroundLight,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      textStyle: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.4,
+                      ),
+                    ),
+                  );
+                }
+                return FollowButton(
+                  publicId: poetProfile.publicId,
+                  compact: true,
+                );
+              }),
             ],
           ),
           const SizedBox(height: AppSpacing.xs),

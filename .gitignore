@@ -123,3 +123,14 @@ app.*.symbols
 # Firebase sensitive files
 *-firebase-adminsdk-*.json
 .github/*.base64
+# Google Cloud / GCP service account JSON keys (NEVER COMMIT)
+sukhan-*.json
+*-service-account*.json
+*-gcp-key*.json
+
+# Local debugging artifacts
+api_responses.json
+feature_image.png
+
+# Android local Kotlin cache
+android/.kotlin/

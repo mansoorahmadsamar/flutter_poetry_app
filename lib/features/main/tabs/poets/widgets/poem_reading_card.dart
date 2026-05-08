@@ -6,6 +6,7 @@ import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/couplet_providers.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/reaction_providers.dart';
 import 'package:flutter_poetry_app/features/engagement/widgets/reaction_button.dart';
+import 'package:flutter_poetry_app/features/engagement/widgets/reaction_summary_bar.dart';
 import 'package:flutter_poetry_app/features/image_poetry/widgets/share_options_sheet.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/couplet_model.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.dart';
@@ -185,111 +186,83 @@ class PoemReadingCard extends ConsumerWidget {
   Widget _buildCoupletActionTray(
       BuildContext context, WidgetRef ref, CoupletModel couplet) {
     final isBookmarked = couplet.isBookmarkedByCurrentUser ?? false;
-    final userReaction = couplet.reactions?['userReaction'] as String?;
     final totalReactions = (couplet.reactions?['total'] as int?) ?? 0;
+    // Only trust userReaction when total > 0 (guards against stale/leaked data)
+    final rawUserReaction = couplet.reactions?['userReaction'] as String?;
+    final userReaction = totalReactions > 0 ? rawUserReaction : null;
     final reactionsByType = couplet.reactions?['byType'] != null
         ? Map<String, int>.from(couplet.reactions!['byType'] as Map)
         : null;
 
     final reactionTypes = ref.watch(reactionTypesProvider).valueOrNull ?? [];
 
-    List<MapEntry<String, int>> topReactions = [];
-    if (reactionsByType != null && reactionsByType.isNotEmpty) {
-      topReactions = reactionsByType.entries.toList()
-        ..sort((a, b) => b.value.compareTo(a.value));
-      if (topReactions.length > 3) topReactions = topReactions.take(3).toList();
-    }
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Reaction button — tap=LOVE toggle, long-press=picker
-          // After reacting, invalidate poemDetailProvider so embedded
-          // couplet reaction state refreshes.
-          ReactionButton(
-            userReaction: userReaction,
-            totalCount: totalReactions,
-            reactionsByType: reactionsByType,
-            size: ReactionButtonSize.compact,
-            onReact: (reactionType) async {
-              try {
-                await ref.read(reactionActionProvider.notifier).react(
-                      targetType: 'couplets',
-                      publicId: couplet.publicId,
-                      reactionType: reactionType,
-                    );
-                // Refresh the poem so embedded couplet reactions update
-                ref.invalidate(poemDetailProvider(poem.publicId));
-              } catch (_) {}
-            },
-          ),
-
-          // Top-3 reaction chips
-          if (topReactions.isNotEmpty) ...[
-            const SizedBox(width: 4),
-            ...topReactions.map((e) {
-              final rt = reactionTypes.isNotEmpty
-                  ? reactionTypes.firstWhere(
-                      (r) => r.key == e.key,
-                      orElse: () => reactionTypes.first,
-                    )
-                  : null;
-              return _reactionChip(rt?.emoji ?? '❤️', e.value);
-            }),
-          ],
-
-          const Spacer(),
-
-          // Bookmark icon only
-          _iconTrayButton(
-            icon: isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-            color: isBookmarked ? AppColors.primary : AppColors.textSecondaryLight,
-            onPressed: () async {
-              try {
-                await ref
-                    .read(coupletActionProvider.notifier)
-                    .toggleBookmark(couplet.publicId, lang: selectedScript);
-                ref.invalidate(poemDetailProvider(poem.publicId));
-              } catch (_) {}
-            },
-          ),
-
-          // Share icon only
-          _iconTrayButton(
-            icon: Icons.share_outlined,
-            color: AppColors.textSecondaryLight,
-            onPressed: () => showModalBottomSheet(
-              context: context,
-              builder: (_) => ShareOptionsSheet(coupletId: couplet.publicId),
+          // Reaction summary bar (overlapping emojis + count)
+          if (reactionTypes.isNotEmpty &&
+              reactionsByType != null &&
+              reactionsByType.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: ReactionSummaryBar(
+                total: totalReactions,
+                byType: reactionsByType,
+                reactionTypes: reactionTypes,
+              ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _reactionChip(String emoji, int count) {
-    return Container(
-      margin: const EdgeInsets.only(right: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-      decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(emoji, style: const TextStyle(fontSize: 13)),
-          const SizedBox(width: 3),
-          Text(
-            _fmtCount(count),
-            style: const TextStyle(
-              fontSize: 11,
-              color: AppColors.textSecondaryLight,
-              fontWeight: FontWeight.w600,
-            ),
+          // Action buttons row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Reaction button — tap=LOVE toggle, long-press=picker
+              ReactionButton(
+                userReaction: userReaction,
+                totalCount: totalReactions,
+                reactionsByType: reactionsByType,
+                size: ReactionButtonSize.compact,
+                onReact: (reactionType) async {
+                  try {
+                    await ref.read(reactionActionProvider.notifier).react(
+                          targetType: 'couplets',
+                          publicId: couplet.publicId,
+                          reactionType: reactionType,
+                        );
+                    // Refresh the poem so embedded couplet reactions update
+                    ref.invalidate(poemDetailProvider(poem.publicId));
+                  } catch (_) {}
+                },
+              ),
+
+              const Spacer(),
+
+              // Bookmark icon only
+              _iconTrayButton(
+                icon: isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+                color: isBookmarked ? AppColors.primary : AppColors.textSecondaryLight,
+                onPressed: () async {
+                  try {
+                    await ref
+                        .read(coupletActionProvider.notifier)
+                        .toggleBookmark(couplet.publicId, lang: selectedScript);
+                    ref.invalidate(poemDetailProvider(poem.publicId));
+                  } catch (_) {}
+                },
+              ),
+
+              // Share icon only
+              _iconTrayButton(
+                icon: Icons.share_outlined,
+                color: AppColors.textSecondaryLight,
+                onPressed: () => showModalBottomSheet(
+                  context: context,
+                  builder: (_) => ShareOptionsSheet(coupletId: couplet.publicId),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -333,6 +306,7 @@ class PoemReadingCard extends ConsumerWidget {
     final reactionsByType = poem.reactions?['byType'] != null
         ? Map<String, int>.from(poem.reactions!['byType'] as Map)
         : null;
+    final reactionTypes = ref.watch(reactionTypesProvider).valueOrNull ?? [];
 
     return GestureDetector(
       onTap: () => onSherSelected(isSelected ? null : index),
@@ -351,6 +325,18 @@ class PoemReadingCard extends ConsumerWidget {
             ..._sherLines(sherText),
             if (isSelected) ...[
               const SizedBox(height: 8),
+              // Reaction summary bar
+              if (reactionTypes.isNotEmpty &&
+                  reactionsByType != null &&
+                  reactionsByType.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: ReactionSummaryBar(
+                    total: totalReactions,
+                    byType: reactionsByType,
+                    reactionTypes: reactionTypes,
+                  ),
+                ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -376,6 +362,7 @@ class PoemReadingCard extends ConsumerWidget {
                       }
                     },
                   ),
+                  const Spacer(),
                   _iconTrayButton(
                     icon: Icons.copy_outlined,
                     color: AppColors.textSecondaryLight,
@@ -479,9 +466,4 @@ class PoemReadingCard extends ConsumerWidget {
         .toList();
   }
 
-  static String _fmtCount(int n) {
-    if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(1)}M';
-    if (n >= 1000) return '${(n / 1000).toStringAsFixed(1)}K';
-    return '$n';
-  }
 }
