@@ -75,7 +75,14 @@
       "Bash(git checkout *)",
       "Bash(/Users/mansoorahmadsamar/Library/Android/sdk/platform-tools/adb -s emulator-5554 logcat -d -t 1000)",
       "Bash(/Users/mansoorahmadsamar/Library/Android/sdk/platform-tools/adb -s emulator-5554 logcat -d -t 3000)",
-      "Bash(/Users/mansoorahmadsamar/Library/Android/sdk/platform-tools/adb -s emulator-5554 logcat -d -t 5000)"
+      "Bash(/Users/mansoorahmadsamar/Library/Android/sdk/platform-tools/adb -s emulator-5554 logcat -d -t 5000)",
+      "Bash(awk '/^[0-9]+:## 21/,0')",
+      "Bash(awk '/inet / && $2 != \"127.0.0.1\" && !/inet6/ {print $2}')",
+      "Bash(awk 'NR==2 {print \"Free: \" $4 \" \\(\" $5 \" used\\)\"}')",
+      "Bash(awk 'NR==2 {print \"Before: \" $4 \" free\"}')",
+      "Bash(xcrun simctl *)",
+      "Bash(awk 'NR==2 {print \"Final: \" $4 \" free\"}')",
+      "Bash(echo \"Exit: $?\")"
     ],
     "deny": [],
     "ask": []

@@ -1,7 +1,7 @@
 # Poetry Backend API - Flutter Mobile App Documentation
 
-**Version:** 1.7.0
-**Last Updated:** March 30, 2026
+**Version:** 1.8.0
+**Last Updated:** May 15, 2026
 **Base URL (Production):** `https://api.poetry.com`
 **Base URL (Development):** `https://dev-api.poetry.com`
 **Base URL (Local):** `http://localhost:8081`
@@ -9,6 +9,69 @@
 ---
 
 ## Recent Updates (December 2025 - May 2026)
+
+### Sign in with Apple (via Firebase) ⭐ NEW (May 15, 2026)
+
+Required for **App Store guideline 4.8** — any app offering a third-party login
+must offer Sign in with Apple as an equivalent option. The backend already
+supports this **with no new endpoint**: Flutter swaps the Apple credential for
+a Firebase ID token (using `firebase_auth`) and posts it to the existing
+`POST /api/auth/firebase/verify` endpoint, exactly like the Google flow.
+
+**What changed on the backend:**
+- `User.provider` now stores the actual underlying provider — `"apple"`,
+  `"google"`, `"password"` — instead of a generic `"firebase"`. Existing rows
+  get upgraded the next time they sign in.
+- The Firebase token's `firebase.sign_in_provider` claim is logged on every
+  verify so you can audit Apple vs. Google traffic in server logs.
+
+**Account linking by email:** if a user previously signed in with Google using
+`mansoor@gmail.com` and later signs in with Apple choosing **Share My Email**,
+they land on the **same account** (no duplicate created). If they pick
+**Hide My Email**, Apple returns a private relay address
+(`xyz@privaterelay.appleid.com`) — that gets a **separate account** (this is by
+Apple's design, not a bug).
+
+**Flutter side:** see [§1.6 Sign in with Apple (via Firebase)](#16-sign-in-with-apple-via-firebase)
+for the complete integration: Apple Developer Portal + Firebase Console +
+Xcode + Dart code + Apple's UI prominence requirements.
+
+---
+
+### Guest Browsing API (Anonymous, No Login Required) ⭐ NEW (May 15, 2026)
+
+Required for **App Store guideline 5.1.1(v)** — apps may not force users to
+register before browsing non-account features. New `/api/guest/**` namespace
+that exposes a **read-only**, **rate-limited**, **cached** subset of the
+catalog with no authentication required.
+
+**Endpoints (all GET, all anonymous):**
+- `GET /api/guest/discover` — featured + trending bundle, single call
+- `GET /api/guest/poems` / `GET /api/guest/poems/{publicId}` — list + detail
+- `GET /api/guest/poems/search?q=` — Elasticsearch search
+- `GET /api/guest/poets` / `GET /api/guest/poets/{publicId}` — list + detail
+- `GET /api/guest/poets/search?q=` — Elasticsearch search
+- `GET /api/guest/couplets/trending` — windowed trending couplets
+
+**What guests can NOT do:** like, bookmark, follow, comment, react, generate
+images, save to collections, see personalized "For You" feed. Tapping any of
+those should prompt sign-in. Any non-GET method on `/api/guest/**` returns 403.
+
+**Hardening (matters because the catalog is the business):**
+- Pagination is **clamped to max 5 pages × 20 items** per call → no deep scrape
+- IP rate limit: **60 req/min + 1000 req/hour per IP** (Bucket4j, behind nginx
+  via `X-Forwarded-For`). 429 + `Retry-After` header on exceed.
+- Discover bundle is **cached on Redis for 15 min per language**; trending
+  couplets cached 5 min. Repeated scraper sweeps hit cache, not Postgres.
+- Slim DTOs strip `isLiked`, `isBookmarked`, `reactions.userReaction` and any
+  "for you" personalization signal — anonymous responses can't leak the
+  shape of authenticated features.
+
+**Flutter side:** see [§21 Guest Browsing API](#21-guest-browsing-api-anonymous)
+for endpoint contracts, response shapes, and the "Sign in to continue" prompt
+pattern for gated actions.
+
+---
 
 ### In-App Account Deletion ⭐ NEW (May 7, 2026)
 
@@ -250,6 +313,7 @@ A single, consolidated API that provides access to all bookmark types (poems, co
 - [2.4 Token Refresh](#24-token-refresh)
 - [2.5 Logout](#25-logout)
 - [2.6 Get Current User](#26-get-current-user)
+- [2.7 Sign in with Apple (via Firebase)](#16-sign-in-with-apple-via-firebase) ⭐ NEW
 
 ### 3. User Profile Management
 - [3.1 Overview](#31-overview-user-profile)
@@ -513,6 +577,21 @@ A single, consolidated API that provides access to all bookmark types (poems, co
   - [19.8.2 Reaction Summary Display](#1982-reaction-summary-display)
   - [19.8.3 API Service Integration](#1983-api-service-integration)
   - [19.8.4 Migration from Likes](#1984-migration-from-likes)
+
+### 21. Guest Browsing API (Anonymous) ⭐ NEW
+- [21.1 Why It Exists & What's Different](#211-why-it-exists--whats-different)
+- [21.2 Endpoint Summary](#212-endpoint-summary)
+- [21.3 Pagination Caps, Rate Limits, Caching](#213-pagination-caps-rate-limits-caching)
+- [21.4 GET /api/guest/discover](#214-get-apiguestdiscover)
+- [21.5 GET /api/guest/poems](#215-get-apiguestpoems)
+- [21.6 GET /api/guest/poems/{publicId}](#216-get-apiguestpoemspublicid)
+- [21.7 GET /api/guest/poems/search](#217-get-apiguestpoemssearch)
+- [21.8 GET /api/guest/poets](#218-get-apiguestpoets)
+- [21.9 GET /api/guest/poets/{publicId}](#219-get-apiguestpoetspublicid)
+- [21.10 GET /api/guest/poets/search](#2110-get-apiguestpoetssearch)
+- [21.11 GET /api/guest/couplets/trending](#2111-get-apiguestcoupletstrending)
+- [21.12 Response DTO Reference](#2112-response-dto-reference)
+- [21.13 Flutter Integration Guide](#2113-flutter-integration-guide)
 
 ### Appendix
 - [A. Flutter Code Examples](#appendix-a-flutter-code-examples)
@@ -1143,6 +1222,284 @@ Authorization: Bearer <access_token>
   "data": null
 }
 ```
+
+---
+
+### 1.6 Sign in with Apple (via Firebase)
+
+**Endpoint:** `POST /api/auth/firebase/verify` *(reuses the existing endpoint — no new backend route)*
+
+**Authentication Required:** No
+
+**Why Apple goes through Firebase:** the backend already verifies Firebase ID
+tokens. Flutter signs in with Apple natively, swaps the Apple credential for
+a Firebase credential via `firebase_auth`, then posts the resulting Firebase
+ID token to the same endpoint Google sign-ins use. The backend extracts the
+underlying provider (`apple.com`) from the token and stores it on
+`User.provider` as `"apple"`.
+
+**Required for App Store guideline 4.8** — every app offering a third-party
+login (Google in our case) must offer Sign in with Apple as an equivalent
+option, with at least equal UI prominence.
+
+---
+
+#### 1.6.1 One-Time Setup — Apple Developer Portal
+
+You need a paid Apple Developer account. Go to https://developer.apple.com/account/resources
+
+**a) Enable Sign in with Apple on your App ID**
+- **Identifiers** → click your iOS app's App ID
+- Scroll to **Sign in with Apple** → check the box → **Save** → **Continue** → **Register**
+- If you see "Edit" instead of just a checkbox, click **Edit** and select **Enable as a primary App ID**
+
+**b) Create a Services ID** (Firebase needs this for the OAuth backchannel)
+- **Identifiers** → **+** → **Services IDs** → Continue
+- Description: `Jahan-e-Sukhan Web Sign-In` (or any human-readable label)
+- Identifier: must be **different** from your iOS bundle ID. Convention: `<bundleid>.signin` (e.g. `com.techhikes.poetry.signin`)
+- **Save** → click the new Services ID → check **Sign in with Apple** → **Configure**
+  - **Primary App ID**: pick your iOS App ID
+  - **Domains**: `<firebase-project-id>.firebaseapp.com` (find this in Firebase Console → Authentication → Settings → Authorized domains; for this project: `poetry-world-eaf6c.firebaseapp.com`)
+  - **Return URLs**: `https://<firebase-project-id>.firebaseapp.com/__/auth/handler`
+  - **Save** → **Continue** → **Register**
+
+**c) Generate a Sign in with Apple key**
+- **Keys** → **+** → Name: `Sign in with Apple Key` → check **Sign in with Apple** → **Configure** → pick your App ID → Save → **Continue** → **Register**
+- **Download the `.p8` file** — you can only download it ONCE. Save it somewhere safe.
+- Note the **Key ID** (10 chars, shown on the page after registration)
+
+**d) Find your Team ID**
+- Top right of the developer portal → **Membership** → **Team ID** (10 chars)
+
+You now have four artifacts to feed into Firebase:
+- **Services ID** (e.g. `com.techhikes.poetry.signin`)
+- **Apple Team ID** (10 chars)
+- **Key ID** (10 chars)
+- **`.p8` private key file** contents
+
+---
+
+#### 1.6.2 One-Time Setup — Firebase Console
+
+Go to https://console.firebase.google.com/project/poetry-world-eaf6c/authentication/providers
+
+- Click **Apple** in the providers list
+- Toggle **Enable**
+- **Services ID**: paste the value from step (b) above
+- **Apple Team ID**: paste from (d)
+- **Key ID**: paste from (c)
+- **Private key**: open the `.p8` file in a text editor, paste the entire
+  contents (including the `-----BEGIN PRIVATE KEY-----` / `-----END PRIVATE KEY-----` lines)
+- **Save**
+
+That's all — your existing `/api/auth/firebase/verify` endpoint will now
+accept Apple-originated Firebase tokens automatically.
+
+---
+
+#### 1.6.3 One-Time Setup — Xcode Capability
+
+The native Apple Sign-In SDK on iOS needs an entitlement that Xcode adds for
+you when you enable the capability:
+
+- Open `ios/Runner.xcworkspace` in Xcode
+- Select the **Runner** target → **Signing & Capabilities** tab
+- Click **+ Capability** → **Sign in with Apple**
+- Save and close — Xcode regenerates the entitlement file
+
+---
+
+#### 1.6.4 Flutter — Dependencies
+
+```yaml
+# pubspec.yaml
+dependencies:
+  sign_in_with_apple: ^6.1.0
+  firebase_auth: ^4.20.0   # already present in this project
+  crypto: ^3.0.3            # for nonce hashing — required by Firebase + Apple
+```
+
+Then `flutter pub get`.
+
+---
+
+#### 1.6.5 Flutter — Sign-In Handler
+
+```dart
+import 'dart:convert';
+import 'dart:math';
+import 'package:crypto/crypto.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+
+/// Generates a cryptographic nonce. Used to prevent replay attacks against
+/// Apple's identity_token. The HASH is sent to Apple, the RAW value is sent
+/// to Firebase. Firebase recomputes the hash on its side to match.
+String _generateNonce([int length = 32]) {
+  const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._';
+  final random = Random.secure();
+  return List.generate(length, (_) => charset[random.nextInt(charset.length)]).join();
+}
+
+String _sha256(String input) => sha256.convert(utf8.encode(input)).toString();
+
+/// Returns the JWT response from /api/auth/firebase/verify on success.
+/// Throws on user cancel or any verification failure.
+Future<Map<String, dynamic>> signInWithApple({required String backendBaseUrl}) async {
+  // 1. Generate nonce — raw is sent to Firebase, hashed is sent to Apple
+  final rawNonce = _generateNonce();
+  final hashedNonce = _sha256(rawNonce);
+
+  // 2. Trigger native Apple Sign-In sheet
+  final appleCredential = await SignInWithApple.getAppleIDCredential(
+    scopes: [
+      AppleIDAuthorizationScopes.email,
+      AppleIDAuthorizationScopes.fullName,
+    ],
+    nonce: hashedNonce,
+  );
+
+  // 3. Convert Apple credential → Firebase credential
+  final oauthCredential = OAuthProvider('apple.com').credential(
+    idToken: appleCredential.identityToken,
+    rawNonce: rawNonce,
+  );
+
+  // 4. Sign in to Firebase with the Apple-backed credential
+  final firebaseUser = await FirebaseAuth.instance.signInWithCredential(oauthCredential);
+  final firebaseIdToken = await firebaseUser.user!.getIdToken();
+  final email = firebaseUser.user!.email;
+  if (email == null) {
+    throw StateError('Firebase did not return an email — Apple sign-in cannot proceed.');
+  }
+
+  // 5. CRITICAL: Apple only returns givenName/familyName on the FIRST sign-in.
+  //    Capture it now or you will never get it again. Firebase's displayName
+  //    will also be null on first sign-in until we explicitly set it.
+  String? fullName;
+  if (appleCredential.givenName != null || appleCredential.familyName != null) {
+    fullName = [appleCredential.givenName, appleCredential.familyName]
+        .where((s) => s != null && s.isNotEmpty)
+        .join(' ');
+    // Persist the name on the Firebase user so subsequent sign-ins have it
+    await firebaseUser.user!.updateDisplayName(fullName);
+  } else {
+    fullName = firebaseUser.user!.displayName;
+  }
+
+  // 6. Hand the Firebase ID token to your backend — same endpoint as Google
+  final response = await http.post(
+    Uri.parse('$backendBaseUrl/api/auth/firebase/verify'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'firebaseToken': firebaseIdToken,
+      'email': email,                    // may be ...@privaterelay.appleid.com
+      'deviceType': 'IOS',
+      'deviceId': '<your-device-id>',
+      // fullName is not part of the contract today, but harmless to send;
+      // you can use it locally to seed the profile if backend returns null.
+    }),
+  );
+
+  if (response.statusCode != 200) {
+    throw StateError('Backend rejected Apple sign-in: ${response.body}');
+  }
+  final body = jsonDecode(response.body) as Map<String, dynamic>;
+  return body['data'] as Map<String, dynamic>;
+}
+```
+
+---
+
+#### 1.6.6 Flutter — UI Requirements (Don't Skip)
+
+Apple is strict about button design and prominence. They reject apps that:
+
+- Hide the Apple button below the fold while showing Google above
+- Render the Apple button smaller than other social-sign-in buttons
+- Use a non-standard button style (custom colors, custom font)
+
+**Do this:**
+```dart
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+
+// Use the official widget — never roll your own
+SignInWithAppleButton(
+  onPressed: () => _handleAppleSignIn(),
+  style: SignInWithAppleButtonStyle.black,   // or .white, .whiteOutlined
+  borderRadius: BorderRadius.circular(8),
+  height: 48,                                // match your Google button height EXACTLY
+)
+```
+
+**Layout rule of thumb:** Apple button **at or above** the Google button,
+**same width**, **same height**. If the Google button is the most prominent
+sign-in option on screen, Apple must be at least as prominent.
+
+---
+
+#### 1.6.7 "Hide My Email" Behavior
+
+When the user picks Apple Sign-In, Apple shows them two choices:
+
+| Choice | What Apple sends as email | Account linking with existing Google account on same email |
+|---|---|---|
+| **Share My Email** | Real email (e.g. `mansoor@gmail.com`) | ✅ Auto-links — backend finds existing user by email |
+| **Hide My Email** | Private relay (e.g. `xyz@privaterelay.appleid.com`) | ❌ Creates a new account — no match on email |
+
+Both behaviors are **correct**. The backend stores the relay address as-is;
+Apple guarantees it's stable per (user, app), so it works as a login key.
+Apple also relays mail you send to the relay address back to the user's real
+inbox, so you can still email them transactional notifications.
+
+**Don't try to "fix" the no-link case** — there is no way to map a relay
+address back to a real email without the user's involvement. Some apps offer
+a manual "merge accounts" flow in settings; we don't have that today.
+
+---
+
+#### 1.6.8 Account Linking by Email (Backend Behavior)
+
+The backend's existing logic in `/api/auth/firebase/verify` handles linking
+automatically:
+
+1. Verify the Firebase ID token (works for any provider).
+2. Look up `User` by `email`.
+3. If found → use that row, just refresh login timestamps. Provider field
+   gets upgraded from `"google"` to `"apple"` if the new sign-in is the
+   richer claim. (Or vice-versa — last-writer wins.)
+4. If not found → create a new `User` row with `provider = "apple"`.
+
+So a user who originally signed in with Google and later signs in with Apple
+**Share My Email** keeps the same `publicId`, same bookmarks, same likes,
+same follows. From their perspective: they "added Apple Sign-In" to their
+existing account.
+
+---
+
+#### 1.6.9 Testing Checklist Before App Store Resubmission
+
+- [ ] Test on a **real iPhone** (Apple Sign-In is unreliable on the simulator).
+- [ ] Test **Share My Email**: tap Apple button → "Continue with [your name]" → "Share My Email" → backend returns a JWT. Check DB: new user has `provider = "apple"` and your real email.
+- [ ] Test **Hide My Email**: same flow but pick "Hide My Email" → backend returns a JWT. Check DB: a separate user row with `email LIKE '%@privaterelay.appleid.com'` and `provider = "apple"`.
+- [ ] Test **the link case**: sign in with Google as `you@gmail.com` → bookmark something → sign out → sign in with Apple → "Share My Email" → verify same `publicId` in `/api/auth/me` and your bookmark is still there.
+- [ ] Test **second sign-in**: sign in with Apple, sign out, sign in again. Verify `appleCredential.givenName` is **null** the second time (this is by design — only first sign-in has the name) and that the user's name from the first sign-in is still preserved on Firebase.
+- [ ] Verify the Apple button is **at least as prominent** as the Google button on every screen that shows social sign-in.
+- [ ] Confirm `/api/auth/me` after Apple sign-in returns `"provider": "apple"`.
+
+---
+
+#### 1.6.10 Troubleshooting
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| `SignInWithAppleAuthorizationException(code: canceled)` | User dismissed the sheet | Treat as cancel, no error UI needed |
+| `invalid_client` from Firebase | Services ID / Team ID / Key ID mismatch in Firebase Console | Re-paste from Apple Developer Portal exactly |
+| Firebase returns `auth/invalid-credential` | Nonce mismatch (you sent the raw nonce to Apple instead of the hashed one, or vice versa) | Send `hashedNonce` to Apple, `rawNonce` to Firebase — see §1.6.5 |
+| Apple button shows but tap does nothing | Capability not enabled in Xcode | Re-do §1.6.3 Xcode setup; clean build folder; rebuild |
+| User name is null on first sign-in | You requested only `email` scope, not `fullName` | Include both scopes in `getAppleIDCredential` call |
+| User created twice with different emails | One sign-in was "Share", the other "Hide My Email" | Expected behavior — these are different identities to Apple |
 
 ---
 
@@ -13457,13 +13814,799 @@ All writes: 401 if unauthenticated, 404 if no owned poet, 403 if resource belong
 
 ---
 
+## 21. Guest Browsing API (Anonymous) {#21-guest-browsing-api-anonymous}
+
+Read-only endpoints for unauthenticated users. Required for **App Store
+guideline 5.1.1(v)** — apps may not force users to register before browsing
+non-account features.
+
+Base Path: `/api/guest`
+Authentication: **None** (no `Authorization` header)
+Methods: **GET only** (any other method returns 403)
+
+---
+
+### 21.1 Why It Exists & What's Different {#211-why-it-exists--whats-different}
+
+Rather than open the existing `/api/poems`, `/api/poets`, etc. to anonymous
+callers, we ship a separate `/api/guest/**` surface. This is intentional —
+the existing endpoints serve **personalized** responses (your bookmarks,
+your reactions, your "for you" ranking) and writing engagement events to
+your user id. None of that is appropriate for anonymous traffic.
+
+| Aspect | `/api/guest/**` (anonymous) | `/api/poems` etc. (authenticated) |
+|---|---|---|
+| Auth header | Not required | JWT required |
+| `isLiked` / `isBookmarked` | **Stripped from response** | Included |
+| `reactions.userReaction` | **Stripped from response** | Included |
+| Personalization ("for you") | None | Yes |
+| Engagement tracking writes | None | Yes |
+| Pagination | **Hard-capped** (5 pages × 20) | Unlimited |
+| Rate limiting | **Tight** (60/min, 1000/hour per IP) | Per-user |
+| Caching | **Aggressive** (Redis, 5–15 min) | Lighter |
+| Response shape | Slim `Guest*Dto` types | Full `*Response` types |
+| Write actions | All return 403 | Allowed |
+
+**Use guest endpoints for:** browse-before-register experience, public landing
+pages, share-link previews, screenshots for the App Store.
+
+**Don't use guest endpoints for:** anything an authenticated user does. Once
+the user signs in, switch to the authenticated endpoints to get
+personalization back.
+
+---
+
+### 21.2 Endpoint Summary {#212-endpoint-summary}
+
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/api/guest/discover` | Single-call bundle: featured poems + featured/trending poets + trending couplets |
+| GET | `/api/guest/poems` | Paginated poem list, filterable by `poetryType` |
+| GET | `/api/guest/poems/{publicId}` | Full poem detail, includes couplets for ghazals |
+| GET | `/api/guest/poems/search?q=...` | Elasticsearch-backed poem search |
+| GET | `/api/guest/poets` | Paginated poet directory |
+| GET | `/api/guest/poets/{publicId}` | Single poet card |
+| GET | `/api/guest/poets/search?q=...` | Elasticsearch-backed poet search |
+| GET | `/api/guest/couplets/trending` | Trending couplets within a window (default 7 days) |
+
+---
+
+### 21.3 Pagination Caps, Rate Limits, Caching {#213-pagination-caps-rate-limits-caching}
+
+**Pagination caps (hard, server-side):**
+- `page` clamped to `[0, 4]` → max 5 pages
+- `size` clamped to `[1, 20]` → max 20 items per page
+- Net effect: at most **100 distinct items** returned per (filter, sort) combo
+- Out-of-range values are silently clamped, not rejected — endpoint still
+  returns 200, just with the clamped slice
+
+**Rate limit (per IP):**
+- **60 requests per minute** — burst protection
+- **1000 requests per hour** — sustained-scrape protection
+- Implementation: Bucket4j, in-memory per app container, `X-Forwarded-For`-aware behind nginx
+- On exceed: HTTP **429 Too Many Requests**
+  - `Retry-After: <seconds>` header — number of whole seconds until at least one token frees up
+  - `X-RateLimit-Remaining: 0` header
+  - Body: `{"success":false,"message":"Too many requests. Please slow down."}`
+- On every successful response: `X-RateLimit-Remaining: <n>` header — tokens left in the per-minute window
+
+**Caching (Redis-backed):**
+- `/api/guest/discover` cached **15 min per `lang`** — same payload returned to all anonymous users in the window
+- `/api/guest/couplets/trending` cached **5 min per (days, page, size)** — distinct calls don't stomp on each other but identical scraper sweeps hit cache
+- `/api/guest/poems`, `/poets`, `/search` — not cached (Elasticsearch handles list queries efficiently). Subject to change.
+
+**Flutter handling for 429:**
+```dart
+if (response.statusCode == 429) {
+  final retryAfter = int.tryParse(response.headers['retry-after'] ?? '60') ?? 60;
+  // Show a non-intrusive toast, NOT a modal
+  showSnackBar('Too many requests, retry in ${retryAfter}s');
+  // Optionally: schedule an automatic retry after retryAfter seconds
+  return;
+}
+```
+
+---
+
+### 21.4 GET /api/guest/discover {#214-get-apiguestdiscover}
+
+Single-call bundle for the unauthenticated landing screen. Combines featured
+poems, featured/trending poets, and trending couplets so you don't make 4
+separate requests.
+
+**Query Parameters:**
+- `lang` *(optional, default `ur`)* — one of `ur` / `en` / `hi`. Invalid values silently fall back to `ur`.
+
+**Example:**
+```bash
+curl 'http://localhost:8081/api/guest/discover?lang=ur'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Guest discover bundle retrieved",
+  "data": {
+    "featuredPoems": [
+      {
+        "publicId": "pm_abc123",
+        "title": "غزل",
+        "excerpt": "دل ہی تو ہے نہ سنگ و خشت...",
+        "poetPublicId": "pt_ghalib",
+        "poetName": "مرزا غالب",
+        "poetProfileImageUrl": "https://cdn.../ghalib.jpg",
+        "poetryType": "GHAZAL",
+        "poetryTypeName": "غزل",
+        "contentType": "TEXT",
+        "thumbnailUrl": "-",
+        "viewCount": 12453,
+        "likeCount": 234,
+        "shareCount": 12,
+        "createdAt": "2026-01-12T10:00:00"
+      }
+    ],
+    "featuredPoets": [
+      {
+        "publicId": "pt_faiz",
+        "name": "فیض احمد فیض",
+        "shortBio": "...",
+        "profileImageUrl": "https://cdn.../faiz.jpg",
+        "birthYear": 1911,
+        "deathYear": 1984,
+        "era": "MODERN",
+        "country": "Pakistan",
+        "countryFlag": "🇵🇰",
+        "poemCount": 198
+      }
+    ],
+    "trendingPoets": [ /* same shape as featuredPoets */ ],
+    "trendingCouplets": [
+      {
+        "publicId": "cp_xyz",
+        "coupletNumber": 1,
+        "coupletType": "MATLA",
+        "coupletTypeName": "مطلع",
+        "verses": [
+          {"publicId": "v1", "verseNumber": 1, "verseText": "..."},
+          {"publicId": "v2", "verseNumber": 2, "verseText": "..."}
+        ],
+        "poemPublicId": "pm_abc123",
+        "poetPublicId": "pt_ghalib",
+        "poetName": "مرزا غالب",
+        "poetProfileImageUrl": "https://cdn.../ghalib.jpg",
+        "likeCount": 87,
+        "shareCount": 4
+      }
+    ],
+    "language": "ur",
+    "timestamp": 1747340000000
+  }
+}
+```
+
+**Notes:**
+- Each section returns up to **6 items**; no pagination on the bundle itself.
+- Bundle is cached for 15 minutes per language — clients don't need to cache further.
+- `timestamp` is server epoch millis at bundle build time; useful for cache-validation UI.
+
+---
+
+### 21.5 GET /api/guest/poems {#215-get-apiguestpoems}
+
+Paginated list of public poems, sorted by `createdAt DESC` (newest first).
+
+**Query Parameters:**
+- `poetryType` *(optional)* — filter by enum: `GHAZAL`, `NAZAM`, `AZAD_NAZAM`, `RUBAI`, `QASIDA`, `MARSIYA`, `NAAT`, `HAMD`, `QATTA`, `VERSE`, `MASNAVI`, etc.
+- `lang` *(optional, default `ur`)* — `ur` / `en` / `hi`
+- `page` *(optional, default `0`)* — clamped to `[0, 4]`
+- `size` *(optional, default `10`)* — clamped to `[1, 20]`
+
+**Example:**
+```bash
+curl 'http://localhost:8081/api/guest/poems?poetryType=GHAZAL&lang=ur&page=0&size=20'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Poems retrieved",
+  "data": {
+    "content": [
+      { "publicId": "...", "title": "...", "excerpt": "...", "poetPublicId": "...",
+        "poetName": "...", "poetProfileImageUrl": "...", "poetryType": "GHAZAL",
+        "poetryTypeName": "غزل", "contentType": "TEXT", "thumbnailUrl": "-",
+        "viewCount": 0, "likeCount": 0, "shareCount": 0,
+        "createdAt": "2026-04-01T00:00:00" }
+    ],
+    "pageable": { "pageNumber": 0, "pageSize": 20, "sort": {...} },
+    "totalElements": 100,
+    "totalPages": 5,
+    "first": true,
+    "last": false,
+    "numberOfElements": 20
+  }
+}
+```
+
+**Notes:**
+- `totalElements` may **understate** real catalog size because of caps —
+  don't display it as "X total poems" to the user. Use it only for has-next pagination.
+- No `isLikedByCurrentUser`, no `reactions.userReaction`, no `isBookmarkedByCurrentUser` — guest DTOs strip these.
+
+---
+
+### 21.6 GET /api/guest/poems/{publicId} {#216-get-apiguestpoemspublicid}
+
+Full poem detail for a single poem. For ghazals (and other structured poetry
+types), the `couplets` array is populated with parsed verses.
+
+**Path Parameters:**
+- `publicId` — poem public ID
+
+**Query Parameters:**
+- `lang` *(optional, default `ur`)* — `ur` / `en` / `hi`. Filters `contents[]` to only that language.
+
+**Example:**
+```bash
+curl 'http://localhost:8081/api/guest/poems/pm_abc123?lang=ur'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Poem retrieved",
+  "data": {
+    "publicId": "pm_abc123",
+    "poetPublicId": "pt_ghalib",
+    "poetName": "مرزا غالب",
+    "poetProfileImageUrl": "https://cdn.../ghalib.jpg",
+    "poetryType": "GHAZAL",
+    "poetryTypeName": "غزل",
+    "requiresStructuredParsing": true,
+    "contentType": "TEXT",
+    "imageUrl": "-",
+    "thumbnailUrl": "-",
+    "yearWritten": 1851,
+    "viewCount": 12454,
+    "likeCount": 234,
+    "shareCount": 12,
+    "commentCount": 0,
+    "tagSlugs": ["love", "classical"],
+    "contents": [
+      {
+        "publicId": "pc_ur",
+        "languageCode": "ur",
+        "languageName": "Urdu",
+        "languageNativeName": "اردو",
+        "script": "ARABIC",
+        "scriptDirection": "rtl",
+        "title": "غزل",
+        "fullText": "دل ہی تو ہے...",
+        "isOriginal": true,
+        "verses": [ /* ... */ ],
+        "totalVerses": 14,
+        "totalCouplets": 7
+      }
+    ],
+    "couplets": [
+      {
+        "publicId": "cp_1",
+        "coupletNumber": 1,
+        "coupletType": "MATLA",
+        "coupletTypeName": "مطلع",
+        "verses": [{...}, {...}],
+        "poemPublicId": "pm_abc123",
+        "poetPublicId": "pt_ghalib",
+        "poetName": "مرزا غالب",
+        "poetProfileImageUrl": "https://cdn.../ghalib.jpg",
+        "likeCount": 87,
+        "shareCount": 4
+      }
+    ],
+    "createdAt": "2026-01-12T10:00:00"
+  }
+}
+```
+
+**Error Responses:**
+- **404 Not Found** — `publicId` doesn't exist or poem is not public
+
+**Side Effect:**
+- `viewCount` is incremented on every successful read. Don't poll this endpoint to refresh state — call once per "open" gesture.
+
+---
+
+### 21.7 GET /api/guest/poems/search {#217-get-apiguestpoemssearch}
+
+Elasticsearch-backed full-text search across poems.
+
+**Query Parameters:**
+- `q` *(required)* — search query. **Returns 400 if missing.**
+- `lang` *(optional, default `ur`)* — `ur` / `en` / `hi`
+- `page` *(optional, default `0`)* — clamped to `[0, 4]`
+- `size` *(optional, default `10`)* — clamped to `[1, 20]`
+
+**Example:**
+```bash
+curl 'http://localhost:8081/api/guest/poems/search?q=محبت&lang=ur'
+```
+
+**Response (200):** Same `Page<GuestPoemSummaryDto>` shape as §21.5.
+
+---
+
+### 21.8 GET /api/guest/poets {#218-get-apiguestpoets}
+
+Paginated poet directory, sorted alphabetically by slug.
+
+**Query Parameters:**
+- `lang` *(optional, default `ur`)* — name returned in this language
+- `page` *(optional, default `0`)* — clamped to `[0, 4]`
+- `size` *(optional, default `10`)* — clamped to `[1, 20]`
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Poets retrieved",
+  "data": {
+    "content": [
+      {
+        "publicId": "pt_faiz",
+        "name": "فیض احمد فیض",
+        "shortBio": "...",
+        "profileImageUrl": "https://cdn.../faiz.jpg",
+        "birthYear": 1911,
+        "deathYear": 1984,
+        "era": "MODERN",
+        "country": "Pakistan",
+        "countryFlag": "🇵🇰",
+        "poemCount": 198
+      }
+    ],
+    "totalElements": 100,
+    "totalPages": 5
+  }
+}
+```
+
+---
+
+### 21.9 GET /api/guest/poets/{publicId} {#219-get-apiguestpoetspublicid}
+
+Single poet card. Same shape as the items in §21.8.
+
+**Query Parameters:**
+- `lang` *(optional, default `ur`)*
+
+**Error Responses:**
+- **404 Not Found** — poet doesn't exist or has been deleted
+
+---
+
+### 21.10 GET /api/guest/poets/search {#2110-get-apiguestpoetssearch}
+
+Elasticsearch-backed poet search.
+
+**Query Parameters:**
+- `q` *(required)* — search query
+- `lang` *(optional, default `ur`)*
+- `page`, `size` — clamped as above
+
+**Response (200):** Same `Page<GuestPoetSummaryDto>` shape as §21.8.
+
+---
+
+### 21.11 GET /api/guest/couplets/trending {#2111-get-apiguestcoupletstrending}
+
+Trending couplets within a recent window.
+
+**Query Parameters:**
+- `days` *(optional, default `7`)* — window in days, clamped to `[1, 30]`
+- `page` *(optional, default `0`)* — clamped to `[0, 4]`
+- `size` *(optional, default `10`)* — clamped to `[1, 20]`
+
+**Example:**
+```bash
+curl 'http://localhost:8081/api/guest/couplets/trending?days=7&page=0&size=10'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Trending couplets retrieved",
+  "data": [
+    {
+      "publicId": "cp_xyz",
+      "coupletNumber": 3,
+      "coupletType": "REGULAR",
+      "coupletTypeName": "شعر",
+      "verses": [{...}, {...}],
+      "poemPublicId": "pm_abc",
+      "poetPublicId": "pt_faiz",
+      "poetName": "فیض احمد فیض",
+      "poetProfileImageUrl": "https://cdn.../faiz.jpg",
+      "likeCount": 412,
+      "shareCount": 28
+    }
+  ]
+}
+```
+
+**Note:** This endpoint returns a flat `List<GuestCoupletDto>`, not a `Page<>`.
+Pagination is via `page`/`size` query params; you don't get a `totalElements`
+back. Treat the response as "the next page of trending" and stop when an
+empty array comes back.
+
+---
+
+### 21.12 Response DTO Reference {#2112-response-dto-reference}
+
+#### `GuestPoemSummaryDto`
+| Field | Type | Notes |
+|---|---|---|
+| `publicId` | string | |
+| `title` | string | In requested `lang` |
+| `excerpt` | string | First few lines, in requested `lang` |
+| `poetPublicId` | string | |
+| `poetName` | string | In requested `lang` |
+| `poetProfileImageUrl` | string | CDN URL or `null` |
+| `poetryType` | enum | `GHAZAL`, `NAZAM`, etc. |
+| `poetryTypeName` | string | Localized name in requested `lang` |
+| `contentType` | string | `TEXT` or `IMAGE` |
+| `thumbnailUrl` | string | For image-based poems, else `"-"` |
+| `viewCount` | int | |
+| `likeCount` | int | Total reactions across all types |
+| `shareCount` | int | |
+| `createdAt` | ISO8601 string | |
+
+#### `GuestPoemDetailDto`
+All `GuestPoemSummaryDto` fields **except** `title`/`excerpt`/`thumbnailUrl`,
+**plus**:
+| Field | Type | Notes |
+|---|---|---|
+| `requiresStructuredParsing` | bool | True for ghazals etc. |
+| `imageUrl` | string | For image poems |
+| `yearWritten` | int | `0` if unknown |
+| `commentCount` | int | |
+| `tagSlugs` | string[] | Hashtag slugs |
+| `contents` | `PoemContentDto[]` | Multilingual content; filtered to requested `lang` |
+| `couplets` | `GuestCoupletDto[]` | Empty for non-structured poetry |
+
+#### `GuestPoetSummaryDto`
+| Field | Type | Notes |
+|---|---|---|
+| `publicId` | string | |
+| `name` | string | In requested `lang` |
+| `shortBio` | string | In requested `lang` |
+| `profileImageUrl` | string | CDN URL |
+| `birthYear` / `deathYear` | int / int? | `null` for living poets |
+| `era` | enum | `CLASSICAL`, `MODERN`, etc. |
+| `country` | string | |
+| `countryFlag` | string | Unicode emoji, e.g. `"🇵🇰"` |
+| `poemCount` | int | |
+
+#### `GuestCoupletDto`
+| Field | Type | Notes |
+|---|---|---|
+| `publicId` | string | |
+| `coupletNumber` | int | 1-indexed within parent poem |
+| `coupletType` | enum | `MATLA`, `MAQTA`, `REGULAR`, `CHORUS`, `REFRAIN` |
+| `coupletTypeName` | string | Urdu name |
+| `verses` | `VerseDto[]` | Typically 2 verses for ghazals |
+| `poemPublicId` | string | Parent poem |
+| `poetPublicId` | string | |
+| `poetName` | string | |
+| `poetProfileImageUrl` | string | |
+| `likeCount` | int | |
+| `shareCount` | int | |
+
+#### `GuestDiscoverBundleDto`
+| Field | Type | Notes |
+|---|---|---|
+| `featuredPoems` | `GuestPoemSummaryDto[]` | Up to 6 |
+| `featuredPoets` | `GuestPoetSummaryDto[]` | Up to 6 |
+| `trendingPoets` | `GuestPoetSummaryDto[]` | Up to 6 |
+| `trendingCouplets` | `GuestCoupletDto[]` | Up to 6 |
+| `language` | string | The `lang` actually used (after fallback) |
+| `timestamp` | long | Epoch millis at bundle build time |
+
+---
+
+### 21.13 Flutter Integration Guide {#2113-flutter-integration-guide}
+
+#### 21.13.1 Remove the Login Wall
+
+Today the app likely shows the sign-in screen at launch and gates everything
+behind it. Apple rejects this. Restructure as:
+
+```
+App launch
+  ↓
+Show home screen (uses /api/guest/discover)
+  ↓
+User browses freely
+  ↓
+User taps a gated action (like, bookmark, follow, comment, etc.)
+  ↓
+Show "Sign in to continue" sheet
+  ↓
+On success: switch to authenticated APIs and re-fetch personalized data
+```
+
+**Authentication state machine:**
+```dart
+enum AuthState { anonymous, authenticated }
+
+class AuthController extends ChangeNotifier {
+  AuthState _state = AuthState.anonymous;
+  String? _token;
+
+  AuthState get state => _state;
+  String? get token => _token;
+  bool get isAnonymous => _state == AuthState.anonymous;
+
+  void setAuthenticated(String token) {
+    _token = token;
+    _state = AuthState.authenticated;
+    notifyListeners();
+  }
+
+  void signOut() {
+    _token = null;
+    _state = AuthState.anonymous;
+    notifyListeners();
+  }
+}
+```
+
+#### 21.13.2 API Client Switching
+
+Use a single API client that picks the right base path based on auth state:
+
+```dart
+class PoetryApi {
+  final AuthController auth;
+  final http.Client http;
+  final String baseUrl;
+
+  PoetryApi(this.auth, this.http, this.baseUrl);
+
+  /// Fetches the home/discover screen. Uses the guest endpoint when
+  /// anonymous, the authenticated discover when signed in (which adds
+  /// personalization).
+  Future<Map<String, dynamic>> discover({String lang = 'ur'}) async {
+    final path = auth.isAnonymous ? '/api/guest/discover' : '/api/discover';
+    final headers = <String, String>{};
+    if (!auth.isAnonymous) {
+      headers['Authorization'] = 'Bearer ${auth.token}';
+    }
+    final r = await http.get(Uri.parse('$baseUrl$path?lang=$lang'), headers: headers);
+    return _unwrap(r);
+  }
+
+  /// Lists poems. Anonymous gets the slim, capped list; authenticated gets
+  /// full DTOs with engagement state.
+  Future<Map<String, dynamic>> listPoems({
+    String? poetryType,
+    String lang = 'ur',
+    int page = 0,
+    int size = 10,
+  }) async {
+    final base = auth.isAnonymous ? '/api/guest/poems' : '/api/poems';
+    final qp = <String, String>{
+      'lang': lang,
+      'page': '$page',
+      'size': '$size',
+      if (poetryType != null) 'poetryType': poetryType,
+    };
+    final uri = Uri.parse('$baseUrl$base').replace(queryParameters: qp);
+    final headers = auth.isAnonymous
+        ? const <String, String>{}
+        : {'Authorization': 'Bearer ${auth.token}'};
+    final r = await http.get(uri, headers: headers);
+    return _unwrap(r);
+  }
+
+  Map<String, dynamic> _unwrap(http.Response r) {
+    if (r.statusCode == 429) {
+      throw RateLimitedException(
+        retryAfter: int.tryParse(r.headers['retry-after'] ?? '60') ?? 60,
+      );
+    }
+    if (r.statusCode != 200) {
+      throw HttpException('${r.statusCode}: ${r.body}');
+    }
+    return jsonDecode(r.body) as Map<String, dynamic>;
+  }
+}
+
+class RateLimitedException implements Exception {
+  final int retryAfter;
+  RateLimitedException({required this.retryAfter});
+}
+```
+
+#### 21.13.3 Gated Action Pattern
+
+Wrap any action that requires auth in this helper:
+
+```dart
+Future<void> requireSignIn(BuildContext context, VoidCallback ifSignedIn) async {
+  final auth = context.read<AuthController>();
+  if (auth.isAnonymous) {
+    final result = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => const SignInPromptSheet(),
+    );
+    if (result == true) ifSignedIn();
+  } else {
+    ifSignedIn();
+  }
+}
+
+// Usage:
+IconButton(
+  icon: const Icon(Icons.favorite_border),
+  onPressed: () => requireSignIn(context, () => _likePoem(poem)),
+)
+```
+
+The sign-in sheet should show **both** Google and Apple options (Apple at
+least as prominent — see §1.6.6) plus a "Continue browsing" dismiss button.
+
+#### 21.13.4 After Sign-In: Re-Fetch Personalization
+
+When the user signs in mid-browse, refresh whatever screen they're on so it
+flips from guest data to personalized data:
+
+```dart
+auth.addListener(() {
+  if (auth.state == AuthState.authenticated) {
+    // Invalidate any in-memory caches keyed on guest data
+    feedController.refresh();
+    discoverController.refresh();
+  }
+});
+```
+
+#### 21.13.5 Handling 429 Rate-Limit Responses
+
+```dart
+try {
+  final data = await api.discover();
+  // ...
+} on RateLimitedException catch (e) {
+  // Don't show a modal — that's annoying. Show a non-blocking toast.
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    content: Text('Slow down a bit — retry in ${e.retryAfter}s'),
+    duration: Duration(seconds: 3),
+  ));
+  // Schedule a single auto-retry
+  Future.delayed(Duration(seconds: e.retryAfter), () {
+    _refresh();
+  });
+}
+```
+
+In practice a real user will never hit the rate limit (60 req/min / 1000 per
+hour leaves a lot of headroom). 429 means either a buggy client (infinite
+loop) or a scraper. Defensive UI handling matters more than aggressive retry.
+
+#### 21.13.6 Dart Models
+
+```dart
+class GuestPoemSummary {
+  final String publicId;
+  final String title;
+  final String excerpt;
+  final String poetPublicId;
+  final String poetName;
+  final String? poetProfileImageUrl;
+  final String poetryType;
+  final String poetryTypeName;
+  final String contentType;
+  final String thumbnailUrl;
+  final int viewCount;
+  final int likeCount;
+  final int shareCount;
+  final DateTime createdAt;
+
+  GuestPoemSummary.fromJson(Map<String, dynamic> j)
+      : publicId = j['publicId'],
+        title = j['title'] ?? '',
+        excerpt = j['excerpt'] ?? '',
+        poetPublicId = j['poetPublicId'],
+        poetName = j['poetName'] ?? '',
+        poetProfileImageUrl = j['poetProfileImageUrl'],
+        poetryType = j['poetryType'],
+        poetryTypeName = j['poetryTypeName'] ?? '',
+        contentType = j['contentType'] ?? 'TEXT',
+        thumbnailUrl = j['thumbnailUrl'] ?? '-',
+        viewCount = j['viewCount'] ?? 0,
+        likeCount = j['likeCount'] ?? 0,
+        shareCount = j['shareCount'] ?? 0,
+        createdAt = DateTime.parse(j['createdAt']);
+}
+
+class GuestPoetSummary {
+  final String publicId;
+  final String name;
+  final String? shortBio;
+  final String? profileImageUrl;
+  final int? birthYear;
+  final int? deathYear;
+  final String? era;
+  final String? country;
+  final String? countryFlag;
+  final int poemCount;
+
+  GuestPoetSummary.fromJson(Map<String, dynamic> j)
+      : publicId = j['publicId'],
+        name = j['name'] ?? '',
+        shortBio = j['shortBio'],
+        profileImageUrl = j['profileImageUrl'],
+        birthYear = j['birthYear'],
+        deathYear = j['deathYear'],
+        era = j['era'],
+        country = j['country'],
+        countryFlag = j['countryFlag'],
+        poemCount = j['poemCount'] ?? 0;
+}
+
+class GuestCouplet {
+  final String publicId;
+  final int coupletNumber;
+  final String coupletType;
+  final String? coupletTypeName;
+  final List<dynamic> verses;
+  final String? poemPublicId;
+  final String? poetPublicId;
+  final String? poetName;
+  final String? poetProfileImageUrl;
+  final int likeCount;
+  final int shareCount;
+
+  GuestCouplet.fromJson(Map<String, dynamic> j)
+      : publicId = j['publicId'],
+        coupletNumber = j['coupletNumber'] ?? 0,
+        coupletType = j['coupletType'] ?? 'REGULAR',
+        coupletTypeName = j['coupletTypeName'],
+        verses = j['verses'] ?? const [],
+        poemPublicId = j['poemPublicId'],
+        poetPublicId = j['poetPublicId'],
+        poetName = j['poetName'],
+        poetProfileImageUrl = j['poetProfileImageUrl'],
+        likeCount = j['likeCount'] ?? 0,
+        shareCount = j['shareCount'] ?? 0;
+}
+```
+
+#### 21.13.7 Anonymous Browsing Checklist for App Review
+
+- [ ] App launches directly to a content screen — no sign-in required to see anything
+- [ ] User can read a complete poem without signing in
+- [ ] User can browse the poet directory without signing in
+- [ ] User can search without signing in
+- [ ] Tapping a write-action (like, bookmark, follow, comment, react, generate image, save to collection) prompts sign-in **only at that moment**, not preemptively
+- [ ] Sign-in sheet has both **Google** and **Apple** options with Apple at least as prominent
+- [ ] After sign-in, the user lands back on the screen they were on (not back to a "welcome" screen)
+- [ ] No 429 errors in normal browsing (a healthy session stays well under 60 req/min)
+
+---
+
 ## Support & Feedback
 
 For issues or questions:
 - GitHub: https://github.com/your-repo/issues
 - Email: support@poetry.com
 
-**Documentation Version:** 1.4.0
-**Last Updated:** March 7, 2026
+**Documentation Version:** 1.8.0
+**Last Updated:** May 15, 2026
 
 ---

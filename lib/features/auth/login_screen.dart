@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'dart:io' show Platform;
 import 'dart:math' as math;
 import '../../core/auth/auth_provider.dart';
+import '../../core/routing/app_router.dart';
 
 /// Stunning login screen with WOW factor for Jahān-e-Sukhan
 class LoginScreen extends ConsumerStatefulWidget {
@@ -75,24 +78,32 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   Future<void> _handleGoogleSignIn(BuildContext context, WidgetRef ref) async {
     final authNotifier = ref.read(authProvider.notifier);
     await authNotifier.signInWithGoogle();
+    if (!context.mounted) return;
+    _showErrorIfAny(context, ref);
+  }
 
-    if (context.mounted) {
-      final authState = ref.read(authProvider);
-      if (authState.errorMessage != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(authState.errorMessage!),
-            backgroundColor: const Color(0xFF8B4513),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            margin: const EdgeInsets.all(16),
-            duration: const Duration(seconds: 4),
-          ),
-        );
-      }
-    }
+  Future<void> _handleAppleSignIn(BuildContext context, WidgetRef ref) async {
+    final authNotifier = ref.read(authProvider.notifier);
+    await authNotifier.signInWithApple();
+    if (!context.mounted) return;
+    _showErrorIfAny(context, ref);
+  }
+
+  void _showErrorIfAny(BuildContext context, WidgetRef ref) {
+    final authState = ref.read(authProvider);
+    if (authState.errorMessage == null) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(authState.errorMessage!),
+        backgroundColor: const Color(0xFF8B4513),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 4),
+      ),
+    );
   }
 
   @override
@@ -309,10 +320,41 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
           const SizedBox(height: 40),
 
-          // Stunning Google Button
+          // Sign-in buttons.
+          //
+          // App Store Guideline 4.8 requires Sign in with Apple at equal
+          // prominence to any other social sign-in. We render the Apple
+          // button FIRST on iOS/macOS (Apple's recommended ordering) and
+          // omit it entirely on Android (Apple guidelines explicitly say
+          // Android apps don't need Sign in with Apple).
+          if (Platform.isIOS || Platform.isMacOS) ...[
+            _buildStunningAppleButton(authState),
+            const SizedBox(height: 14),
+          ],
           _buildStunningGoogleButton(authState),
 
-          const SizedBox(height: 28),
+          const SizedBox(height: 20),
+
+          // Guideline 5.1.1(v): users must be able to browse non-account
+          // content without signing in. The splash redirect already lets
+          // guests reach /main directly; this is a backup affordance for
+          // anyone who manually navigated to /login.
+          TextButton(
+            onPressed: authState.isLoading
+                ? null
+                : () => context.go(AppRoutes.main),
+            child: const Text(
+              'Continue without signing in',
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 14,
+                color: Color(0xFF2C5F2D),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 8),
 
           // Terms
           Text(
@@ -326,6 +368,83 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Sign in with Apple button. Matches the Google button's dimensions
+  /// (height 60, width double.infinity, radius 18) to satisfy Guideline 4.8
+  /// "equal prominence". Uses Apple's mandated black/white styling.
+  Widget _buildStunningAppleButton(authState) {
+    return Container(
+      width: double.infinity,
+      height: 60,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        color: Colors.black,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.35),
+            blurRadius: 25,
+            offset: const Offset(0, 10),
+            spreadRadius: -3,
+          ),
+          BoxShadow(
+            color: const Color(0xFFD4AF37).withValues(alpha: 0.12),
+            blurRadius: 30,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: authState.isLoading
+              ? null
+              : () => _handleAppleSignIn(context, ref),
+          borderRadius: BorderRadius.circular(18),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: authState.isLoading
+                ? const Center(
+                    child: SizedBox(
+                      width: 26,
+                      height: 26,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 3,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Colors.white,
+                        ),
+                      ),
+                    ),
+                  )
+                : const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.apple,
+                        size: 26,
+                        color: Colors.white,
+                      ),
+                      SizedBox(width: 10),
+                      Flexible(
+                        child: Text(
+                          'Continue with Apple',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            letterSpacing: 0.3,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+        ),
       ),
     );
   }

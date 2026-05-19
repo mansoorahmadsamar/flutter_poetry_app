@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_poetry_app/core/auth/auth_provider.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
+import 'package:flutter_poetry_app/features/auth/widgets/ensure_signed_in.dart';
 import '../providers/follow_providers.dart';
 
 /// Reusable follow/unfollow button for poet cards and detail screens.
@@ -28,6 +30,19 @@ class FollowButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // For guests, render the button as "Follow" (never as a loader). Tapping
+    // it opens the sign-in sheet rather than calling the auth-only follow
+    // endpoint. Avoids 401s and gives the user a clear, contextual prompt.
+    if (ref.watch(authProvider).isGuest) {
+      return _buildButton(
+        context,
+        ref,
+        isFollowing: false,
+        isDark: isDark,
+      );
+    }
+
     final followState = ref.watch(followToggleProvider(publicId));
 
     return followState.when(
@@ -68,8 +83,15 @@ class FollowButton extends ConsumerWidget {
     return GestureDetector(
       onTap: isLoading
           ? null
-          : () {
+          : () async {
               HapticFeedback.lightImpact();
+              if (!await ensureSignedIn(
+                context,
+                ref,
+                'Sign in to follow this poet.',
+              )) {
+                return;
+              }
               ref.read(followToggleProvider(publicId).notifier).toggle();
             },
       child: AnimatedContainer(

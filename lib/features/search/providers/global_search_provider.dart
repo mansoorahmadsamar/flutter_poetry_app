@@ -19,7 +19,7 @@ import 'package:flutter_poetry_app/features/discover/models/discover_bundle_mode
 /// Provider for SearchService (API layer)
 final searchServiceProvider = Provider<SearchService>((ref) {
   final dioClient = ref.watch(dioClientProvider);
-  return SearchService(dioClient.dio);
+  return SearchService(dioClient.dio, ref);
 });
 
 /// Provider for SearchHistoryService (local storage)

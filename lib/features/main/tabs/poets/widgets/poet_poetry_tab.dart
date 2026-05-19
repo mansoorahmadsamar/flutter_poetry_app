@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_poetry_app/core/auth/auth_provider.dart';
+import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
+import 'package:flutter_poetry_app/features/auth/widgets/sign_in_prompt_sheet.dart';
 import '../models/poem_model.dart';
 import '../providers/poem_providers.dart';
 import 'poem_card.dart';
@@ -14,6 +17,91 @@ class PoetPoetryTab extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<PoetPoetryTab> createState() => _PoetPoetryTabState();
+}
+
+/// Inline CTA shown when a guest opens a poet's Poetry tab. The guest API
+/// surface has no per-poet poem listing, so we tell the user signing in
+/// unlocks the full back-catalog.
+class _GuestPoemsCta extends StatelessWidget {
+  final String? poetName;
+  const _GuestPoemsCta({this.poetName});
+
+  @override
+  Widget build(BuildContext context) {
+    final who = poetName != null ? 'by $poetName' : 'by this poet';
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppColors.secondary.withValues(alpha: 0.35),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.menu_book_outlined,
+                  color: AppColors.primary, size: 22),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Sign in to see all poems $who',
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primaryDark,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'Browse the full back-catalog, follow the poet for new releases, and save what you love.',
+            style: TextStyle(
+              fontFamily: 'Inter',
+              fontSize: 13,
+              color: Color(0xFF5C5C5C),
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(height: 14),
+          SizedBox(
+            height: 44,
+            child: ElevatedButton(
+              onPressed: () => SignInPromptSheet.show(
+                context,
+                reason: 'Sign in to see all poems $who',
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                'Sign in',
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.2,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _PoetPoetryTabState extends ConsumerState<PoetPoetryTab> {
@@ -43,13 +131,20 @@ class _PoetPoetryTabState extends ConsumerState<PoetPoetryTab> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
+    final isGuest = ref.watch(authProvider).isGuest;
+
+    // For guests, the guest API has no `/poems/poet/{id}` endpoint, so the
+    // per-poetry-type sections will all be empty. Surface an inline CTA at
+    // the top instead — guideline 5.1.1(v)-friendly: the tab is reachable,
+    // there's a clear next step, no error state. Authed users see the
+    // normal per-type sections.
+    return ListView(
       padding: EdgeInsets.all(AppSpacing.md),
-      itemCount: _poetryTypes.length,
-      itemBuilder: (context, index) {
-        final poetryType = _poetryTypes[index];
-        return _buildPoetryTypeSection(poetryType);
-      },
+      children: [
+        if (isGuest) _GuestPoemsCta(poetName: null),
+        if (!isGuest)
+          ..._poetryTypes.map(_buildPoetryTypeSection),
+      ],
     );
   }
 

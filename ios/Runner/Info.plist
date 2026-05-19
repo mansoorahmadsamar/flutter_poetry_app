@@ -77,5 +77,20 @@
 	<string>Sukhan needs permission to save your created poetry images to your photo library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Sukhan needs photo library access so you can choose images as backgrounds for your poetry.</string>
+	<!-- TEMPORARY: allows HTTP traffic to Mac's LAN IP for local-dev testing on a real iPhone.
+	     REMOVE THIS NSAppTransportSecurity block before the App Store release build. -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>192.168.10.2</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<false/>
+			</dict>
+		</dict>
+	</dict>
 </dict>
 </plist>

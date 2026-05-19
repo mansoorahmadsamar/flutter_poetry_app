@@ -6,6 +6,7 @@ import '../network/dio_client.dart';
 import '../storage/preferences_service.dart';
 import '../storage/secure_storage.dart';
 import '../../features/discover/providers/discover_provider.dart';
+import '../../features/discover/services/discover_service.dart';
 import '../../features/engagement/providers/bookmark_providers.dart';
 import '../../features/engagement/providers/bookmark_search_history_provider.dart';
 import '../../features/engagement/providers/bookmark_search_provider.dart';
@@ -13,6 +14,7 @@ import '../../features/engagement/providers/couplet_providers.dart';
 import '../../features/engagement/providers/unified_bookmark_provider.dart';
 import '../../features/feed/providers/feed_engagement_provider.dart';
 import '../../features/feed/providers/feed_provider.dart';
+import '../../features/main/tabs/poets/providers/poet_providers.dart';
 import '../../features/search/providers/search_providers.dart';
 import 'firebase_auth_service.dart';
 import 'auth_state.dart';
@@ -138,6 +140,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
         errorMessage: null,
       );
 
+      _invalidateGuestSurfaces();
+
       _logger.i('');
       _logger.i('═══════════════════════════════════════════════════════');
       _logger.i('✅ FIREBASE SIGN-IN COMPLETED - AUTH STATE UPDATED');
@@ -168,6 +172,75 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
       // Sign out from Firebase on error to clean up state
       await _firebaseAuthService.signOut();
+    }
+  }
+
+  /// Sign in with Apple via Firebase. Required for App Store Guideline 4.8.
+  /// Mirrors [signInWithGoogle] — same loading/error/state-update shape.
+  Future<void> signInWithApple() async {
+    _logger.i('');
+    _logger.i('═══════════════════════════════════════════════════════');
+    _logger.i('🍎 AUTH NOTIFIER - STARTING FIREBASE APPLE SIGN-IN');
+    _logger.i('═══════════════════════════════════════════════════════');
+
+    try {
+      state = state.copyWith(isLoading: true, errorMessage: null);
+
+      final result = await _firebaseAuthService.signInWithApple();
+
+      if (result.isEmpty) {
+        _logger.w('⚠️  User cancelled Apple sign-in');
+        state = state.copyWith(isLoading: false);
+        return;
+      }
+
+      final accessToken = result['accessToken'] as String?;
+      final refreshToken = result['refreshToken'] as String?;
+      final email = result['email'] as String?;
+
+      if (accessToken == null || refreshToken == null) {
+        throw Exception('Backend did not return required tokens');
+      }
+
+      state = state.copyWith(
+        isAuthenticated: true,
+        isLoading: false,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        userEmail: email,
+        errorMessage: null,
+      );
+
+      _invalidateGuestSurfaces();
+
+      _logger.i('═══════════════════════════════════════════════════════');
+      _logger.i('✅ APPLE SIGN-IN COMPLETED - AUTH STATE UPDATED');
+      _logger.i('   Email: $email');
+      _logger.i('═══════════════════════════════════════════════════════');
+    } on FirebaseAuthException catch (e) {
+      _logger.e('❌ Firebase Auth Exception (Apple): ${e.code} - ${e.message}');
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Apple sign-in failed: ${e.message ?? e.code}',
+      );
+    } catch (e, stackTrace) {
+      _logger.e('❌ ERROR IN APPLE SIGN-IN');
+      _logger.e('   Error: $e');
+      _logger.e('   Stack: $stackTrace');
+
+      // Apple-side failures (cancel, config, simulator quirk) leave no
+      // Firebase credential to clean up — just reset our loading state
+      // and let the user retry or pick Google. Surfacing the raw exception
+      // text isn't useful here; the FirebaseAuthService already throws a
+      // human-readable message for error 1000.
+      final message = e is Exception
+          ? e.toString().replaceFirst('Exception: ', '')
+          : 'Sign in with Apple failed. Please try again.';
+
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: message,
+      );
     }
   }
 
@@ -219,9 +292,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
       // Invalidate all user-specific providers to clear cached data
       _logger.i('   Invalidating cached providers...');
+      try {
+        _ref.read(discoverServiceProvider).clearCache();
+      } catch (_) {/* best-effort */}
       _ref.invalidate(feedProvider);
       _ref.invalidate(feedEngagementProvider);
       _ref.invalidate(discoverProvider);
+      _ref.invalidate(featuredPoetsProvider);
+      _ref.invalidate(trendingPoetsProvider);
+      _ref.invalidate(allPoetsProvider);
       _ref.invalidate(bookmarkedCoupletsProvider);
       _ref.invalidate(unifiedBookmarksProvider);
       _ref.invalidate(bookmarkActionProvider);
@@ -253,6 +332,23 @@ class AuthNotifier extends StateNotifier<AuthState> {
   /// Clear error message
   void clearError() {
     state = state.copyWith(errorMessage: null);
+  }
+
+  /// Drop any guest-mode browse caches and force the personalized
+  /// surfaces to refetch. Called from both sign-in paths so the user
+  /// immediately sees their personalized feed / discover / poets after
+  /// signing in mid-browse, instead of stale anonymous data.
+  void _invalidateGuestSurfaces() {
+    try {
+      _ref.read(discoverServiceProvider).clearCache();
+    } catch (_) {
+      // Cache clear is best-effort; never let it break sign-in.
+    }
+    _ref.invalidate(feedProvider);
+    _ref.invalidate(discoverProvider);
+    _ref.invalidate(featuredPoetsProvider);
+    _ref.invalidate(trendingPoetsProvider);
+    _ref.invalidate(allPoetsProvider);
   }
 
   /// Permanently delete the authenticated user's account.
