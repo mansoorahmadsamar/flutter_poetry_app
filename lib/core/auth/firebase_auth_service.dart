@@ -264,12 +264,36 @@ class FirebaseAuthService {
       }
       _logger.i('✅ Got Apple credential (email: ${appleCredential.email ?? "<hidden>"})');
 
+      // Diagnostic: decode the Apple identityToken locally so we can see
+      // exactly what Apple sent before handing it to Firebase. We log
+      // only token-shape fields (iss, aud, exp, iat) plus presence/length
+      // booleans for nonce + authorizationCode. We DO NOT log the token
+      // itself, the user identifier, the email, or any private values.
+      _decodeAndDiagnoseAppleToken(
+        identityToken: appleCredential.identityToken!,
+        authorizationCode: appleCredential.authorizationCode,
+        sentHashedNonceLength: hashedNonce.length,
+      );
+
+      if (appleCredential.authorizationCode.isEmpty) {
+        _logger.e('');
+        _logger.e('🚨 FATAL: Apple did NOT return an authorizationCode.');
+        _logger.e(
+            '   Firebase Apple Sign-In requires authorizationCode in addition to');
+        _logger.e('   identityToken to perform server-side OAuth verification.');
+        _logger.e('   Sign-in cannot continue.');
+      }
+
       // Step 3 — Firebase OAuth credential. rawNonce here MUST match the
-      // value whose SHA-256 was sent to Apple in step 2.
+      // value whose SHA-256 was sent to Apple in step 2. Firebase ALSO
+      // needs Apple's authorizationCode (passed as accessToken) so its
+      // server can perform the Apple OAuth back-channel exchange — without
+      // it Firebase logs "Invalid OAuth response from apple.com".
       _logger.i('');
       _logger.i('🔥 Step 3: Creating Firebase OAuth credential...');
       final oauthCredential = OAuthProvider('apple.com').credential(
         idToken: appleCredential.identityToken,
+        accessToken: appleCredential.authorizationCode,
         rawNonce: rawNonce,
       );
 
@@ -392,6 +416,100 @@ class FirebaseAuthService {
       _logger.e('   Stack: $stackTrace');
       _logger.e('═══════════════════════════════════════════════════════');
       rethrow;
+    }
+  }
+
+  /// Decodes the Apple identity_token payload locally and logs only its
+  /// shape (iss, aud, exp, iat, nonce length, presence flags). Used to
+  /// diagnose `auth/invalid-credential / Invalid OAuth response from
+  /// apple.com` — that error is opaque on the Firebase side, but the token
+  /// Apple actually sent reveals the cause (wrong audience, expired,
+  /// missing nonce, etc.) before Firebase rejects it.
+  ///
+  /// Safety: prints NO sensitive values — no full tokens, no email, no
+  /// user identifier, no private key bytes.
+  void _decodeAndDiagnoseAppleToken({
+    required String identityToken,
+    required String authorizationCode,
+    required int sentHashedNonceLength,
+  }) {
+    try {
+      // JWT format: header.payload.signature — all three base64url-encoded.
+      final parts = identityToken.split('.');
+      if (parts.length != 3) {
+        _logger.e('🚨 identityToken is NOT a valid JWT (expected 3 parts, '
+            'got ${parts.length}). Sign-in cannot continue.');
+        return;
+      }
+
+      // Base64url decode the middle segment (the payload claims).
+      String segment = parts[1];
+      // Pad to a multiple of 4 — JWT base64url strips padding.
+      switch (segment.length % 4) {
+        case 2:
+          segment = '$segment==';
+          break;
+        case 3:
+          segment = '$segment=';
+          break;
+      }
+      final payloadJson = utf8.decode(base64Url.decode(segment));
+      final payload = json.decode(payloadJson) as Map<String, dynamic>;
+
+      final iss = payload['iss'] as String?;
+      final aud = payload['aud'] as String?;
+      final exp = payload['exp'] as int?;
+      final iat = payload['iat'] as int?;
+      final nonceClaim = payload['nonce'] as String?;
+      final nonceSupported = payload['nonce_supported'];
+
+      _logger.i('');
+      _logger.i('🔬 APPLE IDENTITY TOKEN DIAGNOSTIC');
+      _logger.i('   iss (issuer):              $iss');
+      _logger.i('   aud (audience):            $aud');
+      _logger.i('   exp:                       $exp');
+      _logger.i('   iat:                       $iat');
+      _logger.i('   nonce present in token:    ${nonceClaim != null}');
+      _logger.i('   nonce length in token:     ${nonceClaim?.length ?? 0}');
+      _logger.i('   nonce_supported:           $nonceSupported');
+      _logger.i('   sent hashed nonce length:  $sentHashedNonceLength');
+      _logger.i('   authorizationCode present: ${authorizationCode.isNotEmpty}');
+      _logger.i('   authorizationCode length:  ${authorizationCode.length}');
+
+      // Fatal-warn on the most common true root causes of
+      // auth/invalid-credential when client code + config look right.
+
+      // 1) Audience mismatch. Apple sets `aud` to the App ID (the iOS bundle
+      //    identifier) the user signed into. If that differs from the
+      //    bundle in GoogleService-Info.plist / Xcode, Firebase rejects.
+      const expectedBundleId = 'com.techhikes.poetryapp';
+      if (aud != null && aud != expectedBundleId) {
+        _logger.e('');
+        _logger.e('🚨 FATAL: aud mismatch.');
+        _logger.e('   identityToken.aud = $aud');
+        _logger.e('   GoogleService-Info / Xcode bundle = $expectedBundleId');
+        _logger.e('   Apple is signing tokens for a DIFFERENT app than this build.');
+        _logger.e('   Causes: build installed from a different bundle ID, the');
+        _logger.e('   Services ID is bound to the wrong Primary App ID, or the');
+        _logger.e('   provisioning profile was issued for a different App ID.');
+      }
+
+      // 2) Token already expired by the time we hand it to Firebase.
+      if (exp != null) {
+        final nowSeconds = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+        if (exp < nowSeconds) {
+          _logger.e('🚨 FATAL: identityToken is already expired '
+              '(exp=$exp, now=$nowSeconds).');
+        }
+      }
+
+      // 3) Apple should issue tokens with iss = https://appleid.apple.com
+      if (iss != 'https://appleid.apple.com') {
+        _logger.w(
+            '⚠️  Unexpected issuer: $iss (expected https://appleid.apple.com)');
+      }
+    } catch (e) {
+      _logger.w('⚠️  Could not decode Apple identity token for diagnostics: $e');
     }
   }
 
