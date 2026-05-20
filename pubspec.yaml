@@ -73,6 +73,8 @@ dependencies:
   url_launcher: ^6.3.2
   app_links: ^6.3.4  # Replacement for deprecated uni_links
   google_sign_in: ^6.2.1  # Native Google Sign-In for Android/iOS
+  sign_in_with_apple: ^6.1.0  # Native Apple Sign-In for iOS (App Store Guideline 4.8)
+  crypto: ^3.0.3  # SHA-256 nonce hashing for Sign in with Apple
 
   # Firebase Authentication
   firebase_core: ^3.8.1

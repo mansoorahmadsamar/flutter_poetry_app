@@ -1,6 +1,9 @@
+import 'dart:io' show Platform;
+import 'dart:math' as math;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'dart:math' as math;
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../../core/auth/auth_provider.dart';
 
 /// Stunning login screen with WOW factor for Jahān-e-Sukhan
@@ -70,6 +73,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     _controller.dispose();
     _shimmerController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleAppleSignIn(BuildContext context, WidgetRef ref) async {
+    final authNotifier = ref.read(authProvider.notifier);
+    await authNotifier.signInWithApple();
+
+    if (context.mounted) {
+      final authState = ref.read(authProvider);
+      if (authState.errorMessage != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(authState.errorMessage!),
+            backgroundColor: Colors.red.shade700,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _handleGoogleSignIn(BuildContext context, WidgetRef ref) async {
@@ -309,6 +330,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
           const SizedBox(height: 40),
 
+          // Apple Sign-In Button — iOS only. Apple App Store Guideline 4.8
+          // requires Sign in with Apple at equal prominence whenever a
+          // third-party login (Google here) is offered. We render Apple
+          // ABOVE Google with matching height + full width to satisfy the
+          // "at least as prominent" rule.
+          if (!kIsWeb && Platform.isIOS) ...[
+            _buildAppleSignInButton(authState),
+            const SizedBox(height: 14),
+          ],
+
           // Stunning Google Button
           _buildStunningGoogleButton(authState),
 
@@ -326,6 +357,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Native Apple Sign-In button. Uses the official [SignInWithAppleButton]
+  /// widget because Apple is strict about button styling at review time
+  /// (rejecting non-standard colors / fonts / dimensions). Sized to match
+  /// the Google button below it (height 60, full width).
+  Widget _buildAppleSignInButton(authState) {
+    return SizedBox(
+      width: double.infinity,
+      height: 60,
+      child: SignInWithAppleButton(
+        onPressed: authState.isLoading
+            ? () {}
+            : () => _handleAppleSignIn(context, ref),
+        style: SignInWithAppleButtonStyle.black,
+        borderRadius: BorderRadius.circular(18),
+        height: 60,
       ),
     );
   }

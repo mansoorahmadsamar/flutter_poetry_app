@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
+import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
 import 'package:logger/logger.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../config/app_config.dart';
 import '../storage/secure_storage.dart';
 
@@ -198,6 +201,211 @@ class FirebaseAuthService {
       _logger.e('═══════════════════════════════════════════════════════');
       rethrow;
     }
+  }
+
+  /// Sign in with Apple via Firebase Auth.
+  ///
+  /// Flow: native Apple Sign-In sheet → Apple identity token + raw nonce →
+  /// Firebase OAuth credential (provider: apple.com) → Firebase ID token →
+  /// backend `/api/auth/firebase/verify` (same endpoint as Google). Backend
+  /// links the account by email; new users get `provider = "apple"`.
+  ///
+  /// Required for App Store Guideline 4.8 — any app offering a third-party
+  /// login (Google here) must offer Sign in with Apple at equal prominence.
+  Future<Map<String, dynamic>> signInWithApple() async {
+    _logger.i('═══════════════════════════════════════════════════════');
+    _logger.i('🍎 FIREBASE AUTH SERVICE - STARTING APPLE SIGN-IN');
+    _logger.i('═══════════════════════════════════════════════════════');
+
+    try {
+      // Step 1 — generate nonce. Apple receives the SHA-256 hash; Firebase
+      // recomputes it server-side and validates against the raw value sent
+      // below. Mismatch is the #1 cause of auth/invalid-credential.
+      _logger.i('');
+      _logger.i('🎲 Step 1: Generating cryptographic nonce...');
+      final rawNonce = _generateNonce();
+      final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
+
+      // Step 2 — native Apple sheet
+      _logger.i('');
+      _logger.i('🍎 Step 2: Triggering native Apple Sign-In...');
+      final AuthorizationCredentialAppleID appleCredential;
+      try {
+        appleCredential = await SignInWithApple.getAppleIDCredential(
+          scopes: const [
+            AppleIDAuthorizationScopes.email,
+            AppleIDAuthorizationScopes.fullName,
+          ],
+          nonce: hashedNonce,
+        );
+      } on SignInWithAppleAuthorizationException catch (e) {
+        if (e.code == AuthorizationErrorCode.canceled) {
+          _logger.w('⚠️  User cancelled Apple Sign-In');
+          return {};
+        }
+        // error 1000 / AuthorizationErrorCode.unknown is Apple's catch-all
+        // for "I don't know what's wrong with your config". It fires when
+        // the Apple Developer Portal capability or Firebase Console
+        // provider isn't fully wired, and randomly on the iOS Simulator
+        // (incomplete Authentication Services support). Surface a clear
+        // message instead of the cryptic raw exception.
+        if (e.code == AuthorizationErrorCode.unknown) {
+          throw Exception(
+            'Sign in with Apple isn\'t available on this build. '
+            'Try a real device, or verify the Apple Developer Portal '
+            'capability and Firebase Console provider are configured.',
+          );
+        }
+        rethrow;
+      }
+
+      if (appleCredential.identityToken == null) {
+        throw Exception('Apple returned no identity token');
+      }
+      _logger.i('✅ Got Apple credential (email: ${appleCredential.email ?? "<hidden>"})');
+
+      // Step 3 — Firebase OAuth credential. rawNonce here MUST match the
+      // value whose SHA-256 was sent to Apple in step 2.
+      _logger.i('');
+      _logger.i('🔥 Step 3: Creating Firebase OAuth credential...');
+      final oauthCredential = OAuthProvider('apple.com').credential(
+        idToken: appleCredential.identityToken,
+        rawNonce: rawNonce,
+      );
+
+      // Step 4 — sign in to Firebase
+      _logger.i('');
+      _logger.i('🔥 Step 4: Signing in to Firebase with Apple credential...');
+      final userCredential =
+          await _firebaseAuth.signInWithCredential(oauthCredential);
+      _logger.i('✅ Firebase sign-in successful');
+
+      // Step 5 — persist Apple's name on first sign-in. Apple ONLY sends
+      // givenName/familyName on the very first sign-in for an app —
+      // capture it now or it's gone forever.
+      if (appleCredential.givenName != null ||
+          appleCredential.familyName != null) {
+        final fullName = [
+          appleCredential.givenName,
+          appleCredential.familyName,
+        ].where((s) => s != null && s.isNotEmpty).join(' ');
+        if (fullName.isNotEmpty) {
+          _logger.i('💾 Persisting display name on first sign-in: $fullName');
+          await userCredential.user?.updateDisplayName(fullName);
+        }
+      }
+
+      // Step 6 — Firebase ID token
+      _logger.i('');
+      _logger.i('🔑 Step 6: Getting Firebase ID token...');
+      final String? firebaseToken = await userCredential.user?.getIdToken();
+      if (firebaseToken == null) {
+        throw Exception('Failed to get Firebase ID token');
+      }
+      _logger.i('✅ Firebase ID token obtained (length: ${firebaseToken.length})');
+
+      // Step 7 — backend verification (same endpoint as Google).
+      _logger.i('');
+      _logger.i('📤 Step 7: Sending Firebase token to backend...');
+      _logger.i('   Endpoint: ${appConfig.baseApiUrl}/api/auth/firebase/verify');
+
+      final email = userCredential.user?.email ?? appleCredential.email;
+      final client = _createHttpClient();
+      final response = await client.post(
+        Uri.parse('${appConfig.baseApiUrl}/api/auth/firebase/verify'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'firebaseToken': firebaseToken,
+          'email': email,
+          'deviceType': Platform.isIOS ? 'ios' : 'android',
+        }),
+      );
+      client.close();
+
+      _logger.i('📡 Backend response:');
+      _logger.i('   Status Code: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true && data['data'] != null) {
+          final tokenData = data['data'];
+          final accessToken = tokenData['accessToken'] as String?;
+          final refreshToken = tokenData['refreshToken'] as String?;
+          final returnedEmail =
+              tokenData['email'] as String? ?? email ?? '';
+          final userId = tokenData['userId']?.toString() ??
+              tokenData['id']?.toString();
+
+          if (accessToken == null || refreshToken == null) {
+            throw Exception('Backend did not return required tokens');
+          }
+
+          _logger.i('');
+          _logger.i('💾 Step 8: Saving tokens to secure storage...');
+          await _secureStorage.saveToken(_firebaseTokenKey, firebaseToken);
+          await _secureStorage.saveAccessToken(accessToken);
+          await _secureStorage.saveRefreshToken(refreshToken);
+          if (returnedEmail.isNotEmpty) {
+            await _secureStorage.saveUserEmail(returnedEmail);
+          }
+          if (userId != null && userId.isNotEmpty) {
+            await _secureStorage.saveUserId(userId);
+            _logger.i('   User ID saved: $userId');
+          }
+          _logger.i('✅ Tokens saved successfully');
+
+          _logger.i('');
+          _logger.i('═══════════════════════════════════════════════════════');
+          _logger.i('✅ FIREBASE APPLE SIGN-IN COMPLETED SUCCESSFULLY');
+          _logger.i('   Email: $returnedEmail');
+          _logger.i('═══════════════════════════════════════════════════════');
+
+          return {
+            'accessToken': accessToken,
+            'refreshToken': refreshToken,
+            'email': returnedEmail,
+            'firebaseToken': firebaseToken,
+            'success': true,
+          };
+        } else {
+          throw Exception(data['message'] ?? 'Backend authentication failed');
+        }
+      } else if (response.statusCode == 503) {
+        throw Exception('Firebase authentication service is unavailable');
+      } else {
+        final data = json.decode(response.body);
+        throw Exception(data['message'] ?? 'Authentication failed');
+      }
+    } on FirebaseAuthException catch (e) {
+      _logger.e('');
+      _logger.e('═══════════════════════════════════════════════════════');
+      _logger.e('❌ FIREBASE AUTH EXCEPTION (APPLE)');
+      _logger.e('   Code: ${e.code}');
+      _logger.e('   Message: ${e.message}');
+      _logger.e('═══════════════════════════════════════════════════════');
+      rethrow;
+    } catch (e, stackTrace) {
+      _logger.e('');
+      _logger.e('═══════════════════════════════════════════════════════');
+      _logger.e('❌ APPLE SIGN-IN ERROR');
+      _logger.e('   Error: $e');
+      _logger.e('   Stack: $stackTrace');
+      _logger.e('═══════════════════════════════════════════════════════');
+      rethrow;
+    }
+  }
+
+  /// Generates a cryptographically-random URL-safe nonce. The SHA-256 hash
+  /// is sent to Apple; the raw value is sent to Firebase, which recomputes
+  /// the hash on its end to validate. See [signInWithApple].
+  String _generateNonce([int length = 32]) {
+    const charset =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._';
+    final random = Random.secure();
+    return List.generate(
+      length,
+      (_) => charset[random.nextInt(charset.length)],
+    ).join();
   }
 
   /// Refresh access token using refresh token

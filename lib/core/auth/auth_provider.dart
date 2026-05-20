@@ -171,6 +171,83 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  /// Sign in with Apple via Firebase Auth.
+  ///
+  /// Mirrors [signInWithGoogle]'s state machine — same loading/error/state
+  /// shape so the UI doesn't need to special-case Apple. Backend
+  /// verification reuses `/api/auth/firebase/verify`; existing accounts
+  /// link by email automatically.
+  ///
+  /// Required for App Store Guideline 4.8.
+  Future<void> signInWithApple() async {
+    _logger.i('');
+    _logger.i('═══════════════════════════════════════════════════════');
+    _logger.i('🍎 AUTH NOTIFIER - STARTING FIREBASE APPLE SIGN-IN');
+    _logger.i('═══════════════════════════════════════════════════════');
+
+    try {
+      _logger.i('⏳ Setting loading state...');
+      state = state.copyWith(isLoading: true, errorMessage: null);
+
+      _logger.i('');
+      _logger.i('🔥 Calling Firebase Auth Service...');
+      final result = await _firebaseAuthService.signInWithApple();
+
+      if (result.isEmpty) {
+        _logger.w('⚠️  User cancelled Apple Sign-In');
+        state = state.copyWith(isLoading: false);
+        return;
+      }
+
+      final accessToken = result['accessToken'] as String?;
+      final refreshToken = result['refreshToken'] as String?;
+      final email = result['email'] as String?;
+
+      if (accessToken == null || refreshToken == null) {
+        throw Exception('Backend did not return required tokens');
+      }
+
+      _logger.i('');
+      _logger.i('📝 Updating auth state...');
+      state = state.copyWith(
+        isAuthenticated: true,
+        isLoading: false,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        userEmail: email,
+        errorMessage: null,
+      );
+
+      _logger.i('');
+      _logger.i('═══════════════════════════════════════════════════════');
+      _logger.i('✅ FIREBASE APPLE SIGN-IN COMPLETED - AUTH STATE UPDATED');
+      _logger.i('   Email: $email');
+      _logger.i('═══════════════════════════════════════════════════════');
+      _logger.i('');
+    } on FirebaseAuthException catch (e) {
+      _logger.e('❌ Firebase Auth Exception (Apple): ${e.code} - ${e.message}');
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Apple Sign-In failed: ${e.message}',
+      );
+    } catch (e, stackTrace) {
+      _logger.e('');
+      _logger.e('═══════════════════════════════════════════════════════');
+      _logger.e('❌ ERROR IN APPLE SIGN-IN');
+      _logger.e('   Error: $e');
+      _logger.e('   Stack Trace: $stackTrace');
+      _logger.e('═══════════════════════════════════════════════════════');
+
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString(),
+      );
+
+      // Sign out from Firebase on error to clean up state
+      await _firebaseAuthService.signOut();
+    }
+  }
+
   /// Refresh access token
   Future<bool> refreshAccessToken() async {
     _logger.i('🔄 Auth Notifier - Refreshing access token...');
