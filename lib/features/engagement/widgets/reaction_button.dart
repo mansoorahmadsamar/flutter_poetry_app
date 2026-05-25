@@ -91,7 +91,13 @@ class _ReactionButtonState extends ConsumerState<ReactionButton>
 
   void _showPicker() {
     final reactionTypes = ref.read(reactionTypesProvider).valueOrNull;
-    if (reactionTypes == null || reactionTypes.isEmpty) return;
+    // No reaction types means the user is a guest (the provider returns an
+    // empty list for guests). Route the long-press through onReact so it hits
+    // the same sign-in prompt as a tap, instead of doing nothing.
+    if (reactionTypes == null || reactionTypes.isEmpty) {
+      widget.onReact('LOVE');
+      return;
+    }
 
     final isUrdu = ref.read(selectedLanguageProvider) == 'ur';
 

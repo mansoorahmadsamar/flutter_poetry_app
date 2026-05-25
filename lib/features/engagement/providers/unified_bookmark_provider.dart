@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
+import 'package:flutter_poetry_app/core/auth/auth_provider.dart';
 import 'package:flutter_poetry_app/core/network/dio_client.dart';
 import 'package:flutter_poetry_app/features/main/tabs/bookmarks/models/unified_bookmark_model.dart';
 import 'package:flutter_poetry_app/features/engagement/services/unified_bookmark_service.dart';
@@ -24,6 +25,7 @@ final unifiedBookmarksProvider = StateNotifierProvider.family<
   (ref, filters) => UnifiedBookmarksNotifier(
     service: ref.watch(unifiedBookmarkServiceProvider),
     filters: filters,
+    isGuest: ref.watch(authProvider).isGuest,
   ),
 );
 
@@ -31,13 +33,16 @@ final unifiedBookmarksProvider = StateNotifierProvider.family<
 class UnifiedBookmarksNotifier
     extends StateNotifier<AsyncValue<UnifiedBookmarksResponse>> {
   final UnifiedBookmarkService _service;
+  final bool _isGuest;
   BookmarkFilters _currentFilters;
   bool _isLoadingMore = false;
 
   UnifiedBookmarksNotifier({
     required UnifiedBookmarkService service,
     required BookmarkFilters filters,
+    bool isGuest = false,
   })  : _service = service,
+        _isGuest = isGuest,
         _currentFilters = filters,
         super(const AsyncValue.loading()) {
     fetchBookmarks();
@@ -45,6 +50,20 @@ class UnifiedBookmarksNotifier
 
   /// Fetch bookmarks from API
   Future<void> fetchBookmarks({bool isLoadMore = false}) async {
+    // Bookmarks are account-only; guests see the locked tab. Never call the
+    // authed endpoint (avoids a 401 + token-refresh loop).
+    if (_isGuest) {
+      state = const AsyncValue.data(UnifiedBookmarksResponse(
+        content: [],
+        totalElements: 0,
+        totalPages: 0,
+        number: 0,
+        size: 0,
+        empty: true,
+      ));
+      return;
+    }
+
     if (isLoadMore && _isLoadingMore) return;
     _isLoadingMore = isLoadMore;
 
@@ -249,6 +268,10 @@ class UnifiedBookmarksNotifier
 
 final bookmarkStatsProvider =
     FutureProvider.autoDispose<BookmarkStats>((ref) async {
+  // Account-only; guests get zeroed stats instead of a 401.
+  if (ref.watch(authProvider).isGuest) {
+    return const BookmarkStats();
+  }
   final service = ref.watch(unifiedBookmarkServiceProvider);
   return await service.getBookmarkStats();
 });

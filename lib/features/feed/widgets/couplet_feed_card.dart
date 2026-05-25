@@ -9,6 +9,7 @@ import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
+import 'package:flutter_poetry_app/features/auth/widgets/ensure_signed_in.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/couplet_providers.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/reaction_providers.dart';
 import 'package:flutter_poetry_app/features/hashtags/widgets/hashtag_pill.dart';
@@ -156,7 +157,16 @@ class CoupletFeedCard extends ConsumerWidget {
                     (overlay == null && data.reactions?['userReaction'] != null) ||
                     overlay?.isLiked == true,
                 isBookmarked: overlay?.isBookmarked ?? false,
-                onBookmark: () => _onBookmark(ref, itemKey, overlay),
+                onBookmark: () async {
+                  if (!await ensureSignedIn(
+                    context,
+                    ref,
+                    'Sign in to save this couplet to your bookmarks.',
+                  )) {
+                    return;
+                  }
+                  _onBookmark(ref, itemKey, overlay);
+                },
                 onShare: () => _onShare(context, ref),
                 totalReactions: (data.reactions?['total'] as int? ?? 0) +
                     (overlay?.reactionCountDelta ?? 0),
@@ -166,7 +176,16 @@ class CoupletFeedCard extends ConsumerWidget {
                 reactionsByType: overlay?.reactionsByType ??
                     _parseReactionsByType(data.reactions),
                 reactionTypes: ref.watch(reactionTypesProvider).valueOrNull ?? [],
-                onReact: (reactionType) => _onReact(ref, itemKey, overlay, reactionType),
+                onReact: (reactionType) async {
+                  if (!await ensureSignedIn(
+                    context,
+                    ref,
+                    'Sign in to react to this couplet.',
+                  )) {
+                    return;
+                  }
+                  _onReact(ref, itemKey, overlay, reactionType);
+                },
                 extraActions: data.versesTextArabic != null
                     ? [
                         _CopyButton(

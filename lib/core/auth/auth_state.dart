@@ -18,6 +18,11 @@ class AuthState extends Equatable {
     this.errorMessage,
   });
 
+  /// True when the user has finished resolving any stored session and is
+  /// browsing without an account. Used by services to branch onto the
+  /// `/api/guest/**` surface and by the router to allow guest navigation.
+  bool get isGuest => !isAuthenticated && !isLoading;
+
   AuthState copyWith({
     bool? isAuthenticated,
     bool? isLoading,
