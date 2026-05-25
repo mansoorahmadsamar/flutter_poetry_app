@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
+import 'package:flutter_poetry_app/features/auth/widgets/ensure_signed_in.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/bookmark_providers.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/reaction_providers.dart';
 import 'package:flutter_poetry_app/features/engagement/widgets/reaction_button.dart';
@@ -514,6 +515,13 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
                     reactionsByType: poemReactionsByType,
                     size: ReactionButtonSize.compact,
                     onReact: (reactionType) async {
+                      if (!await ensureSignedIn(
+                        context,
+                        ref,
+                        'Sign in to react to this poem.',
+                      )) {
+                        return;
+                      }
                       try {
                         await ref.read(reactionActionProvider.notifier).react(
                               targetType: 'poems',
@@ -527,6 +535,13 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
                   // Save / bookmark poem
                   InkWell(
                     onTap: () async {
+                      if (!await ensureSignedIn(
+                        context,
+                        ref,
+                        'Sign in to save this poem to your bookmarks.',
+                      )) {
+                        return;
+                      }
                       try {
                         await ref.read(bookmarkActionProvider.notifier)
                             .toggleBookmark(poem.publicId, lang: _selectedScript);

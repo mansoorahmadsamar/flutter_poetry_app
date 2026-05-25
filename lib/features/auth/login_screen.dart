@@ -3,8 +3,10 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../../core/auth/auth_provider.dart';
+import '../../core/routing/app_router.dart';
 
 /// Stunning login screen with WOW factor for Jahān-e-Sukhan
 class LoginScreen extends ConsumerStatefulWidget {
@@ -355,6 +357,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
               color: Colors.grey[700],
               height: 1.6,
               fontWeight: FontWeight.w500,
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          // Guest entry — every user lands on this login screen first; tapping
+          // here is the explicit, opt-in way to browse poetry without an
+          // account (App Store Guideline 5.1.1(v)). Account actions inside the
+          // app then prompt sign-in.
+          TextButton(
+            onPressed: authState.isLoading
+                ? null
+                : () => context.go(AppRoutes.main),
+            child: Text(
+              'Continue as guest',
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF2C5F2D),
+                letterSpacing: -0.1,
+                decoration: TextDecoration.underline,
+                decorationColor: const Color(0xFF2C5F2D).withValues(alpha: 0.5),
+              ),
             ),
           ),
         ],

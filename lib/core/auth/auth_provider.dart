@@ -6,6 +6,8 @@ import '../network/dio_client.dart';
 import '../storage/preferences_service.dart';
 import '../storage/secure_storage.dart';
 import '../../features/discover/providers/discover_provider.dart';
+import '../../features/discover/services/discover_service.dart';
+import '../../features/main/tabs/poets/providers/poet_providers.dart';
 import '../../features/engagement/providers/bookmark_providers.dart';
 import '../../features/engagement/providers/bookmark_search_history_provider.dart';
 import '../../features/engagement/providers/bookmark_search_provider.dart';
@@ -145,6 +147,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
       _logger.i('═══════════════════════════════════════════════════════');
       _logger.i('');
 
+      // Drop any guest-cached/anonymous data so the now-authenticated user
+      // sees their personalized feed/discover rather than the guest bundle.
+      _invalidateGuestSurfaces();
+
       // Note: Profile provider will automatically re-fetch due to auth state change
       // since it watches authProvider for isAuthenticated changes
     } on FirebaseAuthException catch (e) {
@@ -224,6 +230,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
       _logger.i('   Email: $email');
       _logger.i('═══════════════════════════════════════════════════════');
       _logger.i('');
+
+      // Drop any guest-cached/anonymous data so the now-authenticated user
+      // sees their personalized feed/discover rather than the guest bundle.
+      _invalidateGuestSurfaces();
     } on FirebaseAuthException catch (e) {
       _logger.e('❌ Firebase Auth Exception (Apple): ${e.code} - ${e.message}');
       state = state.copyWith(
@@ -246,6 +256,23 @@ class AuthNotifier extends StateNotifier<AuthState> {
       // Sign out from Firebase on error to clean up state
       await _firebaseAuthService.signOut();
     }
+  }
+
+  /// Invalidate guest-facing surfaces after a successful sign-in so the
+  /// authenticated user gets their personalized data instead of the cached
+  /// anonymous guest bundle. Cache clear is best-effort — it must never
+  /// break the sign-in flow.
+  void _invalidateGuestSurfaces() {
+    try {
+      _ref.read(discoverServiceProvider).clearCache();
+    } catch (_) {
+      // Best-effort; ignore.
+    }
+    _ref.invalidate(feedProvider);
+    _ref.invalidate(discoverProvider);
+    _ref.invalidate(featuredPoetsProvider);
+    _ref.invalidate(trendingPoetsProvider);
+    _ref.invalidate(allPoetsProvider);
   }
 
   /// Refresh access token

@@ -6,6 +6,7 @@ import '../../../core/design_system/app_colors.dart';
 import '../../../core/providers/user_provider.dart';
 import '../../../core/providers/language_provider.dart';
 import '../../../core/widgets/standard_app_bar.dart';
+import '../../auth/widgets/guest_locked_tab.dart';
 import 'creator/models/claim_status.dart';
 import 'creator/providers/creator_providers.dart';
 import 'creator/screens/creator_dashboard_screen.dart';
@@ -59,6 +60,20 @@ class ProfileTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
+
+    // Guest users get a friendly locked screen with a sign-in CTA instead
+    // of the personalized profile UI (which would fail on user-only
+    // providers anyway). Required for App Store Guideline 5.1.1(v) — the
+    // tab must remain visible and reachable, just not fail loudly.
+    if (authState.isGuest) {
+      return const GuestLockedTab(
+        title: 'Profile',
+        message:
+            'Sign in to manage your account, claim a poet identity, and tune your reading preferences.',
+        icon: Icons.person_outline,
+      );
+    }
+
     final userProfile = ref.watch(userProfileProvider);
     final ownedPoetAsync = ref.watch(ownedPoetProvider);
 

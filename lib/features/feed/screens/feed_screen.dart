@@ -377,10 +377,10 @@ class _EndOfFeed extends StatelessWidget {
         child: Text(
           'You\'re all caught up!',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: isDark
-                ? AppColors.textSecondaryDark
-                : AppColors.textSecondaryLight,
-          ),
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondaryLight,
+              ),
         ),
       ),
     );

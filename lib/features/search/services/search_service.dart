@@ -1,6 +1,9 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
+import 'package:flutter_poetry_app/core/auth/auth_provider.dart';
 import 'package:flutter_poetry_app/core/network/dto/api_response.dart';
+import 'package:flutter_poetry_app/core/network/guest_service.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
 
 /// Service for all global search operations
@@ -12,10 +15,14 @@ import 'package:flutter_poetry_app/features/search/models/search_models.dart';
 /// 5. Trending searches
 class SearchService {
   final Dio _dio;
+  final Ref _ref;
   final Logger _logger = Logger();
   static const String _baseEndpoint = '/api/search';
 
-  SearchService(this._dio);
+  SearchService(this._dio, this._ref);
+
+  bool get _isGuest => _ref.read(authProvider).isGuest;
+  GuestService get _guest => _ref.read(guestServiceProvider);
 
   // ============================================================================
   // COUPLET SEARCH
@@ -124,6 +131,34 @@ class SearchService {
     int page = 0,
     int size = 10,
   }) async {
+    if (_isGuest) {
+      // Guests don't get couplet / verse / tag / category search — those
+      // surfaces aren't in the guest API. We fan out to the available
+      // /api/guest/poems/search + /api/guest/poets/search and synthesize a
+      // UnifiedSearchResponse so the existing search UI renders unchanged.
+      // The poem/poet sections work; couplets/verses/tags/categories are
+      // empty and the screen surfaces "Sign in to search couplets" inline.
+      final poems = type == 'poets_only'
+          ? null
+          : await _guest.searchPoems(q: query, page: page, size: size, lang: lang);
+      final poets = type == 'poems_only'
+          ? null
+          : await _guest.searchPoets(q: query, page: page, size: size, lang: lang);
+
+      return UnifiedSearchResponse(
+        totalResults: (poems?.items.length ?? 0) + (poets?.items.length ?? 0),
+        poemCount: poems?.items.length ?? 0,
+        poetCount: poets?.items.length ?? 0,
+        poems: poems?.items ?? const [],
+        poets: poets?.items ?? const [],
+        totalPoems: poems?.totalElements ?? 0,
+        totalPoets: poets?.totalElements ?? 0,
+        hasMorePoems: poems != null && !poems.isLast,
+        hasMorePoets: poets != null && !poets.isLast,
+        currentPage: page,
+        pageSize: size,
+      );
+    }
     try {
       _logger.i('🔍 Unified search: "$query" (type: $type, lang: $lang, page: $page, size: $size)');
 
@@ -221,8 +256,10 @@ class SearchService {
     String lang = 'ur',
     CancelToken? cancelToken,
   }) async {
-    // Early return for short queries
-    if (query.trim().length < 2) {
+    // No guest autocomplete endpoint — return empty so guests don't hit the
+    // authed route (401) while typing. Guest search still works via
+    // searchUnified -> /api/guest/poems|poets/search.
+    if (_isGuest || query.trim().length < 2) {
       return const AutocompleteResponse(
         poets: [],
         poems: [],
@@ -368,6 +405,17 @@ class SearchService {
     required String query,
     int limit = 5,
   }) async {
+    // Related searches use session/auth analysis — no guest endpoint. Return
+    // empty for guests instead of hitting the authed route (401).
+    if (_isGuest) {
+      return RelatedSearchesResponse(
+        query: query,
+        relatedSearches: const [],
+        totalCount: 0,
+        timeWindow: '30d',
+      );
+    }
+
     try {
       _logger.d('🔗 Fetching related searches for: "$query"');
 

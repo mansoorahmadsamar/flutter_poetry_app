@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
+import 'package:flutter_poetry_app/core/auth/auth_provider.dart';
 import 'package:flutter_poetry_app/core/network/dio_client.dart';
 import 'package:flutter_poetry_app/features/engagement/models/reaction_models.dart';
 import 'package:flutter_poetry_app/features/engagement/services/reaction_service.dart';
@@ -20,6 +21,11 @@ final reactionServiceProvider = Provider<ReactionService>((ref) {
 /// Fetches reaction types once and caches for the session.
 /// Not autoDispose — lives for the app lifetime.
 final reactionTypesProvider = FutureProvider<List<ReactionType>>((ref) async {
+  // Reacting is account-only (the tap is gated by the sign-in sheet), so a
+  // guest never needs the type list. Skip the authed call to avoid a 401.
+  if (ref.watch(authProvider).isGuest) {
+    return const <ReactionType>[];
+  }
   final service = ref.watch(reactionServiceProvider);
   return service.getReactionTypes();
 });

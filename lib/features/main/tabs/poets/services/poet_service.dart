@@ -1,6 +1,9 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
+import 'package:flutter_poetry_app/core/auth/auth_provider.dart';
 import 'package:flutter_poetry_app/core/network/dto/api_response.dart';
+import 'package:flutter_poetry_app/core/network/guest_service.dart';
 import '../models/poet_model.dart';
 import '../models/poet_profile_model.dart';
 import '../models/poet_image_model.dart';
@@ -10,11 +13,83 @@ import '../models/poem_model.dart';
 
 class PoetService {
   final Dio _dio;
+  final Ref _ref;
   final Logger _logger = Logger();
 
   static const String _baseEndpoint = '/api/poets';
 
-  PoetService(this._dio);
+  PoetService(this._dio, this._ref);
+
+  bool get _isGuest => _ref.read(authProvider).isGuest;
+  GuestService get _guest => _ref.read(guestServiceProvider);
+
+  /// Adapt a [GuestPage] to the [PaginatedResponse] shape the rest of the
+  /// app expects. Guest endpoints don't carry a `pageable` sub-object so we
+  /// synthesize the minimal pagination metadata.
+  PaginatedResponse<T> _adaptGuestPage<T>(GuestPage<T> page, int requestedSize) {
+    return PaginatedResponse<T>(
+      content: page.items,
+      pageable: null,
+      totalElements: page.totalElements,
+      totalPages: page.totalPages,
+      last: page.isLast,
+      first: page.page == 0,
+      numberOfElements: page.items.length,
+      size: requestedSize,
+      number: page.page,
+      empty: page.items.isEmpty,
+    );
+  }
+
+  /// Build a [PoetProfileModel] from a [PoetModel] when serving a guest. The
+  /// guest endpoint returns only the poet summary fields — gallery, books,
+  /// videos, facts, tags stay empty; biography reuses shortBio so the screen
+  /// always has something to render.
+  PoetProfileModel _adaptGuestPoet(PoetModel poet) {
+    return PoetProfileModel(
+      publicId: poet.publicId,
+      name: poet.name,
+      biography: poet.shortBio,
+      shortBio: poet.shortBio,
+      gender: poet.gender,
+      era: poet.era,
+      birthYear: poet.birthYear,
+      deathYear: poet.deathYear,
+      birthPlace: poet.birthPlace,
+      country: poet.country,
+      countryFlag: poet.countryFlag,
+      countryFlagUrl: poet.countryFlagUrl,
+      isFeatured: poet.isFeatured,
+      isTrending: poet.isTrending,
+      isVerified: poet.isVerified,
+      viewCount: poet.viewCount,
+      followerCount: poet.followerCount,
+      poemCount: poet.poemCount,
+      profileImageUrl: poet.profileImageUrl,
+      gallery: const [],
+      books: const [],
+      videos: const [],
+      facts: const [],
+      tags: const [],
+    );
+  }
+
+  /// Return an empty paginated response. Used for guest-mode requests on
+  /// surfaces that have no anonymous endpoint (e.g. `getPoemsByPoet`,
+  /// follower listings). Lets the UI render an empty section + an inline
+  /// "Sign in to see all poems by this poet" CTA in the consumer.
+  PaginatedResponse<T> _emptyPage<T>(int size) => PaginatedResponse<T>(
+        content: const [],
+        pageable: null,
+        totalElements: 0,
+        totalPages: 0,
+        last: true,
+        first: true,
+        numberOfElements: 0,
+        size: size,
+        number: 0,
+        empty: true,
+      );
 
   /// Get all poets with pagination
   /// sortBy options: viewCount, poemCount, followerCount, birthYear, deathYear, createdAt, updatedAt
@@ -26,6 +101,11 @@ class PoetService {
     String sortBy = 'viewCount',
     String sortDir = 'desc',
   }) async {
+    if (_isGuest) {
+      final guestPage =
+          await _guest.getPoets(page: page, size: size, lang: lang);
+      return _adaptGuestPage(guestPage, size);
+    }
     try {
       final response = await _dio.get(
         _baseEndpoint,
@@ -64,6 +144,13 @@ class PoetService {
     int size = 10,
     String lang = 'ur',
   }) async {
+    if (_isGuest) {
+      // Guest API has a single "featured" surface — same list backs both
+      // featured and trending sections.
+      final guestPage =
+          await _guest.getPoets(page: page, size: size, lang: lang);
+      return _adaptGuestPage(guestPage, size);
+    }
     try {
       final response = await _dio.get(
         '$_baseEndpoint/featured',
@@ -100,6 +187,11 @@ class PoetService {
     int size = 10,
     String lang = 'ur',
   }) async {
+    if (_isGuest) {
+      final guestPage =
+          await _guest.getPoets(page: page, size: size, lang: lang);
+      return _adaptGuestPage(guestPage, size);
+    }
     try {
       final response = await _dio.get(
         '$_baseEndpoint/trending',
@@ -137,6 +229,12 @@ class PoetService {
     int size = 10,
     String lang = 'ur',
   }) async {
+    if (_isGuest) {
+      // Guest API has no gender filter — fall back to the flat directory.
+      final guestPage =
+          await _guest.getPoets(page: page, size: size, lang: lang);
+      return _adaptGuestPage(guestPage, size);
+    }
     try {
       final response = await _dio.get(
         '$_baseEndpoint/gender/$gender',
@@ -174,6 +272,12 @@ class PoetService {
     int size = 10,
     String lang = 'ur',
   }) async {
+    if (_isGuest) {
+      // Guest API has no era filter — fall back to the flat directory.
+      final guestPage =
+          await _guest.getPoets(page: page, size: size, lang: lang);
+      return _adaptGuestPage(guestPage, size);
+    }
     try {
       final response = await _dio.get(
         '$_baseEndpoint/era/$era',
@@ -211,6 +315,12 @@ class PoetService {
     int size = 10,
     String lang = 'ur',
   }) async {
+    if (_isGuest) {
+      // Guest API has no tag filter — fall back to the flat directory.
+      final guestPage =
+          await _guest.getPoets(page: page, size: size, lang: lang);
+      return _adaptGuestPage(guestPage, size);
+    }
     try {
       final response = await _dio.get(
         '$_baseEndpoint/tags/$tagSlug',
@@ -248,6 +358,15 @@ class PoetService {
     int page = 0,
     int size = 10,
   }) async {
+    if (_isGuest) {
+      final guestPage = await _guest.searchPoets(
+        q: query,
+        page: page,
+        size: size,
+        lang: lang,
+      );
+      return _adaptGuestPage(guestPage, size);
+    }
     try {
       final response = await _dio.get(
         '$_baseEndpoint/search',
@@ -285,6 +404,11 @@ class PoetService {
     int size = 10,
     String lang = 'ur',
   }) async {
+    if (_isGuest) {
+      final guestPage =
+          await _guest.getPoets(page: page, size: size, lang: lang);
+      return _adaptGuestPage(guestPage, size);
+    }
     try {
       final response = await _dio.get(
         '$_baseEndpoint/top/by-poems',
@@ -321,6 +445,11 @@ class PoetService {
     int size = 10,
     String lang = 'ur',
   }) async {
+    if (_isGuest) {
+      final guestPage =
+          await _guest.getPoets(page: page, size: size, lang: lang);
+      return _adaptGuestPage(guestPage, size);
+    }
     try {
       final response = await _dio.get(
         '$_baseEndpoint/top/by-views',
@@ -356,6 +485,14 @@ class PoetService {
     required String publicId,
     String lang = 'ur',
   }) async {
+    if (_isGuest) {
+      // Guest API returns a slim poet summary, not the fat profile shape —
+      // adapt it. Gallery/books/videos/facts/tags are empty for guests; the
+      // poet detail screen renders an inline "Sign in to see all poems"
+      // CTA for the missing poem list.
+      final guestPoet = await _guest.getPoetById(publicId, lang: lang);
+      return _adaptGuestPoet(guestPoet);
+    }
     try {
       final response = await _dio.get(
         '$_baseEndpoint/$publicId/profile',
@@ -639,6 +776,13 @@ class PoetService {
     int size = 20,
     String lang = 'ur',
   }) async {
+    if (_isGuest) {
+      // Guest API has no `/poems/poet/{id}` endpoint. The poet detail
+      // screen renders an inline "Sign in to see all poems by [poet]"
+      // CTA when this comes back empty, so guests still get a clear
+      // sign-in prompt without breaking the screen.
+      return _emptyPage<PoemModel>(size);
+    }
     try {
       final queryParams = <String, dynamic>{
         'page': page,
@@ -676,6 +820,9 @@ class PoetService {
 
   /// Get single poem detail
   Future<PoemModel> getPoemById(String publicId, {String lang = 'ur'}) async {
+    if (_isGuest) {
+      return _guest.getPoemById(publicId, lang: lang);
+    }
     try {
       final response = await _dio.get(
         '/api/poems/$publicId',

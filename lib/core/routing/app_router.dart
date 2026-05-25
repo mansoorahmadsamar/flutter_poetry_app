@@ -37,6 +37,23 @@ class AppRoutes {
   static const String main = '/main';
 }
 
+/// Routes that REQUIRE an authenticated user. A guest who navigates to any
+/// of these (or a nested route under them) is bounced to /login. Everything
+/// else in the app is reachable as a guest — read-only browse, search, poet
+/// and poem detail, image generation entry, etc.
+///
+/// Keep this list tight: account-tied surfaces only. Per-action gating for
+/// individual writes (bookmark, like, follow) happens via SignInPromptSheet,
+/// not at the route level.
+const _authRequiredPrefixes = <String>[
+  '/main/become-poet',
+  '/main/creator',
+  '/bookmarks',
+];
+
+bool _requiresAuth(String location) =>
+    _authRequiredPrefixes.any(location.startsWith);
+
 /// Router provider
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -49,22 +66,29 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isLoading = authState.isLoading;
       final currentLocation = state.matchedLocation;
 
-      // If still loading, stay on splash
+      // While the stored session is being resolved, stay on splash so the
+      // app doesn't briefly flash the login screen before authed routes load.
       if (isLoading && currentLocation != AppRoutes.splash) {
         return AppRoutes.splash;
       }
 
-      // If on splash and not loading
+      // Once auth has settled, splash routes forward: authenticated users go
+      // straight to /main; everyone else lands on the login screen first.
+      // The login screen offers Sign in with Apple, Sign in with Google, and
+      // an explicit "Continue without signing in" affordance — so guests opt
+      // into browsing deliberately rather than skipping login automatically.
       if (currentLocation == AppRoutes.splash && !isLoading) {
         return isAuthenticated ? AppRoutes.main : AppRoutes.login;
       }
 
-      // If not authenticated and trying to access main, redirect to login
-      if (!isAuthenticated && currentLocation == AppRoutes.main) {
+      // Guests who chose to browse can reach open surfaces freely; only
+      // account-only surfaces bounce them back to /login. Reading poetry is
+      // never gated — required for App Store Guideline 5.1.1(v).
+      if (!isAuthenticated && _requiresAuth(currentLocation)) {
         return AppRoutes.login;
       }
 
-      // If authenticated and trying to access login, redirect to main
+      // Already-authed users land back on /main if they re-open /login.
       if (isAuthenticated && currentLocation == AppRoutes.login) {
         return AppRoutes.main;
       }
