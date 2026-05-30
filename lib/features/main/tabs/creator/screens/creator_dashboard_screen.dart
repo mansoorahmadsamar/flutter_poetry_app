@@ -447,9 +447,10 @@ class _CreatorLanguageSheet extends ConsumerWidget {
                 children: langs.map((l) {
                   final on = l.code == selected.code;
                   return ListTile(
-                    leading: Text(
-                      l.direction == 'RTL' ? '🌐' : '🌍',
-                      style: const TextStyle(fontSize: 22),
+                    leading: Icon(
+                      Icons.language,
+                      size: 22,
+                      color: on ? AppColors.primary : AppColors.inkSubtle,
                     ),
                     title: Text(
                       l.name,
@@ -499,9 +500,16 @@ class _TabBarDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      color: AppColors.paperSurface,
-      child: tabBar,
+    // Pin the child to exactly maxExtent. The tab bar's intrinsic height can
+    // otherwise exceed its declared preferredSize (two text lines + Nastaleeq
+    // + padding), which makes the pinned sliver report a layoutExtent larger
+    // than its paintExtent and throw "SliverGeometry is not valid" each frame.
+    return SizedBox(
+      height: maxExtent,
+      child: Container(
+        color: AppColors.paperSurface,
+        child: tabBar,
+      ),
     );
   }
 

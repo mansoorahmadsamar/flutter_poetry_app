@@ -32,6 +32,59 @@ class GalleryTab extends ConsumerWidget {
         ),
       ),
       data: (images) {
+        // Empty: a single centered empty-state block (icon + quote + one
+        // Upload CTA) instead of a lone "ADD" tile + a floating quote.
+        if (images.isEmpty) {
+          return ListView(
+            padding: const EdgeInsets.fromLTRB(24, 48, 24, 90),
+            children: [
+              Center(
+                child: Column(
+                  children: [
+                    Container(
+                      width: 72,
+                      height: 72,
+                      decoration: const BoxDecoration(
+                        color: AppColors.greenSoft,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.photo_library_outlined,
+                          size: 34, color: AppColors.primary),
+                    ),
+                    const SizedBox(height: 18),
+                    Text(
+                      '"تصویر بھی ایک نظم ہے"',
+                      textDirection: TextDirection.rtl,
+                      textAlign: TextAlign.center,
+                      style: SukhanText.nastaleeq(
+                        size: 15,
+                        color: AppColors.primary,
+                        height: 1.9,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    FilledButton.icon(
+                      onPressed: () => _uploadImage(context, ref),
+                      icon: const Icon(Icons.add, size: 16),
+                      label: const Text('Upload an image'),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.secondary,
+                        foregroundColor: AppColors.backgroundLight,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 22, vertical: 10),
+                        shape: const StadiumBorder(),
+                        textStyle: SukhanText.sans(
+                          size: 12,
+                          weight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        }
         return ListView(
           padding: const EdgeInsets.fromLTRB(16, 14, 16, 90),
           children: [
@@ -82,22 +135,6 @@ class GalleryTab extends ConsumerWidget {
                 );
               },
             ),
-            if (images.isEmpty) ...[
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Text(
-                  '"تصویر بھی ایک نظم ہے"',
-                  textDirection: TextDirection.rtl,
-                  textAlign: TextAlign.center,
-                  style: SukhanText.nastaleeq(
-                    size: 14,
-                    color: AppColors.primary,
-                    height: 1.9,
-                  ),
-                ),
-              ),
-            ],
           ],
         );
       },

@@ -24,7 +24,13 @@ class CreatorPoemTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final type = PoetryType.byKey(poem.poetryType);
-    final isUrduTitle = _isRtl(poem.title);
+    // Resolve a display title: real title when present, otherwise a typed
+    // Urdu placeholder ("بے عنوان · {type}") so the tile never shows a bare
+    // "-" or empty heading for untitled/scraped poems.
+    final hasTitle = poem.title.trim().isNotEmpty;
+    final displayTitle =
+        hasTitle ? poem.title : 'بے عنوان · ${type.urduLabel}';
+    final isUrduTitle = _isRtl(displayTitle);
 
     return Material(
       color: Colors.transparent,
@@ -52,19 +58,23 @@ class CreatorPoemTile extends StatelessWidget {
                           children: [
                             Flexible(
                               child: Text(
-                                poem.title,
+                                displayTitle,
                                 textDirection: isUrduTitle
                                     ? TextDirection.rtl
                                     : TextDirection.ltr,
                                 style: isUrduTitle
                                     ? SukhanText.nastaleeq(
                                         size: 18,
-                                        color: AppColors.textPrimaryLight,
+                                        color: hasTitle
+                                            ? AppColors.textPrimaryLight
+                                            : AppColors.inkSubtle,
                                         height: 1.2,
                                       )
                                     : SukhanText.display(
                                         size: 16,
-                                        color: AppColors.textPrimaryLight,
+                                        color: hasTitle
+                                            ? AppColors.textPrimaryLight
+                                            : AppColors.inkSubtle,
                                         weight: FontWeight.w600,
                                         height: 1.2,
                                       ),

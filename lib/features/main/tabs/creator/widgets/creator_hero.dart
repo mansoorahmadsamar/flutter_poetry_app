@@ -139,6 +139,8 @@ class _Body extends StatelessWidget {
                       textDirection: _isRtl(poet.shortBio!)
                           ? TextDirection.rtl
                           : TextDirection.ltr,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
                     ),
                 ],
               ),

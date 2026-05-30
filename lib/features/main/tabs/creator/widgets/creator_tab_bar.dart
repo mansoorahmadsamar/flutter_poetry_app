@@ -65,8 +65,11 @@ class CreatorTabBar extends StatelessWidget implements PreferredSizeWidget {
 
   static const _tabs = CreatorTab.values;
 
+  // Headroom for the tallest (underline) variant: two text lines (English +
+  // Nastaleeq, whose line-box is tall) plus vertical padding. Must comfortably
+  // contain the rendered content so the pinned sliver's extent stays valid.
   @override
-  Size get preferredSize => const Size.fromHeight(64);
+  Size get preferredSize => const Size.fromHeight(70);
 
   @override
   Widget build(BuildContext context) {

@@ -4,8 +4,6 @@ import 'package:go_router/go_router.dart';
 
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
-import 'package:flutter_poetry_app/core/widgets/sukhan/sparkline.dart';
-import 'package:flutter_poetry_app/core/widgets/sukhan/sukhan_chip.dart';
 import '../../models/creator_analytics_model.dart';
 import '../../providers/creator_providers.dart';
 
@@ -41,12 +39,12 @@ class _StatsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final metrics = <_Metric>[
-      _Metric('Followers', 'مداحین', stats.followerCount, _flatTrend(stats.followerCount)),
-      _Metric('Profile views', 'پروفائل دیکھے', stats.profileViews, _flatTrend(stats.profileViews)),
-      _Metric('Poems', 'شاعری', stats.poemCount, _flatTrend(stats.poemCount)),
-      _Metric('Poem views', 'شعر دیکھے', stats.totalPoemViews, _flatTrend(stats.totalPoemViews)),
-      _Metric('Likes', 'پسند', stats.totalPoemLikes, _flatTrend(stats.totalPoemLikes)),
-      _Metric('Bookmarks', 'محفوظ', stats.totalPoemBookmarks, _flatTrend(stats.totalPoemBookmarks)),
+      _Metric('Followers', 'مداحین', stats.followerCount),
+      _Metric('Profile views', 'پروفائل دیکھے', stats.profileViews),
+      _Metric('Poems', 'شاعری', stats.poemCount),
+      _Metric('Poem views', 'شعر دیکھے', stats.totalPoemViews),
+      _Metric('Likes', 'پسند', stats.totalPoemLikes),
+      _Metric('Bookmarks', 'محفوظ', stats.totalPoemBookmarks),
     ];
 
     return ListView(
@@ -54,14 +52,16 @@ class _StatsView extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text('LAST 30 DAYS',
+            Text('OVERVIEW',
                 style: SukhanText.eyebrow(color: AppColors.secondary)),
+            const SizedBox(width: 8),
+            Text('مجموعی جائزہ',
+                textDirection: TextDirection.rtl,
+                style: SukhanText.nastaleeq(
+                  size: 12,
+                  color: AppColors.secondary,
+                )),
             const Spacer(),
-            const SukhanChip(
-              label: '30d ▾',
-              variant: SukhanChipVariant.ghost,
-              fontSize: 11,
-            ),
           ],
         ),
         const SizedBox(height: 12),
@@ -72,7 +72,7 @@ class _StatsView extends StatelessWidget {
             crossAxisCount: 2,
             crossAxisSpacing: 8,
             mainAxisSpacing: 8,
-            mainAxisExtent: 100,
+            mainAxisExtent: 92,
           ),
           itemCount: metrics.length,
           itemBuilder: (_, i) => _MetricCard(metric: metrics[i]),
@@ -147,24 +147,13 @@ class _StatsView extends StatelessWidget {
     );
   }
 
-  /// Generate a synthetic 7-point ascending trend ending at the current value.
-  /// The backend doesn't yet expose timeseries, so we approximate visually.
-  List<double> _flatTrend(int current) {
-    if (current == 0) return List<double>.filled(7, 0);
-    final base = current * 0.6;
-    return List.generate(
-      7,
-      (i) => base + (current - base) * (i / 6),
-    );
-  }
 }
 
 class _Metric {
-  const _Metric(this.english, this.urdu, this.value, this.trend);
+  const _Metric(this.english, this.urdu, this.value);
   final String english;
   final String urdu;
   final int value;
-  final List<double> trend;
 }
 
 class _MetricCard extends StatelessWidget {
@@ -191,30 +180,24 @@ class _MetricCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                _fmt(metric.value),
-                style: SukhanText.display(
-                  size: 22,
-                  color: AppColors.textPrimaryLight,
-                  weight: FontWeight.w600,
-                  letterSpacing: -0.22,
-                ),
-              ),
-              const Spacer(),
-              const Icon(Icons.arrow_upward, size: 12, color: AppColors.success),
-            ],
-          ),
-          const SizedBox(height: 4),
-          if (metric.value > 0)
-            Sparkline(
-              data: metric.trend,
-              color: AppColors.primary,
-              width: 140,
-              height: 18,
+          Text(
+            _fmt(metric.value),
+            style: SukhanText.display(
+              size: 22,
+              color: AppColors.textPrimaryLight,
+              weight: FontWeight.w600,
+              letterSpacing: -0.22,
             ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            metric.urdu,
+            textDirection: TextDirection.rtl,
+            style: SukhanText.nastaleeq(
+              size: 12,
+              color: AppColors.secondary,
+            ),
+          ),
         ],
       ),
     );
