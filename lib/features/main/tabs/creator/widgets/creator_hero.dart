@@ -6,7 +6,6 @@ import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
 import 'package:flutter_poetry_app/core/widgets/sukhan/diagonal_hatch.dart';
 import 'package:flutter_poetry_app/core/widgets/sukhan/portrait.dart';
-import 'package:flutter_poetry_app/core/widgets/sukhan/verified_mark.dart';
 import '../models/owned_poet_model.dart';
 
 /// Green-gradient hero shown at the top of the creator dashboard.
@@ -44,21 +43,8 @@ class CreatorHero extends StatelessWidget {
             child: _Body(poet: poet),
           ),
           DiagonalHatchOverlay(
-            color: AppColors.secondary.withValues(alpha: 0.22),
-            opacity: 0.22,
-          ),
-          Positioned(
-            top: 12,
-            right: 14,
-            child: Text(
-              '۞',
-              style: TextStyle(
-                fontFamily: AppTypography.urduFontFamily,
-                fontSize: 26,
-                color: AppColors.secondaryLight.withValues(alpha: 0.78),
-                height: 1,
-              ),
-            ),
+            color: AppColors.secondary.withValues(alpha: 0.18),
+            opacity: 0.18,
           ),
         ],
       ),
@@ -72,74 +58,109 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasPenName = poet.penName != null && poet.penName!.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Portrait(
-                  size: 72,
-                  initial: poet.displayInitial,
-                  hue: PortraitHue.gold,
-                  ring: true,
-                  imageUrl: poet.profileImageUrl,
-                ),
-                if (poet.isVerifiedOwner)
-                  const Positioned(
-                    bottom: -2,
-                    right: -2,
-                    child: VerifiedMark(size: 22),
-                  ),
-              ],
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            // LEFT — tappable portrait pushes the edit-profile screen. A small
+            // gold camera badge signals the avatar itself is interactive.
+            GestureDetector(
+              onTap: () =>
+                  GoRouter.of(context).push('/main/creator/profile/edit'),
+              child: Stack(
+                clipBehavior: Clip.none,
                 children: [
-                  Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    spacing: 8,
-                    children: [
-                      Text(
-                        poet.name,
-                        style: SukhanText.display(
-                          size: 20,
-                          color: AppColors.backgroundLight,
-                          weight: FontWeight.w500,
-                          letterSpacing: -0.2,
-                          height: 1.1,
+                  Portrait(
+                    size: 92,
+                    initial: poet.displayInitial,
+                    hue: PortraitHue.gold,
+                    ring: true,
+                    imageUrl: poet.profileImageUrl,
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      width: 26,
+                      height: 26,
+                      decoration: BoxDecoration(
+                        color: AppColors.secondary,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppColors.primaryDark,
+                          width: 2,
                         ),
                       ),
-                      if (poet.penName != null)
-                        Text(
-                          poet.penName!,
+                      child: const Icon(
+                        Icons.camera_alt,
+                        size: 13,
+                        color: AppColors.primaryDark,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 14),
+
+            // RIGHT — title row + gold divider + Urdu bio paragraph.
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Title row: pen name (right-aligned, Nastaleeq) with the
+                  // flower ornament to its right edge.
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          hasPenName ? poet.penName! : poet.name,
                           textDirection: TextDirection.rtl,
+                          textAlign: TextAlign.right,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: SukhanText.nastaleeq(
-                            size: 18,
+                            size: 28,
                             color: AppColors.secondaryLight,
-                            height: 1.1,
+                            height: 1.15,
                           ),
                         ),
+                      ),
+                      const SizedBox(width: 8),
+                      Icon(
+                        Icons.local_florist_outlined,
+                        size: 22,
+                        color:
+                            AppColors.secondaryLight.withValues(alpha: 0.85),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
+                  // Thin gold divider line under the title.
+                  Container(
+                    height: 1,
+                    color: AppColors.secondary.withValues(alpha: 0.55),
+                  ),
+                  const SizedBox(height: 10),
+                  // Bio paragraph (clamped to 4 lines).
                   if (poet.shortBio != null && poet.shortBio!.isNotEmpty)
                     Text(
                       poet.shortBio!,
-                      style: SukhanText.italic(
-                        size: 12,
-                        color: AppColors.backgroundLight.withValues(alpha: 0.78),
-                        height: 1.5,
-                      ),
                       textDirection: _isRtl(poet.shortBio!)
                           ? TextDirection.rtl
                           : TextDirection.ltr,
-                      maxLines: 3,
+                      style: SukhanText.nastaleeq(
+                        size: 14,
+                        color: AppColors.backgroundLight
+                            .withValues(alpha: 0.92),
+                        height: 1.6,
+                      ),
+                      maxLines: 4,
                       overflow: TextOverflow.ellipsis,
                     ),
                 ],
@@ -147,18 +168,39 @@ class _Body extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+
+        const SizedBox(height: 20),
+
+        // Stats row — icon + value + label, evenly distributed.
         Row(
           children: [
-            _StatBlock(value: _fmt(poet.followerCount), label: 'Followers'),
-            const SizedBox(width: 18),
-            _StatBlock(value: _fmt(poet.poemCount), label: 'Poems'),
-            const SizedBox(width: 18),
-            _StatBlock(value: _fmt(poet.viewCount), label: 'Views'),
-            const Spacer(),
+            Expanded(
+              child: _StatBlock(
+                icon: Icons.group_outlined,
+                value: _fmt(poet.followerCount),
+                label: 'Followers',
+              ),
+            ),
+            Expanded(
+              child: _StatBlock(
+                icon: Icons.menu_book_outlined,
+                value: _fmt(poet.poemCount),
+                label: 'Poems',
+              ),
+            ),
+            Expanded(
+              child: _StatBlock(
+                icon: Icons.visibility_outlined,
+                value: _fmt(poet.viewCount),
+                label: 'Views',
+              ),
+            ),
           ],
         ),
-        const SizedBox(height: 14),
+
+        const SizedBox(height: 18),
+
+        // Action buttons: gold-filled Edit profile + gold-outline Share.
         Row(
           children: [
             Expanded(
@@ -169,7 +211,7 @@ class _Body extends StatelessWidget {
                     GoRouter.of(context).push('/main/creator/profile/edit'),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 12),
             Expanded(
               child: _GhostButton(
                 icon: Icons.ios_share,
@@ -203,30 +245,46 @@ class _Body extends StatelessWidget {
 }
 
 class _StatBlock extends StatelessWidget {
-  const _StatBlock({required this.value, required this.label});
+  const _StatBlock({
+    required this.icon,
+    required this.value,
+    required this.label,
+  });
+  final IconData icon;
   final String value;
   final String label;
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Text(value,
-            style: SukhanText.display(
-              size: 20,
-              color: AppColors.backgroundLight,
-              weight: FontWeight.w600,
-              height: 1,
-            )),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(icon, size: 18, color: AppColors.secondaryLight),
+            const SizedBox(width: 8),
+            Text(
+              value,
+              style: SukhanText.display(
+                size: 22,
+                color: AppColors.backgroundLight,
+                weight: FontWeight.w600,
+                height: 1,
+              ),
+            ),
+          ],
+        ),
         const SizedBox(height: 4),
-        Text(label.toUpperCase(),
-            style: SukhanText.sans(
-              size: 10,
-              color: AppColors.backgroundLight.withValues(alpha: 0.7),
-              letterSpacing: 0.8,
-              weight: FontWeight.w500,
-            )),
+        Text(
+          label,
+          style: SukhanText.sans(
+            size: 12,
+            color: AppColors.backgroundLight.withValues(alpha: 0.75),
+            weight: FontWeight.w500,
+          ),
+        ),
       ],
     );
   }
@@ -242,18 +300,18 @@ class _GoldButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton.icon(
       onPressed: onPressed,
-      icon: Icon(icon, size: 14),
+      icon: Icon(icon, size: 18),
       label: Text(label),
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.secondary,
-        foregroundColor: AppColors.backgroundLight,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        foregroundColor: AppColors.primaryDark,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         textStyle: SukhanText.sans(
-          size: 12,
+          size: 14,
           weight: FontWeight.w600,
-          letterSpacing: 0.4,
+          letterSpacing: 0.2,
         ),
       ),
     );
@@ -270,19 +328,18 @@ class _GhostButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return OutlinedButton.icon(
       onPressed: onPressed,
-      icon: Icon(icon, size: 14),
+      icon: Icon(icon, size: 18, color: AppColors.secondary),
       label: Text(label),
       style: OutlinedButton.styleFrom(
-        backgroundColor: AppColors.backgroundLight.withValues(alpha: 0.12),
-        foregroundColor: AppColors.backgroundLight,
-        side: BorderSide(
-          color: AppColors.backgroundLight.withValues(alpha: 0.32),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        backgroundColor: Colors.transparent,
+        foregroundColor: AppColors.secondary,
+        side: const BorderSide(color: AppColors.secondary, width: 1.2),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         textStyle: SukhanText.sans(
-          size: 12,
-          weight: FontWeight.w500,
+          size: 14,
+          weight: FontWeight.w600,
+          letterSpacing: 0.2,
         ),
       ),
     );

@@ -108,43 +108,31 @@ class _CreatorDashboardScreenState
   Widget _topBar(OwnedPoet poet) {
     return Container(
       color: AppColors.primary,
-      padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+      padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
       child: SafeArea(
         bottom: false,
-        child: Row(
-          children: [
-            const SizedBox(width: 8),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text('Creator',
-                        style: SukhanText.eyebrow(
-                          color: AppColors.secondaryLight,
-                        )),
-                    Text(
-                      poet.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: SukhanText.display(
-                        size: 16,
-                        color: AppColors.backgroundLight,
-                        weight: FontWeight.w500,
-                        height: 1.1,
-                      ),
-                    ),
-                  ],
+        child: SizedBox(
+          height: 48,
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Profile',
+                  style: SukhanText.display(
+                    size: 18,
+                    color: AppColors.backgroundLight,
+                    weight: FontWeight.w600,
+                    height: 1.1,
+                  ),
                 ),
               ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.more_vert, color: AppColors.backgroundLight),
-              onPressed: () => _showMenu(context),
-            ),
-          ],
+              IconButton(
+                icon: const Icon(Icons.more_vert,
+                    color: AppColors.backgroundLight),
+                onPressed: () => _showMenu(context),
+              ),
+            ],
+          ),
         ),
       ),
     );
