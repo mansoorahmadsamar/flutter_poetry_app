@@ -13460,6 +13460,21 @@ Authorization: Bearer <token>
 
 Includes **both public and private** poems (unlike the public `/api/poets/{id}/poems` which hides private ones). Returns paginated `PoemSummaryResponse` with `viewCount`, `likeCount`, `commentCount`, `shareCount`, `isPublic`.
 
+**`firstMisra` (string, nullable)** — first non-empty line of the primary-language content body, trimmed and truncated to 80 chars. Provided as a fallback display title for poems whose `title` is missing or a literal `"-"` (common for scraped Ghazals where the source had no title). Client logic:
+
+```dart
+String resolveTitle(PoemSummaryResponse p) {
+  final t = p.title?.trim();
+  if (t != null && t.isNotEmpty && t != '-') return t;
+  if (p.firstMisra != null && p.firstMisra!.isNotEmpty) return p.firstMisra!;
+  return 'بے عنوان · ${p.poetryTypeName}';
+}
+```
+
+`firstMisra` is `null` only when the poem has no original content row (rare/defensive). Excluded soft-deleted poems do not appear in this list.
+
+**Count semantics:** `totalElements` from this endpoint equals `poemCount` from `GET /api/me/poet-profile` — both count poems that are not soft-deleted (public + private + drafts). The hero card and list header will not disagree.
+
 #### 20.10.2 Compose a Poem
 
 ```

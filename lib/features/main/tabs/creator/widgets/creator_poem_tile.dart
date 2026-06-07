@@ -37,23 +37,30 @@ class CreatorPoemTile extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: onTap,
-        child: Container(
-          decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.dividerLight),
-          ),
-          padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+        // Mirror the entire tile body for Urdu titles so the title sits on
+        // the right, the type chip + more-icon on the left, and the
+        // engagement row (views/likes ↔ PUBLIC) flips to match. Flutter
+        // handles the row/column reordering automatically via Directionality.
+        child: Directionality(
+          textDirection:
+              isUrduTitle ? TextDirection.rtl : TextDirection.ltr,
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppColors.surfaceLight,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.dividerLight),
+            ),
+            padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                         Row(
                           children: [
                             Flexible(
@@ -180,7 +187,8 @@ class CreatorPoemTile extends StatelessWidget {
                     ),
                   ],
                 ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

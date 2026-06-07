@@ -5,6 +5,7 @@ class CreatorPoem {
   const CreatorPoem({
     required this.publicId,
     required this.title,
+    this.firstMisra,
     required this.poetryType,
     this.languageCode = 'ur',
     this.script = 'ARABIC',
@@ -20,6 +21,10 @@ class CreatorPoem {
 
   final String publicId;
   final String title;
+  /// First verse of the primary-language body, server-trimmed and capped at
+  /// 80 chars. Used as the display title when [title] is blank/dash-only.
+  /// Per FLUTTER_API_DOCUMENTATION.md §20.10.1.
+  final String? firstMisra;
   final String poetryType;
   final String languageCode;
   final String script;
@@ -34,9 +39,12 @@ class CreatorPoem {
 
   factory CreatorPoem.fromJson(Map<String, dynamic> json) {
     final resolvedTitle = _resolveTitle(json);
+    final firstMisraRaw = (json['firstMisra'] as String?)?.trim();
     return CreatorPoem(
       publicId: json['publicId'] as String,
       title: resolvedTitle,
+      firstMisra:
+          (firstMisraRaw == null || firstMisraRaw.isEmpty) ? null : firstMisraRaw,
       poetryType: (json['poetryType'] as String?) ?? 'GHAZAL',
       languageCode: (json['languageCode'] as String?) ?? 'ur',
       script: (json['script'] as String?) ?? 'ARABIC',
@@ -100,6 +108,14 @@ class CreatorPoem {
         final t = ((best['title'] as String?) ?? '').trim();
         if (!_isBlankTitle(t)) return t;
       }
+    }
+
+    // Server-provided first verse as the final fallback (FLUTTER_API
+    // §20.10.1). Trim + cap defensively in case an older server returns
+    // an over-long value.
+    final misra = (json['firstMisra'] as String?)?.trim();
+    if (misra != null && !_isBlankTitle(misra)) {
+      return misra.length > 80 ? '${misra.substring(0, 80)}…' : misra;
     }
 
     return '';
