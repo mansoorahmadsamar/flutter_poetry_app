@@ -225,22 +225,6 @@ class _CreatorMenuSheet extends ConsumerWidget {
                   GoRouter.of(context).push('/main/creator/profile/edit');
                 },
               ),
-              ListTile(
-                leading: const Icon(Icons.translate_outlined),
-                title: const Text('Manage translations'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  GoRouter.of(context).push('/main/creator/translations/en');
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.fact_check_outlined),
-                title: const Text('Edit facts'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  GoRouter.of(context).push('/main/creator/facts');
-                },
-              ),
 
               const Divider(height: 1),
 
