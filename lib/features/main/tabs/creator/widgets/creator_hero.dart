@@ -56,9 +56,21 @@ class _Body extends StatelessWidget {
   const _Body({required this.poet});
   final OwnedPoet poet;
 
+  /// Display title for the hero: the poet's full name, with the pen name
+  /// in parentheses when both exist and differ. Examples:
+  ///   name: "عباس تابش", penName: "تابش"   → "عباس تابش (تابش)"
+  ///   name: "عباس تابش", penName: null     → "عباس تابش"
+  ///   name: "عباس تابش", penName: "عباس تابش" → "عباس تابش" (no duplication)
+  String _titleFor(OwnedPoet poet) {
+    final pen = poet.penName?.trim();
+    if (pen == null || pen.isEmpty || pen == poet.name.trim()) {
+      return poet.name;
+    }
+    return '${poet.name} ($pen)';
+  }
+
   @override
   Widget build(BuildContext context) {
-    final hasPenName = poet.penName != null && poet.penName!.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -111,15 +123,16 @@ class _Body extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Title row: pen name (right-aligned, Nastaleeq) with the
-                  // flower ornament to its right edge.
+                  // Title row: full name with the pen name in parentheses
+                  // when both exist and differ, right-aligned Nastaleeq,
+                  // with the flower ornament to its right edge.
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Flexible(
                         child: Text(
-                          hasPenName ? poet.penName! : poet.name,
+                          _titleFor(poet),
                           textDirection: TextDirection.rtl,
                           textAlign: TextAlign.right,
                           maxLines: 1,
