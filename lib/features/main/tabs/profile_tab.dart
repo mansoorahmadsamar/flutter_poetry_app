@@ -100,16 +100,10 @@ class ProfileTab extends ConsumerWidget {
             children: [
               const SizedBox(height: 16),
 
-              // Become-a-poet entry. While poet mode is gated for v1.0
-              // (kPoetModeEnabled == false) we always show the teaser
-              // card and suppress the in-flight claim banner — a tap
-              // shows a "Coming Soon" dialog regardless of backend state.
-              if (!kPoetModeEnabled)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: const BecomePoetCard(),
-                )
-              else if (ownedPoet == null)
+              // Become-a-poet entry: show the teaser card when the user has
+              // no owned poet, or the in-flight claim banner when a claim is
+              // pending/rejected. (Verified poets see the dashboard above.)
+              if (ownedPoet == null)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: const BecomePoetCard(),

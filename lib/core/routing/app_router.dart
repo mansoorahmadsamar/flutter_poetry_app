@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/splash/splash_screen.dart';
@@ -16,6 +17,8 @@ import '../../features/main/tabs/creator/screens/edit_profile_screen.dart';
 import '../../features/main/tabs/creator/screens/manage_translations_screen.dart';
 import '../../features/main/tabs/creator/screens/manage_facts_screen.dart';
 import '../../features/main/tabs/creator/screens/upload_book_screen.dart';
+import '../../features/main/tabs/creator/screens/creator_image_detail_screen.dart';
+import '../../features/main/tabs/creator/models/creator_image_model.dart';
 import '../../features/search/screens/poets_search_screen.dart';
 import '../../features/search/screens/app_search_screen.dart';
 import '../../features/search/screens/category_results_screen.dart';
@@ -192,6 +195,23 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: 'facts',
                 name: 'creator-facts',
                 builder: (context, state) => const ManageFactsScreen(),
+              ),
+              GoRoute(
+                path: 'images/:id',
+                name: 'creator-image-detail',
+                builder: (context, state) {
+                  // The gallery passes the already-loaded CreatorImage as
+                  // `extra` to avoid an extra fetch on push. Deep-link
+                  // callers without the object aren't supported yet
+                  // (would need an image-by-id fetch endpoint).
+                  final image = state.extra as CreatorImage?;
+                  if (image == null) {
+                    return const Scaffold(
+                      body: Center(child: Text('Image not available')),
+                    );
+                  }
+                  return CreatorImageDetailScreen(image: image);
+                },
               ),
             ],
           ),

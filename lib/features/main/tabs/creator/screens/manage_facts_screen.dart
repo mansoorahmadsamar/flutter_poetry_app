@@ -43,6 +43,7 @@ class ManageFactsScreen extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'manage-facts-fab',
         backgroundColor: AppColors.secondary,
         foregroundColor: AppColors.backgroundLight,
         onPressed: () => _showAddSheet(context, ref),

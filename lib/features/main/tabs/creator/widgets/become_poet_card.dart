@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
@@ -7,41 +8,13 @@ import 'package:flutter_poetry_app/core/widgets/sukhan/diagonal_hatch.dart';
 import 'package:flutter_poetry_app/core/widgets/sukhan/gold_divider.dart';
 
 /// Feature flag for the entire Poet Mode surface (claim flow + creator
-/// dashboard + compose). Gated for the v1.0 App Store release: the
-/// "Become a Poet" card shows a "Coming Soon" dialog instead of opening
-/// the claim flow, and verified poets are routed to the standard profile
-/// UI instead of the dashboard so reviewers and existing test accounts
-/// see a consistent, polished surface. Flip to `true` once poet mode is
-/// ready to ship.
-const bool kPoetModeEnabled = false;
+/// dashboard + compose). When `true`, the "Become a Poet" card opens the
+/// onboarding flow and verified poets see the creator dashboard in place
+/// of the standard profile.
+const bool kPoetModeEnabled = true;
 
 void _onBecomePoetTap(BuildContext context) {
-  showDialog<void>(
-    context: context,
-    builder: (_) => AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      title: Row(
-        children: [
-          const Icon(Icons.auto_awesome, color: AppColors.primary),
-          const SizedBox(width: 8),
-          const Text('Coming Soon'),
-        ],
-      ),
-      content: const Text(
-        'Poet Mode is on its way. You\'ll soon be able to claim your '
-        'name, share your original verses, and grow a readership '
-        'inside Sukhan. Watch this space — we\'ll let you know the '
-        'moment it\'s ready.',
-      ),
-      actions: [
-        FilledButton(
-          onPressed: () => Navigator.of(context).pop(),
-          style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
-          child: const Text('Got it'),
-        ),
-      ],
-    ),
-  );
+  context.push('/main/become-poet');
 }
 
 enum BecomePoetCardVariant { celebratory, quiet, manuscript }

@@ -108,43 +108,31 @@ class _CreatorDashboardScreenState
   Widget _topBar(OwnedPoet poet) {
     return Container(
       color: AppColors.primary,
-      padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+      padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
       child: SafeArea(
         bottom: false,
-        child: Row(
-          children: [
-            const SizedBox(width: 8),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text('Creator',
-                        style: SukhanText.eyebrow(
-                          color: AppColors.secondaryLight,
-                        )),
-                    Text(
-                      poet.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: SukhanText.display(
-                        size: 16,
-                        color: AppColors.backgroundLight,
-                        weight: FontWeight.w500,
-                        height: 1.1,
-                      ),
-                    ),
-                  ],
+        child: SizedBox(
+          height: 48,
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Profile',
+                  style: SukhanText.display(
+                    size: 18,
+                    color: AppColors.backgroundLight,
+                    weight: FontWeight.w600,
+                    height: 1.1,
+                  ),
                 ),
               ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.more_vert, color: AppColors.backgroundLight),
-              onPressed: () => _showMenu(context),
-            ),
-          ],
+              IconButton(
+                icon: const Icon(Icons.more_vert,
+                    color: AppColors.backgroundLight),
+                onPressed: () => _showMenu(context),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -235,22 +223,6 @@ class _CreatorMenuSheet extends ConsumerWidget {
                 onTap: () {
                   Navigator.of(context).pop();
                   GoRouter.of(context).push('/main/creator/profile/edit');
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.translate_outlined),
-                title: const Text('Manage translations'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  GoRouter.of(context).push('/main/creator/translations/en');
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.fact_check_outlined),
-                title: const Text('Edit facts'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  GoRouter.of(context).push('/main/creator/facts');
                 },
               ),
 
@@ -447,9 +419,10 @@ class _CreatorLanguageSheet extends ConsumerWidget {
                 children: langs.map((l) {
                   final on = l.code == selected.code;
                   return ListTile(
-                    leading: Text(
-                      l.direction == 'RTL' ? '🌐' : '🌍',
-                      style: const TextStyle(fontSize: 22),
+                    leading: Icon(
+                      Icons.language,
+                      size: 22,
+                      color: on ? AppColors.primary : AppColors.inkSubtle,
                     ),
                     title: Text(
                       l.name,
@@ -499,9 +472,16 @@ class _TabBarDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      color: AppColors.paperSurface,
-      child: tabBar,
+    // Pin the child to exactly maxExtent. The tab bar's intrinsic height can
+    // otherwise exceed its declared preferredSize (two text lines + Nastaleeq
+    // + padding), which makes the pinned sliver report a layoutExtent larger
+    // than its paintExtent and throw "SliverGeometry is not valid" each frame.
+    return SizedBox(
+      height: maxExtent,
+      child: Container(
+        color: AppColors.paperSurface,
+        child: tabBar,
+      ),
     );
   }
 

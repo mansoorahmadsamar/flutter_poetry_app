@@ -437,7 +437,8 @@ class _MetaStrip extends StatelessWidget {
             ),
             const SizedBox(width: 6),
             SukhanChip(
-              label: isPublic ? '🌍 Public' : '🔒 Draft',
+              label: isPublic ? 'Public' : 'Draft',
+              icon: isPublic ? Icons.public : Icons.lock_outline,
               variant: SukhanChipVariant.outline,
               fontSize: 11,
               onTap: () => onIsPublicChange(!isPublic),

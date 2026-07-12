@@ -32,6 +32,14 @@ class BooksTab extends ConsumerWidget {
         ),
       ),
       data: (books) {
+        // Empty: show only the Borges manuscript card (it has its own Upload
+        // CTA) — no redundant "0 BOOKS / Upload" header.
+        if (books.isEmpty) {
+          return ListView(
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 90),
+            children: const [_BorgesEmpty()],
+          );
+        }
         return ListView(
           padding: const EdgeInsets.fromLTRB(16, 14, 16, 90),
           children: [
@@ -66,7 +74,6 @@ class BooksTab extends ConsumerWidget {
                   padding: const EdgeInsets.only(bottom: 10),
                   child: _BookTile(book: b),
                 )),
-            if (books.isEmpty) const _BorgesEmpty(),
           ],
         );
       },
