@@ -5,7 +5,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
+import 'package:flutter_poetry_app/core/auth/auth_provider.dart';
 import 'package:flutter_poetry_app/core/widgets/standard_app_bar.dart';
+import 'package:flutter_poetry_app/features/auth/widgets/guest_locked_tab.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/unified_bookmark_provider.dart';
 import 'package:flutter_poetry_app/features/main/tabs/bookmarks/models/unified_bookmark_model.dart';
 import 'package:flutter_poetry_app/features/main/tabs/bookmarks/widgets/unified_bookmark_card.dart';
@@ -99,6 +101,19 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
 
   @override
   Widget build(BuildContext context) {
+    // Bookmarks are account-only. Guests see the friendly locked screen
+    // instead of a 401 error from `/api/users/me/bookmarks`. Tab stays
+    // visible in the bottom nav so the surface is discoverable — required
+    // for App Store Guideline 5.1.1(v).
+    if (ref.watch(authProvider).isGuest) {
+      return const GuestLockedTab(
+        title: 'Bookmarks',
+        message:
+            'Sign in to save verses you love, organize them into collections, and pick up where you left off.',
+        icon: Icons.bookmark_outline_rounded,
+      );
+    }
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final lang = ref.watch(selectedLanguageProvider);
     final isUrdu = lang == 'ur';

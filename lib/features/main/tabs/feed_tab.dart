@@ -12,6 +12,7 @@ class FeedTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'feed-fab',
         onPressed: () => _openPoetryEditor(context),
         icon: const Icon(Icons.palette_outlined),
         label: const Text('Create Poetry Image'),

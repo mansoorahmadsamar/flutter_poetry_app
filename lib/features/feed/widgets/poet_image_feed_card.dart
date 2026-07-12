@@ -12,6 +12,7 @@ import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/features/image_poetry/providers/image_bookmark_providers.dart';
+import 'package:flutter_poetry_app/features/auth/widgets/ensure_signed_in.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/reaction_providers.dart';
 import '../models/feed_content_data.dart';
 import '../models/feed_item.dart';
@@ -128,20 +129,45 @@ class PoetImageFeedCard extends ConsumerWidget {
                   const SizedBox(height: AppSpacing.sm),
                   FeedEngagementRow(
                     likeCount:
-                        data.likeCount + (overlay?.reactionCountDelta ?? overlay?.likeCountDelta ?? 0),
+                        (data.reactions?['total'] as int? ?? data.likeCount) +
+                        (overlay?.reactionCountDelta ?? 0),
                     bookmarkCount:
                         data.bookmarkCount +
                         (overlay?.bookmarkCountDelta ?? 0),
                     shareCount: data.shareCount,
-                    isLiked: overlay?.userReaction != null || overlay?.isLiked == true,
+                    isLiked: overlay?.userReaction != null ||
+                        (overlay == null && data.reactions?['userReaction'] != null) ||
+                        overlay?.isLiked == true,
                     isBookmarked: overlay?.isBookmarked ?? false,
-                    onBookmark: () => _onBookmark(ref, itemKey, overlay),
+                    onBookmark: () async {
+                      if (!await ensureSignedIn(
+                        context,
+                        ref,
+                        'Sign in to save this to your bookmarks.',
+                      )) {
+                        return;
+                      }
+                      _onBookmark(ref, itemKey, overlay);
+                    },
                     onShare: () => _onShare(context, ref),
-                    totalReactions: item.socialContext?.totalReactions,
-                    userReaction: overlay?.userReaction,
-                    reactionsByType: _parseReactionsByType(data.reactions),
+                    totalReactions: (data.reactions?['total'] as int? ?? 0) +
+                        (overlay?.reactionCountDelta ?? 0),
+                    userReaction: overlay != null
+                        ? overlay.userReaction
+                        : data.reactions?['userReaction'] as String?,
+                    reactionsByType: overlay?.reactionsByType ??
+                        _parseReactionsByType(data.reactions),
                     reactionTypes: ref.watch(reactionTypesProvider).valueOrNull ?? [],
-                    onReact: (reactionType) => _onReact(ref, itemKey, overlay, reactionType),
+                    onReact: (reactionType) async {
+                      if (!await ensureSignedIn(
+                        context,
+                        ref,
+                        'Sign in to react to this.',
+                      )) {
+                        return;
+                      }
+                      _onReact(ref, itemKey, overlay, reactionType);
+                    },
                     extraActions:
                         data.contentText != null &&
                                 data.contentText!.isNotEmpty
@@ -365,9 +391,24 @@ class PoetImageFeedCard extends ConsumerWidget {
   }
 
   void _onReact(WidgetRef ref, String itemKey, FeedEngagementOverlay? overlay, String reactionType) {
-    final currentReaction = overlay?.userReaction;
+    final serverReaction = data.reactions?['userReaction'] as String?;
+    final currentReaction = overlay?.userReaction ?? (overlay == null ? serverReaction : null);
     final bool isRemoving = currentReaction == reactionType;
     final bool isAdding = currentReaction == null;
+
+    // Compute optimistic reactionsByType
+    final baseByType = overlay?.reactionsByType ?? _parseReactionsByType(data.reactions) ?? {};
+    final updatedByType = Map<String, int>.from(baseByType);
+    if (isRemoving) {
+      updatedByType[reactionType] = (updatedByType[reactionType] ?? 1) - 1;
+      if (updatedByType[reactionType]! <= 0) updatedByType.remove(reactionType);
+    } else {
+      if (currentReaction != null) {
+        updatedByType[currentReaction] = (updatedByType[currentReaction] ?? 1) - 1;
+        if (updatedByType[currentReaction]! <= 0) updatedByType.remove(currentReaction);
+      }
+      updatedByType[reactionType] = (updatedByType[reactionType] ?? 0) + 1;
+    }
 
     final newOverlay = (overlay ?? const FeedEngagementOverlay()).copyWith(
       userReaction: () => isRemoving ? null : reactionType,
@@ -376,6 +417,7 @@ class PoetImageFeedCard extends ConsumerWidget {
           (isRemoving ? -1 : (isAdding ? 1 : 0)),
       likeCountDelta: (overlay?.likeCountDelta ?? 0) +
           (isRemoving ? -1 : (isAdding ? 1 : 0)),
+      reactionsByType: () => updatedByType.isEmpty ? null : updatedByType,
     );
     ref.read(feedEngagementProvider.notifier).state = {
       ...ref.read(feedEngagementProvider),

@@ -39,7 +39,7 @@ class AppConfig {
     return const AppConfig._(
       environment: AppEnvironment.dev,
       appName: 'Poetry DEV',
-      baseApiUrl: 'http://10.0.2.2:8081', // Android emulator -> host machine
+      baseApiUrl: 'http://10.0.2.2:8081', // Android emulator -> Mac localhost (dev)
       apiTimeout: 30000, // 30 seconds
       feedTTL: 300, // 5 minutes
       poemTTL: 1800, // 30 minutes
@@ -72,13 +72,15 @@ class AppConfig {
     return const AppConfig._(
       environment: AppEnvironment.prod,
       appName: 'Poetry',
-      baseApiUrl: 'https://134.199.243.167',
+      // Use the domain (valid Let's Encrypt cert) not the raw IP — iOS App
+      // Transport Security rejects HTTPS-by-IP since the cert has no IP SAN.
+      baseApiUrl: 'https://api.prod.jahanesukhan.com',
       apiTimeout: 30000,
       feedTTL: 900, // 15 minutes
       poemTTL: 7200, // 2 hours
       enableLogging: false,
       enableAnalytics: true,
-      googleOAuthRedirectUri: 'https://134.199.243.167/auth/callback',
+      googleOAuthRedirectUri: 'https://api.prod.jahanesukhan.com/auth/callback',
       googleWebClientId: '461228119902-ofi032jvtvsqrenp0349rs06rahfpkru.apps.googleusercontent.com',
     );
   }

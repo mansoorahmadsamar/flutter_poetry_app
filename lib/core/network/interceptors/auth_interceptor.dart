@@ -3,7 +3,11 @@ import 'package:logger/logger.dart';
 import '../../constants/app_constants.dart';
 import '../../storage/secure_storage.dart';
 
-/// Enhanced authentication interceptor with automatic token refresh
+/// Enhanced authentication interceptor with automatic token refresh.
+///
+/// Requests to the `/api/guest/**` surface (anonymous-only endpoints) bypass
+/// auth-header injection AND the 401-refresh dance — the backend strips
+/// personalization for those calls and would otherwise see leftover credentials.
 class AuthInterceptor extends Interceptor {
   final SecureStorageService _secureStorage;
   final Dio _dio;
@@ -13,13 +17,32 @@ class AuthInterceptor extends Interceptor {
   bool _isRefreshing = false;
   final List<({DioException error, ErrorInterceptorHandler handler})> _pendingRequests = [];
 
+  /// All paths starting with this prefix are treated as anonymous —
+  /// no Authorization header, no X-User-Id, no 401 refresh.
+  static const _guestPathPrefix = '/api/guest/';
+
   AuthInterceptor(this._secureStorage, this._dio);
+
+  bool _isGuestPath(String path) => path.startsWith(_guestPathPrefix);
 
   @override
   Future<void> onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
+    // Always set Content-Type regardless of path
+    options.headers[AppConstants.contentTypeHeader] =
+        AppConstants.contentTypeJson;
+
+    // Guest endpoints must NEVER carry auth credentials, even if the user has
+    // a valid token stored. The backend's caching + personalization-stripping
+    // depend on a clean anonymous request.
+    if (_isGuestPath(options.path)) {
+      options.headers.remove(AppConstants.authorizationHeader);
+      options.headers.remove('X-User-Id');
+      return handler.next(options);
+    }
+
     // Get access token from secure storage
     final accessToken = await _secureStorage.getAccessToken();
 
@@ -38,10 +61,6 @@ class AuthInterceptor extends Interceptor {
       options.headers['X-User-Id'] = userId;
     }
 
-    // Ensure content type is set
-    options.headers[AppConstants.contentTypeHeader] =
-        AppConstants.contentTypeJson;
-
     handler.next(options);
   }
 
@@ -50,6 +69,14 @@ class AuthInterceptor extends Interceptor {
     DioException err,
     ErrorInterceptorHandler handler,
   ) async {
+    // Defensive: never run the refresh dance for guest paths. The backend
+    // shouldn't 401 anonymous endpoints, but if it ever does we just pass
+    // the error through rather than burning the queue with retries.
+    if (_isGuestPath(err.requestOptions.path)) {
+      await _handleErrorResponse(err);
+      return handler.next(err);
+    }
+
     // Handle 401 Unauthorized errors by attempting token refresh
     if (err.response?.statusCode == 401) {
       _logger.w('⚠️  Received 401 Unauthorized, attempting token refresh...');

@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -5,6 +6,8 @@ import '../network/dio_client.dart';
 import '../storage/preferences_service.dart';
 import '../storage/secure_storage.dart';
 import '../../features/discover/providers/discover_provider.dart';
+import '../../features/discover/services/discover_service.dart';
+import '../../features/main/tabs/poets/providers/poet_providers.dart';
 import '../../features/engagement/providers/bookmark_providers.dart';
 import '../../features/engagement/providers/bookmark_search_history_provider.dart';
 import '../../features/engagement/providers/bookmark_search_provider.dart';
@@ -144,6 +147,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
       _logger.i('═══════════════════════════════════════════════════════');
       _logger.i('');
 
+      // Drop any guest-cached/anonymous data so the now-authenticated user
+      // sees their personalized feed/discover rather than the guest bundle.
+      _invalidateGuestSurfaces();
+
       // Note: Profile provider will automatically re-fetch due to auth state change
       // since it watches authProvider for isAuthenticated changes
     } on FirebaseAuthException catch (e) {
@@ -168,6 +175,104 @@ class AuthNotifier extends StateNotifier<AuthState> {
       // Sign out from Firebase on error to clean up state
       await _firebaseAuthService.signOut();
     }
+  }
+
+  /// Sign in with Apple via Firebase Auth.
+  ///
+  /// Mirrors [signInWithGoogle]'s state machine — same loading/error/state
+  /// shape so the UI doesn't need to special-case Apple. Backend
+  /// verification reuses `/api/auth/firebase/verify`; existing accounts
+  /// link by email automatically.
+  ///
+  /// Required for App Store Guideline 4.8.
+  Future<void> signInWithApple() async {
+    _logger.i('');
+    _logger.i('═══════════════════════════════════════════════════════');
+    _logger.i('🍎 AUTH NOTIFIER - STARTING FIREBASE APPLE SIGN-IN');
+    _logger.i('═══════════════════════════════════════════════════════');
+
+    try {
+      _logger.i('⏳ Setting loading state...');
+      state = state.copyWith(isLoading: true, errorMessage: null);
+
+      _logger.i('');
+      _logger.i('🔥 Calling Firebase Auth Service...');
+      final result = await _firebaseAuthService.signInWithApple();
+
+      if (result.isEmpty) {
+        _logger.w('⚠️  User cancelled Apple Sign-In');
+        state = state.copyWith(isLoading: false);
+        return;
+      }
+
+      final accessToken = result['accessToken'] as String?;
+      final refreshToken = result['refreshToken'] as String?;
+      final email = result['email'] as String?;
+
+      if (accessToken == null || refreshToken == null) {
+        throw Exception('Backend did not return required tokens');
+      }
+
+      _logger.i('');
+      _logger.i('📝 Updating auth state...');
+      state = state.copyWith(
+        isAuthenticated: true,
+        isLoading: false,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        userEmail: email,
+        errorMessage: null,
+      );
+
+      _logger.i('');
+      _logger.i('═══════════════════════════════════════════════════════');
+      _logger.i('✅ FIREBASE APPLE SIGN-IN COMPLETED - AUTH STATE UPDATED');
+      _logger.i('   Email: $email');
+      _logger.i('═══════════════════════════════════════════════════════');
+      _logger.i('');
+
+      // Drop any guest-cached/anonymous data so the now-authenticated user
+      // sees their personalized feed/discover rather than the guest bundle.
+      _invalidateGuestSurfaces();
+    } on FirebaseAuthException catch (e) {
+      _logger.e('❌ Firebase Auth Exception (Apple): ${e.code} - ${e.message}');
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Apple Sign-In failed: ${e.message}',
+      );
+    } catch (e, stackTrace) {
+      _logger.e('');
+      _logger.e('═══════════════════════════════════════════════════════');
+      _logger.e('❌ ERROR IN APPLE SIGN-IN');
+      _logger.e('   Error: $e');
+      _logger.e('   Stack Trace: $stackTrace');
+      _logger.e('═══════════════════════════════════════════════════════');
+
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString(),
+      );
+
+      // Sign out from Firebase on error to clean up state
+      await _firebaseAuthService.signOut();
+    }
+  }
+
+  /// Invalidate guest-facing surfaces after a successful sign-in so the
+  /// authenticated user gets their personalized data instead of the cached
+  /// anonymous guest bundle. Cache clear is best-effort — it must never
+  /// break the sign-in flow.
+  void _invalidateGuestSurfaces() {
+    try {
+      _ref.read(discoverServiceProvider).clearCache();
+    } catch (_) {
+      // Best-effort; ignore.
+    }
+    _ref.invalidate(feedProvider);
+    _ref.invalidate(discoverProvider);
+    _ref.invalidate(featuredPoetsProvider);
+    _ref.invalidate(trendingPoetsProvider);
+    _ref.invalidate(allPoetsProvider);
   }
 
   /// Refresh access token
@@ -252,5 +357,93 @@ class AuthNotifier extends StateNotifier<AuthState> {
   /// Clear error message
   void clearError() {
     state = state.copyWith(errorMessage: null);
+  }
+
+  /// Permanently delete the authenticated user's account.
+  ///
+  /// Calls `DELETE /api/users/me` with `{"confirmation":"DELETE"}` (App Store
+  /// Guideline 5.1.1(v)). On 200, hard-deletes the user on the backend, then
+  /// clears local session state mirroring [logout].
+  Future<void> deleteAccount() async {
+    _logger.i('');
+    _logger.i('═══════════════════════════════════════════════════════');
+    _logger.i('🗑️  DELETING ACCOUNT');
+    _logger.i('═══════════════════════════════════════════════════════');
+
+    try {
+      state = state.copyWith(isLoading: true, errorMessage: null);
+
+      final dioClient = _ref.read(dioClientProvider);
+      final response = await dioClient.delete<Map<String, dynamic>>(
+        '/api/users/me',
+        data: {'confirmation': 'DELETE'},
+      );
+
+      final body = response.data;
+      final success = response.statusCode == 200 && body?['success'] == true;
+      if (!success) {
+        final message = body?['message']?.toString() ??
+            'Failed to delete account (status ${response.statusCode})';
+        throw Exception(message);
+      }
+
+      _logger.i('✅ Server-side account deletion succeeded');
+
+      _logger.i('   Signing out of Firebase + clearing secure storage...');
+      await _firebaseAuthService.signOut();
+
+      _logger.i('   Clearing SharedPreferences...');
+      try {
+        final prefs = _ref.read(preferencesServiceProvider);
+        await prefs.clearAll();
+      } catch (e) {
+        _logger.w('⚠️  Failed to clear preferences: $e');
+      }
+
+      _logger.i('   Invalidating cached providers...');
+      _ref.invalidate(feedProvider);
+      _ref.invalidate(feedEngagementProvider);
+      _ref.invalidate(discoverProvider);
+      _ref.invalidate(bookmarkedCoupletsProvider);
+      _ref.invalidate(unifiedBookmarksProvider);
+      _ref.invalidate(bookmarkActionProvider);
+      _ref.invalidate(bookmarkSearchProvider);
+      _ref.invalidate(bookmarkSearchHistoryProvider);
+      _ref.invalidate(coupletsProvider);
+      _ref.invalidate(coupletProvider);
+      _ref.invalidate(coupletActionProvider);
+      _ref.invalidate(searchHistoryProvider);
+      _ref.invalidate(searchQueryProvider);
+
+      // Resetting to default AuthState clears tokens and sets isAuthenticated
+      // to false; the GoRouter redirect listening on auth state will send the
+      // user back to /login automatically.
+      state = const AuthState();
+
+      _logger.i('═══════════════════════════════════════════════════════');
+      _logger.i('✅ ACCOUNT DELETED — ALL LOCAL DATA CLEARED');
+      _logger.i('═══════════════════════════════════════════════════════');
+      _logger.i('');
+    } on DioException catch (e) {
+      final serverMessage =
+          (e.response?.data is Map<String, dynamic>
+                  ? (e.response?.data as Map<String, dynamic>)['message']
+                  : null)
+              ?.toString();
+      _logger.e('❌ Delete account failed: ${e.message}');
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage:
+            serverMessage ?? 'Failed to delete account. Please try again.',
+      );
+      rethrow;
+    } catch (e) {
+      _logger.e('❌ Delete account error: $e');
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString(),
+      );
+      rethrow;
+    }
   }
 }

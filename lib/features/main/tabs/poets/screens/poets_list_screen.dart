@@ -8,6 +8,7 @@ import '../providers/poets_pagination_provider.dart';
 import '../providers/poets_discovery_provider.dart';
 import '../widgets/poet_card.dart';
 import '../widgets/poets_horizontal_section.dart';
+import 'package:flutter_poetry_app/core/auth/auth_provider.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 
 /// Poets discovery feed screen.
@@ -31,6 +32,10 @@ class _PoetsListScreenState extends ConsumerState<PoetsListScreen>
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _allPoetsKey = GlobalKey();
   PoetsFilterType _activeGridFilter = PoetsFilterType.all;
+
+  /// True when no user is signed in. Era/gender discovery sections are
+  /// hidden for guests (no guest API equivalent — see poets_discovery_provider).
+  bool get _isGuest => ref.watch(authProvider).isGuest;
   late final AnimationController _searchPulseController;
   late final Animation<double> _searchPulseAnimation;
 
@@ -196,39 +201,45 @@ class _PoetsListScreenState extends ConsumerState<PoetsListScreen>
           onPoetTap: (p) => _onPoetTap(p.publicId),
         ),
       ),
-      SliverToBoxAdapter(
-        child: PoetsHorizontalSection(
-          title: 'Classical Poets',
-          icon: Icons.auto_stories_rounded,
-          iconColor: AppColors.primary,
-          poets: state.classical.poets,
-          totalCount: state.classical.totalCount,
-          onSeeAll: () => _onSeeAll(PoetsFilterType.classical),
-          onPoetTap: (p) => _onPoetTap(p.publicId),
+      // Era/gender sections only render for authed users — the guest API
+      // has no era/gender filter, so for guests these sections (and their
+      // "See all" filter chips) are hidden rather than showing an
+      // unfiltered list under a "Classical Poets" header.
+      if (!_isGuest) ...[
+        SliverToBoxAdapter(
+          child: PoetsHorizontalSection(
+            title: 'Classical Poets',
+            icon: Icons.auto_stories_rounded,
+            iconColor: AppColors.primary,
+            poets: state.classical.poets,
+            totalCount: state.classical.totalCount,
+            onSeeAll: () => _onSeeAll(PoetsFilterType.classical),
+            onPoetTap: (p) => _onPoetTap(p.publicId),
+          ),
         ),
-      ),
-      SliverToBoxAdapter(
-        child: PoetsHorizontalSection(
-          title: 'Modern Poets',
-          icon: Icons.brush_rounded,
-          iconColor: AppColors.urduTextAccent,
-          poets: state.modern.poets,
-          totalCount: state.modern.totalCount,
-          onSeeAll: () => _onSeeAll(PoetsFilterType.modern),
-          onPoetTap: (p) => _onPoetTap(p.publicId),
+        SliverToBoxAdapter(
+          child: PoetsHorizontalSection(
+            title: 'Modern Poets',
+            icon: Icons.brush_rounded,
+            iconColor: AppColors.urduTextAccent,
+            poets: state.modern.poets,
+            totalCount: state.modern.totalCount,
+            onSeeAll: () => _onSeeAll(PoetsFilterType.modern),
+            onPoetTap: (p) => _onPoetTap(p.publicId),
+          ),
         ),
-      ),
-      SliverToBoxAdapter(
-        child: PoetsHorizontalSection(
-          title: 'Women Poets',
-          icon: Icons.female_rounded,
-          iconColor: AppColors.error,
-          poets: state.women.poets,
-          totalCount: state.women.totalCount,
-          onSeeAll: () => _onSeeAll(PoetsFilterType.women),
-          onPoetTap: (p) => _onPoetTap(p.publicId),
+        SliverToBoxAdapter(
+          child: PoetsHorizontalSection(
+            title: 'Women Poets',
+            icon: Icons.female_rounded,
+            iconColor: AppColors.error,
+            poets: state.women.poets,
+            totalCount: state.women.totalCount,
+            onSeeAll: () => _onSeeAll(PoetsFilterType.women),
+            onPoetTap: (p) => _onPoetTap(p.publicId),
+          ),
         ),
-      ),
+      ],
     ];
   }
 

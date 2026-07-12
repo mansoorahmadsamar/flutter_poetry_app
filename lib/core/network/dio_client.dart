@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
@@ -23,6 +24,13 @@ class DioClient {
         headers: {
           AppConstants.contentTypeHeader: AppConstants.contentTypeJson,
         },
+        // Decode response bytes leniently: some catalog records have a
+        // stray U+FFFD byte saved mid-string in the DB. Strict UTF-8
+        // decoding throws and aborts the whole response parse, killing
+        // any screen that loads the bad record. allowMalformed turns the
+        // bad bytes into the replacement glyph instead of crashing.
+        responseDecoder: (responseBytes, options, responseBody) =>
+            utf8.decode(responseBytes, allowMalformed: true),
       ),
     );
 

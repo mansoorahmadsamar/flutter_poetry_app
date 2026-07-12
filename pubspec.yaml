@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+1
+version: 1.0.0+4
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -73,6 +73,8 @@ dependencies:
   url_launcher: ^6.3.2
   app_links: ^6.3.4  # Replacement for deprecated uni_links
   google_sign_in: ^6.2.1  # Native Google Sign-In for Android/iOS
+  sign_in_with_apple: ^6.1.0  # Native Apple Sign-In for iOS (App Store Guideline 4.8)
+  crypto: ^3.0.3  # SHA-256 nonce hashing for Sign in with Apple
 
   # Firebase Authentication
   firebase_core: ^3.8.1
@@ -87,6 +89,7 @@ dependencies:
   # Image Poetry Generation
   path_provider: ^2.1.2  # For file storage paths
   image_picker: ^1.0.7  # Pick images from gallery/camera
+  file_picker: ^8.0.0  # Pick PDF/EPUB book files (poet creator mode)
   photo_view: ^0.14.0  # Zoomable image viewer
   flutter_colorpicker: ^1.0.3  # Color picker for customization
 

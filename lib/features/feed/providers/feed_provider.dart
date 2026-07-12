@@ -94,6 +94,10 @@ class FeedNotifier extends StateNotifier<FeedState> {
 
     try {
       final response = await _feedService.getFeed(lang: _lang);
+      // The user may have navigated away (e.g. into the creator dashboard)
+      // while this request was in flight, disposing the notifier. Bail before
+      // touching `state` to avoid "used after dispose".
+      if (!mounted) return;
       final newItems = _dedup(response.items);
 
       // Auto-advance: if first page returns empty but has a cursor, try once more
@@ -114,6 +118,7 @@ class FeedNotifier extends StateNotifier<FeedState> {
             lang: _lang,
             cursor: response.nextCursor,
           );
+          if (!mounted) return;
           final retryItems = _dedup(retry.items);
           state = FeedState(
             items: retryItems,
@@ -163,6 +168,7 @@ class FeedNotifier extends StateNotifier<FeedState> {
         lang: _lang,
         cursor: state.nextCursor,
       );
+      if (!mounted) return;
       final newItems = _dedup(response.items);
       state = state.copyWith(
         items: [...state.items, ...newItems],
@@ -221,6 +227,7 @@ class FeedNotifier extends StateNotifier<FeedState> {
         cursor: state.nextCursor,
         refresh: true,
       );
+      if (!mounted) return 0;
       final newItems = _dedup(response.items);
       if (newItems.isEmpty) return 0;
 

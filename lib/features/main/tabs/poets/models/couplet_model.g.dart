@@ -18,8 +18,8 @@ _$CoupletModelImpl _$$CoupletModelImplFromJson(Map<String, dynamic> json) =>
       likeCount: (json['likeCount'] as num?)?.toInt() ?? 0,
       bookmarkCount: (json['bookmarkCount'] as num?)?.toInt() ?? 0,
       shareCount: (json['shareCount'] as num?)?.toInt() ?? 0,
-      isLikedByCurrentUser: json['isLiked'] as bool,
-      isBookmarkedByCurrentUser: json['isBookmarked'] as bool,
+      isLikedByCurrentUser: json['isLiked'] as bool?,
+      isBookmarkedByCurrentUser: json['isBookmarked'] as bool?,
       tagSlugs: (json['tagSlugs'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
@@ -67,8 +67,8 @@ _$CoupletDetailResponseImpl _$$CoupletDetailResponseImplFromJson(
       likeCount: (json['likeCount'] as num?)?.toInt() ?? 0,
       bookmarkCount: (json['bookmarkCount'] as num?)?.toInt() ?? 0,
       shareCount: (json['shareCount'] as num?)?.toInt() ?? 0,
-      isLikedByCurrentUser: json['isLiked'] as bool,
-      isBookmarkedByCurrentUser: json['isBookmarked'] as bool,
+      isLikedByCurrentUser: json['isLiked'] as bool?,
+      isBookmarkedByCurrentUser: json['isBookmarked'] as bool?,
       tagSlugs: (json['tagSlugs'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
@@ -128,8 +128,8 @@ _$BookmarkedCoupletResponseImpl _$$BookmarkedCoupletResponseImplFromJson(
       poetProfileImageUrl: json['poetProfileImageUrl'] as String?,
       likeCount: (json['likeCount'] as num?)?.toInt() ?? 0,
       bookmarkCount: (json['bookmarkCount'] as num?)?.toInt() ?? 0,
-      isLikedByCurrentUser: json['isLiked'] as bool,
-      isBookmarkedByCurrentUser: json['isBookmarked'] as bool,
+      isLikedByCurrentUser: json['isLiked'] as bool?,
+      isBookmarkedByCurrentUser: json['isBookmarked'] as bool?,
       tagSlugs: (json['tagSlugs'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
