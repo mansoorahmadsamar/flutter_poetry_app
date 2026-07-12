@@ -166,7 +166,7 @@
     <header>
       <h1>Privacy Policy</h1>
       <p class="subtitle">Sukhan — Poetry App</p>
-      <p class="updated">Last Updated: May 4, 2026</p>
+      <p class="updated">Last Updated: June 4, 2026</p>
     </header>
 
     <p class="intro">
@@ -179,20 +179,30 @@
     <h2>1. Information We Collect</h2>
 
     <h3>1.1 Account Information</h3>
-    <p>When you sign in with Google, we receive:</p>
+    <p>You can sign in with <strong>Sign in with Apple</strong> or <strong>Google Sign-In</strong>.
+       When you sign in we receive:</p>
     <ul>
-      <li><strong>Name</strong> and <strong>email address</strong> from your Google account</li>
-      <li><strong>Profile picture URL</strong></li>
-      <li><strong>Google account identifier</strong></li>
+      <li><strong>Name</strong> — your name as held by your Apple ID or Google account
+        (you can choose not to share your real name with Apple)</li>
+      <li><strong>Email address</strong> — your real email address, or, if you chose Apple's
+        <em>Hide My Email</em>, an Apple private-relay address (<code>…@privaterelay.appleid.com</code>)
+        that forwards to your real address</li>
+      <li><strong>Profile picture URL</strong> (Google only; Apple does not share a profile picture)</li>
+      <li><strong>User identifiers</strong> — a Firebase Authentication user ID (UID), an account ID
+        from your provider (Apple or Google), and a public account ID we create on our servers to
+        identify your account</li>
     </ul>
-    <p>We do not access your Google password, contacts, or any other Google account data.</p>
+    <p>We do not access your provider password, contacts, or any other provider account data.</p>
 
     <h3>1.2 Usage Data</h3>
     <p>We collect data about how you interact with the App:</p>
     <ul>
-      <li><strong>Engagement activity</strong> — likes, bookmarks, shares, and follows</li>
-      <li><strong>Feed interactions</strong> — impressions, views, and time spent on content</li>
-      <li><strong>Search queries</strong> — stored locally on your device (not sent to our servers)</li>
+      <li><strong>Engagement activity</strong> — likes, reactions, bookmarks, shares, and follows</li>
+      <li><strong>Feed interactions</strong> — impressions, views, and time spent on content
+        (used to personalize your feed)</li>
+      <li><strong>Search queries</strong> — the words you search are sent to our servers to return
+        results and to power autocomplete and related-search suggestions; a short history of your
+        recent searches is also stored on your device so you can quickly re-run them</li>
     </ul>
 
     <h3>1.3 User-Created Content</h3>
@@ -201,7 +211,11 @@
       <li><strong>Custom background images</strong> you upload for poetry creation</li>
       <li><strong>Bookmark notes</strong> you add to saved content</li>
       <li><strong>Image collections</strong> you organize</li>
-      <li><strong>Original poetry</strong> you submit if you are an approved Poet (poet mode)</li>
+      <li><strong>Original poems and translations</strong> you compose if you are an approved Poet
+        (poet mode), including any title, body, tags, language, and poetry type you provide</li>
+      <li><strong>Poet profile details</strong> you provide as an approved Poet — pen name, full name,
+        short bio, biography, birth year, and (optionally) a profile photo</li>
+      <li><strong>Books</strong> (PDF/EPUB) you upload as an approved Poet</li>
     </ul>
 
     <h3>1.4 Device Information</h3>
@@ -249,18 +263,23 @@
       <tbody>
         <tr>
           <td><strong>Firebase Authentication</strong> (Google)</td>
-          <td>User sign-in via Google</td>
-          <td>Email, name, profile photo</td>
+          <td>Verifies your sign-in token and links your account on our backend</td>
+          <td>Provider ID token, email, name</td>
         </tr>
         <tr>
-          <td><strong>Google Sign-In</strong></td>
+          <td><strong>Sign in with Apple</strong> (Apple Inc.)</td>
+          <td>OAuth-based authentication on iOS</td>
+          <td>Apple ID token, email (or private-relay address), name (first sign-in only)</td>
+        </tr>
+        <tr>
+          <td><strong>Google Sign-In</strong> (Google)</td>
           <td>OAuth 2.0 authentication</td>
-          <td>Google account credentials</td>
+          <td>Google account ID token, email, name, profile picture URL</td>
         </tr>
         <tr>
-          <td><strong>AWS S3</strong></td>
-          <td>Cloud image storage</td>
-          <td>Uploaded and generated images</td>
+          <td><strong>AWS S3 / CloudFront</strong></td>
+          <td>Cloud image storage and delivery</td>
+          <td>Uploaded and generated images, profile pictures, book files</td>
         </tr>
       </tbody>
     </table>
@@ -320,8 +339,9 @@
     <p>We do <strong>not</strong> sell, rent, or trade your personal information to third parties.</p>
     <p>Your data may be shared only in these circumstances:</p>
     <ul>
-      <li><strong>With Firebase/Google</strong> for authentication purposes</li>
-      <li><strong>With cloud storage providers</strong> for image hosting</li>
+      <li><strong>With Firebase, Google, and Apple</strong> for authentication purposes
+        (only the data needed to verify and complete sign-in)</li>
+      <li><strong>With cloud storage providers</strong> (AWS S3 / CloudFront) for image and book hosting</li>
       <li><strong>When required by law</strong> to comply with legal obligations</li>
       <li><strong>With your consent</strong> when you use the native share feature to share poetry content via other apps on your device</li>
     </ul>
@@ -361,8 +381,10 @@
       <li><strong>Access</strong> your personal data through the App</li>
       <li><strong>Delete</strong> your bookmarks, collections, and generated images directly in the App</li>
       <li><strong>Delete your account</strong> and all associated data from within the App
-        (Settings → Account → Delete Account)</li>
-      <li><strong>Revoke</strong> Google Sign-In access through your Google Account settings</li>
+        (Profile → Danger Zone → Delete Account)</li>
+      <li><strong>Revoke</strong> Google Sign-In access through your Google Account settings, or
+        Sign in with Apple access through <em>Settings → Apple ID → Sign-In &amp; Security →
+        Sign in with Apple</em> on your Apple device</li>
       <li><strong>Contact us</strong> at the email below if you need help with any of the above</li>
     </ul>
 
