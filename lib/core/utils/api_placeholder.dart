@@ -1,27 +1,28 @@
 import 'package:json_annotation/json_annotation.dart';
 
-/// The API sends `"-"` in place of a missing string value (for example
-/// `firstMisra`, `excerpt`, `era`, `thumbnailUrl`, `profileImageUrl`, `color`).
-/// `"-"` is not null, so every reader must treat it as absent.
-const String kApiMissingValue = '-';
+/// The value the API sends for an absent string field (`firstMisra`,
+/// `excerpt`, `era`, `thumbnailUrl`, `profileImageUrl`, `color`, ids on
+/// search results, …). It is not null, so every reader must treat it as
+/// absent before it is shown or used as an id.
+const String kApiPlaceholder = '-';
 
 /// Returns [value] trimmed, or `null` when it is null, blank or the API's
-/// [kApiMissingValue] placeholder.
+/// [kApiPlaceholder].
 String? presentOrNull(String? value) {
   if (value == null) return null;
   final trimmed = value.trim();
-  if (trimmed.isEmpty || trimmed == kApiMissingValue) return null;
+  if (trimmed.isEmpty || trimmed == kApiPlaceholder) return null;
   return trimmed;
 }
 
-/// JSON converter for model string fields that may carry the API's `"-"`
-/// placeholder: reads it (and blank strings) as `null`.
-class PlaceholderStringConverter implements JsonConverter<String?, String?> {
+/// Reads an optional string field, treating null, blank, `"-"` and
+/// non-string values as absent.
+class PlaceholderStringConverter implements JsonConverter<String?, Object?> {
   const PlaceholderStringConverter();
 
   @override
-  String? fromJson(String? json) => presentOrNull(json);
+  String? fromJson(Object? json) => json is String ? presentOrNull(json) : null;
 
   @override
-  String? toJson(String? object) => object;
+  Object? toJson(String? value) => value;
 }

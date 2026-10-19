@@ -290,7 +290,10 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
   ///
   /// Parameters:
   /// - [query]: Optional query (uses currentQuery if null)
-  Future<void> executeSearch({String? query}) async {
+  /// - [segment]: Optional tab to show the results in. Set in the same state
+  ///   update — unlike [setActiveSegment], which re-runs the current query
+  ///   first (an extra request and an extra search-log row).
+  Future<void> executeSearch({String? query, DiscoverSegment? segment}) async {
     final searchQuery = query?.trim() ?? state.currentQuery;
 
     if (searchQuery.isEmpty) return;
@@ -307,6 +310,7 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
     // Update state to searching mode
     state = state.copyWith(
       currentQuery: searchQuery,
+      activeSegment: segment ?? state.activeSegment,
       mode: SearchMode.searching,
       isLoadingResults: true,
       autocompleteResults: null, // Hide autocomplete

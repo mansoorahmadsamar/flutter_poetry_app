@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
+import 'package:flutter_poetry_app/core/utils/api_placeholder.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.dart';
 import 'package:flutter_poetry_app/features/search/utils/highlighted_text.dart';
 import 'package:shimmer/shimmer.dart';
@@ -27,6 +28,7 @@ class AppSearchPoemCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final displayTitle = poem.title ?? poem.poetryTypeName ?? poem.poetryType;
     final isUrdu = _isUrduText(displayTitle);
+    final poetImageUrl = presentOrNull(poem.poetProfileImageUrl);
 
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -114,9 +116,9 @@ class AppSearchPoemCard extends StatelessWidget {
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(12),
-                          child: poem.poetProfileImageUrl != null
+                          child: poetImageUrl != null
                               ? CachedNetworkImage(
-                                  imageUrl: poem.poetProfileImageUrl!,
+                                  imageUrl: poetImageUrl,
                                   width: 24,
                                   height: 24,
                                   fit: BoxFit.cover,

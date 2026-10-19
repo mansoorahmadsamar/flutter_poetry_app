@@ -235,16 +235,21 @@ Flushing:
 
 ### 9.5 Search: `features/search/`
 - **Screen:** `AppSearchScreen` (`/search`, `screens/app_search_screen.dart`) switches between four modes: idle (`AppSearchIdleContent`), suggestions (`AppSearchSuggestions`), preview "All" results (`AppSearchPreviewResults`) and filtered tab results (`AppSearchFilteredResults`).
-- **State:** `globalSearchProvider` / `GlobalSearchNotifier` (`providers/global_search_provider.dart:665`) has a 300 ms debounce (`:222`) and an in-memory result cache.
+- **State:** `globalSearchProvider` / `GlobalSearchNotifier` (`providers/global_search_provider.dart:669`) has a 300 ms debounce (`:222`) and an in-memory result cache.
 - **Endpoints:** `/api/search`, `/api/search/couplets`, `/autocomplete`, `/recommendations`, `/related`, `/trending` (`services/search_service.dart:20`).
 - **Guest behaviour:**
   - `searchUnified` fans out to `/api/guest/poems/search` and `/api/guest/poets/search`, so couplets, tags and categories come back empty (`:134-140`).
   - Autocomplete returns empty for guests and for queries under 2 characters (`:262`).
   - Related searches return empty for guests (`:410`).
-- **Taps:**
-  - Preview: only poet rows are tappable (`app_search_preview_results.dart:113-114`). Poem cards are built with no `onTap` (`:174-177`), and category and tag chips have no navigation. **They look tappable and do nothing.**
-  - Filtered: poet and poem taps work. A couplet tap pushes the poem only `if (couplet.poem != null)` (`app_search_screen.dart:250-258`). `CoupletSearchResult.poem` is nullable (`models/search_models.dart:106`), and QA observed it null for every result, so the tap is a no-op (always-null is **UNVERIFIED** from code alone).
-- **Highlighting:** `HighlightedText` (`utils/highlighted_text.dart`) highlights matches on the client after Urdu normalization. `_buildOrigToNormMap` normalizes each character separately; `normalize(' ')` trims to `''`, so spaces count as "removed" (`:144-150`). Every preceding space therefore shifts the highlight one character.
+- **Taps** (one helper, `utils/search_result_navigation.dart`; route names in `AppRoutes`):
+  - Poet → `/main/poets/:publicId`; poem → `/main/poems/:publicId` — in "All", every tab and autocomplete.
+  - Couplet → its parent poem, `/main/poems/:poemPublicId`, from `CoupletSearchResult.poemIdToOpen` (the flat `poemPublicId` field, else the legacy nested `poem.publicId`). The backend is adding `poemPublicId`/`poemTitle`/`poetPublicId`/`poetName` (additive, nullable); until it ships, couplet results carry neither, so they render **without** a chevron or tap handler rather than as dead buttons.
+  - Tag → `/hashtags/:slug` (search tags are the `Tag` rows whose slugs are the hashtag slugs); a tag with a missing/`"-"` slug is not tappable.
+  - Category → searches its name in "All" (there is no category screen; same as the Discover category grid).
+  - Preview and filtered result widgets take **required** tap callbacks, so a result type cannot be added without one. Tests: `test/features/search/screens/`.
+  - `setActiveSegment` re-runs the current query (an extra request and search-log row per tab switch); `executeSearch(segment:)` switches tab without that.
+- **Highlighting:** `HighlightedText` (`utils/highlighted_text.dart`) highlights matches on the client after Urdu normalization, using `AppSearchUrduNormalizer.normalizeWithOffsets` to map normalized matches back to source characters (the old per-character mapping drifted one character left per preceding space). Diacritics inside or right after a matched word stay in the highlighted span.
+- **Not shown:** `UnifiedSearchResponse.verses` (verse hits with `poemPublicId`) is parsed but no widget renders it.
 - **Related screens:**
   - `PoetsSearchScreen` (`/main/poets-search`) uses `poetSearchPaginationProvider`. `SearchResultsGrid` (a sliver) listens to the enclosing `CustomScrollView`'s position and calls `loadMore()` within 600 px of the end; the notifier de-duplicates poets across pages, stops when a page adds nothing new, and drops a page that was in flight when a new search started.
   - `CategoryResultsScreen` is orphaned (§7). `widgets/autocomplete_suggestions.dart` is used only by the dead `main/tabs/search_tab.dart`.

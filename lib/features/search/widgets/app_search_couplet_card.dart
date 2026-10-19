@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
+import 'package:flutter_poetry_app/core/utils/api_placeholder.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
 import 'package:flutter_poetry_app/features/search/utils/highlighted_text.dart';
 import 'package:shimmer/shimmer.dart';
@@ -12,9 +13,14 @@ import 'package:shimmer/shimmer.dart';
 /// - Verse text (Nastaliq, 20px, centered)
 /// - Thin separator between verses
 /// - Poet attribution row with avatar, name, poem title, and engagement metrics
+/// - A chevron only when [onTap] is set; without it the card is inert, so a
+///   couplet with no known poem never looks tappable.
 ///
 /// Design: marginH:16, marginV:4, padding:16, borderRadius:12
 class AppSearchCoupletCard extends StatelessWidget {
+  /// Key of the chevron shown on tappable cards.
+  static const chevronKey = Key('search-couplet-chevron');
+
   final CoupletSearchResult couplet;
   final VoidCallback? onTap;
   final String searchQuery;
@@ -29,6 +35,8 @@ class AppSearchCoupletCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final poetName = couplet.displayPoetName;
+    final poemTitle = couplet.displayPoemTitle;
 
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -140,11 +148,11 @@ class AppSearchCoupletCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (couplet.poet != null)
+                        if (poetName != null)
                           HighlightedText(
-                            text: couplet.poet!.name,
+                            text: poetName,
                             query: searchQuery,
-                            textDirection: TextDirection.rtl,
+                            textDirection: _directionOf(poetName),
                             style: TextStyle(
                               fontFamily: 'Jameel Noori Nastaleeq',
                               fontSize: 14,
@@ -153,11 +161,11 @@ class AppSearchCoupletCard extends StatelessWidget {
                               color: AppColors.secondary,
                             ),
                           ),
-                        if (couplet.poem != null)
+                        if (poemTitle != null)
                           HighlightedText(
-                            text: couplet.poem!.title,
+                            text: poemTitle,
                             query: searchQuery,
-                            textDirection: TextDirection.rtl,
+                            textDirection: _directionOf(poemTitle),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -175,6 +183,20 @@ class AppSearchCoupletCard extends StatelessWidget {
 
                   // Engagement metrics
                   _buildMetrics(isDark),
+
+                  // Opens the parent poem
+                  if (onTap != null)
+                    Padding(
+                      padding: EdgeInsetsDirectional.only(start: AppSpacing.sm),
+                      child: Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        key: chevronKey,
+                        size: 14,
+                        color: isDark
+                            ? AppColors.textDisabledDark
+                            : AppColors.textDisabledLight,
+                      ),
+                    ),
                 ],
               ),
             ],
@@ -185,7 +207,7 @@ class AppSearchCoupletCard extends StatelessWidget {
   }
 
   Widget _buildAvatar(bool isDark) {
-    final imageUrl = couplet.poet?.profileImageUrl;
+    final imageUrl = presentOrNull(couplet.poet?.profileImageUrl);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
@@ -265,6 +287,11 @@ class AppSearchCoupletCard extends StatelessWidget {
       ],
     );
   }
+
+  static TextDirection _directionOf(String text) =>
+      RegExp(r'[\u0600-\u06FF]').hasMatch(text)
+          ? TextDirection.rtl
+          : TextDirection.ltr;
 
   String _formatCount(int count) {
     if (count >= 1000) return '${(count / 1000).toStringAsFixed(1)}k';

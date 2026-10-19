@@ -17,18 +17,25 @@ import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.da
 /// Uses `ListView.builder` for true virtualization (NOT Column + .map().toList()).
 /// Loads more at 80% scroll threshold. Page size: 20 items.
 /// Each card wrapped in RepaintBoundary for scroll performance.
+///
+/// The tap callbacks are required so no result type renders as a dead card.
+/// Couplets without a parent poem id are rendered as not tappable.
 class AppSearchFilteredResults extends ConsumerStatefulWidget {
   final DiscoverSegment segment;
-  final ValueChanged<PoetModel>? onPoetTap;
-  final ValueChanged<PoemModel>? onPoemTap;
-  final ValueChanged<CoupletSearchResult>? onCoupletTap;
+  final ValueChanged<PoetModel> onPoetTap;
+  final ValueChanged<PoemModel> onPoemTap;
+
+  /// Called only for couplets with a [CoupletSearchResult.poemIdToOpen].
+  final ValueChanged<CoupletSearchResult> onCoupletTap;
+  final ValueChanged<AutocompleteCategory> onCategoryTap;
 
   const AppSearchFilteredResults({
     super.key,
     required this.segment,
-    this.onPoetTap,
-    this.onPoemTap,
-    this.onCoupletTap,
+    required this.onPoetTap,
+    required this.onPoemTap,
+    required this.onCoupletTap,
+    required this.onCategoryTap,
   });
 
   @override
@@ -177,37 +184,42 @@ class _AppSearchFilteredResultsState
         if (index >= results.poets.length) return const SizedBox.shrink();
         final poet = results.poets[index];
         return AppSearchPoetCard(
+          key: ValueKey('search-poet-${poet.publicId}'),
           poet: poet,
           searchQuery: query,
-          onTap: widget.onPoetTap != null ? () => widget.onPoetTap!(poet) : null,
+          onTap: () => widget.onPoetTap(poet),
         );
 
       case DiscoverSegment.poems:
         if (index >= results.poems.length) return const SizedBox.shrink();
         final poem = results.poems[index];
         return AppSearchPoemCard(
+          key: ValueKey('search-poem-${poem.publicId}'),
           poem: poem,
           searchQuery: query,
-          onTap: widget.onPoemTap != null ? () => widget.onPoemTap!(poem) : null,
+          onTap: () => widget.onPoemTap(poem),
         );
 
       case DiscoverSegment.verses:
         if (index >= results.couplets.length) return const SizedBox.shrink();
         final couplet = results.couplets[index];
         return AppSearchCoupletCard(
+          key: ValueKey('search-couplet-${couplet.publicId}'),
           couplet: couplet,
           searchQuery: query,
-          onTap: widget.onCoupletTap != null
-              ? () => widget.onCoupletTap!(couplet)
-              : null,
+          onTap: couplet.poemIdToOpen == null
+              ? null
+              : () => widget.onCoupletTap(couplet),
         );
 
       case DiscoverSegment.categories:
         if (index >= results.categories.length) return const SizedBox.shrink();
         final category = results.categories[index];
         return _CategoryListItem(
+          key: ValueKey('search-category-${category.publicId}'),
           category: category,
           isDark: isDark,
+          onTap: () => widget.onCategoryTap(category),
         );
 
       default:
@@ -353,10 +365,13 @@ class _AppSearchFilteredResultsState
 class _CategoryListItem extends StatelessWidget {
   final AutocompleteCategory category;
   final bool isDark;
+  final VoidCallback onTap;
 
   const _CategoryListItem({
+    super.key,
     required this.category,
     required this.isDark,
+    required this.onTap,
   });
 
   @override
@@ -369,6 +384,7 @@ class _CategoryListItem extends StatelessWidget {
         vertical: AppSpacing.xs,
       ),
       child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         splashColor: AppColors.primary.withValues(alpha: 0.08),
         child: Container(

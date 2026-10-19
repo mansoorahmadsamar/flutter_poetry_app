@@ -64,114 +64,85 @@ class HighlightedText extends StatelessWidget {
       backgroundColor: highlightBg,
     );
 
-    // Normalize both text and query for matching
-    final normalizedText = AppSearchUrduNormalizer.normalize(text);
-    final normalizedQuery = AppSearchUrduNormalizer.normalize(query.trim());
-
-    if (normalizedQuery.isEmpty) {
+    final ranges = highlightRanges(text, query);
+    if (ranges.isEmpty) {
       return [TextSpan(text: text, style: style)];
     }
 
-    // Find all match positions in the normalized text
-    final lowerText = normalizedText.toLowerCase();
-    final lowerQuery = normalizedQuery.toLowerCase();
-
-    // Build a character-level mapping: original index → normalized index
-    // Since normalization can remove characters, we need to map positions back.
-    final matchRanges = <_Range>[];
-    int searchFrom = 0;
-    while (true) {
-      final pos = lowerText.indexOf(lowerQuery, searchFrom);
-      if (pos == -1) break;
-      matchRanges.add(_Range(pos, pos + lowerQuery.length));
-      searchFrom = pos + 1; // Allow overlapping for short queries
-    }
-
-    if (matchRanges.isEmpty) {
-      return [TextSpan(text: text, style: style)];
-    }
-
-    // Map normalized positions back to original text positions.
-    // Build a mapping array: for each char in original, what's the index in normalized.
-    final origToNorm = _buildOrigToNormMap(text, normalizedText);
-
-    // For each char in the original text, check if its normalized index
-    // falls within any match range.
-    final highlighted = List.filled(text.length, false);
-    for (int i = 0; i < text.length; i++) {
-      final normIdx = origToNorm[i];
-      if (normIdx < 0) continue; // Char was removed by normalization
-      for (final range in matchRanges) {
-        if (normIdx >= range.start && normIdx < range.end) {
-          highlighted[i] = true;
-          break;
-        }
-      }
-    }
-
-    // Build spans from the highlighted flags
     final spans = <TextSpan>[];
-    int i = 0;
-    while (i < text.length) {
-      final isMatch = highlighted[i];
-      int j = i + 1;
-      while (j < text.length && highlighted[j] == isMatch) {
-        j++;
+    var cursor = 0;
+    for (final range in ranges) {
+      if (range.start > cursor) {
+        spans.add(TextSpan(
+          text: text.substring(cursor, range.start),
+          style: style,
+        ));
       }
-      spans.add(TextSpan(
-        text: text.substring(i, j),
-        style: isMatch ? highlightStyle : style,
-      ));
-      i = j;
+      spans.add(TextSpan(text: range.textInside(text), style: highlightStyle));
+      cursor = range.end;
     }
-
+    if (cursor < text.length) {
+      spans.add(TextSpan(text: text.substring(cursor), style: style));
+    }
     return spans;
   }
 
-  /// Build a mapping from original text char index → normalized text char index.
-  /// Characters removed by normalization get -1.
-  List<int> _buildOrigToNormMap(String original, String normalized) {
-    // Re-normalize character by character to build the mapping.
-    // This is an approximation: we normalize the full original string
-    // and then align the two strings using a simple pointer walk.
-    final map = List.filled(original.length, -1);
-    int normIdx = 0;
+  /// The ranges of [text] (UTF-16 offsets, end exclusive, sorted and
+  /// non-overlapping) that match [query] after Urdu normalization and
+  /// case folding.
+  ///
+  /// A range covers the matched characters plus any diacritics, tatweel or
+  /// extra whitespace inside them, and diacritics/tatweel directly after the
+  /// last matched letter, so a word is never split from its marks (that
+  /// would break Nastaliq joining).
+  static List<TextRange> highlightRanges(String text, String query) {
+    final normalizedQuery = _foldCase(AppSearchUrduNormalizer.normalize(query));
+    if (normalizedQuery.isEmpty || text.isEmpty) return const [];
 
-    for (int origIdx = 0; origIdx < original.length; origIdx++) {
-      if (normIdx >= normalized.length) break;
+    final normalized = AppSearchUrduNormalizer.normalizeWithOffsets(text);
+    final haystack = _foldCase(normalized.text);
+    final sourceToNormalized = normalized.sourceToNormalized;
 
-      final origChar = original[origIdx];
-      final normOfChar = AppSearchUrduNormalizer.normalize(origChar);
-
-      if (normOfChar.isEmpty) {
-        // This char was removed (diacritic/tatweel)
-        map[origIdx] = -1;
-        continue;
-      }
-
-      // Check if the normalized version of this char matches what's at normIdx
-      if (normIdx < normalized.length &&
-          normOfChar.length == 1 &&
-          normOfChar[0].toLowerCase() == normalized[normIdx].toLowerCase()) {
-        map[origIdx] = normIdx;
-        normIdx++;
-      } else if (normOfChar.length == 1) {
-        // Variant mapping changed the char — still maps to normIdx
-        map[origIdx] = normIdx;
-        normIdx++;
-      } else {
-        // Edge case: normalization expanded? Shouldn't happen but be safe
-        map[origIdx] = normIdx;
-        normIdx++;
-      }
+    // normalized index → source index (every normalized char has one source).
+    final normalizedToSource = List<int>.filled(haystack.length, -1);
+    for (var i = 0; i < sourceToNormalized.length; i++) {
+      final n = sourceToNormalized[i];
+      if (n >= 0) normalizedToSource[n] = i;
     }
 
-    return map;
-  }
-}
+    final ranges = <TextRange>[];
+    var searchFrom = 0;
+    while (true) {
+      final pos = haystack.indexOf(normalizedQuery, searchFrom);
+      if (pos == -1) break;
+      searchFrom = pos + 1; // overlapping matches merge below
 
-class _Range {
-  final int start;
-  final int end;
-  const _Range(this.start, this.end);
+      final start = normalizedToSource[pos];
+      var end = normalizedToSource[pos + normalizedQuery.length - 1] + 1;
+      while (end < text.length &&
+          sourceToNormalized[end] < 0 &&
+          AppSearchUrduNormalizer.isDroppedMark(text[end])) {
+        end++;
+      }
+
+      if (ranges.isNotEmpty && start <= ranges.last.end) {
+        final last = ranges.removeLast();
+        ranges.add(TextRange(start: last.start, end: end > last.end ? end : last.end));
+      } else {
+        ranges.add(TextRange(start: start, end: end));
+      }
+    }
+    return ranges;
+  }
+
+  /// Lower-cases [s] one code unit at a time so indices never shift (a few
+  /// characters, e.g. 'İ', lower-case to two code units; those are kept).
+  static String _foldCase(String s) {
+    final buffer = StringBuffer();
+    for (var i = 0; i < s.length; i++) {
+      final lower = s[i].toLowerCase();
+      buffer.write(lower.length == 1 ? lower : s[i]);
+    }
+    return buffer.toString();
+  }
 }

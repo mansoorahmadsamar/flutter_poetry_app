@@ -38,6 +38,11 @@ class AppRoutes {
   static const String splash = '/';
   static const String login = '/login';
   static const String main = '/main';
+
+  // Route names (for context.pushNamed). Path parameter: publicId / slug.
+  static const String poetDetailName = 'poet-detail';
+  static const String poemDetailName = 'poem-detail';
+  static const String hashtagDetailName = 'hashtag-detail';
 }
 
 /// Routes that REQUIRE an authenticated user. A guest who navigates to any
@@ -118,14 +123,14 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: 'poets/:publicId',
-            name: 'poet-detail',
+            name: AppRoutes.poetDetailName,
             builder: (context, state) => PoetDetailScreen(
               publicId: state.pathParameters['publicId']!,
             ),
           ),
           GoRoute(
             path: 'poems/:publicId',
-            name: 'poem-detail',
+            name: AppRoutes.poemDetailName,
             builder: (context, state) => PoemDetailScreen(
               publicId: state.pathParameters['publicId']!,
             ),
@@ -298,7 +303,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Hashtag routes
       GoRoute(
         path: '/hashtags/:slug',
-        name: 'hashtag-detail',
+        name: AppRoutes.hashtagDetailName,
         builder: (context, state) => HashtagDetailScreen(
           slug: state.pathParameters['slug']!,
         ),

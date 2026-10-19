@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
+import 'package:flutter_poetry_app/core/utils/api_placeholder.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poet_model.dart';
 import 'package:flutter_poetry_app/features/search/utils/highlighted_text.dart';
 import 'package:shimmer/shimmer.dart';
@@ -121,11 +122,12 @@ class AppSearchPoetCard extends StatelessWidget {
   }
 
   Widget _buildAvatar(bool isDark) {
+    final imageUrl = presentOrNull(poet.profileImageUrl);
     return ClipRRect(
       borderRadius: BorderRadius.circular(28),
-      child: poet.profileImageUrl != null
+      child: imageUrl != null
           ? CachedNetworkImage(
-              imageUrl: poet.profileImageUrl!,
+              imageUrl: imageUrl,
               width: 56,
               height: 56,
               fit: BoxFit.cover,
