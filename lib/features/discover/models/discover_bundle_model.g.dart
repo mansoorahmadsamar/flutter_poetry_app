@@ -113,6 +113,8 @@ _$ContentCardImpl _$$ContentCardImplFromJson(Map<String, dynamic> json) =>
       excerpt: const PlaceholderStringConverter().fromJson(json['excerpt']),
       poetPublicId:
           const PlaceholderStringConverter().fromJson(json['poetPublicId']),
+      poemPublicId:
+          const PlaceholderStringConverter().fromJson(json['poemPublicId']),
     );
 
 Map<String, dynamic> _$$ContentCardImplToJson(_$ContentCardImpl instance) =>
@@ -131,6 +133,8 @@ Map<String, dynamic> _$$ContentCardImplToJson(_$ContentCardImpl instance) =>
       'excerpt': const PlaceholderStringConverter().toJson(instance.excerpt),
       'poetPublicId':
           const PlaceholderStringConverter().toJson(instance.poetPublicId),
+      'poemPublicId':
+          const PlaceholderStringConverter().toJson(instance.poemPublicId),
     };
 
 _$ContentMetricsImpl _$$ContentMetricsImplFromJson(Map<String, dynamic> json) =>

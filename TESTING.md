@@ -57,7 +57,8 @@
 
 - `test/helpers/feed_card_harness.dart` — `pumpFeedCard` (no router) and `pumpFeedCardInRouter`, which mounts the card
   in a `GoRouter` whose `/main/poets/:publicId` and `/main/poems/:publicId` routes show `poet:<id>` / `poem:<id>`, so a
-  tap test can assert where the tap went. Guest cards are built from `test/fixtures/guest/discover_ur.json` through the
+  tap test can assert where the tap went. It overrides `feedProvider` with an `IdleFeedService`, so a card tap that
+  records an engagement event loads and sends nothing. Guest cards are built from `test/fixtures/guest/discover_ur.json` through the
   real `GuestService` + `FeedResponse.fromGuestBundle` (see `guest_feed_poet_tap_test.dart`).
 
 ### Three things every test must know

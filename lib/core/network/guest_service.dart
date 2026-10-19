@@ -314,6 +314,7 @@ class GuestService {
       primaryText: excerpt,
       secondaryText: j['poetName']?.toString(),
       poetPublicId: presentOrNull(j['poetPublicId']?.toString()),
+      poemPublicId: presentOrNull(j['poemPublicId']?.toString()),
       badge: j['coupletTypeName']?.toString(),
       badgeKey: j['coupletType']?.toString(),
       language: 'ur',

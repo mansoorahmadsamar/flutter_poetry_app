@@ -112,6 +112,7 @@ FeedItem _coupletItemFromCard(ContentCard card) {
       versesTextArabic: card.primaryText,
       poetName: card.secondaryText,
       poetPublicId: card.poetPublicId,
+      poemPublicId: card.poemPublicId,
       poetProfileImageUrl: card.imageUrl,
       likeCount: card.metrics?.likeCount ?? 0,
       shareCount: card.metrics?.shareCount ?? 0,

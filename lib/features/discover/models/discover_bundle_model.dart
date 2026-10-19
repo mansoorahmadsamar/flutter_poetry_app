@@ -84,6 +84,9 @@ class ContentCard with _$ContentCard {
     /// The poet behind a POEM / COUPLET card, under the same name the
     /// signed-in feed's `contentData` uses. `null` when absent or `"-"`.
     @PlaceholderStringConverter() String? poetPublicId,
+    /// The parent poem of a COUPLET card (what a tap opens), under the same
+    /// name signed-in couplets use. `null` when absent or `"-"`.
+    @PlaceholderStringConverter() String? poemPublicId,
   }) = _ContentCard;
 
   factory ContentCard.fromJson(Map<String, dynamic> json) =>

@@ -994,6 +994,11 @@ mixin _$ContentCard {
   @PlaceholderStringConverter()
   String? get poetPublicId => throw _privateConstructorUsedError;
 
+  /// The parent poem of a COUPLET card (what a tap opens), under the same
+  /// name signed-in couplets use. `null` when absent or `"-"`.
+  @PlaceholderStringConverter()
+  String? get poemPublicId => throw _privateConstructorUsedError;
+
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
   $ContentCardCopyWith<ContentCard> get copyWith =>
@@ -1019,7 +1024,8 @@ abstract class $ContentCardCopyWith<$Res> {
       double? score,
       String? imageUrl,
       @PlaceholderStringConverter() String? excerpt,
-      @PlaceholderStringConverter() String? poetPublicId});
+      @PlaceholderStringConverter() String? poetPublicId,
+      @PlaceholderStringConverter() String? poemPublicId});
 
   $ContentMetricsCopyWith<$Res>? get metrics;
 }
@@ -1050,6 +1056,7 @@ class _$ContentCardCopyWithImpl<$Res, $Val extends ContentCard>
     Object? imageUrl = freezed,
     Object? excerpt = freezed,
     Object? poetPublicId = freezed,
+    Object? poemPublicId = freezed,
   }) {
     return _then(_value.copyWith(
       type: null == type
@@ -1104,6 +1111,10 @@ class _$ContentCardCopyWithImpl<$Res, $Val extends ContentCard>
           ? _value.poetPublicId
           : poetPublicId // ignore: cast_nullable_to_non_nullable
               as String?,
+      poemPublicId: freezed == poemPublicId
+          ? _value.poemPublicId
+          : poemPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 
@@ -1141,7 +1152,8 @@ abstract class _$$ContentCardImplCopyWith<$Res>
       double? score,
       String? imageUrl,
       @PlaceholderStringConverter() String? excerpt,
-      @PlaceholderStringConverter() String? poetPublicId});
+      @PlaceholderStringConverter() String? poetPublicId,
+      @PlaceholderStringConverter() String? poemPublicId});
 
   @override
   $ContentMetricsCopyWith<$Res>? get metrics;
@@ -1171,6 +1183,7 @@ class __$$ContentCardImplCopyWithImpl<$Res>
     Object? imageUrl = freezed,
     Object? excerpt = freezed,
     Object? poetPublicId = freezed,
+    Object? poemPublicId = freezed,
   }) {
     return _then(_$ContentCardImpl(
       type: null == type
@@ -1225,6 +1238,10 @@ class __$$ContentCardImplCopyWithImpl<$Res>
           ? _value.poetPublicId
           : poetPublicId // ignore: cast_nullable_to_non_nullable
               as String?,
+      poemPublicId: freezed == poemPublicId
+          ? _value.poemPublicId
+          : poemPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -1245,7 +1262,8 @@ class _$ContentCardImpl implements _ContentCard {
       this.score,
       this.imageUrl,
       @PlaceholderStringConverter() this.excerpt,
-      @PlaceholderStringConverter() this.poetPublicId});
+      @PlaceholderStringConverter() this.poetPublicId,
+      @PlaceholderStringConverter() this.poemPublicId});
 
   factory _$ContentCardImpl.fromJson(Map<String, dynamic> json) =>
       _$$ContentCardImplFromJson(json);
@@ -1288,9 +1306,15 @@ class _$ContentCardImpl implements _ContentCard {
   @PlaceholderStringConverter()
   final String? poetPublicId;
 
+  /// The parent poem of a COUPLET card (what a tap opens), under the same
+  /// name signed-in couplets use. `null` when absent or `"-"`.
+  @override
+  @PlaceholderStringConverter()
+  final String? poemPublicId;
+
   @override
   String toString() {
-    return 'ContentCard(type: $type, publicId: $publicId, primaryText: $primaryText, secondaryText: $secondaryText, badge: $badge, badgeKey: $badgeKey, metrics: $metrics, language: $language, direction: $direction, score: $score, imageUrl: $imageUrl, excerpt: $excerpt, poetPublicId: $poetPublicId)';
+    return 'ContentCard(type: $type, publicId: $publicId, primaryText: $primaryText, secondaryText: $secondaryText, badge: $badge, badgeKey: $badgeKey, metrics: $metrics, language: $language, direction: $direction, score: $score, imageUrl: $imageUrl, excerpt: $excerpt, poetPublicId: $poetPublicId, poemPublicId: $poemPublicId)';
   }
 
   @override
@@ -1318,7 +1342,9 @@ class _$ContentCardImpl implements _ContentCard {
                 other.imageUrl == imageUrl) &&
             (identical(other.excerpt, excerpt) || other.excerpt == excerpt) &&
             (identical(other.poetPublicId, poetPublicId) ||
-                other.poetPublicId == poetPublicId));
+                other.poetPublicId == poetPublicId) &&
+            (identical(other.poemPublicId, poemPublicId) ||
+                other.poemPublicId == poemPublicId));
   }
 
   @JsonKey(ignore: true)
@@ -1337,7 +1363,8 @@ class _$ContentCardImpl implements _ContentCard {
       score,
       imageUrl,
       excerpt,
-      poetPublicId);
+      poetPublicId,
+      poemPublicId);
 
   @JsonKey(ignore: true)
   @override
@@ -1367,7 +1394,8 @@ abstract class _ContentCard implements ContentCard {
           final double? score,
           final String? imageUrl,
           @PlaceholderStringConverter() final String? excerpt,
-          @PlaceholderStringConverter() final String? poetPublicId}) =
+          @PlaceholderStringConverter() final String? poetPublicId,
+          @PlaceholderStringConverter() final String? poemPublicId}) =
       _$ContentCardImpl;
 
   factory _ContentCard.fromJson(Map<String, dynamic> json) =
@@ -1406,6 +1434,12 @@ abstract class _ContentCard implements ContentCard {
   /// signed-in feed's `contentData` uses. `null` when absent or `"-"`.
   @PlaceholderStringConverter()
   String? get poetPublicId;
+  @override
+
+  /// The parent poem of a COUPLET card (what a tap opens), under the same
+  /// name signed-in couplets use. `null` when absent or `"-"`.
+  @PlaceholderStringConverter()
+  String? get poemPublicId;
   @override
   @JsonKey(ignore: true)
   _$$ContentCardImplCopyWith<_$ContentCardImpl> get copyWith =>

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
+import 'package:flutter_poetry_app/core/utils/api_placeholder.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
@@ -53,7 +54,8 @@ class CoupletFeedCard extends ConsumerWidget {
       ),
       color: _cardColor(isDark),
       child: InkWell(
-        onTap: () => _onTap(context, ref),
+        // Opens the parent poem; a couplet without one is not tappable.
+        onTap: _poemId == null ? null : () => _onTap(context, ref),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(
@@ -109,7 +111,7 @@ class CoupletFeedCard extends ConsumerWidget {
               ],
 
               // "Open poem →" CTA
-              if (data.poemPublicId != null) ...[
+              if (_poemId != null) ...[
                 const SizedBox(height: AppSpacing.md),
                 Align(
                   alignment: Alignment.center,
@@ -336,11 +338,14 @@ class CoupletFeedCard extends ConsumerWidget {
   }
 
 
+  /// The poem this couplet opens, or null when absent or the API's `"-"`.
+  String? get _poemId => presentOrNull(data.poemPublicId);
+
   void _onTap(BuildContext context, WidgetRef ref) {
+    final poemId = _poemId;
+    if (poemId == null) return;
     ref.read(feedProvider.notifier).trackAction(item, 'open_item');
-    if (data.poemPublicId != null) {
-      context.push('/main/poems/${data.poemPublicId}');
-    }
+    context.push('/main/poems/$poemId');
   }
 
   void _onCopy(BuildContext context) {
