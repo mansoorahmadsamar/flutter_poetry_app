@@ -150,3 +150,6 @@ key.properties
 *service-account*.json
 *-firebase-adminsdk-*.json
 client_secret*.json
+
+# Personal Claude Code settings: machine-local, may hold credentials (T-049)
+.claude/settings.local.json
