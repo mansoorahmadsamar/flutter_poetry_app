@@ -208,7 +208,7 @@ adb install -r build/app/outputs/flutter-apk/app-release.apk
 
 # 3. ALWAYS afterwards: the Flutter migrator rewrites tracked Android files on every build
 git status
-git diff android/app/build.gradle.kts android/gradle.properties   # e.g. minSdk 23 -> flutter.minSdkVersion
+git diff android/app/build.gradle.kts android/gradle.properties   # e.g. minSdk 24 -> flutter.minSdkVersion
 git checkout -- android/app/build.gradle.kts android/gradle.properties   # only if the diff is the migrator's
 
 # 4. Read and drive the UI without screenshots (Flutter semantics text is exposed)
@@ -221,8 +221,9 @@ adb emu network delay gprs           # reset with: adb emu network delay none
 adb shell svc wifi disable && adb shell svc data disable   # offline; re-enable afterwards
 ```
 
-`minSdk = 23` in `android/app/build.gradle.kts:47` is deliberate (Firebase Auth); the migrator's rewrite must not be
-committed.
+`minSdk = 24` in `android/app/build.gradle.kts` is deliberate: Google Play automatic protection rejects bundles below
+API 24 (Firebase Auth needs 23+). It stays an explicit number because `flutter.minSdkVersion` differs between Flutter
+versions (CI uses 3.27.1); the migrator's rewrite must not be committed.
 
 ## 8. Production QA, safely
 

@@ -44,7 +44,9 @@ android {
         applicationId = "com.techhikes.poetry_app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = 23  // Firebase Auth 23.x requires API 23+
+        // Android 7.0+: Google Play automatic protection rejects bundles below API 24
+        // (Firebase Auth needs 23+). Kept explicit: flutter.minSdkVersion differs per Flutter version.
+        minSdk = 24
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

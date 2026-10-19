@@ -21,7 +21,7 @@
 | Images/fonts | `cached_network_image`, `google_fonts` (runtime fetching **on**: `allowRuntimeFetching` is never set) | Only *Jameel Noori Nastaleeq* is bundled (`pubspec.yaml` `fonts:`). |
 | Unused deps | `hive`, `hive_flutter`, `connectivity_plus`, `retrofit`, `riverpod_annotation`, `pretty_dio_logger`, `permission_handler`, `intl` | No `package:` import of any of these appears in `lib/`. |
 
-App IDs: Android `com.techhikes.poetry_app` (`android/app/build.gradle.kts:44`, `minSdk = 23` at `:47`), iOS `com.techhikes.poetryapp` (`ios/Runner.xcodeproj/project.pbxproj:505`). Version is `1.0.0+4` in `pubspec.yaml`; CI overrides it (§13).
+App IDs: Android `com.techhikes.poetry_app` (`android/app/build.gradle.kts:44`, `minSdk = 24` (Android 7.0, required by Play automatic protection)), iOS `com.techhikes.poetryapp` (`ios/Runner.xcodeproj/project.pbxproj:505`). Version is `1.0.0+4` in `pubspec.yaml`; CI overrides it (§13).
 
 ---
 
@@ -374,7 +374,7 @@ Production is the only backend with real data, and there is no staging (`stage-a
 
 1. **Use a release build.** Only `kReleaseMode` selects `https://api.prod.jahanesukhan.com` (`app_config.dart:108-109`). A debug build always calls `http://10.0.2.2:8081`.
 2. Install the release build on an emulator or device, following the release-build rig in `TESTING.md`.
-3. **`flutter build` runs the Flutter migrator**, which has silently rewritten `android/app/build.gradle.kts` (`minSdk = 23` → `flutter.minSdkVersion`) and `android/gradle.properties`. After any build, run `git status` and revert those edits unless they are intended.
+3. **`flutter build` runs the Flutter migrator**, which has silently rewritten `android/app/build.gradle.kts` (`minSdk` → `flutter.minSdkVersion`) and `android/gradle.properties`. After any build, run `git status` and revert those edits unless they are intended.
 4. Prod QA has side effects. Sign-in, search, opening poems and poets, and feed events all write analytics and counters. Use the owner's account and keep actions minimal.
 5. Release builds turn off `LoggingInterceptor`. To see traffic, use a proxy or device logs. Which `Logger` output survives in release mode is **UNVERIFIED**.
 6. To test locally against a debug build, run the backend on the host at port 8081. `10.0.2.2` works on the Android emulator only; iOS Simulator and physical devices need a code change.
