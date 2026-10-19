@@ -3,7 +3,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -202,11 +201,7 @@ class PoetImageFeedCard extends ConsumerWidget {
         // Poet name + era
         Expanded(
           child: GestureDetector(
-            onTap: () {
-              if (data.poetPublicId != null) {
-                context.push('/main/poets/${data.poetPublicId}');
-              }
-            },
+            onTap: FeedPoetAvatar.profileTap(context, data.poetPublicId),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -342,9 +337,7 @@ class PoetImageFeedCard extends ConsumerWidget {
 
   void _onTap(BuildContext context, WidgetRef ref) {
     ref.read(feedProvider.notifier).trackAction(item, 'open_item');
-    if (data.poetPublicId != null) {
-      context.push('/main/poets/${data.poetPublicId}');
-    }
+    FeedPoetAvatar.profileTap(context, data.poetPublicId)?.call();
   }
 
   void _onCopy(BuildContext context) {

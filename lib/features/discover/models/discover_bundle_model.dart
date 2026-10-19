@@ -81,6 +81,9 @@ class ContentCard with _$ContentCard {
     /// Opening lines of a poem (newline-separated misras). `null` when the
     /// API sends nothing, a blank string or its `"-"` placeholder.
     @PlaceholderStringConverter() String? excerpt,
+    /// The poet behind a POEM / COUPLET card, under the same name the
+    /// signed-in feed's `contentData` uses. `null` when absent or `"-"`.
+    @PlaceholderStringConverter() String? poetPublicId,
   }) = _ContentCard;
 
   factory ContentCard.fromJson(Map<String, dynamic> json) =>

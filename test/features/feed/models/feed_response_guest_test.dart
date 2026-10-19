@@ -89,4 +89,63 @@ void main() {
       expect(ContentCard.fromJson(card(lines)).excerpt, lines);
     });
   });
+
+  group('guest poet public id (T-109)', () {
+    test('regression: guest poem cards keep the poet\'s poetPublicId', () async {
+      final body = loadJsonFixture('guest/discover_ur.json');
+      final apiPoems = ((body['data'] as Map<String, dynamic>)['featuredPoems']
+              as List)
+          .cast<Map<String, dynamic>>();
+      final bundle =
+          await GuestService(FixtureDioClient(body)).getDiscoverBundle(lang: 'ur');
+
+      final poems = FeedResponse.fromGuestBundle(bundle)
+          .items
+          .where((i) => i.type == 'POEM')
+          .map((i) => i.contentData as PoemContentData)
+          .toList();
+      expect(poems, hasLength(apiPoems.length));
+      for (var i = 0; i < poems.length; i++) {
+        expect(poems[i].poetPublicId, apiPoems[i]['poetPublicId']);
+      }
+    });
+
+    test('guest couplet cards keep the poet\'s poetPublicId', () {
+      final feed = FeedResponse.fromGuestBundle(const DiscoverBundle(
+        trendingSearches: TrendingSearches(),
+        editorsPicks: ContentSection(),
+        recommended: ContentSection(items: [
+          ContentCard(
+            type: 'COUPLET',
+            publicId: 'c1',
+            primaryText: 'misra',
+            poetPublicId: 'poet-1',
+          ),
+        ]),
+        featuredPoets: ContentSection(),
+        categories: ContentSection(),
+        language: 'ur',
+      ));
+      final data = feed.items.single.contentData as CoupletContentData;
+      expect(data.poetPublicId, 'poet-1');
+    });
+
+    test('ContentCard.fromJson: "-", blank, null and missing are absent', () {
+      Map<String, dynamic> card(Object? id) => {
+            'type': 'POEM',
+            'publicId': 'p1',
+            'primaryText': 'title',
+            'poetPublicId': id,
+          };
+      for (final id in ['-', '', null]) {
+        expect(ContentCard.fromJson(card(id)).poetPublicId, isNull);
+      }
+      expect(
+        ContentCard.fromJson(
+            {'type': 'POEM', 'publicId': 'p1', 'primaryText': 't'}).poetPublicId,
+        isNull,
+      );
+      expect(ContentCard.fromJson(card('poet-1')).poetPublicId, 'poet-1');
+    });
+  });
 }

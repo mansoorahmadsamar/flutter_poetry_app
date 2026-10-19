@@ -989,6 +989,11 @@ mixin _$ContentCard {
   @PlaceholderStringConverter()
   String? get excerpt => throw _privateConstructorUsedError;
 
+  /// The poet behind a POEM / COUPLET card, under the same name the
+  /// signed-in feed's `contentData` uses. `null` when absent or `"-"`.
+  @PlaceholderStringConverter()
+  String? get poetPublicId => throw _privateConstructorUsedError;
+
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
   $ContentCardCopyWith<ContentCard> get copyWith =>
@@ -1013,7 +1018,8 @@ abstract class $ContentCardCopyWith<$Res> {
       String direction,
       double? score,
       String? imageUrl,
-      @PlaceholderStringConverter() String? excerpt});
+      @PlaceholderStringConverter() String? excerpt,
+      @PlaceholderStringConverter() String? poetPublicId});
 
   $ContentMetricsCopyWith<$Res>? get metrics;
 }
@@ -1043,6 +1049,7 @@ class _$ContentCardCopyWithImpl<$Res, $Val extends ContentCard>
     Object? score = freezed,
     Object? imageUrl = freezed,
     Object? excerpt = freezed,
+    Object? poetPublicId = freezed,
   }) {
     return _then(_value.copyWith(
       type: null == type
@@ -1093,6 +1100,10 @@ class _$ContentCardCopyWithImpl<$Res, $Val extends ContentCard>
           ? _value.excerpt
           : excerpt // ignore: cast_nullable_to_non_nullable
               as String?,
+      poetPublicId: freezed == poetPublicId
+          ? _value.poetPublicId
+          : poetPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 
@@ -1129,7 +1140,8 @@ abstract class _$$ContentCardImplCopyWith<$Res>
       String direction,
       double? score,
       String? imageUrl,
-      @PlaceholderStringConverter() String? excerpt});
+      @PlaceholderStringConverter() String? excerpt,
+      @PlaceholderStringConverter() String? poetPublicId});
 
   @override
   $ContentMetricsCopyWith<$Res>? get metrics;
@@ -1158,6 +1170,7 @@ class __$$ContentCardImplCopyWithImpl<$Res>
     Object? score = freezed,
     Object? imageUrl = freezed,
     Object? excerpt = freezed,
+    Object? poetPublicId = freezed,
   }) {
     return _then(_$ContentCardImpl(
       type: null == type
@@ -1208,6 +1221,10 @@ class __$$ContentCardImplCopyWithImpl<$Res>
           ? _value.excerpt
           : excerpt // ignore: cast_nullable_to_non_nullable
               as String?,
+      poetPublicId: freezed == poetPublicId
+          ? _value.poetPublicId
+          : poetPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -1227,7 +1244,8 @@ class _$ContentCardImpl implements _ContentCard {
       this.direction = 'rtl',
       this.score,
       this.imageUrl,
-      @PlaceholderStringConverter() this.excerpt});
+      @PlaceholderStringConverter() this.excerpt,
+      @PlaceholderStringConverter() this.poetPublicId});
 
   factory _$ContentCardImpl.fromJson(Map<String, dynamic> json) =>
       _$$ContentCardImplFromJson(json);
@@ -1264,9 +1282,15 @@ class _$ContentCardImpl implements _ContentCard {
   @PlaceholderStringConverter()
   final String? excerpt;
 
+  /// The poet behind a POEM / COUPLET card, under the same name the
+  /// signed-in feed's `contentData` uses. `null` when absent or `"-"`.
+  @override
+  @PlaceholderStringConverter()
+  final String? poetPublicId;
+
   @override
   String toString() {
-    return 'ContentCard(type: $type, publicId: $publicId, primaryText: $primaryText, secondaryText: $secondaryText, badge: $badge, badgeKey: $badgeKey, metrics: $metrics, language: $language, direction: $direction, score: $score, imageUrl: $imageUrl, excerpt: $excerpt)';
+    return 'ContentCard(type: $type, publicId: $publicId, primaryText: $primaryText, secondaryText: $secondaryText, badge: $badge, badgeKey: $badgeKey, metrics: $metrics, language: $language, direction: $direction, score: $score, imageUrl: $imageUrl, excerpt: $excerpt, poetPublicId: $poetPublicId)';
   }
 
   @override
@@ -1292,7 +1316,9 @@ class _$ContentCardImpl implements _ContentCard {
             (identical(other.score, score) || other.score == score) &&
             (identical(other.imageUrl, imageUrl) ||
                 other.imageUrl == imageUrl) &&
-            (identical(other.excerpt, excerpt) || other.excerpt == excerpt));
+            (identical(other.excerpt, excerpt) || other.excerpt == excerpt) &&
+            (identical(other.poetPublicId, poetPublicId) ||
+                other.poetPublicId == poetPublicId));
   }
 
   @JsonKey(ignore: true)
@@ -1310,7 +1336,8 @@ class _$ContentCardImpl implements _ContentCard {
       direction,
       score,
       imageUrl,
-      excerpt);
+      excerpt,
+      poetPublicId);
 
   @JsonKey(ignore: true)
   @override
@@ -1328,18 +1355,20 @@ class _$ContentCardImpl implements _ContentCard {
 
 abstract class _ContentCard implements ContentCard {
   const factory _ContentCard(
-      {required final String type,
-      required final String publicId,
-      required final String primaryText,
-      final String? secondaryText,
-      final String? badge,
-      final String? badgeKey,
-      final ContentMetrics? metrics,
-      final String language,
-      final String direction,
-      final double? score,
-      final String? imageUrl,
-      @PlaceholderStringConverter() final String? excerpt}) = _$ContentCardImpl;
+          {required final String type,
+          required final String publicId,
+          required final String primaryText,
+          final String? secondaryText,
+          final String? badge,
+          final String? badgeKey,
+          final ContentMetrics? metrics,
+          final String language,
+          final String direction,
+          final double? score,
+          final String? imageUrl,
+          @PlaceholderStringConverter() final String? excerpt,
+          @PlaceholderStringConverter() final String? poetPublicId}) =
+      _$ContentCardImpl;
 
   factory _ContentCard.fromJson(Map<String, dynamic> json) =
       _$ContentCardImpl.fromJson;
@@ -1371,6 +1400,12 @@ abstract class _ContentCard implements ContentCard {
   /// API sends nothing, a blank string or its `"-"` placeholder.
   @PlaceholderStringConverter()
   String? get excerpt;
+  @override
+
+  /// The poet behind a POEM / COUPLET card, under the same name the
+  /// signed-in feed's `contentData` uses. `null` when absent or `"-"`.
+  @PlaceholderStringConverter()
+  String? get poetPublicId;
   @override
   @JsonKey(ignore: true)
   _$$ContentCardImplCopyWith<_$ContentCardImpl> get copyWith =>

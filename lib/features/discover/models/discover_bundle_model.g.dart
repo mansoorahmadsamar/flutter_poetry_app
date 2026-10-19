@@ -110,8 +110,9 @@ _$ContentCardImpl _$$ContentCardImplFromJson(Map<String, dynamic> json) =>
       direction: json['direction'] as String? ?? 'rtl',
       score: (json['score'] as num?)?.toDouble(),
       imageUrl: json['imageUrl'] as String?,
-      excerpt: const PlaceholderStringConverter()
-          .fromJson(json['excerpt'] as String?),
+      excerpt: const PlaceholderStringConverter().fromJson(json['excerpt']),
+      poetPublicId:
+          const PlaceholderStringConverter().fromJson(json['poetPublicId']),
     );
 
 Map<String, dynamic> _$$ContentCardImplToJson(_$ContentCardImpl instance) =>
@@ -128,6 +129,8 @@ Map<String, dynamic> _$$ContentCardImplToJson(_$ContentCardImpl instance) =>
       'score': instance.score,
       'imageUrl': instance.imageUrl,
       'excerpt': const PlaceholderStringConverter().toJson(instance.excerpt),
+      'poetPublicId':
+          const PlaceholderStringConverter().toJson(instance.poetPublicId),
     };
 
 _$ContentMetricsImpl _$$ContentMetricsImplFromJson(Map<String, dynamic> json) =>

@@ -233,11 +233,7 @@ class PoemFeedCard extends ConsumerWidget {
         // Poet name + era
         Expanded(
           child: GestureDetector(
-            onTap: () {
-              if (data.poetPublicId != null) {
-                context.push('/main/poets/${data.poetPublicId}');
-              }
-            },
+            onTap: FeedPoetAvatar.profileTap(context, data.poetPublicId),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,

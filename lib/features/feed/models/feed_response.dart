@@ -92,6 +92,7 @@ FeedItem _poemItemFromCard(ContentCard card) {
       // the title, or the card shows the title twice and no verse.
       excerpt: card.excerpt == card.primaryText ? null : card.excerpt,
       poetName: card.secondaryText,
+      poetPublicId: card.poetPublicId,
       poetProfileImageUrl: card.imageUrl,
       poetryType: card.badgeKey,
       likeCount: card.metrics?.likeCount ?? 0,
@@ -110,6 +111,7 @@ FeedItem _coupletItemFromCard(ContentCard card) {
     contentData: CoupletContentData(
       versesTextArabic: card.primaryText,
       poetName: card.secondaryText,
+      poetPublicId: card.poetPublicId,
       poetProfileImageUrl: card.imageUrl,
       likeCount: card.metrics?.likeCount ?? 0,
       shareCount: card.metrics?.shareCount ?? 0,

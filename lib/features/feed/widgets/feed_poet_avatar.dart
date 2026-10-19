@@ -19,6 +19,15 @@ class FeedPoetAvatar extends StatelessWidget {
   final String? poetName;
   final String? imageUrl;
 
+  /// Opens `/main/poets/:publicId`, or null when the id is absent or the
+  /// API's `"-"` — the avatar and poet name are then not tappable. One rule
+  /// for every feed card.
+  static VoidCallback? profileTap(BuildContext context, String? poetPublicId) {
+    final publicId = presentOrNull(poetPublicId);
+    if (publicId == null) return null;
+    return () => context.push('/main/poets/$publicId');
+  }
+
   /// Semantic label for a poet avatar or name that opens the profile.
   static String semanticLabel(String? poetName) {
     final name = presentOrNull(poetName);
@@ -28,10 +37,8 @@ class FeedPoetAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final publicId = presentOrNull(poetPublicId);
     final url = presentOrNull(imageUrl);
-    final openProfile =
-        publicId == null ? null : () => context.push('/main/poets/$publicId');
+    final openProfile = profileTap(context, poetPublicId);
 
     return Semantics(
       button: openProfile != null,
