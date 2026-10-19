@@ -1,27 +1,52 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
+import '../../auth/token_refresher.dart';
 import '../../constants/app_constants.dart';
 import '../../storage/secure_storage.dart';
 
-/// Enhanced authentication interceptor with automatic token refresh.
+/// Called when the session can no longer be refreshed. Must be idempotent:
+/// several failing requests can report the same expiry.
+typedef SessionExpiredCallback = Future<void> Function();
+
+/// Adds credentials to requests and recovers from 401s.
+///
+/// On a 401 for a request that carried an access token:
+/// - if another request already refreshed the token, retry with the new one;
+/// - otherwise refresh once (shared by every concurrent 401, see
+///   [TokenRefresher]) and retry the request once;
+/// - if the refresh is refused, report [onSessionExpired] (the app signs the
+///   user out and shows the login screen) and fail the request with its 401;
+/// - if the refresh can't reach the server, fail the request with that
+///   network error so the screen says "offline", and keep the user signed in.
 ///
 /// Requests to the `/api/guest/**` surface (anonymous-only endpoints) bypass
-/// auth-header injection AND the 401-refresh dance — the backend strips
-/// personalization for those calls and would otherwise see leftover credentials.
+/// auth-header injection AND the 401 handling — the backend strips
+/// personalization for those calls and would otherwise see leftover
+/// credentials. Requests sent without a token (a guest calling an
+/// account-only endpoint) also never refresh or sign anyone out.
 class AuthInterceptor extends Interceptor {
   final SecureStorageService _secureStorage;
   final Dio _dio;
+  final TokenRefresher _refresher;
+  final SessionExpiredCallback? _onSessionExpired;
   final Logger _logger = Logger();
-
-  // Lock to prevent concurrent token refresh attempts
-  bool _isRefreshing = false;
-  final List<({DioException error, ErrorInterceptorHandler handler})> _pendingRequests = [];
 
   /// All paths starting with this prefix are treated as anonymous —
   /// no Authorization header, no X-User-Id, no 401 refresh.
   static const _guestPathPrefix = '/api/guest/';
 
-  AuthInterceptor(this._secureStorage, this._dio);
+  /// Marks a request that was already retried after a refresh, so a second
+  /// 401 is passed on instead of refreshing in a loop.
+  static const retriedAfterRefreshKey = 'auth.retriedAfterRefresh';
+
+  AuthInterceptor(
+    this._secureStorage,
+    this._dio,
+    this._refresher, {
+    SessionExpiredCallback? onSessionExpired,
+  }) : _onSessionExpired = onSessionExpired;
 
   bool _isGuestPath(String path) => path.startsWith(_guestPathPrefix);
 
@@ -43,16 +68,13 @@ class AuthInterceptor extends Interceptor {
       return handler.next(options);
     }
 
-    // Get access token from secure storage
     final accessToken = await _secureStorage.getAccessToken();
-
-    // Add token to headers if available
     if (accessToken != null && accessToken.isNotEmpty) {
       options.headers[AppConstants.authorizationHeader] =
           '${AppConstants.bearerPrefix} $accessToken';
-      _logger.i('🔐 Authorization token added (${accessToken.length} chars)');
     } else {
-      _logger.w('⚠️  No authorization token available');
+      // A retried request must not keep a stale header from its first try.
+      options.headers.remove(AppConstants.authorizationHeader);
     }
 
     // Add user ID for personalization
@@ -69,166 +91,87 @@ class AuthInterceptor extends Interceptor {
     DioException err,
     ErrorInterceptorHandler handler,
   ) async {
-    // Defensive: never run the refresh dance for guest paths. The backend
-    // shouldn't 401 anonymous endpoints, but if it ever does we just pass
-    // the error through rather than burning the queue with retries.
-    if (_isGuestPath(err.requestOptions.path)) {
-      await _handleErrorResponse(err);
+    final options = err.requestOptions;
+    final sentToken = _bearerToken(options);
+
+    final canRecover = err.response?.statusCode == 401 &&
+        !_isGuestPath(options.path) &&
+        options.path != AppConstants.authRefreshPath &&
+        options.extra[retriedAfterRefreshKey] != true &&
+        sentToken != null;
+    if (!canRecover) {
+      _logError(err);
       return handler.next(err);
     }
 
-    // Handle 401 Unauthorized errors by attempting token refresh
-    if (err.response?.statusCode == 401) {
-      _logger.w('⚠️  Received 401 Unauthorized, attempting token refresh...');
+    // Another request may have refreshed while this one was in flight.
+    final storedToken = await _secureStorage.getAccessToken();
+    if (storedToken != null &&
+        storedToken.isNotEmpty &&
+        storedToken != sentToken) {
+      return _retry(options, handler);
+    }
 
-      if (_isRefreshing) {
-        _logger.i('⏳ Token refresh already in progress, queueing request...');
-        // Queue this request to be retried after token refresh
-        _pendingRequests.add((error: err, handler: handler));
-        return;
-      }
-
-      _isRefreshing = true;
-
-      try {
-        // Attempt to refresh the access token
-        final refreshToken = await _secureStorage.getRefreshToken();
-
-        if (refreshToken == null) {
-          _logger.e('❌ No refresh token available');
-          _isRefreshing = false;
-          handler.reject(err);
-          return;
+    _logger.w('401 on ${options.method} ${options.path}; refreshing token');
+    final outcome = await _refresher.refresh();
+    switch (outcome.kind) {
+      case RefreshOutcomeKind.refreshed:
+        return _retry(options, handler);
+      case RefreshOutcomeKind.rejected:
+        _logger.w('Session expired; signing out');
+        // Not awaited: the caller gets its 401 now; sign-out (clearing tokens,
+        // invalidating providers, routing to login) follows.
+        final onSessionExpired = _onSessionExpired;
+        if (onSessionExpired != null) {
+          unawaited(onSessionExpired().catchError((Object e) {
+            _logger.e('Session-expiry handler failed: $e');
+          }));
         }
-
-        _logger.i('🔄 Refreshing access token...');
-        _logger.i('   Refresh Token Length: ${refreshToken.length} chars');
-        _logger.i('   Original Request: ${err.requestOptions.method} ${err.requestOptions.path}');
-
-        final response = await _dio.post(
-          '/api/auth/refresh',
-          data: {
-            'refreshToken': refreshToken,
-          },
-          options: Options(
-            headers: {'Content-Type': 'application/json'},
-          ),
-        );
-
-        _logger.i('   Refresh Response Status: ${response.statusCode}');
-        _logger.i('   Refresh Response Body: ${response.data}');
-
-        if (response.statusCode == 200 &&
-            response.data is Map &&
-            response.data['success'] == true) {
-          final data = response.data['data'];
-
-          if (data != null && data['accessToken'] != null) {
-            final newAccessToken = data['accessToken'] as String;
-            final newRefreshToken =
-                data['refreshToken'] as String? ?? refreshToken;
-
-            await _secureStorage.saveAccessToken(newAccessToken);
-            await _secureStorage.saveRefreshToken(newRefreshToken);
-
-            _logger.i('✅ Token refreshed successfully');
-            _logger.i('   New Access Token Length: ${newAccessToken.length} chars');
-            _logger.i('   New Refresh Token Length: ${newRefreshToken.length} chars');
-
-            // Update the original request with new token
-            err.requestOptions.headers[AppConstants.authorizationHeader] =
-                '${AppConstants.bearerPrefix} $newAccessToken';
-
-            // Retry the original request with new token
-            _isRefreshing = false;
-            _logger.i('🔁 Retrying original request: ${err.requestOptions.method} ${err.requestOptions.path}');
-            final retryResponse = await _dio.fetch(err.requestOptions);
-            handler.resolve(retryResponse);
-
-            // Retry all queued requests
-            _retryQueuedRequests(newAccessToken);
-            return;
-          }
-        }
-
-        _logger.e('❌ Token refresh failed');
-        _logger.e('   Status Code: ${response.statusCode}');
-        _logger.e('   Response: ${response.data}');
-        _isRefreshing = false;
-        handler.reject(err);
-        _clearPendingRequests(err);
-      } catch (refreshError, stackTrace) {
-        _logger.e('❌ Token refresh error: $refreshError');
-        _logger.e('   Stack Trace: $stackTrace');
-        _isRefreshing = false;
-        handler.reject(err);
-        _clearPendingRequests(err);
-      }
-    } else {
-      // Handle other errors
-      await _handleErrorResponse(err);
-      handler.next(err);
+        return handler.next(err);
+      case RefreshOutcomeKind.unavailable:
+        // Report the network failure, not the 401: the user is offline, not
+        // signed out.
+        final cause = outcome.error!;
+        return handler.next(DioException(
+          requestOptions: options,
+          response: cause.response,
+          type: cause.type,
+          error: cause.error,
+          message: cause.message,
+        ));
     }
   }
 
-  /// Retry all queued requests with new token
-  void _retryQueuedRequests(String newAccessToken) async {
-    if (_pendingRequests.isNotEmpty) {
-      _logger.i('🔁 Retrying ${_pendingRequests.length} queued requests...');
-      _logger.i('   New Token Length: ${newAccessToken.length} chars');
-
-      for (int i = 0; i < _pendingRequests.length; i++) {
-        final pending = _pendingRequests[i];
-        _logger.i('   [${i + 1}/${_pendingRequests.length}] Retrying queued request...');
-        // Update request with new token and retry
-        pending.error.requestOptions.headers[AppConstants.authorizationHeader] =
-            '${AppConstants.bearerPrefix} $newAccessToken';
-        try {
-          final response = await _dio.fetch(pending.error.requestOptions);
-          pending.handler.resolve(response);
-        } catch (e) {
-          pending.handler.reject(pending.error);
-        }
-      }
-      _pendingRequests.clear();
-      _logger.i('✅ All queued requests retried');
+  Future<void> _retry(
+    RequestOptions options,
+    ErrorInterceptorHandler handler,
+  ) async {
+    options.extra[retriedAfterRefreshKey] = true;
+    try {
+      // onRequest attaches the current (new) token.
+      final response = await _dio.fetch<dynamic>(options);
+      handler.resolve(response);
+    } on DioException catch (e) {
+      // Already passed through the interceptors once; don't process it again.
+      handler.reject(e);
     }
   }
 
-  /// Clear pending requests on error
-  void _clearPendingRequests(DioException err) {
-    if (_pendingRequests.isNotEmpty) {
-      _logger.e('❌ Clearing ${_pendingRequests.length} pending requests');
-      _logger.e('   Error: ${err.message}');
-
-      for (final pending in _pendingRequests) {
-        pending.handler.reject(err);
-      }
-      _pendingRequests.clear();
-      _logger.e('   All pending requests cleared');
-    }
+  static String? _bearerToken(RequestOptions options) {
+    final header = options.headers[AppConstants.authorizationHeader];
+    if (header is! String) return null;
+    const prefix = '${AppConstants.bearerPrefix} ';
+    if (!header.startsWith(prefix)) return null;
+    final token = header.substring(prefix.length);
+    return token.isEmpty ? null : token;
   }
 
-  /// Log detailed error information
-  Future<void> _handleErrorResponse(DioException err) async {
-    final authHeader = err.requestOptions.headers[AppConstants.authorizationHeader];
-
-    _logger.e('');
-    _logger.e('═══════════════════════════════════════════════════════');
-    _logger.e('❌ API REQUEST ERROR');
-    _logger.e('   Status Code: ${err.response?.statusCode}');
-    _logger.e('   Message: ${err.message}');
-    _logger.e('   Path: ${err.requestOptions.path}');
-    _logger.e('   Method: ${err.requestOptions.method}');
-    _logger.e('   Type: ${err.type.name}');
-    _logger.e('');
-    _logger.e('   🔐 Authentication Info:');
-    if (authHeader != null && authHeader.isNotEmpty) {
-      _logger.e('      Token Attached: ✅ YES');
-      _logger.e('      Header Length: ${authHeader.length} characters');
-    } else {
-      _logger.e('      Token Attached: ❌ NO');
-    }
-    _logger.e('═══════════════════════════════════════════════════════');
+  void _logError(DioException err) {
+    final hasToken = _bearerToken(err.requestOptions) != null;
+    _logger.e(
+      'API error ${err.response?.statusCode ?? err.type.name} on '
+      '${err.requestOptions.method} ${err.requestOptions.path} '
+      '(token attached: $hasToken)',
+    );
   }
 }

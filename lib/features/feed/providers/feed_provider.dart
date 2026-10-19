@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_poetry_app/core/network/request_failure.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import '../models/feed_item.dart';
 import '../services/feed_event_tracker.dart';
@@ -14,6 +15,9 @@ class FeedState {
   final bool isLoading;
   final bool isLoadingMore;
   final String? error;
+
+  /// Why the last load failed (offline, server, …), for the error copy.
+  final RequestFailureKind? errorKind;
   final bool isInitial;
 
   const FeedState({
@@ -24,6 +28,7 @@ class FeedState {
     this.isLoading = false,
     this.isLoadingMore = false,
     this.error,
+    this.errorKind,
     this.isInitial = true,
   });
 
@@ -35,6 +40,7 @@ class FeedState {
     bool? isLoading,
     bool? isLoadingMore,
     String? Function()? error,
+    RequestFailureKind? Function()? errorKind,
     bool? isInitial,
   }) {
     return FeedState(
@@ -45,6 +51,7 @@ class FeedState {
       isLoading: isLoading ?? this.isLoading,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
       error: error != null ? error() : this.error,
+      errorKind: errorKind != null ? errorKind() : this.errorKind,
       isInitial: isInitial ?? this.isInitial,
     );
   }
@@ -83,6 +90,7 @@ class FeedNotifier extends StateNotifier<FeedState> {
   Future<void> loadFirstPage() async {
     // Flush events from previous session
     await _flushEvents();
+    if (!mounted) return;
     _tracker.reset();
     _seenItemKeys.clear();
     _autoAdvanceAttempted = false;
@@ -147,10 +155,14 @@ class FeedNotifier extends StateNotifier<FeedState> {
         isInitial: false,
       );
     } catch (e) {
+      // The notifier may have been disposed meanwhile (e.g. invalidated by a
+      // sign-out after a refused token refresh).
+      if (!mounted) return;
       state = state.copyWith(
         isLoading: false,
         isInitial: false,
         error: () => e.toString(),
+        errorKind: () => classifyRequestFailure(e),
       );
     }
   }
@@ -160,7 +172,8 @@ class FeedNotifier extends StateNotifier<FeedState> {
     if (_fetchLock || !state.hasMore) return;
     _fetchLock = true;
 
-    state = state.copyWith(isLoadingMore: true, error: () => null);
+    state = state.copyWith(
+        isLoadingMore: true, error: () => null, errorKind: () => null);
 
     try {
       await _flushEvents();
@@ -186,9 +199,11 @@ class FeedNotifier extends StateNotifier<FeedState> {
         await loadFirstPage();
         return;
       }
+      if (!mounted) return;
       state = state.copyWith(
         isLoadingMore: false,
         error: () => errorMsg,
+        errorKind: () => classifyRequestFailure(e),
       );
     } finally {
       _fetchLock = false;

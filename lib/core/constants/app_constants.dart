@@ -8,6 +8,9 @@ class AppConstants {
   static const String contentTypeHeader = 'Content-Type';
   static const String contentTypeJson = 'application/json';
 
+  /// Exchanges a refresh token for a new access token.
+  static const String authRefreshPath = '/api/auth/refresh';
+
   // Storage Keys
   static const String accessTokenKey = 'access_token';
   static const String refreshTokenKey = 'refresh_token';
