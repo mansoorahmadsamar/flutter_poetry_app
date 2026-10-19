@@ -28,11 +28,19 @@ class GuestService {
 
   GuestService(this._dioClient);
 
+  /// The highest page any `/api/guest/**` list serves. The backend clamps
+  /// `page` to `0..maxPage` (`GuestController.guestPageable`), so asking for
+  /// a later page returns this one again — it is always the last page.
+  static const int maxPage = 4;
+
+  /// The largest page size the backend allows (`size` is clamped to 1..20).
+  static const int maxPageSize = 20;
+
   /// Clamps caller-supplied pagination to the server-enforced bounds so we
   /// never produce out-of-range requests. The backend silently clamps too,
   /// but doing it client-side keeps logs honest.
-  int _clampPage(int page) => page.clamp(0, 4).toInt();
-  int _clampSize(int size) => size.clamp(1, 20).toInt();
+  int _clampPage(int page) => page.clamp(0, maxPage).toInt();
+  int _clampSize(int size) => size.clamp(1, maxPageSize).toInt();
 
   // ──────────────────────────────────────────────────────────────────────────
   // Discover bundle
@@ -245,6 +253,7 @@ class GuestService {
     }
     final content = _asMapList(data['content']);
     return GuestPage<T>(
+      serverLast: data['last'] == true,
       items: content.map(parse).toList(),
       page: (data['pageable'] is Map<String, dynamic>
               ? (data['pageable'] as Map<String, dynamic>)['pageNumber'] as int?
@@ -360,15 +369,27 @@ class GuestPage<T> {
   final int totalPages;
   final int totalElements;
 
+  /// The envelope's own `last` flag, when it sent one.
+  final bool serverLast;
+
   const GuestPage({
     required this.items,
     required this.page,
     required this.totalPages,
     required this.totalElements,
+    this.serverLast = false,
   });
 
-  bool get isLast => totalPages == 0 || page >= totalPages - 1;
-  int get nextPage => math.min(page + 1, 4); // server clamps to [0,4]
+  /// No further page can be fetched: the server said so, this is its last
+  /// page, or this is [GuestService.maxPage] — `totalPages` counts every
+  /// match, but a request past the clamp returns this page again.
+  bool get isLast =>
+      serverLast ||
+      totalPages == 0 ||
+      page >= totalPages - 1 ||
+      page >= GuestService.maxPage;
+
+  int get nextPage => math.min(page + 1, GuestService.maxPage);
 }
 
 final guestServiceProvider = Provider<GuestService>((ref) {

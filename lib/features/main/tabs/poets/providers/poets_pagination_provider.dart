@@ -83,11 +83,20 @@ class PoetsPaginationNotifier extends StateNotifier<PoetsPaginationState> {
       final nextPage = state.currentPage + 1;
       final result = await _fetchPoets(nextPage);
 
+      // A poet already listed (the same poet on two pages) is skipped, and a
+      // page that adds nobody new ends paging so the list can't keep
+      // requesting the same page (e.g. a clamped guest page).
+      final seen = {for (final poet in state.poets) poet.publicId};
+      final fresh = <PoetModel>[
+        for (final poet in result.content as List<PoetModel>)
+          if (seen.add(poet.publicId)) poet,
+      ];
+
       state = state.copyWith(
         isLoadingMore: false,
-        poets: [...state.poets, ...result.content],
+        poets: [...state.poets, ...fresh],
         currentPage: nextPage,
-        hasMore: !result.last,
+        hasMore: !result.last && fresh.isNotEmpty,
       );
     } catch (e) {
       state = state.copyWith(
