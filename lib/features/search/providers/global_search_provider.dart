@@ -9,6 +9,7 @@ import 'package:flutter_poetry_app/features/search/models/search_models.dart';
 import 'package:flutter_poetry_app/features/search/services/search_service.dart';
 import 'package:flutter_poetry_app/features/search/services/search_history_service.dart';
 import 'package:flutter_poetry_app/features/search/utils/app_search_urdu_normalizer.dart';
+import 'package:flutter_poetry_app/features/search/utils/search_segment_results.dart';
 import 'package:flutter_poetry_app/features/discover/services/discover_service.dart';
 import 'package:flutter_poetry_app/features/discover/models/discover_bundle_model.dart';
 
@@ -359,7 +360,7 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
       final relatedSearches = results[1] as RelatedSearchesResponse;
 
       _logger.i('🔍 Setting state with unified results: totalResults=${unifiedResults.totalResults}');
-      _logger.i('   Poets: ${unifiedResults.poets.length}, Poems: ${unifiedResults.poems.length}, Couplets: ${unifiedResults.couplets.length}');
+      _logger.i('   Poets: ${unifiedResults.poets.length}, Poems: ${unifiedResults.poems.length}, Couplets: ${unifiedResults.couplets.length}, Verses: ${unifiedResults.verses.length}');
 
       // Cache the result for back-navigation
       _cacheResult(normalizedQuery, unifiedResults);
@@ -398,8 +399,9 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
 
   /// Load more items for the currently active segment.
   ///
-  /// Uses `type=poems_only`, `type=verses_only`, etc. and the tracked
-  /// `nextPage` per segment. Appends results to the existing lists.
+  /// Fetches the segment's next page (`type=poems_only`, `verses_only`, …,
+  /// see [SearchSegmentResults]) at [pageSize] and merges it into the loaded
+  /// results, tracking the next page per segment.
   Future<void> loadMore() async {
     final segment = state.activeSegment;
     if (segment == DiscoverSegment.all) return; // Preview mode — no pagination
@@ -408,15 +410,13 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
     final current = state.unifiedResults;
     if (current == null) return;
 
-    // Check hasMore flag for this segment
-    if (!_hasMoreForSegment(current, segment)) return;
+    if (!segment.hasMore(current)) return;
 
     final page = state.nextPage[segment] ?? 1;
     final query = state.currentQuery;
     if (query.isEmpty) return;
 
     final normalizedQuery = AppSearchUrduNormalizer.normalize(query);
-    final typeParam = _segmentToTypeParam(segment);
     final generation = _searchGeneration;
 
     state = state.copyWith(isLoadingMore: true);
@@ -424,7 +424,7 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
     try {
       final moreResults = await _searchService.loadMore(
         query: normalizedQuery,
-        type: typeParam,
+        type: segment.apiType,
         page: page,
         lang: _languageCode,
         size: pageSize,
@@ -434,10 +434,10 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
       // old results, and the new search has already reset the paging state.
       if (generation != _searchGeneration) return;
 
-      // Merge: append new items to existing lists, update hasMore flags
-      final merged = _mergeResults(current, moreResults, segment);
+      // Merge into the latest results (another tab may have paged meanwhile).
+      final latest = state.unifiedResults ?? current;
+      final merged = segment.merge(latest, moreResults);
 
-      // Update next page
       final updatedNextPage = Map<DiscoverSegment, int>.from(state.nextPage);
       updatedNextPage[segment] = page + 1;
 
@@ -450,91 +450,12 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
       // Update LRU cache with merged results
       _cacheResult(normalizedQuery, merged);
 
-      _logger.i('✅ Loaded page $page for ${segment.name} — appended ${_newItemCount(moreResults, segment)} items');
+      _logger.i('✅ Loaded page $page for ${segment.name} — '
+          '${segment.loadedCount(merged) - segment.loadedCount(latest)} new items');
     } catch (e) {
       if (generation != _searchGeneration) return;
       _logger.e('❌ Failed to load more for ${segment.name}: $e');
       state = state.copyWith(isLoadingMore: false);
-    }
-  }
-
-  /// Check if there are more items for a segment
-  bool _hasMoreForSegment(UnifiedSearchResponse results, DiscoverSegment segment) {
-    switch (segment) {
-      case DiscoverSegment.poets:
-        return results.hasMorePoets;
-      case DiscoverSegment.poems:
-        return results.hasMorePoems;
-      case DiscoverSegment.verses:
-        return results.hasMoreCouplets;
-      case DiscoverSegment.categories:
-        return results.hasMoreCategories;
-      case DiscoverSegment.all:
-        return false;
-    }
-  }
-
-  /// Map segment to API type parameter
-  String _segmentToTypeParam(DiscoverSegment segment) {
-    switch (segment) {
-      case DiscoverSegment.poets:
-        return 'poets_only';
-      case DiscoverSegment.poems:
-        return 'poems_only';
-      case DiscoverSegment.verses:
-        return 'couplets_only';
-      case DiscoverSegment.categories:
-        return 'categories_only';
-      case DiscoverSegment.all:
-        return 'all';
-    }
-  }
-
-  /// Merge paginated results into existing results
-  UnifiedSearchResponse _mergeResults(
-    UnifiedSearchResponse existing,
-    UnifiedSearchResponse more,
-    DiscoverSegment segment,
-  ) {
-    switch (segment) {
-      case DiscoverSegment.poets:
-        return existing.copyWith(
-          poets: [...existing.poets, ...more.poets],
-          hasMorePoets: more.hasMorePoets,
-        );
-      case DiscoverSegment.poems:
-        return existing.copyWith(
-          poems: [...existing.poems, ...more.poems],
-          hasMorePoems: more.hasMorePoems,
-        );
-      case DiscoverSegment.verses:
-        return existing.copyWith(
-          couplets: [...existing.couplets, ...more.couplets],
-          hasMoreCouplets: more.hasMoreCouplets,
-        );
-      case DiscoverSegment.categories:
-        return existing.copyWith(
-          categories: [...existing.categories, ...more.categories],
-          hasMoreCategories: more.hasMoreCategories,
-        );
-      case DiscoverSegment.all:
-        return existing;
-    }
-  }
-
-  /// Count new items from a paginated response for a segment
-  int _newItemCount(UnifiedSearchResponse results, DiscoverSegment segment) {
-    switch (segment) {
-      case DiscoverSegment.poets:
-        return results.poets.length;
-      case DiscoverSegment.poems:
-        return results.poems.length;
-      case DiscoverSegment.verses:
-        return results.couplets.length;
-      case DiscoverSegment.categories:
-        return results.categories.length;
-      case DiscoverSegment.all:
-        return 0;
     }
   }
 

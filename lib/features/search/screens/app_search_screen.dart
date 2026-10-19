@@ -239,6 +239,7 @@ class _AppSearchScreenState extends ConsumerState<AppSearchScreen> {
           onPoemTap: (poem) =>
               SearchResultNavigation.openPoem(context, poem.publicId),
           onCoupletTap: _openCoupletPoem,
+          onVerseTap: _openVersePoem,
           onCategoryTap: _searchCategory,
           onTagTap: (tag) => SearchResultNavigation.openHashtag(context, tag.slug),
         );
@@ -256,6 +257,7 @@ class _AppSearchScreenState extends ConsumerState<AppSearchScreen> {
           onPoemTap: (poem) =>
               SearchResultNavigation.openPoem(context, poem.publicId),
           onCoupletTap: _openCoupletPoem,
+          onVerseTap: _openVersePoem,
           onCategoryTap: _searchCategory,
         );
     }
@@ -278,6 +280,13 @@ class _AppSearchScreenState extends ConsumerState<AppSearchScreen> {
   /// runs when there is one.
   void _openCoupletPoem(CoupletSearchResult couplet) {
     final poemId = couplet.poemIdToOpen;
+    if (poemId != null) SearchResultNavigation.openPoem(context, poemId);
+  }
+
+  /// A verse opens its parent poem — never `/main/poems/:verseId`. Cards
+  /// without a poem id are built without a tap handler.
+  void _openVersePoem(VerseSearchResult verse) {
+    final poemId = verse.poemIdToOpen;
     if (poemId != null) SearchResultNavigation.openPoem(context, poemId);
   }
 

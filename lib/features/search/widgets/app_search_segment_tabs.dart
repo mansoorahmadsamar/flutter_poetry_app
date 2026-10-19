@@ -6,6 +6,7 @@ import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/features/search/models/global_search_state.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
+import 'package:flutter_poetry_app/features/search/utils/search_segment_results.dart';
 
 /// Segment data for each tab chip.
 class _SegmentData {
@@ -35,9 +36,9 @@ class _SegmentData {
   }
 }
 
-/// 5-segment tab bar (Urdu-first labels, no Dictionary/Watch).
+/// 6-segment tab bar (Urdu-first labels, no Dictionary/Watch).
 ///
-/// Segments: سب | شعراء | غزلیں | اشعار | زمرے
+/// Segments: سب | شعراء | غزلیں | اشعار | مصرعے | زمرے
 ///
 /// Only watches `activeSegment` via `.select()` to minimize rebuilds.
 class AppSearchSegmentTabs extends ConsumerWidget {
@@ -73,6 +74,13 @@ class AppSearchSegmentTabs extends ConsumerWidget {
       icon: Icons.format_quote_rounded,
     ),
     _SegmentData(
+      segment: DiscoverSegment.misras,
+      urduLabel: 'مصرعے',
+      hindiLabel: 'मिसरे',
+      englishLabel: 'Lines',
+      icon: Icons.short_text_rounded,
+    ),
+    _SegmentData(
       segment: DiscoverSegment.categories,
       urduLabel: 'زمرے',
       hindiLabel: 'श्रेणियाँ',
@@ -86,21 +94,8 @@ class AppSearchSegmentTabs extends ConsumerWidget {
   static int _totalForSegment(
     UnifiedSearchResponse? results,
     DiscoverSegment segment,
-  ) {
-    if (results == null) return 0;
-    switch (segment) {
-      case DiscoverSegment.all:
-        return 0; // "All" doesn't show a count
-      case DiscoverSegment.poets:
-        return results.totalPoets;
-      case DiscoverSegment.poems:
-        return results.totalPoems;
-      case DiscoverSegment.verses:
-        return results.totalCouplets;
-      case DiscoverSegment.categories:
-        return results.totalCategories;
-    }
-  }
+  ) =>
+      results == null ? 0 : segment.total(results);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

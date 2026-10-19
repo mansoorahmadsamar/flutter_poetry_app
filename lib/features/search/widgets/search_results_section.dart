@@ -99,6 +99,10 @@ class SearchResultsSection extends ConsumerWidget {
       case DiscoverSegment.verses:
         return _buildVersesOnlyResults(context, ref, results.couplets, isDark);
 
+      // Unreachable: this widget is only built by the dead search_tab.dart.
+      case DiscoverSegment.misras:
+        return const SizedBox.shrink();
+
       case DiscoverSegment.categories:
         return _buildCategoriesResults(context, isDark);
 

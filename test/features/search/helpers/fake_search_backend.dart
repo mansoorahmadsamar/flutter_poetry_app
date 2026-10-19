@@ -75,7 +75,8 @@ class FakeSearchBackend {
     final params = options.queryParameters;
     final type = params['type'] as String? ?? 'all';
     if (type == 'all') {
-      return FakeReply(200, {'success': true, 'message': 'ok', 'data': allPage});
+      return FakeReply(
+          200, {'success': true, 'message': 'ok', 'data': allPage});
     }
     final page = params['page'] as int? ?? 0;
     final key = switch (type) {
@@ -93,7 +94,7 @@ class FakeSearchBackend {
     ];
     return FakeReply(200, {
       'success': true,
-        'message': 'ok',
+      'message': 'ok',
       'data': {
         key: items,
         hasMoreKey: page < lastPage,
@@ -123,9 +124,8 @@ class FakeSearchBackend {
   /// backend. Disposed with the test's [ProviderContainer].
   GlobalSearchNotifier createNotifier({String lang = 'ur'}) {
     final container = ProviderContainer(overrides: [
-      authOverride(signedIn
-          ? FakeAuthNotifier.signedIn()
-          : FakeAuthNotifier.guest()),
+      authOverride(
+          signedIn ? FakeAuthNotifier.signedIn() : FakeAuthNotifier.guest()),
     ]);
     final service = _ServiceHolder.create(container, dio);
     final notifier = GlobalSearchNotifier(

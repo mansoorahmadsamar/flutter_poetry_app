@@ -13,6 +13,7 @@ import 'package:flutter_poetry_app/features/search/providers/global_search_provi
 import 'package:flutter_poetry_app/features/search/widgets/app_search_couplet_card.dart';
 import 'package:flutter_poetry_app/features/search/widgets/app_search_poet_card.dart';
 import 'package:flutter_poetry_app/features/search/widgets/app_search_poem_card.dart';
+import 'package:flutter_poetry_app/features/search/widgets/app_search_verse_card.dart';
 
 /// Smart grouped overview (the "سب" tab experience).
 ///
@@ -23,8 +24,8 @@ import 'package:flutter_poetry_app/features/search/widgets/app_search_poem_card.
 ///
 /// Every visible result is either tappable or rendered without a tap
 /// affordance: the callbacks are required so a new result type cannot ship
-/// as a dead card. Couplets without a parent poem id and tags without a slug
-/// are rendered as not tappable.
+/// as a dead card. Couplets and verses without a parent poem id and tags
+/// without a slug are rendered as not tappable.
 class AppSearchPreviewResults extends ConsumerWidget {
   final ValueChanged<String> onRelatedSearchTap;
   final ValueChanged<PoetModel> onPoetTap;
@@ -32,6 +33,9 @@ class AppSearchPreviewResults extends ConsumerWidget {
 
   /// Called only for couplets with a [CoupletSearchResult.poemIdToOpen].
   final ValueChanged<CoupletSearchResult> onCoupletTap;
+
+  /// Called only for verses with a [VerseSearchResult.poemIdToOpen].
+  final ValueChanged<VerseSearchResult> onVerseTap;
   final ValueChanged<AutocompleteCategory> onCategoryTap;
 
   /// Called only for tags with a slug.
@@ -43,6 +47,7 @@ class AppSearchPreviewResults extends ConsumerWidget {
     required this.onPoetTap,
     required this.onPoemTap,
     required this.onCoupletTap,
+    required this.onVerseTap,
     required this.onCategoryTap,
     required this.onTagTap,
   });
@@ -169,6 +174,44 @@ class AppSearchPreviewResults extends ConsumerWidget {
                   onTap: couplet.poemIdToOpen == null
                       ? null
                       : () => onCoupletTap(couplet),
+                ),
+              );
+            },
+          ),
+          SliverToBoxAdapter(child: SizedBox(height: AppSpacing.lg)),
+        ],
+
+        // Matching single lines (max 3) — e.g. Roman `jigar` hits that are
+        // neither a couplet nor a poem title.
+        if (unified.verses.isNotEmpty) ...[
+          SliverToBoxAdapter(
+            child: _SectionHeader(
+              title: _misrasTitle(languageCode),
+              count: unified.verseCount,
+              icon: Icons.short_text_rounded,
+              isDark: isDark,
+              isUrdu: isUrdu,
+              languageCode: languageCode,
+              onSeeAll: unified.verses.length > _versePreviewCount ||
+                      unified.hasMoreVerses
+                  ? () => ref
+                      .read(globalSearchProvider.notifier)
+                      .setActiveSegment(DiscoverSegment.misras)
+                  : null,
+            ),
+          ),
+          SliverList.builder(
+            itemCount: unified.verses.take(_versePreviewCount).length,
+            itemBuilder: (context, index) {
+              final verse = unified.verses[index];
+              return RepaintBoundary(
+                child: AppSearchVerseCard(
+                  key: ValueKey('search-verse-${verse.resultKey}'),
+                  result: verse,
+                  searchQuery: query,
+                  onTap: verse.poemIdToOpen == null
+                      ? null
+                      : () => onVerseTap(verse),
                 ),
               );
             },
@@ -328,6 +371,10 @@ class AppSearchPreviewResults extends ConsumerWidget {
       l == 'ur' ? 'شعراء' : (l == 'hi' ? 'कवि' : 'Poets');
   String _versesTitle(String l) =>
       l == 'ur' ? 'اشعار' : (l == 'hi' ? 'शेर' : 'Verses');
+  static const _versePreviewCount = 3;
+
+  String _misrasTitle(String l) =>
+      l == 'ur' ? 'مصرعے' : (l == 'hi' ? 'मिसरे' : 'Lines');
   String _poemsTitle(String l) =>
       l == 'ur' ? 'غزلیں / نظمیں' : (l == 'hi' ? 'ग़ज़लें' : 'Poems');
   String _categoriesTitle(String l) =>

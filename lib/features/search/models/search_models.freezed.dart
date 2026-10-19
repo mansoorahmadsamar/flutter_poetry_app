@@ -1920,12 +1920,19 @@ VerseSearchResult _$VerseSearchResultFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$VerseSearchResult {
   VerseModel get verse => throw _privateConstructorUsedError;
-  String get poemPublicId => throw _privateConstructorUsedError;
-  String get poemTitle => throw _privateConstructorUsedError;
-  String get poetryType => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get poemPublicId => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get poemTitle => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get poetryType => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
   String? get poetryTypeName => throw _privateConstructorUsedError;
-  String get poetPublicId => throw _privateConstructorUsedError;
-  String get poetName => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get poetPublicId => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get poetName => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
   String? get poetProfileImageUrl => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -1942,13 +1949,13 @@ abstract class $VerseSearchResultCopyWith<$Res> {
   @useResult
   $Res call(
       {VerseModel verse,
-      String poemPublicId,
-      String poemTitle,
-      String poetryType,
-      String? poetryTypeName,
-      String poetPublicId,
-      String poetName,
-      String? poetProfileImageUrl});
+      @PlaceholderStringConverter() String? poemPublicId,
+      @PlaceholderStringConverter() String? poemTitle,
+      @PlaceholderStringConverter() String? poetryType,
+      @PlaceholderStringConverter() String? poetryTypeName,
+      @PlaceholderStringConverter() String? poetPublicId,
+      @PlaceholderStringConverter() String? poetName,
+      @PlaceholderStringConverter() String? poetProfileImageUrl});
 
   $VerseModelCopyWith<$Res> get verse;
 }
@@ -1967,12 +1974,12 @@ class _$VerseSearchResultCopyWithImpl<$Res, $Val extends VerseSearchResult>
   @override
   $Res call({
     Object? verse = null,
-    Object? poemPublicId = null,
-    Object? poemTitle = null,
-    Object? poetryType = null,
+    Object? poemPublicId = freezed,
+    Object? poemTitle = freezed,
+    Object? poetryType = freezed,
     Object? poetryTypeName = freezed,
-    Object? poetPublicId = null,
-    Object? poetName = null,
+    Object? poetPublicId = freezed,
+    Object? poetName = freezed,
     Object? poetProfileImageUrl = freezed,
   }) {
     return _then(_value.copyWith(
@@ -1980,30 +1987,30 @@ class _$VerseSearchResultCopyWithImpl<$Res, $Val extends VerseSearchResult>
           ? _value.verse
           : verse // ignore: cast_nullable_to_non_nullable
               as VerseModel,
-      poemPublicId: null == poemPublicId
+      poemPublicId: freezed == poemPublicId
           ? _value.poemPublicId
           : poemPublicId // ignore: cast_nullable_to_non_nullable
-              as String,
-      poemTitle: null == poemTitle
+              as String?,
+      poemTitle: freezed == poemTitle
           ? _value.poemTitle
           : poemTitle // ignore: cast_nullable_to_non_nullable
-              as String,
-      poetryType: null == poetryType
+              as String?,
+      poetryType: freezed == poetryType
           ? _value.poetryType
           : poetryType // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       poetryTypeName: freezed == poetryTypeName
           ? _value.poetryTypeName
           : poetryTypeName // ignore: cast_nullable_to_non_nullable
               as String?,
-      poetPublicId: null == poetPublicId
+      poetPublicId: freezed == poetPublicId
           ? _value.poetPublicId
           : poetPublicId // ignore: cast_nullable_to_non_nullable
-              as String,
-      poetName: null == poetName
+              as String?,
+      poetName: freezed == poetName
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       poetProfileImageUrl: freezed == poetProfileImageUrl
           ? _value.poetProfileImageUrl
           : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
@@ -2030,13 +2037,13 @@ abstract class _$$VerseSearchResultImplCopyWith<$Res>
   @useResult
   $Res call(
       {VerseModel verse,
-      String poemPublicId,
-      String poemTitle,
-      String poetryType,
-      String? poetryTypeName,
-      String poetPublicId,
-      String poetName,
-      String? poetProfileImageUrl});
+      @PlaceholderStringConverter() String? poemPublicId,
+      @PlaceholderStringConverter() String? poemTitle,
+      @PlaceholderStringConverter() String? poetryType,
+      @PlaceholderStringConverter() String? poetryTypeName,
+      @PlaceholderStringConverter() String? poetPublicId,
+      @PlaceholderStringConverter() String? poetName,
+      @PlaceholderStringConverter() String? poetProfileImageUrl});
 
   @override
   $VerseModelCopyWith<$Res> get verse;
@@ -2054,12 +2061,12 @@ class __$$VerseSearchResultImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? verse = null,
-    Object? poemPublicId = null,
-    Object? poemTitle = null,
-    Object? poetryType = null,
+    Object? poemPublicId = freezed,
+    Object? poemTitle = freezed,
+    Object? poetryType = freezed,
     Object? poetryTypeName = freezed,
-    Object? poetPublicId = null,
-    Object? poetName = null,
+    Object? poetPublicId = freezed,
+    Object? poetName = freezed,
     Object? poetProfileImageUrl = freezed,
   }) {
     return _then(_$VerseSearchResultImpl(
@@ -2067,30 +2074,30 @@ class __$$VerseSearchResultImplCopyWithImpl<$Res>
           ? _value.verse
           : verse // ignore: cast_nullable_to_non_nullable
               as VerseModel,
-      poemPublicId: null == poemPublicId
+      poemPublicId: freezed == poemPublicId
           ? _value.poemPublicId
           : poemPublicId // ignore: cast_nullable_to_non_nullable
-              as String,
-      poemTitle: null == poemTitle
+              as String?,
+      poemTitle: freezed == poemTitle
           ? _value.poemTitle
           : poemTitle // ignore: cast_nullable_to_non_nullable
-              as String,
-      poetryType: null == poetryType
+              as String?,
+      poetryType: freezed == poetryType
           ? _value.poetryType
           : poetryType // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       poetryTypeName: freezed == poetryTypeName
           ? _value.poetryTypeName
           : poetryTypeName // ignore: cast_nullable_to_non_nullable
               as String?,
-      poetPublicId: null == poetPublicId
+      poetPublicId: freezed == poetPublicId
           ? _value.poetPublicId
           : poetPublicId // ignore: cast_nullable_to_non_nullable
-              as String,
-      poetName: null == poetName
+              as String?,
+      poetName: freezed == poetName
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       poetProfileImageUrl: freezed == poetProfileImageUrl
           ? _value.poetProfileImageUrl
           : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
@@ -2101,16 +2108,17 @@ class __$$VerseSearchResultImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$VerseSearchResultImpl implements _VerseSearchResult {
+class _$VerseSearchResultImpl extends _VerseSearchResult {
   const _$VerseSearchResultImpl(
       {required this.verse,
-      required this.poemPublicId,
-      required this.poemTitle,
-      required this.poetryType,
-      this.poetryTypeName,
-      required this.poetPublicId,
-      required this.poetName,
-      this.poetProfileImageUrl});
+      @PlaceholderStringConverter() this.poemPublicId,
+      @PlaceholderStringConverter() this.poemTitle,
+      @PlaceholderStringConverter() this.poetryType,
+      @PlaceholderStringConverter() this.poetryTypeName,
+      @PlaceholderStringConverter() this.poetPublicId,
+      @PlaceholderStringConverter() this.poetName,
+      @PlaceholderStringConverter() this.poetProfileImageUrl})
+      : super._();
 
   factory _$VerseSearchResultImpl.fromJson(Map<String, dynamic> json) =>
       _$$VerseSearchResultImplFromJson(json);
@@ -2118,18 +2126,25 @@ class _$VerseSearchResultImpl implements _VerseSearchResult {
   @override
   final VerseModel verse;
   @override
-  final String poemPublicId;
+  @PlaceholderStringConverter()
+  final String? poemPublicId;
   @override
-  final String poemTitle;
+  @PlaceholderStringConverter()
+  final String? poemTitle;
   @override
-  final String poetryType;
+  @PlaceholderStringConverter()
+  final String? poetryType;
   @override
+  @PlaceholderStringConverter()
   final String? poetryTypeName;
   @override
-  final String poetPublicId;
+  @PlaceholderStringConverter()
+  final String? poetPublicId;
   @override
-  final String poetName;
+  @PlaceholderStringConverter()
+  final String? poetName;
   @override
+  @PlaceholderStringConverter()
   final String? poetProfileImageUrl;
 
   @override
@@ -2179,16 +2194,18 @@ class _$VerseSearchResultImpl implements _VerseSearchResult {
   }
 }
 
-abstract class _VerseSearchResult implements VerseSearchResult {
+abstract class _VerseSearchResult extends VerseSearchResult {
   const factory _VerseSearchResult(
-      {required final VerseModel verse,
-      required final String poemPublicId,
-      required final String poemTitle,
-      required final String poetryType,
-      final String? poetryTypeName,
-      required final String poetPublicId,
-      required final String poetName,
-      final String? poetProfileImageUrl}) = _$VerseSearchResultImpl;
+          {required final VerseModel verse,
+          @PlaceholderStringConverter() final String? poemPublicId,
+          @PlaceholderStringConverter() final String? poemTitle,
+          @PlaceholderStringConverter() final String? poetryType,
+          @PlaceholderStringConverter() final String? poetryTypeName,
+          @PlaceholderStringConverter() final String? poetPublicId,
+          @PlaceholderStringConverter() final String? poetName,
+          @PlaceholderStringConverter() final String? poetProfileImageUrl}) =
+      _$VerseSearchResultImpl;
+  const _VerseSearchResult._() : super._();
 
   factory _VerseSearchResult.fromJson(Map<String, dynamic> json) =
       _$VerseSearchResultImpl.fromJson;
@@ -2196,18 +2213,25 @@ abstract class _VerseSearchResult implements VerseSearchResult {
   @override
   VerseModel get verse;
   @override
-  String get poemPublicId;
+  @PlaceholderStringConverter()
+  String? get poemPublicId;
   @override
-  String get poemTitle;
+  @PlaceholderStringConverter()
+  String? get poemTitle;
   @override
-  String get poetryType;
+  @PlaceholderStringConverter()
+  String? get poetryType;
   @override
+  @PlaceholderStringConverter()
   String? get poetryTypeName;
   @override
-  String get poetPublicId;
+  @PlaceholderStringConverter()
+  String? get poetPublicId;
   @override
-  String get poetName;
+  @PlaceholderStringConverter()
+  String? get poetName;
   @override
+  @PlaceholderStringConverter()
   String? get poetProfileImageUrl;
   @override
   @JsonKey(ignore: true)

@@ -194,26 +194,37 @@ _$VerseSearchResultImpl _$$VerseSearchResultImplFromJson(
         Map<String, dynamic> json) =>
     _$VerseSearchResultImpl(
       verse: VerseModel.fromJson(json['verse'] as Map<String, dynamic>),
-      poemPublicId: json['poemPublicId'] as String,
-      poemTitle: json['poemTitle'] as String,
-      poetryType: json['poetryType'] as String,
-      poetryTypeName: json['poetryTypeName'] as String?,
-      poetPublicId: json['poetPublicId'] as String,
-      poetName: json['poetName'] as String,
-      poetProfileImageUrl: json['poetProfileImageUrl'] as String?,
+      poemPublicId:
+          const PlaceholderStringConverter().fromJson(json['poemPublicId']),
+      poemTitle: const PlaceholderStringConverter().fromJson(json['poemTitle']),
+      poetryType:
+          const PlaceholderStringConverter().fromJson(json['poetryType']),
+      poetryTypeName:
+          const PlaceholderStringConverter().fromJson(json['poetryTypeName']),
+      poetPublicId:
+          const PlaceholderStringConverter().fromJson(json['poetPublicId']),
+      poetName: const PlaceholderStringConverter().fromJson(json['poetName']),
+      poetProfileImageUrl: const PlaceholderStringConverter()
+          .fromJson(json['poetProfileImageUrl']),
     );
 
 Map<String, dynamic> _$$VerseSearchResultImplToJson(
         _$VerseSearchResultImpl instance) =>
     <String, dynamic>{
       'verse': instance.verse,
-      'poemPublicId': instance.poemPublicId,
-      'poemTitle': instance.poemTitle,
-      'poetryType': instance.poetryType,
-      'poetryTypeName': instance.poetryTypeName,
-      'poetPublicId': instance.poetPublicId,
-      'poetName': instance.poetName,
-      'poetProfileImageUrl': instance.poetProfileImageUrl,
+      'poemPublicId':
+          const PlaceholderStringConverter().toJson(instance.poemPublicId),
+      'poemTitle':
+          const PlaceholderStringConverter().toJson(instance.poemTitle),
+      'poetryType':
+          const PlaceholderStringConverter().toJson(instance.poetryType),
+      'poetryTypeName':
+          const PlaceholderStringConverter().toJson(instance.poetryTypeName),
+      'poetPublicId':
+          const PlaceholderStringConverter().toJson(instance.poetPublicId),
+      'poetName': const PlaceholderStringConverter().toJson(instance.poetName),
+      'poetProfileImageUrl': const PlaceholderStringConverter()
+          .toJson(instance.poetProfileImageUrl),
     };
 
 _$PoemSummaryImpl _$$PoemSummaryImplFromJson(Map<String, dynamic> json) =>

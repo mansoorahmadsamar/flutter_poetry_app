@@ -36,6 +36,24 @@ UnifiedSearchResponse realUrduSearchResponse() {
   );
 }
 
+/// The real production response for the Roman query `q=jigar` (4 poems,
+/// 5 verse hits, 0 couplets), with image URLs removed. Its verses carry the
+/// poem id and `"-"` for the poet fields (the backend before T-073).
+UnifiedSearchResponse realRomanJigarResponse() {
+  final data = searchFixture('unified_search_jigar.json')['data']
+      as Map<String, dynamic>;
+  final response = UnifiedSearchResponse.fromJson(data);
+  return response.copyWith(
+    poets: [for (final p in response.poets) p.copyWith(profileImageUrl: null)],
+    poems: [
+      for (final p in response.poems) p.copyWith(poetProfileImageUrl: null),
+    ],
+    verses: [
+      for (final v in response.verses) v.copyWith(poetProfileImageUrl: null),
+    ],
+  );
+}
+
 /// The couplet contract variants (see the fixture's `_comment`), each given a
 /// distinct id so their cards can be found by key.
 ({
@@ -124,6 +142,16 @@ class FakeGlobalSearchNotifier extends GlobalSearchNotifier {
   }
 
   final searches = <({String? query, DiscoverSegment? segment})>[];
+
+  /// Tabs switched to, in order. Switching never searches here; the real
+  /// reuse-or-fetch rule is covered by `global_search_tab_switch_test.dart`.
+  final segmentSwitches = <DiscoverSegment>[];
+
+  @override
+  void setActiveSegment(DiscoverSegment segment) {
+    segmentSwitches.add(segment);
+    state = state.copyWith(activeSegment: segment);
+  }
 
   @override
   Future<void> executeSearch({String? query, DiscoverSegment? segment}) async {

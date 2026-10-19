@@ -20,7 +20,8 @@ enum DiscoverSegment {
   all, // All content types
   poets, // Poets only
   poems, // Poems only
-  verses, // Verses/couplets only
+  verses, // Couplets (اشعار) — `couplets[]`, paged with `type=couplets_only`
+  misras, // Single matching lines (مصرعے) — `verses[]`, `type=verses_only`
   categories, // Categories only
 }
 

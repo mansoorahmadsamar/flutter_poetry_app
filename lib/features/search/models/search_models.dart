@@ -138,23 +138,42 @@ class CoupletSearchResult with _$CoupletSearchResult {
   String? get displayPoemTitle => poemTitle ?? presentOrNull(poem?.title);
 }
 
-/// Verse search result from unified search API
-/// This has a different structure than CoupletSearchResult
+/// A single matching verse (misra) from `/api/search` `verses[]`
+/// (`type=verses_only` when paging). Different from [CoupletSearchResult]:
+/// one line plus its parent poem and poet.
+///
+/// Every parent field is optional: older backends send `"-"` for the poet
+/// fields, and a null would otherwise fail the whole search response. All of
+/// them read `"-"` as null.
 @freezed
 class VerseSearchResult with _$VerseSearchResult {
+  const VerseSearchResult._();
+
   const factory VerseSearchResult({
     required VerseModel verse,
-    required String poemPublicId,
-    required String poemTitle,
-    required String poetryType,
-    String? poetryTypeName,
-    required String poetPublicId,
-    required String poetName,
-    String? poetProfileImageUrl,
+    @PlaceholderStringConverter() String? poemPublicId,
+    @PlaceholderStringConverter() String? poemTitle,
+    @PlaceholderStringConverter() String? poetryType,
+    @PlaceholderStringConverter() String? poetryTypeName,
+    @PlaceholderStringConverter() String? poetPublicId,
+    @PlaceholderStringConverter() String? poetName,
+    @PlaceholderStringConverter() String? poetProfileImageUrl,
   }) = _VerseSearchResult;
 
   factory VerseSearchResult.fromJson(Map<String, dynamic> json) =>
       _$VerseSearchResultFromJson(json);
+
+  /// The poem a tap on this verse opens (`/main/poems/:id`), or null when the
+  /// API did not say — the card is then not tappable. Never the verse's id.
+  String? get poemIdToOpen => poemPublicId;
+
+  /// The verse's Roman transliteration, if the API sent one.
+  String? get romanizedText => presentOrNull(verse.romanizedText);
+
+  /// Identity for de-duplicating pages and keying widgets.
+  String get resultKey =>
+      presentOrNull(verse.publicId) ??
+      '${poemPublicId ?? ''}#${verse.verseNumber ?? verse.text}';
 }
 
 /// Summary information about a poem

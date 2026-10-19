@@ -75,6 +75,20 @@ class LanguageTypography {
     return getTextDirection(languageCode) == TextDirection.rtl;
   }
 
+  static final _arabicScript =
+      RegExp(r'[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]');
+  static final _devanagariScript = RegExp(r'[\u0900-\u097F]');
+
+  /// The language code whose typography fits [text]'s script, for content
+  /// that carries no language field (e.g. search hits): `ur` for Arabic
+  /// script (Nastaliq, RTL), `hi` for Devanagari, otherwise `en` (Latin —
+  /// English or Roman Urdu, LTR). Arabic script wins in mixed text.
+  static String languageCodeForScript(String text) {
+    if (_arabicScript.hasMatch(text)) return 'ur';
+    if (_devanagariScript.hasMatch(text)) return 'hi';
+    return 'en';
+  }
+
   /// Create language-aware text style
   static TextStyle createStyle({
     required double baseFontSize,

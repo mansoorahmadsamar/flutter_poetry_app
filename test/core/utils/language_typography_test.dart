@@ -172,4 +172,40 @@ void main() {
       expect(style.height, LanguageTypography.urduLineHeight);
     });
   });
+
+  group('LanguageTypography.languageCodeForScript', () {
+    test('Urdu (Arabic script, with diacritics) is ur', () {
+      expect(LanguageTypography.languageCodeForScript('دونوں جگر جگر ہیں'), 'ur');
+      expect(LanguageTypography.languageCodeForScript('دِل'), 'ur');
+    });
+
+    test('Roman Urdu and English are en', () {
+      expect(
+        LanguageTypography.languageCodeForScript('donon jigar jigar hain'),
+        'en',
+      );
+      expect(LanguageTypography.languageCodeForScript(''), 'en');
+    });
+
+    test('Devanagari is hi', () {
+      expect(LanguageTypography.languageCodeForScript('दिल'), 'hi');
+    });
+
+    test('mixed Urdu and Roman reads as Urdu', () {
+      expect(LanguageTypography.languageCodeForScript('dil دل'), 'ur');
+    });
+
+    test('its direction follows getTextDirection', () {
+      expect(
+        LanguageTypography.getTextDirection(
+            LanguageTypography.languageCodeForScript('جگر')),
+        TextDirection.rtl,
+      );
+      expect(
+        LanguageTypography.getTextDirection(
+            LanguageTypography.languageCodeForScript('दिल')),
+        TextDirection.ltr,
+      );
+    });
+  });
 }

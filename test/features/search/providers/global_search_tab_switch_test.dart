@@ -58,16 +58,16 @@ void main() {
       notifier.setActiveSegment(DiscoverSegment.poems);
       await notifier.loadMore();
       expect(backend.searches, hasLength(2));
-      expect(notifier.state.unifiedResults!.poems,
-          hasLength(firstPagePoems * 2));
+      expect(
+          notifier.state.unifiedResults!.poems, hasLength(firstPagePoems * 2));
 
       notifier.setActiveSegment(DiscoverSegment.poets);
       notifier.setActiveSegment(DiscoverSegment.poems);
       await pumpEventQueue();
 
       expect(backend.searches, hasLength(2));
-      expect(notifier.state.unifiedResults!.poems,
-          hasLength(firstPagePoems * 2));
+      expect(
+          notifier.state.unifiedResults!.poems, hasLength(firstPagePoems * 2));
 
       // The next page continues where the last one stopped.
       await notifier.loadMore();
@@ -106,7 +106,8 @@ void main() {
   });
 
   group('GlobalSearchNotifier.loadMore paging', () {
-    test('regression: the next page uses the first page\'s size, so no '
+    test(
+        'regression: the next page uses the first page\'s size, so no '
         'results are skipped', () async {
       await notifier.executeSearch(query: 'jigar');
       notifier.setActiveSegment(DiscoverSegment.poems);
@@ -157,6 +158,23 @@ void main() {
       expect(notifier.state.currentQuery, 'dil');
       expect(notifier.state.unifiedResults, same(fresh));
       expect(notifier.state.mode, SearchMode.results);
+    });
+  });
+
+  group('مصرعے tab (verse hits)', () {
+    test('pages verse hits with type=verses_only and appends them', () async {
+      await notifier.executeSearch(query: 'jigar');
+      final firstPage = notifier.state.unifiedResults!.verses.length;
+      expect(firstPage, greaterThan(0));
+
+      notifier.setActiveSegment(DiscoverSegment.misras);
+      await notifier.loadMore();
+
+      final request = backend.searches.last.queryParameters;
+      expect(request['type'], 'verses_only');
+      expect(request['page'], 1);
+      expect(notifier.state.unifiedResults!.verses, hasLength(firstPage * 2));
+      expect(backend.searches, hasLength(2));
     });
   });
 }

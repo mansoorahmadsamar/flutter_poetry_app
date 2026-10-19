@@ -50,6 +50,8 @@
   `SearchService` over a `FakeDioAdapter` that answers `/api/search` from a fixture (`type=all`) or with synthetic
   single-type pages, so tests **count requests** (each one is a `search_queries` row on the real backend). Set
   `onSearch` to hold a response open (`Completer`) or fail it.
+- Fixtures: `unified_search_dil_ur.json` (Urdu `دل`) and `unified_search_jigar.json` (Roman `jigar`: 0 couplets,
+  5 verse hits whose poet fields are `"-"`); `realRomanJigarResponse()` loads the latter with image URLs removed.
 
 ### Three things every test must know
 

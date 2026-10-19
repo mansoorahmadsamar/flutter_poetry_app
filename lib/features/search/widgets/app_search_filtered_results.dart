@@ -6,9 +6,11 @@ import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/features/search/models/global_search_state.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
+import 'package:flutter_poetry_app/features/search/utils/search_segment_results.dart';
 import 'package:flutter_poetry_app/features/search/widgets/app_search_couplet_card.dart';
 import 'package:flutter_poetry_app/features/search/widgets/app_search_poet_card.dart';
 import 'package:flutter_poetry_app/features/search/widgets/app_search_poem_card.dart';
+import 'package:flutter_poetry_app/features/search/widgets/app_search_verse_card.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poet_model.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.dart';
 
@@ -19,7 +21,7 @@ import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.da
 /// Each card wrapped in RepaintBoundary for scroll performance.
 ///
 /// The tap callbacks are required so no result type renders as a dead card.
-/// Couplets without a parent poem id are rendered as not tappable.
+/// Couplets and verses without a parent poem id are rendered as not tappable.
 class AppSearchFilteredResults extends ConsumerStatefulWidget {
   final DiscoverSegment segment;
   final ValueChanged<PoetModel> onPoetTap;
@@ -27,6 +29,9 @@ class AppSearchFilteredResults extends ConsumerStatefulWidget {
 
   /// Called only for couplets with a [CoupletSearchResult.poemIdToOpen].
   final ValueChanged<CoupletSearchResult> onCoupletTap;
+
+  /// Called only for verses with a [VerseSearchResult.poemIdToOpen].
+  final ValueChanged<VerseSearchResult> onVerseTap;
   final ValueChanged<AutocompleteCategory> onCategoryTap;
 
   const AppSearchFilteredResults({
@@ -35,6 +40,7 @@ class AppSearchFilteredResults extends ConsumerStatefulWidget {
     required this.onPoetTap,
     required this.onPoemTap,
     required this.onCoupletTap,
+    required this.onVerseTap,
     required this.onCategoryTap,
   });
 
@@ -127,51 +133,15 @@ class _AppSearchFilteredResultsState
     );
   }
 
-  bool _hasMoreForSegment(UnifiedSearchResponse results) {
-    switch (widget.segment) {
-      case DiscoverSegment.poets:
-        return results.hasMorePoets;
-      case DiscoverSegment.poems:
-        return results.hasMorePoems;
-      case DiscoverSegment.verses:
-        return results.hasMoreCouplets;
-      case DiscoverSegment.categories:
-        return results.hasMoreCategories;
-      default:
-        return false;
-    }
-  }
+  bool _hasMoreForSegment(UnifiedSearchResponse results) =>
+      widget.segment.hasMore(results);
 
   /// Total count in DB for this segment (for header label)
-  int _getTotalCount(UnifiedSearchResponse results) {
-    switch (widget.segment) {
-      case DiscoverSegment.poets:
-        return results.totalPoets;
-      case DiscoverSegment.poems:
-        return results.totalPoems;
-      case DiscoverSegment.verses:
-        return results.totalCouplets;
-      case DiscoverSegment.categories:
-        return results.totalCategories;
-      default:
-        return 0;
-    }
-  }
+  int _getTotalCount(UnifiedSearchResponse results) =>
+      widget.segment.total(results);
 
-  int _getItemCount(UnifiedSearchResponse results) {
-    switch (widget.segment) {
-      case DiscoverSegment.poets:
-        return results.poets.length;
-      case DiscoverSegment.poems:
-        return results.poems.length;
-      case DiscoverSegment.verses:
-        return results.couplets.length;
-      case DiscoverSegment.categories:
-        return results.categories.length;
-      default:
-        return 0;
-    }
-  }
+  int _getItemCount(UnifiedSearchResponse results) =>
+      widget.segment.loadedCount(results);
 
   Widget _buildItem(
     UnifiedSearchResponse results,
@@ -210,6 +180,18 @@ class _AppSearchFilteredResultsState
           onTap: couplet.poemIdToOpen == null
               ? null
               : () => widget.onCoupletTap(couplet),
+        );
+
+      case DiscoverSegment.misras:
+        if (index >= results.verses.length) return const SizedBox.shrink();
+        final verse = results.verses[index];
+        return AppSearchVerseCard(
+          key: ValueKey('search-verse-${verse.resultKey}'),
+          result: verse,
+          searchQuery: query,
+          onTap: verse.poemIdToOpen == null
+              ? null
+              : () => widget.onVerseTap(verse),
         );
 
       case DiscoverSegment.categories:
@@ -266,6 +248,8 @@ class _AppSearchFilteredResultsState
         return isUrdu ? 'غزلیں' : 'poems';
       case DiscoverSegment.verses:
         return isUrdu ? 'اشعار' : 'verses';
+      case DiscoverSegment.misras:
+        return isUrdu ? 'مصرعے' : 'lines';
       case DiscoverSegment.categories:
         return isUrdu ? 'زمرے' : 'categories';
       default:
@@ -343,6 +327,7 @@ class _AppSearchFilteredResultsState
           itemBuilder: (_, __) => const AppSearchPoemSkeleton(),
         );
       case DiscoverSegment.verses:
+      case DiscoverSegment.misras:
         return ListView.builder(
           padding: EdgeInsets.only(top: AppSpacing.md),
           itemCount: 4,
