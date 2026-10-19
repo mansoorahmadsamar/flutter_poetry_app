@@ -1,0 +1,227 @@
+# gitleaks baseline — secrets ALREADY in git history (all branches) as of 2026-10-19.
+#
+# Each entry is pinned by fingerprint (commit:file:rule:line), so a NEW secret in the
+# same file is still caught. These are not 'false positives': every entry is treated
+# as a real credential until it has been rotated (see poetry-backend/docs/SECURITY.md). History
+# cannot be unwritten; rotation is what makes an entry harmless.
+#
+# Never add an entry without confirming what the match is. Never add one to silence
+# a secret committed after 2026-10-19 — remove the secret and rotate it instead.
+# Baseline: 54 finding(s). Generated with:
+#   gitleaks detect --source . --redact --log-opts="--all" --report-format json
+
+# .claude/settings.local.json · jwt · commit b74dc1c 2026-03-06 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+b74dc1c881d1b1dfdf6d9e7c5ae3706681336cab:.claude/settings.local.json:jwt:43
+
+# .claude/settings.local.json · jwt · commit b74dc1c 2026-03-06 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+b74dc1c881d1b1dfdf6d9e7c5ae3706681336cab:.claude/settings.local.json:jwt:47
+
+# API_DOCUMENTATION.md · generic-api-key · commit 2921f7e 2025-11-12 · history only (file no longer tracked)
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+2921f7e7f0c263d5cc53ce3629accaea158e51ec:API_DOCUMENTATION.md:generic-api-key:251
+
+# API_DOCUMENTATION.md · generic-api-key · commit 2921f7e 2025-11-12 · history only (file no longer tracked)
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+2921f7e7f0c263d5cc53ce3629accaea158e51ec:API_DOCUMENTATION.md:generic-api-key:266
+
+# API_DOCUMENTATION.md · generic-api-key · commit 2921f7e 2025-11-12 · history only (file no longer tracked)
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+2921f7e7f0c263d5cc53ce3629accaea158e51ec:API_DOCUMENTATION.md:generic-api-key:267
+
+# API_DOCUMENTATION.md · generic-api-key · commit 2921f7e 2025-11-12 · history only (file no longer tracked)
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+2921f7e7f0c263d5cc53ce3629accaea158e51ec:API_DOCUMENTATION.md:generic-api-key:335
+
+# API_DOCUMENTATION.md · generic-api-key · commit 7230b91 2025-11-15 · history only (file no longer tracked)
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+7230b9196ec9fa70d8f7deddcf8f01196e455f06:API_DOCUMENTATION.md:generic-api-key:148
+
+# API_DOCUMENTATION.md · generic-api-key · commit 7230b91 2025-11-15 · history only (file no longer tracked)
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+7230b9196ec9fa70d8f7deddcf8f01196e455f06:API_DOCUMENTATION.md:generic-api-key:165
+
+# API_DOCUMENTATION.md · generic-api-key · commit 7230b91 2025-11-15 · history only (file no longer tracked)
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+7230b9196ec9fa70d8f7deddcf8f01196e455f06:API_DOCUMENTATION.md:generic-api-key:166
+
+# API_DOCUMENTATION.md · sukhan-platform-token · commit 2921f7e 2025-11-12 · history only (file no longer tracked)
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+2921f7e7f0c263d5cc53ce3629accaea158e51ec:API_DOCUMENTATION.md:sukhan-platform-token:135
+
+# API_DOCUMENTATION.md · sukhan-platform-token · commit 7230b91 2025-11-15 · history only (file no longer tracked)
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+7230b9196ec9fa70d8f7deddcf8f01196e455f06:API_DOCUMENTATION.md:sukhan-platform-token:427
+
+# API_DOCUMENTATION.md · sukhan-platform-token · commit 7230b91 2025-11-15 · history only (file no longer tracked)
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+7230b9196ec9fa70d8f7deddcf8f01196e455f06:API_DOCUMENTATION.md:sukhan-platform-token:431
+
+# API_DOCUMENTATION.md · sukhan-platform-token · commit 7230b91 2025-11-15 · history only (file no longer tracked)
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+7230b9196ec9fa70d8f7deddcf8f01196e455f06:API_DOCUMENTATION.md:sukhan-platform-token:2317
+
+# AUTH_ARCHITECTURE.md · generic-api-key · commit 7230b91 2025-11-15 · history only (file no longer tracked)
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+7230b9196ec9fa70d8f7deddcf8f01196e455f06:AUTH_ARCHITECTURE.md:generic-api-key:165
+
+# AUTH_ARCHITECTURE.md · generic-api-key · commit 7230b91 2025-11-15 · history only (file no longer tracked)
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+7230b9196ec9fa70d8f7deddcf8f01196e455f06:AUTH_ARCHITECTURE.md:generic-api-key:176
+
+# AUTH_ARCHITECTURE.md · generic-api-key · commit 7230b91 2025-11-15 · history only (file no longer tracked)
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+7230b9196ec9fa70d8f7deddcf8f01196e455f06:AUTH_ARCHITECTURE.md:generic-api-key:177
+
+# FLUTTER_ANDROID_AUTH_GUIDE.md · generic-api-key · commit 7230b91 2025-11-15 · history only (file no longer tracked)
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+7230b9196ec9fa70d8f7deddcf8f01196e455f06:FLUTTER_ANDROID_AUTH_GUIDE.md:generic-api-key:439
+
+# FLUTTER_ANDROID_AUTH_GUIDE.md · generic-api-key · commit 7230b91 2025-11-15 · history only (file no longer tracked)
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+7230b9196ec9fa70d8f7deddcf8f01196e455f06:FLUTTER_ANDROID_AUTH_GUIDE.md:generic-api-key:440
+
+# FLUTTER_API_DOCUMENTATION.md · curl-auth-header · commit da4adbb 2026-02-13 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+da4adbbf65a46bf0d36ddbbfd61be056ce876880:FLUTTER_API_DOCUMENTATION.md:curl-auth-header:6804
+
+# FLUTTER_API_DOCUMENTATION.md · curl-auth-header · commit da4adbb 2026-02-13 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+da4adbbf65a46bf0d36ddbbfd61be056ce876880:FLUTTER_API_DOCUMENTATION.md:curl-auth-header:6808
+
+# FLUTTER_API_DOCUMENTATION.md · generic-api-key · commit 8b38a78 2025-11-20 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+8b38a78ff429ef5b71c0f2a1279664c0b253f953:FLUTTER_API_DOCUMENTATION.md:generic-api-key:114
+
+# FLUTTER_API_DOCUMENTATION.md · generic-api-key · commit 8b38a78 2025-11-20 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+8b38a78ff429ef5b71c0f2a1279664c0b253f953:FLUTTER_API_DOCUMENTATION.md:generic-api-key:127
+
+# FLUTTER_API_DOCUMENTATION.md · generic-api-key · commit 8b38a78 2025-11-20 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+8b38a78ff429ef5b71c0f2a1279664c0b253f953:FLUTTER_API_DOCUMENTATION.md:generic-api-key:203
+
+# FLUTTER_API_DOCUMENTATION.md · generic-api-key · commit 681a2d3 2025-12-29 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+681a2d3dc43e3c2d033b2c8e14d70e966ccadc96:FLUTTER_API_DOCUMENTATION.md:generic-api-key:697
+
+# FLUTTER_API_DOCUMENTATION.md · generic-api-key · commit 681a2d3 2025-12-29 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+681a2d3dc43e3c2d033b2c8e14d70e966ccadc96:FLUTTER_API_DOCUMENTATION.md:generic-api-key:710
+
+# FLUTTER_API_DOCUMENTATION.md · generic-api-key · commit 681a2d3 2025-12-29 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+681a2d3dc43e3c2d033b2c8e14d70e966ccadc96:FLUTTER_API_DOCUMENTATION.md:generic-api-key:760
+
+# FLUTTER_API_DOCUMENTATION.md · generic-api-key · commit 681a2d3 2025-12-29 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+681a2d3dc43e3c2d033b2c8e14d70e966ccadc96:FLUTTER_API_DOCUMENTATION.md:generic-api-key:852
+
+# IMAGE_POETRY_DOCUMENTATION.md · curl-auth-header · commit 8ae52aa 2025-12-14 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+8ae52aa3e92e437536388d01be7273a287d5695f:IMAGE_POETRY_DOCUMENTATION.md:curl-auth-header:939
+
+# IMAGE_POETRY_DOCUMENTATION.md · curl-auth-header · commit 8ae52aa 2025-12-14 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+8ae52aa3e92e437536388d01be7273a287d5695f:IMAGE_POETRY_DOCUMENTATION.md:curl-auth-header:1005
+
+# IMAGE_POETRY_DOCUMENTATION.md · curl-auth-header · commit 8ae52aa 2025-12-14 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+8ae52aa3e92e437536388d01be7273a287d5695f:IMAGE_POETRY_DOCUMENTATION.md:curl-auth-header:1045
+
+# IMAGE_POETRY_DOCUMENTATION.md · curl-auth-header · commit 8ae52aa 2025-12-14 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+8ae52aa3e92e437536388d01be7273a287d5695f:IMAGE_POETRY_DOCUMENTATION.md:curl-auth-header:1074
+
+# IMAGE_POETRY_DOCUMENTATION.md · curl-auth-header · commit 8ae52aa 2025-12-14 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+8ae52aa3e92e437536388d01be7273a287d5695f:IMAGE_POETRY_DOCUMENTATION.md:curl-auth-header:1119
+
+# IMAGE_POETRY_DOCUMENTATION.md · curl-auth-header · commit 8ae52aa 2025-12-14 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+8ae52aa3e92e437536388d01be7273a287d5695f:IMAGE_POETRY_DOCUMENTATION.md:curl-auth-header:1151
+
+# IMAGE_POETRY_DOCUMENTATION.md · curl-auth-header · commit 8ae52aa 2025-12-14 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+8ae52aa3e92e437536388d01be7273a287d5695f:IMAGE_POETRY_DOCUMENTATION.md:curl-auth-header:1155
+
+# IMAGE_POETRY_DOCUMENTATION.md · curl-auth-header · commit 8ae52aa 2025-12-14 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+8ae52aa3e92e437536388d01be7273a287d5695f:IMAGE_POETRY_DOCUMENTATION.md:curl-auth-header:1159
+
+# IMAGE_POETRY_DOCUMENTATION.md · curl-auth-header · commit 8ae52aa 2025-12-14 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+8ae52aa3e92e437536388d01be7273a287d5695f:IMAGE_POETRY_DOCUMENTATION.md:curl-auth-header:1202
+
+# IMAGE_POETRY_DOCUMENTATION.md · curl-auth-header · commit 8ae52aa 2025-12-14 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+8ae52aa3e92e437536388d01be7273a287d5695f:IMAGE_POETRY_DOCUMENTATION.md:curl-auth-header:1230
+
+# IMAGE_POETRY_DOCUMENTATION.md · curl-auth-header · commit 8ae52aa 2025-12-14 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+8ae52aa3e92e437536388d01be7273a287d5695f:IMAGE_POETRY_DOCUMENTATION.md:curl-auth-header:1260
+
+# IMAGE_POETRY_DOCUMENTATION.md · curl-auth-header · commit 8ae52aa 2025-12-14 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+8ae52aa3e92e437536388d01be7273a287d5695f:IMAGE_POETRY_DOCUMENTATION.md:curl-auth-header:1264
+
+# IMAGE_POETRY_DOCUMENTATION.md · curl-auth-header · commit 8ae52aa 2025-12-14 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+8ae52aa3e92e437536388d01be7273a287d5695f:IMAGE_POETRY_DOCUMENTATION.md:curl-auth-header:1296
+
+# IMAGE_POETRY_DOCUMENTATION.md · curl-auth-header · commit 8ae52aa 2025-12-14 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+8ae52aa3e92e437536388d01be7273a287d5695f:IMAGE_POETRY_DOCUMENTATION.md:curl-auth-header:1348
+
+# IMAGE_POETRY_DOCUMENTATION.md · curl-auth-header · commit 8ae52aa 2025-12-14 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+8ae52aa3e92e437536388d01be7273a287d5695f:IMAGE_POETRY_DOCUMENTATION.md:curl-auth-header:1390
+
+# PACKAGE_NAME_UPDATED.md · sukhan-platform-token · commit 7230b91 2025-11-15 · history only (file no longer tracked)
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+7230b9196ec9fa70d8f7deddcf8f01196e455f06:PACKAGE_NAME_UPDATED.md:sukhan-platform-token:122
+
+# PRODUCTION_USAGE_GUIDE.md · curl-auth-header · commit 475eff6 2026-01-14 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+475eff614d5dd911c90c888901dfe0468700a1ec:PRODUCTION_USAGE_GUIDE.md:curl-auth-header:43
+
+# PRODUCTION_USAGE_GUIDE.md · curl-auth-header · commit 475eff6 2026-01-14 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+475eff614d5dd911c90c888901dfe0468700a1ec:PRODUCTION_USAGE_GUIDE.md:curl-auth-header:72
+
+# PRODUCTION_USAGE_GUIDE.md · generic-api-key · commit 475eff6 2026-01-14 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+475eff614d5dd911c90c888901dfe0468700a1ec:PRODUCTION_USAGE_GUIDE.md:generic-api-key:64
+
+# TROUBLESHOOTING.md · sukhan-platform-token · commit 7230b91 2025-11-15 · history only (file no longer tracked)
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+7230b9196ec9fa70d8f7deddcf8f01196e455f06:TROUBLESHOOTING.md:sukhan-platform-token:142
+
+# android/app/google-services.json · gcp-api-key · commit eb6e29e 2025-11-19 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+eb6e29e0f88c5be1d152defe5c5010ee3c790507:android/app/google-services.json:gcp-api-key:31
+
+# docs/RELEASE_SIGNING.md · sukhan-android-signing-password · commit 7e5db4e 2026-02-04 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+7e5db4ea408029bfde093f11767e0e72e13bbb17:docs/RELEASE_SIGNING.md:sukhan-android-signing-password:80
+
+# docs/RELEASE_SIGNING.md · sukhan-android-signing-password · commit 7e5db4e 2026-02-04 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+7e5db4ea408029bfde093f11767e0e72e13bbb17:docs/RELEASE_SIGNING.md:sukhan-android-signing-password:81
+
+# lib/firebase_options.dart · gcp-api-key · commit eb6e29e 2025-11-19 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+eb6e29e0f88c5be1d152defe5c5010ee3c790507:lib/firebase_options.dart:gcp-api-key:50
+
+# lib/firebase_options.dart · gcp-api-key · commit eb6e29e 2025-11-19 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+eb6e29e0f88c5be1d152defe5c5010ee3c790507:lib/firebase_options.dart:gcp-api-key:58
+
+# lib/firebase_options.dart · gcp-api-key · commit eb6e29e 2025-11-19 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+eb6e29e0f88c5be1d152defe5c5010ee3c790507:lib/firebase_options.dart:gcp-api-key:68
+
+# lib/firebase_options.dart · gcp-api-key · commit b67347e 2026-01-08 · still tracked at HEAD
+# KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
+b67347e1c37c80ea348fa4703b2c6e3b7253c35f:lib/firebase_options.dart:gcp-api-key:58

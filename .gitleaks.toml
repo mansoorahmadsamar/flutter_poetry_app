@@ -1,0 +1,86 @@
+# Sukhan flutter_poetry_app — secret scanning.
+#
+# Used by the pre-commit hook (.githooks/pre-commit) and /security-check.
+# gitleaks picks this file up automatically when run from the repo root.
+#
+# Sukhan is LIVE on Google Play and the App Store. Pushing to `develop` or
+# `main` runs play-store-release.yml. The release keystore passwords, the Play
+# service-account JSON, the Firebase admin SDK key and the Google OAuth client
+# secret must never reach a commit — they are CI secrets / gitignored files.
+# Secrets already in history are pinned in .gitleaksignore (pending rotation).
+
+title = "Sukhan flutter_poetry_app"
+
+[extend]
+useDefault = true          # Google API keys, private keys, JWTs, GitHub tokens, etc.
+
+# --- Sukhan-specific rules --------------------------------------------------
+# Value pattern: a literal directly after the key. A value starting with $
+# (shell / GitHub Actions placeholder) never matches.
+
+[[rules]]
+id = "sukhan-google-oauth-client-secret"
+description = "Google OAuth client secret (GOCSPX- prefix)"
+regex = '''\b(GOCSPX-[A-Za-z0-9_-]{20,})'''
+secretGroup = 1
+keywords = ["gocspx"]
+tags = ["sukhan", "google", "credential"]
+
+[[rules]]
+id = "sukhan-android-signing-password"
+description = "Android/iOS signing password (key.properties, gradle, CI) assigned a literal value"
+regex = '''(?i)\b(?:storePassword|keyPassword|STORE_PASSWORD|KEY_PASSWORD|KEYSTORE_PASSWORD|IOS_CERTIFICATE_PASSWORD)["']?\s*[:=]\s*["']?([^\s"'$`{}<>#,;()\[\]]{6,})(?:[\s"',;})\]]|$)'''
+secretGroup = 1
+keywords = ["password"]
+tags = ["sukhan", "signing", "credential"]
+
+[[rules]]
+id = "sukhan-platform-token"
+description = "Sukhan admin/API token assigned a literal value"
+regex = '''(?i)\b(?:ADMIN_JWT_TOKEN|POETRY_API_TOKEN|AUTH_TOKEN|ACCESS_TOKEN|REFRESH_TOKEN)["']?\s*[:=]\s*["']?([^\s"'$`{}<>#,;()\[\]]{16,})(?:[\s"',;})\]]|$)'''
+secretGroup = 1
+keywords = ["token"]
+tags = ["sukhan", "credential"]
+
+[[rules]]
+id = "sukhan-service-account-key-id"
+description = "Google/Firebase service-account JSON (private_key_id) — never commit; it is a CI secret"
+regex = '''"private_key_id"\s*:\s*"([a-f0-9]{32,})"'''
+secretGroup = 1
+keywords = ["private_key_id"]
+tags = ["sukhan", "google", "credential"]
+
+[[rules]]
+id = "sukhan-generic-password-literal"
+description = "Any password/secret assigned a literal value (nested YAML keys included)"
+regex = '''(?i)\b(?:password|passwd|secret|api[._-]?key|access[._-]?token)\s*(?::|=)\s*(?:"([^"\s$]{6,})"|'([^'\s$]{6,})'|([^\s'"$#,;{}()\[\]]{6,}))\s*$'''
+secretGroup = 0
+keywords = ["password", "passwd", "secret", "api_key", "apikey", "api-key", "access_token", "accesstoken"]
+tags = ["sukhan", "credential"]
+
+# --- Allowlist --------------------------------------------------------------
+# Narrow on purpose. Every entry is a placeholder or a pattern file, never a
+# real secret. Widening this list is a security decision, not tidying.
+# Signing material (android/key.properties, *.jks, *.keystore), service-account
+# JSON and .github/*.base64 are gitignored — they are NOT allowlisted here.
+# google-services.json / GoogleService-Info.plist are tracked and their Firebase
+# client API keys are pinned in .gitleaksignore, not allowlisted.
+
+[allowlist]
+description = "Documented placeholders and this file's own patterns"
+
+paths = [
+  '''(^|/)\.gitleaks\.toml$''',            # this file's own patterns
+  '''(^|/)\.gitleaksignore$''',            # fingerprints only
+  '''\.env(\.[a-z_]+)?\.example$''',       # templates: placeholders only (still reviewed on change)
+]
+
+regexes = [
+  '''\$\{\{\s*secrets\.[A-Z0-9_]+\s*\}\}''',               # GitHub Actions secret reference
+  '''\$\{[A-Za-z_][A-Za-z0-9_.]*:?\}''',                    # ${VAR} / ${VAR:} with no fallback
+  '''(?i)^(?:your|enter|insert|replace)[-_ ]?''',          # YOUR_TOKEN, your_password, replace_with…
+  '''(?i)change[-_]?me|placeholder|example|redacted|xxxxx|\*\*\*\*|dummy''',
+  '''^<[^>]+>$''',                                          # <password>
+  '''^(?:password|passwd|secret|token|key)[;,)]?$''',       # code: this.password = password;
+  '''^(?:args|self|config|settings|cfg|env|options|opts|props|properties|this|widget|process\.env|import\.meta\.env)\.''',  # attribute reads
+]
