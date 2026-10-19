@@ -9,7 +9,7 @@ Sukhan (Jahan-e-Sukhan) is published on Google Play (`com.techhikes.poetry_app`)
 - **Release workflows reach users.** `.github/workflows/play-store-release.yml` and `firebase-app-distribution.yml` ship builds; they have no analyze/test gate. Never trigger them, tag a release, or push/merge to `main` or `develop` without the owner's explicit OK. Work on a branch.
 - **Debug builds do not talk to production.** `lib/core/config/app_config.dart` picks the environment by build mode: debug → `http://10.0.2.2:8081` (a local backend), release → `https://api.prod.jahanesukhan.com`. A "Could not load feed" in a debug build usually means no local backend, not an app bug. Verify against production only with a release build (see TESTING.md).
 - **QA against production has side effects.** Signing in, searching, tapping a trending chip, opening a poem or poet all write analytics, counters or interests on the live backend. Use the owner's own account, keep actions minimal, never like/bookmark/follow/comment just to test, and report every side effect.
-- **`flutter build` edits tracked files.** The Flutter migrator silently rewrote `android/app/build.gradle.kts` (`minSdk` → `flutter.minSdkVersion`) and `android/gradle.properties` during a build. After any build, run `git status` and revert those edits unless the change is intended and reviewed — `minSdk` decides which phones can install the next release. It is `24` (Android 7.0) because Google Play automatic protection rejects lower; keep it an explicit number, since `flutter.minSdkVersion` differs between Flutter versions (CI uses 3.27.1).
+- **`flutter build` edits tracked files.** The Flutter migrator silently rewrote `android/app/build.gradle.kts` (`minSdk` → `flutter.minSdkVersion`) and `android/gradle.properties` during a build. After any build, run `git status` and revert those edits unless the change is intended and reviewed — `minSdk` decides which phones can install the next release. It is `24` (Android 7.0) because Google Play automatic protection rejects lower; keep it an explicit number, since `flutter.minSdkVersion` differs between Flutter versions.
 
 ## The prime rule: code ships with tests — no exceptions
 
@@ -138,7 +138,7 @@ If a tracker call fails with a dropped connection, retry it.
 ## Repo facts you need
 
 - **Flutter 3.44 / Dart 3.12.** Riverpod, Dio (hand-written calls, no Retrofit), go_router, flutter_secure_storage, shared_preferences, cached_network_image, google_fonts (runtime fetching on; only Jameel Noori Nastaleeq is bundled), Firebase Auth + Google + Apple sign-in.
-- **`pubspec.lock` is git-ignored**, so dependency resolution can differ between machines.
+- **`pubspec.lock` is committed** and CI pins the same Flutter as local (**3.44.4**), so CI builds exactly what was tested. Upgrade Flutter in `.github/workflows/*.yml` and locally together, and commit the lockfile when dependencies change. Release builds target SDK 36 (Flutter 3.44 default), which Google Play requires.
 - **Release signing** uses `android/key.properties` + `android/keystore/release.keystore` (never commit or print them).
 - **Android emulator:** `Pixel_7_Pro_API_35`; launch with `-dns-server 8.8.8.8,1.1.1.1` (otherwise the API host may not resolve) and remove a stale `~/.android/avd/Pixel_7_Pro_API_35.avd/multiinstance.lock` before relaunching. `adb shell uiautomator dump` exposes on-screen text for scripted checks.
 - Older root-level `*.md` files are historical notes and may be wrong; [ARCHITECTURE.md](ARCHITECTURE.md) and the code are the source of truth.

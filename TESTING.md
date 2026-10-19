@@ -223,7 +223,7 @@ adb shell svc wifi disable && adb shell svc data disable   # offline; re-enable 
 
 `minSdk = 24` in `android/app/build.gradle.kts` is deliberate: Google Play automatic protection rejects bundles below
 API 24 (Firebase Auth needs 23+). It stays an explicit number because `flutter.minSdkVersion` differs between Flutter
-versions (CI uses 3.27.1); the migrator's rewrite must not be committed.
+versions; the migrator's rewrite must not be committed. CI and local both use Flutter 3.44.4.
 
 ## 8. Production QA, safely
 

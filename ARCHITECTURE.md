@@ -11,7 +11,7 @@
 
 | Concern | Choice | Notes |
 |---|---|---|
-| SDK | Flutter 3.44.4 / Dart 3.12.2 (local) | CI pins **Flutter 3.27.1** (`.github/workflows/play-store-release.yml`, "Setup Flutter"). `pubspec.lock` is git-ignored (`.gitignore:3`), so CI resolves dependencies fresh. |
+| SDK | Flutter 3.44.4 / Dart 3.12.2 (local) | CI pins the same **Flutter 3.44.4** (`.github/workflows/play-store-release.yml`, "Setup Flutter") and `pubspec.lock` is committed, so CI builds the tested dependency set. Release target SDK 36, min SDK 24. |
 | State | `flutter_riverpod` 2.x: `StateNotifierProvider`, `FutureProvider(.autoDispose/.family)`, `StateProvider`, `Provider` | No `@riverpod` code generation is used. `riverpod_annotation` and `riverpod_generator` are declared but never imported. |
 | Models | `freezed` + `json_serializable` (`*.freezed.dart`, `*.g.dart` are committed) | `FeedEvent` is a hand-written class (`feed/models/feed_event.dart`). |
 | HTTP | `dio` 5: one shared instance, calls written by hand in `*_service.dart` | `retrofit` and `retrofit_generator` are declared but unused. Firebase verify, refresh and logout use `package:http` instead (`core/auth/firebase_auth_service.dart`). |
@@ -359,7 +359,7 @@ Logout and account deletion clear **all** SharedPreferences. The `feed_cache`, `
 - **Tests:** `test/core/utils/language_typography_test.dart` (17) and `text_direction_helper_test.dart` (7), **24 tests** in total. No widget, network or golden tests. There is no `integration_test/`: adding the `integration_test` package breaks the Android build until Gradle is wired for it.
 - **CI** (`.github/workflows/`):
   - `play-store-release.yml` runs on **every push to `develop` or `main`**, and on manual dispatch with a choice of track.
-    - Steps: Flutter **3.27.1** → `pub get` → decode secrets → `flutter build appbundle --release --build-name=MAJOR.MINOR.<run_number> --build-number=<run_number>` → upload to Play.
+    - Steps: Flutter **3.44.4** → `pub get` → decode secrets → `flutter build appbundle --release --build-name=MAJOR.MINOR.<run_number> --build-number=<run_number>` → upload to Play.
     - Track: `main` → **production**, `develop` → **alpha**.
     - **No `flutter analyze` or `flutter test` step.**
   - `firebase-app-distribution.yml` is manual-only (its push trigger is commented out). It builds a release APK, uploads to the `testers` group, and also has no test or analyze gate. Its iOS job is commented out.
@@ -402,7 +402,7 @@ Production is the only backend with real data, and there is no staging (`stage-a
 - Two RTL helpers disagree (ur/ar/fa/ps vs ur only).
 - Logout wipes the language preference along with search history (`preferences_service.dart:40-42`).
 - The Google sign-in verify payload hard-codes `deviceType: 'android'` (`firebase_auth_service.dart:113-119`).
-- CI pins Flutter 3.27.1 while local is 3.44.4; `pubspec.lock` is not committed.
+- (Fixed 2026-10-19) CI previously pinned Flutter 3.27.1 with an uncommitted `pubspec.lock`, so CI built different dependencies (dio 5.11 broke the build) and targeted SDK 35, which Google Play rejected.
 - No analyze or test gate in CI; a push to `main` releases straight to the Play **production** track.
 - Several routes and screens are unreachable, and several dependencies are unused (§12).
 - Section "see all" on Discover is a TODO no-op (`discover_screen.dart:489-496`).
