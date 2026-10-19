@@ -1,5 +1,6 @@
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_poetry_app/core/constants/app_constants.dart';
 
 /// Service for managing search history in local storage
 ///
@@ -9,7 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// - Duplicate-aware (removes duplicates)
 /// - Persistent across app sessions
 class SearchHistoryService {
-  static const String _historyKey = 'global_search_history';
+  static const String _historyKey = AppConstants.globalSearchHistoryKey;
   static const int _maxHistoryItems = 10;
   final Logger _logger = Logger();
 

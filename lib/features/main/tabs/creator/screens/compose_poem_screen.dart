@@ -11,6 +11,7 @@ import '../models/creator_poem_model.dart';
 import '../providers/creator_poems_provider.dart';
 import '../providers/creator_providers.dart';
 import '../utils/api_error_messages.dart';
+import 'package:flutter_poetry_app/core/constants/app_constants.dart';
 
 enum ComposeVariant { metaVisible, distractionFree, sherHelper }
 
@@ -27,7 +28,7 @@ extension on ComposeVariant {
   }
 }
 
-const _composeVariantPrefKey = 'creator.compose.variant';
+const _composeVariantPrefKey = AppConstants.composeVariantPreferenceKey;
 
 /// Compose poem — 3 variants from the design.
 /// User's last-used variant is persisted via SharedPreferences.

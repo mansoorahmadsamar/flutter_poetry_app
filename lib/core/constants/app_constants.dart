@@ -20,6 +20,14 @@ class AppConstants {
   static const String languagePreferenceKey = 'language_preference';
   static const String themePreferenceKey = 'theme_preference';
 
+  // SharedPreferences keys for search history. Device-level: kept on logout.
+  static const String searchHistoryKey = 'search_history';
+  static const String globalSearchHistoryKey = 'global_search_history';
+
+  // SharedPreferences keys tied to the signed-in account: cleared on logout.
+  static const String bookmarkSearchHistoryKey = 'bookmark_search_history';
+  static const String composeVariantPreferenceKey = 'creator.compose.variant';
+
   // Pagination
   static const int defaultPageSize = 10;
   static const int defaultPage = 0;

@@ -370,11 +370,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   /// Remove what belongs to the signed-in user from this device and drop
-  /// every provider that may hold their data.
-  Future<void> _clearUserData() async {
+  /// every provider that may hold their data. The language choice and (unless
+  /// [includeSearchHistory]) search history are device settings and stay.
+  Future<void> _clearUserData({bool includeSearchHistory = false}) async {
     try {
       final prefs = _ref.read(preferencesServiceProvider);
-      await prefs.clearAll();
+      await prefs.clearUserData(includeSearchHistory: includeSearchHistory);
     } catch (e) {
       _logger.w('⚠️  Failed to clear preferences: $e');
     }
@@ -456,7 +457,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       _logger.i('   Signing out of Firebase + clearing secure storage...');
       await _firebaseAuthService.signOut();
 
-      await _clearUserData();
+      // Deleting the account also forgets what was searched on it.
+      await _clearUserData(includeSearchHistory: true);
 
       // Resetting to default AuthState clears tokens and sets isAuthenticated
       // to false; the GoRouter redirect listening on auth state will send the
