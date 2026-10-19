@@ -142,7 +142,7 @@ Known consequences:
 | `/api/guest/couplets/trending` | `GuestService.getTrendingCouplets` |
 
 Services that branch on `isGuest`: `FeedService`, `DiscoverService`, `SearchService`, `PoetService`, `UnifiedBookmarksNotifier`, `PoetsDiscoveryNotifier`, `reaction_providers.dart:26`. Services with **no guest branch**, which therefore call authenticated endpoints for guests:
-- `PoetService.getPoetGallery/Books/Videos/Facts` (`poet_service.dart:522-640`). The poet-detail **Gallery, Books and Videos** tabs return 401 for guests.
+- `PoetService.getPoetGallery/Books/Videos/Facts` (`poet_service.dart:522-640`). The poet-detail **Gallery, Books and Videos** tabs would return 401 for guests, so those tabs show guests a sign-in prompt and never call them (`poets/widgets/poet_sign_in_prompt.dart`).
 - `HashtagService` (all of `/api/hashtags/**`). Whether the backend allows anonymous access to these is **UNVERIFIED**.
 - The image-poetry services and the like and bookmark services. Writes are gated in the UI by `ensureSignedIn()` (`features/auth/widgets/ensure_signed_in.dart`).
 
@@ -205,7 +205,7 @@ An `IndexedStack` (`:75-78`) holds Feed, Discover, Bookmarks (`AppBookmarksScree
   - `smartRefresh()` prepends new items using `refresh=true` (`:215-246`).
   - `hideItem()` removes the item locally and emits a `hide` event (`:249-256`).
 - Card types: `FeedContentData.fromJson` (`models/feed_content_data.dart:9-17`) maps `COUPLET`, `POEM`, `POET_SPOTLIGHT` and `POET_IMAGE` to typed models, and anything else to `UnknownContentData`. `FeedItemBuilder` renders nothing for unknown types (`widgets/feed_item_builder.dart:25, 95`).
-- **Guest feed:** `FeedService.getFeed` returns `FeedResponse.fromGuestBundle(/api/guest/discover)` (`feed_service.dart:28-32`, `models/feed_response.dart:55-79`). The order is couplets from `recommended`, then poems from `editorsPicks`, then poet spotlights. It is a single page (`hasMore: false`) with `sessionId: 'guest'`. `ContentCard` has no excerpt field (`discover_bundle_model.dart:67-80`), so the guest poem card sets `excerpt: card.primaryText`, which is the title (`feed_response.dart:89-92`). **Guest poem cards show only the title.**
+- **Guest feed:** `FeedService.getFeed` returns `FeedResponse.fromGuestBundle(/api/guest/discover)` (`feed_service.dart:28-32`, `models/feed_response.dart:55-79`). The order is couplets from `recommended`, then poems from `editorsPicks`, then poet spotlights. It is a single page (`hasMore: false`) with `sessionId: 'guest'`. `ContentCard.excerpt` carries the guest API's `excerpt` (`"-"` reads as null via `PlaceholderStringConverter`, `core/utils/api_placeholder.dart`), so guest poem cards show the opening lines like signed-in cards; the title is never substituted for a missing excerpt.
 
 ### 9.3 Engagement events (feed only): `feed/services/feed_event_tracker.dart`
 | Event `t` | Emitted when | Where |
@@ -246,7 +246,7 @@ Flushing:
   - Filtered: poet and poem taps work. A couplet tap pushes the poem only `if (couplet.poem != null)` (`app_search_screen.dart:250-258`). `CoupletSearchResult.poem` is nullable (`models/search_models.dart:106`), and QA observed it null for every result, so the tap is a no-op (always-null is **UNVERIFIED** from code alone).
 - **Highlighting:** `HighlightedText` (`utils/highlighted_text.dart`) highlights matches on the client after Urdu normalization. `_buildOrigToNormMap` normalizes each character separately; `normalize(' ')` trims to `''`, so spaces count as "removed" (`:144-150`). Every preceding space therefore shifts the highlight one character.
 - **Related screens:**
-  - `PoetsSearchScreen` (`/main/poets-search`) uses `poetSearchPaginationProvider`. `loadMore()` is never called and the screen has no `ScrollController`, so **only the first page ever loads**.
+  - `PoetsSearchScreen` (`/main/poets-search`) uses `poetSearchPaginationProvider`. `SearchResultsGrid` (a sliver) listens to the enclosing `CustomScrollView`'s position and calls `loadMore()` within 600 px of the end; the notifier de-duplicates poets across pages, stops when a page adds nothing new, and drops a page that was in flight when a new search started.
   - `CategoryResultsScreen` is orphaned (§7). `widgets/autocomplete_suggestions.dart` is used only by the dead `main/tabs/search_tab.dart`.
 
 ### 9.6 Poets and poet detail: `features/main/tabs/poets/`
@@ -262,7 +262,7 @@ Flushing:
 | Videos | `poetVideosProvider` |
 | Poetry | `poetPoemsProvider` + `poemPagesProvider` |
 
-  Gallery, Books and Videos have no guest branch and return 401 for guests. `ownedPoetProvider` also shows a claim affordance (`:313`).
+  Gallery, Books and Videos have no guest endpoint; for guests each tab shows `PoetSignInPrompt` (`GuestLockedTab`) instead of building its provider. `ownedPoetProvider` also shows a claim affordance (`:313`).
 - **Follow:** `FollowButton` uses the follow providers and is gated with `ensureSignedIn`.
 
 ### 9.7 Poem detail: `features/main/tabs/poets/screens/poem_detail_screen.dart`
@@ -283,7 +283,7 @@ Flushing:
 ### 9.9 Hashtags: `features/hashtags/`
 - `HashtagDetailScreen` (`/hashtags/:slug`) has the tabs Couplets, Poems, Images and Poets (`screens/hashtag_detail_screen.dart:146-149`).
 - `HashtagService` calls `/api/hashtags/trending`, `/:slug` and `/:slug/{poems,couplets,images,poets}`.
-- `HashtagPill` parses `hashtag.color` with `int.parse(color.replaceAll('#','0xFF'))` (`widgets/hashtag_pill.dart:28`). The API's `"-"` placeholder **throws**.
+- `HashtagPill`, `HashtagDetailScreen` and `PoetOverviewTab` parse API colours with `parseHexColor` (`core/utils/color_parser.dart`): `#RGB`, `#RRGGBB`, `#AARRGGBB`; `null`, `"-"` and junk fall back.
 
 ### 9.10 Bookmarks tab: `features/main/tabs/bookmarks/screens/app_bookmarks_screen.dart`
 - `unifiedBookmarksProvider(BookmarkFilters)` + `bookmarkStatsProvider` → `UnifiedBookmarkService`: `/api/bookmarks/{recent,poems,couplets,images,search,stats}`, `DELETE /api/bookmarks/{type}/{id}`, `/api/bookmarks/{type}/{id}/notes`.
@@ -308,7 +308,7 @@ Flushing:
 
 - **Fonts:**
   - The bundled family is declared as `'Jameel Noori Nastaleeq'` (with spaces) in `pubspec.yaml`, and about 114 call sites use that exact string.
-  - `LanguageTypography.createStyle` uses `'JameelNooriNastaleeq'`, **without spaces** (`core/utils/language_typography.dart:94`). That name matches no declared family, so the style falls back to the platform font. Its users are `LocalizedText` → poem/couplet cards, hashtag tabs, poet detail and others. **The visual effect on devices is UNVERIFIED.**
+  - `LanguageTypography.createStyle` uses `AppTypography.urduFontFamily` (fixed 2026-10-19; it previously used `'JameelNooriNastaleeq'`, which matched no declared family). About 113 other call sites still repeat the literal `'Jameel Noori Nastaleeq'` instead of the constant.
   - Everything else comes from `google_fonts` at runtime: Roboto (UI, `design_system/app_typography.dart`), `notoNastaliqUrdu`, `notoSansDevanagari`, `fraunces`, `inter`, `jetBrainsMono`. These need network access on first use.
 - **Direction helpers disagree:**
   - `LanguageTypography.getTextDirection` treats `ur`, `ar`, `fa` and `ps` as RTL (`language_typography.dart:59-69`).
@@ -361,8 +361,8 @@ Logout and account deletion clear **all** SharedPreferences. The `feed_cache`, `
   - `play-store-release.yml` runs on **every push to `develop` or `main`**, and on manual dispatch with a choice of track.
     - Steps: Flutter **3.44.4** → `pub get` → decode secrets → `flutter build appbundle --release --build-name=MAJOR.MINOR.<run_number> --build-number=<run_number>` → upload to Play.
     - Track: `main` → **production**, `develop` → **alpha**.
-    - **No `flutter analyze` or `flutter test` step.**
-  - `firebase-app-distribution.yml` is manual-only (its push trigger is commented out). It builds a release APK, uploads to the `testers` group, and also has no test or analyze gate. Its iOS job is commented out.
+    - `flutter analyze --no-fatal-infos --no-fatal-warnings` and `flutter test` run right after `pub get`, before any secret is decoded or anything is built.
+  - `firebase-app-distribution.yml` is manual-only (its push trigger is commented out). It builds a release APK, uploads to the `testers` group, with the same analyze and test gate. Its iOS job is commented out.
   - The most recent Play Store Release run (2026-07-12, `develop`) **failed**. Its logs have expired, so the cause is **UNVERIFIED**. The previous three runs succeeded.
 - **iOS releases** are not automated; how they are shipped is **UNVERIFIED**. Release signing is described in `docs/RELEASE_SIGNING.md`.
 
@@ -390,19 +390,15 @@ Production is the only backend with real data, and there is no staging (`stage-a
 - All five tabs fetch on `/main` entry because of the `IndexedStack` (`main_screen.dart:75`).
 - No retries, no offline detection, single 30 s timeout; `AppError` is unused.
 - Feed events are dropped when a batch POST fails (`feed_event_tracker.dart:85-90`).
-- Guest feed poem cards show only the title (`feed_response.dart:89-92`).
 - Guest poet lists ignore their filter (featured, trending, era, gender, tag all return the same list) (`poet_service.dart:104-455`).
-- Poet Gallery, Books and Videos tabs return 401 for guests (`poet_service.dart:522-600`); hashtag endpoints have no guest path.
+- Hashtag endpoints have no guest path.
 - Search preview poem, couplet, category and tag cards have no `onTap` (`app_search_preview_results.dart:174-177`).
 - Filtered couplet search results cannot open their poem (`couplet.poem` is null) (`app_search_screen.dart:250-258`).
 - Search highlight drifts one character per preceding space (`highlighted_text.dart:144-150`).
-- Poet search never loads page 2: `loadMore()` is never called (`poets_search_screen.dart`).
-- `HashtagPill` crashes on `color: "-"` (`hashtag_pill.dart:28`).
-- `LanguageTypography` uses a font family name that does not exist (`language_typography.dart:94`).
 - Two RTL helpers disagree (ur/ar/fa/ps vs ur only).
 - Logout wipes the language preference along with search history (`preferences_service.dart:40-42`).
 - The Google sign-in verify payload hard-codes `deviceType: 'android'` (`firebase_auth_service.dart:113-119`).
 - (Fixed 2026-10-19) CI previously pinned Flutter 3.27.1 with an uncommitted `pubspec.lock`, so CI built different dependencies (dio 5.11 broke the build) and targeted SDK 35, which Google Play rejected.
-- No analyze or test gate in CI; a push to `main` releases straight to the Play **production** track.
+- CI runs analyze (errors only) and tests before building, but there is no PR check, and a push to `main` releases straight to the Play **production** track.
 - Several routes and screens are unreachable, and several dependencies are unused (§12).
 - Section "see all" on Discover is a TODO no-op (`discover_screen.dart:489-496`).

@@ -4,7 +4,8 @@
 > all passing (`flutter test` → `+24: All tests passed!`, run 2026-10-19 on Flutter 3.44.4). There are no widget tests,
 > no fakes for Dio or secure storage, no JSON fixtures, no golden tests and no automated device tests. Device QA is
 > manual, on an emulator with a release build (§7). The release workflows (`play-store-release.yml`,
-> `firebase-app-distribution.yml`) build and ship **without running `flutter analyze` or `flutter test`**.
+> `firebase-app-distribution.yml`) run `flutter analyze --no-fatal-infos --no-fatal-warnings` and `flutter test` before
+> building (added 2026-10-19 on `fix/app-misc`); there is still no pull-request check.
 >
 > **Backlog:** everything in Phases 0–4 below. Untested today: networking/auth/refresh, every screen and widget, JSON
 > models, search normalisation and highlighting, feed, discover, hashtags, image poetry, creator mode.
