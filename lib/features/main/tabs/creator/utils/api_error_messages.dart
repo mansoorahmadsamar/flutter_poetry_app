@@ -41,6 +41,7 @@ String friendlyApiMessage(Object error, CreatorAction action) {
     case DioExceptionType.connectionTimeout:
     case DioExceptionType.sendTimeout:
     case DioExceptionType.receiveTimeout:
+    case DioExceptionType.transformTimeout:
       return 'Slow connection — please try again.';
     case DioExceptionType.connectionError:
       return "Can't reach Sukhan right now. Check your connection.";
