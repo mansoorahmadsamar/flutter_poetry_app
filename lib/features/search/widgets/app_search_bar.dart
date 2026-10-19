@@ -138,19 +138,26 @@ class _AppSearchBarState extends State<AppSearchBar> {
   }
 
   Widget _buildPrefixIcon(bool isDark) {
-    // Back button inside the bar if enabled, otherwise just search icon
+    // Back button inside the bar if enabled, otherwise just search icon.
+    // In RTL the back arrow is mirrored to "→", so it needs a spoken label.
     if (widget.showBackButton && widget.onBack != null) {
-      return GestureDetector(
+      return Semantics(
+        button: true,
+        label: _backLabel(),
+        excludeSemantics: true,
         onTap: widget.onBack,
-        behavior: HitTestBehavior.opaque,
-        child: Padding(
-          padding: EdgeInsetsDirectional.only(start: 4),
-          child: Icon(
-            Icons.arrow_back_rounded,
-            size: 22,
-            color: isDark
-                ? AppColors.textSecondaryDark
-                : Colors.grey.withValues(alpha: 0.7),
+        child: GestureDetector(
+          onTap: widget.onBack,
+          behavior: HitTestBehavior.opaque,
+          child: Padding(
+            padding: EdgeInsetsDirectional.only(start: 4),
+            child: Icon(
+              Icons.arrow_back_rounded,
+              size: 22,
+              color: isDark
+                  ? AppColors.textSecondaryDark
+                  : Colors.grey.withValues(alpha: 0.7),
+            ),
           ),
         ),
       );
@@ -184,12 +191,35 @@ class _AppSearchBarState extends State<AppSearchBar> {
 
     return IconButton(
       onPressed: widget.onClear,
+      tooltip: _clearLabel(),
       icon: Icon(
         Icons.clear_rounded,
         size: 20,
         color: Colors.grey.withValues(alpha: 0.7),
       ),
     );
+  }
+
+  String _clearLabel() {
+    switch (widget.languageCode) {
+      case 'ur':
+        return 'تلاش صاف کریں';
+      case 'hi':
+        return 'खोज साफ़ करें';
+      default:
+        return 'Clear search';
+    }
+  }
+
+  String _backLabel() {
+    switch (widget.languageCode) {
+      case 'ur':
+        return 'واپس';
+      case 'hi':
+        return 'वापस';
+      default:
+        return 'Back';
+    }
   }
 
   String _getHintText() {

@@ -278,41 +278,48 @@ class _SearchActionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.md,
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.search_rounded,
-              size: 20,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondaryLight,
-            ),
-            SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Text(
-                isUrdu ? 'تلاش کریں: "$query"' : 'Search for "$query"',
-                textDirection: isUrdu ? TextDirection.rtl : TextDirection.ltr,
-                style: TextStyle(
-                  fontFamily: isUrdu ? 'Jameel Noori Nastaleeq' : null,
-                  fontSize: isUrdu ? 16 : 14,
-                  color: AppColors.primary,
-                  height: isUrdu ? 1.8 : 1.4,
+    // The trailing "→" is decorative: the row reads as one button with the
+    // "Search for …" text as its label.
+    return Semantics(
+      button: true,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.md,
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.search_rounded,
+                size: 20,
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondaryLight,
+              ),
+              SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Text(
+                  isUrdu ? 'تلاش کریں: "$query"' : 'Search for "$query"',
+                  textDirection: isUrdu ? TextDirection.rtl : TextDirection.ltr,
+                  style: TextStyle(
+                    fontFamily: isUrdu ? 'Jameel Noori Nastaleeq' : null,
+                    fontSize: isUrdu ? 16 : 14,
+                    color: AppColors.primary,
+                    height: isUrdu ? 1.8 : 1.4,
+                  ),
                 ),
               ),
-            ),
-            Icon(
-              Icons.arrow_forward_rounded,
-              size: 18,
-              color: AppColors.primary,
-            ),
-          ],
+              ExcludeSemantics(
+                child: Icon(
+                  Icons.arrow_forward_rounded,
+                  size: 18,
+                  color: AppColors.primary,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
