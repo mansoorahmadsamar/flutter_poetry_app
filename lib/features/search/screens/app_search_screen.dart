@@ -195,6 +195,18 @@ class _AppSearchScreenState extends ConsumerState<AppSearchScreen> {
         return AppSearchSuggestions(
           key: const ValueKey('suggesting'),
           onSuggestionTap: _executeQuery,
+          onPoetTap: (poet) {
+            _searchFocusNode.unfocus();
+            SearchResultNavigation.openPoet(context, poet.publicId);
+          },
+          onPoemTap: (poem) {
+            _searchFocusNode.unfocus();
+            SearchResultNavigation.openPoem(context, poem.publicId);
+          },
+          onTagTap: (tag) {
+            _searchFocusNode.unfocus();
+            SearchResultNavigation.openHashtag(context, tag.slug);
+          },
           onSearchTap: () {
             final query = ref.read(globalSearchProvider).currentQuery;
             if (query.isNotEmpty) {
