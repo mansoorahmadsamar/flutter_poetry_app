@@ -53,6 +53,13 @@
 - Fixtures: `unified_search_dil_ur.json` (Urdu `دل`) and `unified_search_jigar.json` (Roman `jigar`: 0 couplets,
   5 verse hits whose poet fields are `"-"`); `realRomanJigarResponse()` loads the latter with image URLs removed.
 
+### Feed card helpers
+
+- `test/helpers/feed_card_harness.dart` — `pumpFeedCard` (no router) and `pumpFeedCardInRouter`, which mounts the card
+  in a `GoRouter` whose `/main/poets/:publicId` and `/main/poems/:publicId` routes show `poet:<id>` / `poem:<id>`, so a
+  tap test can assert where the tap went. Guest cards are built from `test/fixtures/guest/discover_ur.json` through the
+  real `GuestService` + `FeedResponse.fromGuestBundle` (see `guest_feed_poet_tap_test.dart`).
+
 ### Three things every test must know
 
 1. **Fonts.** The app uses `google_fonts`, which fetches fonts over HTTP at runtime. Every test file that can reach
