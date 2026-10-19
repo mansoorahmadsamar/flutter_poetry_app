@@ -208,4 +208,56 @@ void main() {
       );
     });
   });
+
+  /// T-115: the 14 private `_isUrduText` copies in search widgets came in two
+  /// flavours; the shared helpers must give exactly the same answers.
+  group('LanguageTypography Arabic-script checks match the old helpers', () {
+    final legacy = RegExp(r'[؀-ۿ]');
+    bool legacyContains(String t) => legacy.hasMatch(t);
+    bool legacyMostly(String t) =>
+        legacy.allMatches(t).length > t.length / 3;
+
+    const samples = [
+      '',
+      ' ',
+      'دل',
+      'دِل', // diacritics
+      'فیض احمد فیض',
+      'جگرؔ بسوانی',
+      'dil',
+      'gham nahi uska',
+      'dil دل', // mixed: contains, but not mostly
+      'dil e nadan دل',
+      'دل dil',
+      'दिल', // Devanagari
+      'Mirza Ghalib (مرزا غالب)',
+      '1857',
+      '#محبت',
+      '😊 دل',
+    ];
+
+    for (final text in samples) {
+      test('"$text"', () {
+        expect(LanguageTypography.containsArabicScript(text),
+            legacyContains(text));
+        expect(LanguageTypography.isMostlyArabicScript(text),
+            legacyMostly(text));
+      });
+    }
+
+    test('the two differ on mostly-Roman text with one Urdu word', () {
+      expect(LanguageTypography.containsArabicScript('dil e nadan دل'), isTrue);
+      expect(LanguageTypography.isMostlyArabicScript('dil e nadan دل'), isFalse);
+    });
+
+    test('languageCodeForScript agrees with containsArabicScript', () {
+      for (final text in samples) {
+        expect(
+          LanguageTypography.languageCodeForScript(text) == 'ur',
+          LanguageTypography.containsArabicScript(text),
+          reason: text,
+        );
+      }
+    });
+  });
 }

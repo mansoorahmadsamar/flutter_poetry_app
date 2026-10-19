@@ -13,6 +13,7 @@ import 'package:flutter_poetry_app/features/search/widgets/app_search_poem_card.
 import 'package:flutter_poetry_app/features/search/widgets/app_search_verse_card.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poet_model.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.dart';
+import 'package:flutter_poetry_app/core/utils/language_typography.dart';
 
 /// Virtualized infinite-scroll list for a single segment.
 ///
@@ -361,7 +362,7 @@ class _CategoryListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isUrdu = _isUrduText(category.name);
+    final isUrdu = LanguageTypography.containsArabicScript(category.name);
 
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -457,9 +458,5 @@ class _CategoryListItem extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  bool _isUrduText(String text) {
-    return RegExp(r'[\u0600-\u06FF]').hasMatch(text);
   }
 }

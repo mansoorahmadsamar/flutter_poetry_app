@@ -6,6 +6,7 @@ import 'package:flutter_poetry_app/core/utils/api_placeholder.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
 import 'package:flutter_poetry_app/features/search/utils/highlighted_text.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:flutter_poetry_app/core/utils/language_typography.dart';
 
 /// Compact couplet card optimized for search results.
 ///
@@ -289,7 +290,7 @@ class AppSearchCoupletCard extends StatelessWidget {
   }
 
   static TextDirection _directionOf(String text) =>
-      RegExp(r'[\u0600-\u06FF]').hasMatch(text)
+      LanguageTypography.containsArabicScript(text)
           ? TextDirection.rtl
           : TextDirection.ltr;
 

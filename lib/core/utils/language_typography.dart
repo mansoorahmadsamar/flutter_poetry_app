@@ -75,16 +75,27 @@ class LanguageTypography {
     return getTextDirection(languageCode) == TextDirection.rtl;
   }
 
-  static final _arabicScript =
-      RegExp(r'[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]');
+  /// Arabic-script letters (Urdu, Persian, Arabic): the basic Arabic block,
+  /// the one definition every search and feed widget uses.
+  static final _arabicScript = RegExp(r'[\u0600-\u06FF]');
   static final _devanagariScript = RegExp(r'[\u0900-\u097F]');
+
+  /// Whether [text] contains any Arabic-script letter — e.g. a mixed
+  /// `dil دل` counts. Use for text that is either Urdu or Latin.
+  static bool containsArabicScript(String text) => _arabicScript.hasMatch(text);
+
+  /// Whether more than a third of [text] (UTF-16 units, spaces included) is
+  /// Arabic script — "primarily Urdu", so a Roman phrase with one Urdu word
+  /// stays left-to-right.
+  static bool isMostlyArabicScript(String text) =>
+      _arabicScript.allMatches(text).length > text.length / 3;
 
   /// The language code whose typography fits [text]'s script, for content
   /// that carries no language field (e.g. search hits): `ur` for Arabic
   /// script (Nastaliq, RTL), `hi` for Devanagari, otherwise `en` (Latin —
   /// English or Roman Urdu, LTR). Arabic script wins in mixed text.
   static String languageCodeForScript(String text) {
-    if (_arabicScript.hasMatch(text)) return 'ur';
+    if (containsArabicScript(text)) return 'ur';
     if (_devanagariScript.hasMatch(text)) return 'hi';
     return 'en';
   }

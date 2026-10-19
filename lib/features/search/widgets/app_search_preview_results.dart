@@ -14,6 +14,7 @@ import 'package:flutter_poetry_app/features/search/widgets/app_search_couplet_ca
 import 'package:flutter_poetry_app/features/search/widgets/app_search_poet_card.dart';
 import 'package:flutter_poetry_app/features/search/widgets/app_search_poem_card.dart';
 import 'package:flutter_poetry_app/features/search/widgets/app_search_verse_card.dart';
+import 'package:flutter_poetry_app/core/utils/language_typography.dart';
 
 /// Smart grouped overview (the "سب" tab experience).
 ///
@@ -570,7 +571,7 @@ class _MiniPoetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isUrdu = _isUrduText(name);
+    final isUrdu = LanguageTypography.containsArabicScript(name);
 
     return GestureDetector(
       onTap: onTap,
@@ -672,7 +673,7 @@ class _CategoriesChips extends StatelessWidget {
               spacing: AppSpacing.sm,
               runSpacing: AppSpacing.sm,
               children: categories.map((cat) {
-                final isTextUrdu = _isUrduText(cat.name);
+                final isTextUrdu = LanguageTypography.containsArabicScript(cat.name);
                 return _ChipTapTarget(
                   key: ValueKey('search-category-${cat.publicId}'),
                   borderRadius: 12,
@@ -755,7 +756,7 @@ class _TagsChips extends StatelessWidget {
               spacing: AppSpacing.sm,
               runSpacing: AppSpacing.sm,
               children: tags.map((tag) {
-                final isTextUrdu = _isUrduText(tag.name);
+                final isTextUrdu = LanguageTypography.containsArabicScript(tag.name);
                 return _ChipTapTarget(
                   key: ValueKey('search-tag-${tag.publicId}'),
                   borderRadius: 20,
@@ -866,7 +867,7 @@ class _RelatedSearches extends StatelessWidget {
             spacing: AppSpacing.sm,
             runSpacing: AppSpacing.sm,
             children: searches.map((search) {
-              final isTextUrdu = _isUrduText(search.query);
+              final isTextUrdu = LanguageTypography.containsArabicScript(search.query);
               return GestureDetector(
                 onTap: () => onTap(search.query),
                 child: Container(
@@ -913,8 +914,4 @@ TextStyle _headerStyle(bool isUrdu, bool isDark) {
     color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
     height: isUrdu ? 1.8 : 1.4,
   );
-}
-
-bool _isUrduText(String text) {
-  return RegExp(r'[\u0600-\u06FF]').hasMatch(text);
 }

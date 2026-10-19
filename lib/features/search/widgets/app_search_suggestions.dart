@@ -8,6 +8,7 @@ import 'package:flutter_poetry_app/core/utils/api_placeholder.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:flutter_poetry_app/core/utils/language_typography.dart';
 
 /// Inline autocomplete suggestions (NOT a floating overlay).
 ///
@@ -407,7 +408,7 @@ class _PoetSuggestionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isUrdu = _isUrduText(poet.name);
+    final isUrdu = LanguageTypography.containsArabicScript(poet.name);
     final imageUrl = presentOrNull(poet.profileImageUrl);
 
     return InkWell(
@@ -506,7 +507,7 @@ class _TextSuggestionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isUrdu = _isUrduText(text);
+    final isUrdu = LanguageTypography.containsArabicScript(text);
 
     return InkWell(
       onTap: onTap,
@@ -539,18 +540,18 @@ class _TextSuggestionRow extends StatelessWidget {
                     SizedBox(height: 2),
                     Text(
                       subtitle!,
-                      textDirection: _isUrduText(subtitle!)
+                      textDirection: LanguageTypography.containsArabicScript(subtitle!)
                           ? TextDirection.rtl
                           : TextDirection.ltr,
                       style: TextStyle(
-                        fontFamily: _isUrduText(subtitle!)
+                        fontFamily: LanguageTypography.containsArabicScript(subtitle!)
                             ? 'Jameel Noori Nastaleeq'
                             : null,
-                        fontSize: _isUrduText(subtitle!) ? 13 : 12,
+                        fontSize: LanguageTypography.containsArabicScript(subtitle!) ? 13 : 12,
                         color: isDark
                             ? AppColors.textSecondaryDark
                             : AppColors.textSecondaryLight,
-                        height: _isUrduText(subtitle!) ? 1.6 : 1.3,
+                        height: LanguageTypography.containsArabicScript(subtitle!) ? 1.6 : 1.3,
                       ),
                     ),
                   ],
@@ -621,12 +622,4 @@ class _SuggestionSkeleton extends StatelessWidget {
       ),
     );
   }
-}
-
-// ---------------------------------------------------------------------------
-// Shared helper
-// ---------------------------------------------------------------------------
-
-bool _isUrduText(String text) {
-  return RegExp(r'[\u0600-\u06FF]').hasMatch(text);
 }

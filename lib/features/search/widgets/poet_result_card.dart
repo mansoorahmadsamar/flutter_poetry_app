@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
+import 'package:flutter_poetry_app/core/utils/language_typography.dart';
 
 /// Poet result card for search results
 ///
@@ -26,7 +27,7 @@ class PoetResultCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isUrdu = _isUrduText(poet.name);
+    final isUrdu = LanguageTypography.isMostlyArabicScript(poet.name);
 
     return Container(
       width: 160,
@@ -130,11 +131,5 @@ class PoetResultCard extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  bool _isUrduText(String text) {
-    final urduPattern = RegExp(r'[\u0600-\u06FF]');
-    final urduMatches = urduPattern.allMatches(text).length;
-    return urduMatches > text.length / 3;
   }
 }

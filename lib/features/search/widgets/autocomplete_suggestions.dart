@@ -7,6 +7,7 @@ import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
 import 'package:flutter_poetry_app/features/search/widgets/top_match_card.dart';
+import 'package:flutter_poetry_app/core/utils/language_typography.dart';
 
 /// Autocomplete suggestions overlay widget
 ///
@@ -212,7 +213,7 @@ class AutocompleteSuggestions extends ConsumerWidget {
     AutocompletePoet poet,
     bool isDark,
   ) {
-    final isUrdu = _isUrduText(poet.name);
+    final isUrdu = LanguageTypography.isMostlyArabicScript(poet.name);
 
     return ListTile(
       contentPadding: EdgeInsets.symmetric(
@@ -271,7 +272,7 @@ class AutocompleteSuggestions extends ConsumerWidget {
     AutocompletePoem poem,
     bool isDark,
   ) {
-    final isUrdu = _isUrduText(poem.title);
+    final isUrdu = LanguageTypography.isMostlyArabicScript(poem.title);
 
     return ListTile(
       contentPadding: EdgeInsets.symmetric(
@@ -314,7 +315,7 @@ class AutocompleteSuggestions extends ConsumerWidget {
     AutocompleteTag tag,
     bool isDark,
   ) {
-    final isUrdu = _isUrduText(tag.name);
+    final isUrdu = LanguageTypography.isMostlyArabicScript(tag.name);
 
     return ListTile(
       contentPadding: EdgeInsets.symmetric(
@@ -352,7 +353,7 @@ class AutocompleteSuggestions extends ConsumerWidget {
     AutocompleteCategory category,
     bool isDark,
   ) {
-    final isUrdu = _isUrduText(category.name);
+    final isUrdu = LanguageTypography.isMostlyArabicScript(category.name);
 
     return ListTile(
       contentPadding: EdgeInsets.symmetric(
@@ -448,12 +449,5 @@ class AutocompleteSuggestions extends ConsumerWidget {
     };
 
     return labels[languageCode]?[key] ?? labels['en']![key]!;
-  }
-
-  /// Detect if text is primarily Urdu
-  bool _isUrduText(String text) {
-    final urduPattern = RegExp(r'[\u0600-\u06FF]');
-    final urduMatches = urduPattern.allMatches(text).length;
-    return urduMatches > text.length / 3;
   }
 }

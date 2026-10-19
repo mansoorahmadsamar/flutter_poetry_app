@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
+import 'package:flutter_poetry_app/core/utils/language_typography.dart';
 
 /// Top match card for autocomplete suggestions
 ///
@@ -29,7 +30,7 @@ class TopMatchCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isUrdu = _isUrduText(title);
+    final isUrdu = LanguageTypography.isMostlyArabicScript(title);
 
     return Container(
       margin: EdgeInsets.symmetric(
@@ -177,12 +178,5 @@ class TopMatchCard extends StatelessWidget {
       default:
         return type.toUpperCase();
     }
-  }
-
-  /// Detect if text is primarily Urdu
-  bool _isUrduText(String text) {
-    final urduPattern = RegExp(r'[\u0600-\u06FF]');
-    final urduMatches = urduPattern.allMatches(text).length;
-    return urduMatches > text.length / 3;
   }
 }

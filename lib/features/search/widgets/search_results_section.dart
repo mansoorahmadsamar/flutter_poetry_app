@@ -9,6 +9,7 @@ import 'package:flutter_poetry_app/features/main/tabs/poets/widgets/couplet_card
 import 'package:flutter_poetry_app/features/search/utils/search_adapters.dart';
 import 'package:flutter_poetry_app/features/search/widgets/poet_result_card.dart';
 import 'package:flutter_poetry_app/features/search/widgets/couplet_sort_dropdown.dart';
+import 'package:flutter_poetry_app/core/utils/language_typography.dart';
 
 /// Search results section with segment-aware rendering
 ///
@@ -471,7 +472,7 @@ class SearchResultsSection extends ConsumerWidget {
             runSpacing: AppSpacing.xs,
             children: relatedSearches.map((search) {
               final query = search.query ?? search.toString();
-              final isUrdu = _isUrduText(query);
+              final isUrdu = LanguageTypography.isMostlyArabicScript(query);
               return ActionChip(
                 label: Text(
                   query,
@@ -507,12 +508,5 @@ class SearchResultsSection extends ConsumerWidget {
         ],
       ),
     );
-  }
-
-  /// Detect if text is primarily Urdu
-  bool _isUrduText(String text) {
-    final urduPattern = RegExp(r'[\u0600-\u06FF]');
-    final urduMatches = urduPattern.allMatches(text).length;
-    return urduMatches > text.length / 3;
   }
 }

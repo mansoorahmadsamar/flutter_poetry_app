@@ -326,6 +326,7 @@ Flushing:
   - Most widgets hard-code `TextDirection.rtl` directly (about 165 occurrences) or use the API's `direction` field.
   - The tests in `test/core/utils/` document the disagreement.
 - **Size and line height:** Urdu, Arabic and Persian use a 1.18× size and 1.75 line height; Hindi 1.06× and 1.5; English 1.0× and 1.4 (`language_typography.dart:7-18`).
+- **Script detection:** one definition, `LanguageTypography` (`core/utils/language_typography.dart`): `containsArabicScript` (any letter in U+0600–U+06FF), `isMostlyArabicScript` (more than a third of the text), and `languageCodeForScript` (`ur` / `hi` / `en`) for content without a language field. Search widgets used to carry 14 private `_isUrduText` copies in those two flavours; they now call these, with identical results (`test/core/utils/language_typography_test.dart`).
 - **Search normalization:** `AppSearchUrduNormalizer` (`search/utils/app_search_urdu_normalizer.dart:43-64`) strips diacritics and tatweel, maps Arabic letter variants to Urdu, collapses whitespace, and trims.
 - **Theme:** light only (`main.dart:59`). `themeNotifierProvider`/`themeProvider` and the `theme_preference` key are never read by the app.
 
