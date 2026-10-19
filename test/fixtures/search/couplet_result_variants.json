@@ -1,0 +1,210 @@
+{
+  "_comment": "Couplet results for the contract that adds poemPublicId/poemTitle/poetPublicId/poetName. \"withoutNewFields\" is the real production couplet (GET /api/search?q=%D8%AF%D9%84&size=3&lang=ur, 2026-10-19). The other variants add the new fields to it; their poem/poet values are copied from poems[0] of the same response, so the link is illustrative, not the real parent poem.",
+  "withoutNewFields": {
+    "publicId": "49d5f0f9-6208-4508-8b8b-cb354b6c8aa0",
+    "coupletNumber": 4,
+    "coupletType": "REGULAR",
+    "coupletTypeName": "Regular",
+    "likeCount": 0,
+    "bookmarkCount": 0,
+    "shareCount": 0,
+    "reactions": {
+      "total": 0,
+      "byType": null,
+      "userReaction": "-"
+    },
+    "isBookmarked": null,
+    "verses": [
+      {
+        "publicId": "17b890a2-24be-41c9-b69b-956fbce03327",
+        "verseNumber": 7,
+        "coupletNumber": 4,
+        "verseType": "REGULAR",
+        "verseText": "دل طلب دل آشنا دل کیش دل جو دل نواز",
+        "romanizedText": "dil talab dil ashna dil kīsh dil-ju dil-navaz",
+        "translation": "-"
+      },
+      {
+        "publicId": "8889f665-322a-48d5-bc14-48f7ee95daf2",
+        "verseNumber": 8,
+        "coupletNumber": 4,
+        "verseType": "REGULAR",
+        "verseText": "دل کی ہولی دل کی دیوالی ہے دل کی عید ہے",
+        "romanizedText": "dil ki holi dil ki divali hai dil ki iid hai",
+        "translation": "-"
+      }
+    ],
+    "tagSlugs": null,
+    "createdAt": "2026-04-12T03:48:43.187805"
+  },
+  "withNewFields": {
+    "publicId": "49d5f0f9-6208-4508-8b8b-cb354b6c8aa0",
+    "coupletNumber": 4,
+    "coupletType": "REGULAR",
+    "coupletTypeName": "Regular",
+    "likeCount": 0,
+    "bookmarkCount": 0,
+    "shareCount": 0,
+    "reactions": {
+      "total": 0,
+      "byType": null,
+      "userReaction": "-"
+    },
+    "isBookmarked": null,
+    "verses": [
+      {
+        "publicId": "17b890a2-24be-41c9-b69b-956fbce03327",
+        "verseNumber": 7,
+        "coupletNumber": 4,
+        "verseType": "REGULAR",
+        "verseText": "دل طلب دل آشنا دل کیش دل جو دل نواز",
+        "romanizedText": "dil talab dil ashna dil kīsh dil-ju dil-navaz",
+        "translation": "-"
+      },
+      {
+        "publicId": "8889f665-322a-48d5-bc14-48f7ee95daf2",
+        "verseNumber": 8,
+        "coupletNumber": 4,
+        "verseType": "REGULAR",
+        "verseText": "دل کی ہولی دل کی دیوالی ہے دل کی عید ہے",
+        "romanizedText": "dil ki holi dil ki divali hai dil ki iid hai",
+        "translation": "-"
+      }
+    ],
+    "tagSlugs": null,
+    "createdAt": "2026-04-12T03:48:43.187805",
+    "poemPublicId": "0ee4a0ab-9c6e-4778-af05-570883d47c75",
+    "poemTitle": "قوی دل شادماں دل پارسا دل",
+    "poetPublicId": "3fa444be-3b88-4fa7-9231-96753e802201",
+    "poetName": "حسرتؔ موہانی"
+  },
+  "placeholders": {
+    "publicId": "49d5f0f9-6208-4508-8b8b-cb354b6c8aa0",
+    "coupletNumber": 4,
+    "coupletType": "REGULAR",
+    "coupletTypeName": "Regular",
+    "likeCount": 0,
+    "bookmarkCount": 0,
+    "shareCount": 0,
+    "reactions": {
+      "total": 0,
+      "byType": null,
+      "userReaction": "-"
+    },
+    "isBookmarked": null,
+    "verses": [
+      {
+        "publicId": "17b890a2-24be-41c9-b69b-956fbce03327",
+        "verseNumber": 7,
+        "coupletNumber": 4,
+        "verseType": "REGULAR",
+        "verseText": "دل طلب دل آشنا دل کیش دل جو دل نواز",
+        "romanizedText": "dil talab dil ashna dil kīsh dil-ju dil-navaz",
+        "translation": "-"
+      },
+      {
+        "publicId": "8889f665-322a-48d5-bc14-48f7ee95daf2",
+        "verseNumber": 8,
+        "coupletNumber": 4,
+        "verseType": "REGULAR",
+        "verseText": "دل کی ہولی دل کی دیوالی ہے دل کی عید ہے",
+        "romanizedText": "dil ki holi dil ki divali hai dil ki iid hai",
+        "translation": "-"
+      }
+    ],
+    "tagSlugs": null,
+    "createdAt": "2026-04-12T03:48:43.187805",
+    "poemPublicId": "-",
+    "poemTitle": "-",
+    "poetPublicId": "-",
+    "poetName": "-"
+  },
+  "nulls": {
+    "publicId": "49d5f0f9-6208-4508-8b8b-cb354b6c8aa0",
+    "coupletNumber": 4,
+    "coupletType": "REGULAR",
+    "coupletTypeName": "Regular",
+    "likeCount": 0,
+    "bookmarkCount": 0,
+    "shareCount": 0,
+    "reactions": {
+      "total": 0,
+      "byType": null,
+      "userReaction": "-"
+    },
+    "isBookmarked": null,
+    "verses": [
+      {
+        "publicId": "17b890a2-24be-41c9-b69b-956fbce03327",
+        "verseNumber": 7,
+        "coupletNumber": 4,
+        "verseType": "REGULAR",
+        "verseText": "دل طلب دل آشنا دل کیش دل جو دل نواز",
+        "romanizedText": "dil talab dil ashna dil kīsh dil-ju dil-navaz",
+        "translation": "-"
+      },
+      {
+        "publicId": "8889f665-322a-48d5-bc14-48f7ee95daf2",
+        "verseNumber": 8,
+        "coupletNumber": 4,
+        "verseType": "REGULAR",
+        "verseText": "دل کی ہولی دل کی دیوالی ہے دل کی عید ہے",
+        "romanizedText": "dil ki holi dil ki divali hai dil ki iid hai",
+        "translation": "-"
+      }
+    ],
+    "tagSlugs": null,
+    "createdAt": "2026-04-12T03:48:43.187805",
+    "poemPublicId": null,
+    "poemTitle": null,
+    "poetPublicId": null,
+    "poetName": null
+  },
+  "legacyNestedPoem": {
+    "publicId": "49d5f0f9-6208-4508-8b8b-cb354b6c8aa0",
+    "coupletNumber": 4,
+    "coupletType": "REGULAR",
+    "coupletTypeName": "Regular",
+    "likeCount": 0,
+    "bookmarkCount": 0,
+    "shareCount": 0,
+    "reactions": {
+      "total": 0,
+      "byType": null,
+      "userReaction": "-"
+    },
+    "isBookmarked": null,
+    "verses": [
+      {
+        "publicId": "17b890a2-24be-41c9-b69b-956fbce03327",
+        "verseNumber": 7,
+        "coupletNumber": 4,
+        "verseType": "REGULAR",
+        "verseText": "دل طلب دل آشنا دل کیش دل جو دل نواز",
+        "romanizedText": "dil talab dil ashna dil kīsh dil-ju dil-navaz",
+        "translation": "-"
+      },
+      {
+        "publicId": "8889f665-322a-48d5-bc14-48f7ee95daf2",
+        "verseNumber": 8,
+        "coupletNumber": 4,
+        "verseType": "REGULAR",
+        "verseText": "دل کی ہولی دل کی دیوالی ہے دل کی عید ہے",
+        "romanizedText": "dil ki holi dil ki divali hai dil ki iid hai",
+        "translation": "-"
+      }
+    ],
+    "tagSlugs": null,
+    "createdAt": "2026-04-12T03:48:43.187805",
+    "poem": {
+      "publicId": "0ee4a0ab-9c6e-4778-af05-570883d47c75",
+      "title": "قوی دل شادماں دل پارسا دل",
+      "poetName": "حسرتؔ موہانی"
+    },
+    "poet": {
+      "publicId": "3fa444be-3b88-4fa7-9231-96753e802201",
+      "name": "حسرتؔ موہانی",
+      "profileImageUrl": null
+    }
+  }
+}

@@ -156,6 +156,12 @@ _$CoupletSearchResultImpl _$$CoupletSearchResultImplFromJson(
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
+      poemPublicId:
+          const PlaceholderStringConverter().fromJson(json['poemPublicId']),
+      poemTitle: const PlaceholderStringConverter().fromJson(json['poemTitle']),
+      poetPublicId:
+          const PlaceholderStringConverter().fromJson(json['poetPublicId']),
+      poetName: const PlaceholderStringConverter().fromJson(json['poetName']),
     );
 
 Map<String, dynamic> _$$CoupletSearchResultImplToJson(
@@ -175,6 +181,13 @@ Map<String, dynamic> _$$CoupletSearchResultImplToJson(
       'isLiked': instance.isLiked,
       'isBookmarked': instance.isBookmarked,
       'createdAt': instance.createdAt?.toIso8601String(),
+      'poemPublicId':
+          const PlaceholderStringConverter().toJson(instance.poemPublicId),
+      'poemTitle':
+          const PlaceholderStringConverter().toJson(instance.poemTitle),
+      'poetPublicId':
+          const PlaceholderStringConverter().toJson(instance.poetPublicId),
+      'poetName': const PlaceholderStringConverter().toJson(instance.poetName),
     };
 
 _$VerseSearchResultImpl _$$VerseSearchResultImplFromJson(

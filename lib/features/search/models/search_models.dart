@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:flutter_poetry_app/core/utils/api_placeholder.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poet_model.dart';
 
@@ -97,6 +98,8 @@ class AutocompleteCategory with _$AutocompleteCategory {
 /// Search result for a single couplet
 @freezed
 class CoupletSearchResult with _$CoupletSearchResult {
+  const CoupletSearchResult._();
+
   const factory CoupletSearchResult({
     required String publicId,
     required int coupletNumber,
@@ -112,10 +115,27 @@ class CoupletSearchResult with _$CoupletSearchResult {
     bool? isLiked,  // Made nullable - API returns null when not authenticated
     bool? isBookmarked,  // Made nullable - API returns null when not authenticated
     DateTime? createdAt,  // Added from API response
+    // Flat parent fields (additive, nullable backend contract). Older
+    // backends omit them and may send "-" — both parse to null.
+    @PlaceholderStringConverter() String? poemPublicId,
+    @PlaceholderStringConverter() String? poemTitle,
+    @PlaceholderStringConverter() String? poetPublicId,
+    @PlaceholderStringConverter() String? poetName,
   }) = _CoupletSearchResult;
 
   factory CoupletSearchResult.fromJson(Map<String, dynamic> json) =>
       _$CoupletSearchResultFromJson(json);
+
+  /// The poem a tap on this couplet should open (`/main/poems/:id`), or null
+  /// when the API did not say — the card is then rendered as not tappable.
+  /// Never the couplet's own id.
+  String? get poemIdToOpen => poemPublicId ?? presentOrNull(poem?.publicId);
+
+  /// Poet name to attribute the couplet to, if known.
+  String? get displayPoetName => poetName ?? presentOrNull(poet?.name);
+
+  /// Title of the parent poem, if known.
+  String? get displayPoemTitle => poemTitle ?? presentOrNull(poem?.title);
 }
 
 /// Verse search result from unified search API
