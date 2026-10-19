@@ -26,6 +26,20 @@
   No `mocktail`, no Dio mock adapter, no `integration_test`.
 - `analysis_options.yaml` includes `package:flutter_lints/flutter.yaml` with no extra rules.
 
+### Auth and network test helpers (fix/app-auth)
+
+- `test/helpers/fake_dio_adapter.dart` — `FakeDioAdapter`: routes by `'METHOD /path'`, records requests (header
+  snapshots), and answers with a status + JSON, `FakeReply.offline()` or `FakeReply.timeout()`.
+- `test/helpers/fake_secure_storage.dart` — the real `SecureStorageService` over flutter_secure_storage's in-memory
+  test platform (`setMockInitialValues` works on 9.2.4).
+- `test/helpers/auth_harness.dart` — `AuthHarness`: a `ProviderContainer` running the real `AuthNotifier`,
+  `DioClient`, `AuthInterceptor` and `TokenRefresher`, with network (`httpClientAdapterProvider`), keychain,
+  Firebase/Google plugins, SharedPreferences and clock (`clockProvider`) faked. Widget tests can override
+  `appRoutesProvider` to drive the real router with light screens.
+- Covered: expired session at startup, 401 + refresh refused/offline/timeout/503/success, concurrent 401s, the
+  refresh endpoint's own 401, guest paths, router not rebuilt on refresh, logout keeping language/search history,
+  Google `deviceType`.
+
 ### Three things every test must know
 
 1. **Fonts.** The app uses `google_fonts`, which fetches fonts over HTTP at runtime. Every test file that can reach
@@ -117,7 +131,7 @@ Each row is a test that must exist and pass. Whether each bug is already fixed i
 
 | # | Bug (as shipped) | Test | Type |
 |---|---|---|---|
-| 1 | **Login dead-end** — expired session showed "Could not load feed" forever | fake adapter: feed → 401, `/api/auth/refresh` (`auth_interceptor.dart:109`) → 401; assert tokens cleared and the user lands on sign-in/guest, not the error | Mocked network + widget |
+| 1 | **Login dead-end** — expired session showed "Could not load feed" forever (**done**: `test/core/network/auth_interceptor_test.dart`, `test/core/routing/app_router_test.dart`) | fake adapter: feed → 401, `/api/auth/refresh` (`auth_interceptor.dart:109`) → 401; assert tokens cleared and the user lands on sign-in/guest, not the error | Mocked network + widget |
 | 2 | **Search tap targets** — poem, couplet, category and tag result cards did nothing when tapped; couplet results could not open their poem | for each card built in `app_search_preview_results.dart:143,174` and `app_search_filtered_results.dart:179–197`: tap → assert navigation. Cards take an optional `onTap` (e.g. `app_search_couplet_card.dart:19,39`), so a missing callback compiles silently | Widget |
 | 3 | **Highlight drift** — highlight moved one character left per preceding space | `HighlightedText` with leading/double spaces, diacritics and tatweel before the match; assert the highlighted substring equals the query. Cause area: `normalize` collapses whitespace and trims (`app_search_urdu_normalizer.dart:61–63`) while `highlighted_text.dart:96` maps original → normalised indices | Unit |
 | 4 | **Roman couplet search** returned no couplets | search screen with fixture: Roman query + `lang=ur` → couplet section populated (backend half lives in the backend's TESTING.md) | Widget + fixture |

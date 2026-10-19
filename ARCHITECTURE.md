@@ -61,32 +61,31 @@ Conventions, as practised in the code:
 1. `main()` (`main.dart:12-45`) initializes Firebase (failures are logged and swallowed, `:25-28`), calls `initializeAppConfig()`, awaits `SharedPreferences`, and overrides `preferencesServiceProvider` (`:40`).
 2. `MyApp` watches `routerProvider`. `themeMode` is hard-coded to `ThemeMode.light` (`main.dart:59`).
 3. `authProvider` (`core/auth/auth_provider.dart:24`) → `AuthNotifier._checkAuthStatus()` (`:42-78`):
-   - If an access token **and** a refresh token are stored, it marks the user `isAuthenticated: true` **without checking expiry or calling the backend** (`:51-59`).
+   - If an access token **and** a refresh token are stored, it reads the access token's `exp` (`core/auth/jwt_expiry.dart`). A valid token restores the session with no network call. An expired one is refreshed first (`TokenRefresher`): refused → signed out with `sessionExpired: true` (login screen shows "Your session has expired"); unreachable → stays signed in.
    - If `user_id` is missing or looks like a UUID, it backfills it from `GET /api/auth/me` in the background (`:62-66, 81-100`).
-4. Router redirect (`app_router.dart:67-101`):
-   - While `isLoading` is true, every route is held on `/` (the splash screen).
+4. Router redirect (`appRedirect` in `app_router.dart`). The `GoRouter` is built once; it receives auth changes through `refreshListenable` (`authRouteStateProvider` = `isAuthenticated` + `isRestoringSession`) and navigates to `/login` whenever the user goes from signed in to signed out.
+   - While `isRestoringSession` is true (app start only), every route is held on `/` (the splash screen).
    - Once loading finishes, `/` redirects to `/main` if authenticated and to `/login` otherwise.
    - A guest who opens a path under `_authRequiredPrefixes` = `/main/become-poet`, `/main/creator`, `/bookmarks` (`:51-55`) is sent to `/login`.
    - An authenticated user who opens `/login` is sent to `/main`.
 5. `LoginScreen` offers Apple sign-in, Google sign-in, and **"Continue as guest"** (`features/auth/login_screen.dart:365-374` → `context.go('/main')`).
 6. Sign-in (`AuthNotifier.signInWithGoogle/Apple`, `:104-259`) goes through `FirebaseAuthService`:
    1. Get a Firebase ID token.
-   2. `POST {baseApiUrl}/api/auth/firebase/verify` with `package:http` (`firebase_auth_service.dart:113`, `:339`). The Google body hard-codes `'deviceType': 'android'`.
+   2. `POST {baseApiUrl}/api/auth/firebase/verify` with `package:http`. `deviceType` is `deviceTypeFor(defaultTargetPlatform)`: `ios`, `android` or `web`.
    3. Save `accessToken`, `refreshToken`, email, `userId` and `firebase_token` to secure storage (`:146-160`).
    4. `_invalidateGuestSurfaces()` clears the discover cache and invalidates the feed, discover and poets providers (`auth_provider.dart:265-276`).
 7. Logout (`:303-355`):
    1. `POST /api/auth/logout` with the refresh token (`firebase_auth_service.dart:687`).
    2. Sign out of Firebase and Google, and delete the secure-storage keys.
-   3. `prefs.clearAll()` wipes **all** SharedPreferences, including the language choice (`preferences_service.dart:40-42`).
+   3. `PreferencesService.clearUserData()` removes only account keys (bookmark search history, creator compose variant). Language, theme, onboarding and search history stay; account deletion also clears search history.
    4. Invalidate about 13 providers and reset `AuthState`.
 8. Account deletion: `DELETE /api/users/me` with `{"confirmation":"DELETE"}` (`auth_provider.dart:367-448`), then the same cleanup as logout.
 
 `AuthState.isGuest => !isAuthenticated && !isLoading` (`core/auth/auth_state.dart:24`).
 
 Auth-related quirks visible in the code:
-- `routerProvider` does `ref.watch(authProvider)` (`app_router.dart:62`), so **every** change to `AuthState` (loading flag, error, token) builds a new `GoRouter` with `initialLocation: '/'`. The likely effect is that signing in from the sign-in sheet deep in the stack resets navigation to `/main`. **UNVERIFIED** on a device.
 - `AuthState.copyWith` uses `errorMessage ?? this.errorMessage` (`auth_state.dart:40`), so `clearError()` (`auth_provider.dart:358-360`) cannot clear an error.
-- The only path that logs a user out after a failed refresh is `AuthNotifier.refreshAccessToken()` (`auth_provider.dart:279-300`). Its only caller is `new_poet_form_screen.dart:330`.
+- A refused refresh anywhere (startup, `AuthInterceptor`, `AuthNotifier.refreshAccessToken()`) ends in `AuthNotifier.expireSession()`: local sign-out (no backend call), user providers invalidated, `sessionExpired: true`. A network failure never signs the user out.
 
 ---
 
@@ -124,13 +123,15 @@ Consequences:
 |---|---|---|
 | Guest path `/api/guest/**` | Removes `Authorization` and `X-User-Id`; skips refresh on error | `:22, 40-44, 75-78` |
 | Other requests | Adds `Authorization: Bearer <access_token>` if stored and `X-User-Id: <user_id>` if stored | `:47-63` |
-| 401 | A single-flight refresh `POST /api/auth/refresh {refreshToken}` on the **same** Dio. On success it saves the tokens, retries the original request and replays the queued 401s. | `:81-151` |
-| Refresh fails or no refresh token | `handler.reject(err)`. **It does not log out**, clear tokens or change `AuthState`. | `:97-101, 154-166` |
+| 401 on a request that carried a token | If another request already stored a newer token, retry with it. Otherwise one shared `TokenRefresher.refresh()` (`core/auth/token_refresher.dart`: own Dio without the auth interceptor, no bearer header, single flight) and one retry. A retried request that 401s again is passed on. | |
+| Refresh refused (no/expired refresh token, 4xx, or the 500 the backend throws for unknown/revoked refresh tokens) | Calls `onSessionExpired` → `AuthNotifier.expireSession()`; the request fails with its 401 | |
+| Refresh unreachable (offline, timeout, 502/503/504) | The request fails with the network error (screens show "offline"); the user stays signed in | |
+| 401 on a request without a token (guest) | Passed on; no refresh, no sign-out | |
 | Other errors | Logged, then passed on | `:167-171` |
 
 Known consequences:
-- Stored tokens are trusted at startup (§3), and a failed refresh never logs the user out. A user whose refresh token has also expired therefore stays "authenticated" with every authenticated call failing: the feed shows **"Could not load feed"** (`feed/screens/feed_screen.dart:266`) on every launch until they log out by hand. This is a known bug.
-- **UNVERIFIED (code reading only):** the refresh call goes through the same interceptor while `_isRefreshing == true`. If `/api/auth/refresh` itself answers **401**, that error is queued into `_pendingRequests` (`:84-89`) and never resolved, which would hang the original request instead of failing it. This depends on what status code the backend returns for a bad refresh token.
+- Fixed (T-008): users with an expired session used to stay "authenticated" with every call failing ("Could not load feed" forever), and a 401 from `/api/auth/refresh` hung the original request (verified in a test against the old interceptor). See `test/core/network/auth_interceptor_test.dart`.
+- The feed's error copy comes from `classifyRequestFailure` (`core/network/request_failure.dart`): offline, slow, server error or expired session.
 
 **Guest surface.** `GuestService` (`core/network/guest_service.dart`) is GET-only. It clamps `page` to 0–4 and `size` to 1–20 (`:33-34`). The backend rate limit is 60 requests/min per IP: a 429 becomes `GuestRateLimitException(retryAfter)` (`:219-233`).
 
@@ -187,7 +188,7 @@ Navigation is mostly `context.push('/main/poems/$id')` with string paths. `pushN
 ## 8. State-management conventions
 
 - Language: `selectedLanguageProvider` (`core/providers/language_provider.dart:91`) is a `Provider<String>` derived from `selectedLanguageNotifierProvider`, which is persisted in prefs (default `'ur'`). `feedProvider` and `discoverProvider` **watch** it, so changing the language rebuilds those notifiers and refetches.
-- Many providers `ref.watch(authProvider)` wholesale (router, unified bookmarks, poets discovery, owned poet, user profile), so any `AuthState` change re-runs them.
+- Providers select only the auth fields they need (`isGuest` / `isAuthenticated`), so a token refresh re-runs nothing. The login screen, sign-in sheet and profile tab still watch `authProvider` whole for `isLoading`/`errorMessage`.
 - Optimistic feed engagement: `feedEngagementProvider` (`feed/providers/feed_engagement_provider.dart:59`) is a `StateProvider<Map<itemKey, overlay>>` laid over server counts. It is cleared on feed reload.
 - `imageCollectionServiceProvider` is defined twice: in `image_poetry/providers/image_collection_providers.dart` and in `image_bookmark_providers.dart`.
 
