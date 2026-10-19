@@ -177,4 +177,39 @@ void main() {
       expect(backend.searches, hasLength(2));
     });
   });
+
+  /// T-113: /api/search accepts no sort or poet parameter (backend
+  /// SearchController: q, type, lang, script, page, size), so re-running it
+  /// for these only logged another search_queries row.
+  group('sort and poet filter', () {
+    test('regression: changing them makes no request', () async {
+      await notifier.executeSearch(query: 'jigar');
+      final loaded = notifier.state.unifiedResults;
+
+      notifier.setSortBy('likes');
+      notifier.setPoetFilter('poet-1');
+      notifier.setActiveSegment(DiscoverSegment.verses);
+      notifier.setCoupletSort(CoupletSortOption.likes);
+      notifier.setPoetFilter(null);
+      await pumpEventQueue();
+
+      expect(backend.searches, hasLength(1));
+      expect(backend.relatedRequests, hasLength(1));
+      expect(notifier.state.sortBy, 'likes');
+      expect(notifier.state.coupletSort, CoupletSortOption.likes);
+      expect(notifier.state.selectedFilter, isNull);
+      expect(notifier.state.mode, SearchMode.results);
+      expect(notifier.state.unifiedResults, same(loaded));
+    });
+
+    test('setting them before searching makes no request', () async {
+      notifier.setSortBy('trending');
+      notifier.setPoetFilter('poet-1');
+      notifier.setCoupletSort(CoupletSortOption.recent);
+      await pumpEventQueue();
+
+      expect(backend.searches, isEmpty);
+      expect(notifier.state.selectedFilter, 'poet-1');
+    });
+  });
 }

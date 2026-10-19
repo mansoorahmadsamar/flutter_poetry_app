@@ -463,39 +463,27 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
   // FILTERS & SORTING
   // ==========================================================================
 
-  /// Change sort option and re-execute search
-  ///
-  /// Sort options:
-  /// - relevance (BM25 scoring)
-  /// - likes (most liked)
-  /// - shares (most shared)
-  /// - bookmarks (most bookmarked)
-  /// - trending (engagement score)
-  ///
-  /// Parameters:
-  /// - [sortBy]: New sort option
+  // `/api/search` takes no sort or poet parameter (backend SearchController:
+  // q, type, lang, script, page, size), and every call is logged as a search
+  // that feeds trending. So these setters only record the choice: re-running
+  // the search returned the same results and logged another search. A sort
+  // that works server-side would go through `/api/search/couplets`, which
+  // accepts `sort` and `poet` and is not logged.
+  //
+  // Their only callers today are reachable from dead code
+  // (`main/tabs/search_tab.dart` → `CoupletSortDropdown`).
+
+  /// Records the sort option (relevance, likes, shares, bookmarks, trending).
+  /// Makes no request.
   void setSortBy(String sortBy) {
     if (state.sortBy == sortBy) return;
-
     state = state.copyWith(sortBy: sortBy);
-
-    // Re-execute search if in results mode
-    if (state.mode == SearchMode.results) {
-      executeSearch();
-    }
   }
 
-  /// Set poet filter and re-execute search
-  ///
-  /// Parameters:
-  /// - [poetId]: Poet publicId (null to clear filter)
+  /// Records the poet filter (poet publicId, or null to clear). Makes no
+  /// request.
   void setPoetFilter(String? poetId) {
     state = state.copyWith(selectedFilter: poetId);
-
-    // Re-execute search if in results mode
-    if (state.mode == SearchMode.results) {
-      executeSearch();
-    }
   }
 
   /// Switches the results tab.
@@ -519,18 +507,9 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
       state.unifiedResults != null &&
       _resultsQuery == AppSearchUrduNormalizer.normalize(state.currentQuery);
 
-  /// Set couplet sort option and re-execute search
-  ///
-  /// Parameters:
-  /// - [sortOption]: New couplet sort option
+  /// Records the couplet sort option. Makes no request (see [setSortBy]).
   void setCoupletSort(CoupletSortOption sortOption) {
     state = state.copyWith(coupletSort: sortOption);
-
-    // Re-execute search if in verses segment
-    if (state.activeSegment == DiscoverSegment.verses &&
-        state.mode == SearchMode.results) {
-      executeSearch();
-    }
   }
 
   // ==========================================================================
