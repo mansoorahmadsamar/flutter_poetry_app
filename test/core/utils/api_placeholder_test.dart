@@ -24,4 +24,20 @@ void main() {
       expect(presentOrNull('--'), '--');
     });
   });
+
+  group('PlaceholderStringConverter', () {
+    const converter = PlaceholderStringConverter();
+
+    test('reads "-" and blank as null', () {
+      expect(converter.fromJson('-'), isNull);
+      expect(converter.fromJson(''), isNull);
+      expect(converter.fromJson(null), isNull);
+    });
+
+    test('keeps real values and writes them back unchanged', () {
+      expect(converter.fromJson('غزل'), 'غزل');
+      expect(converter.toJson('غزل'), 'غزل');
+      expect(converter.toJson(null), isNull);
+    });
+  });
 }

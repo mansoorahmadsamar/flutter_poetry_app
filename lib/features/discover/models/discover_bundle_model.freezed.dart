@@ -982,7 +982,12 @@ mixin _$ContentCard {
   String get language => throw _privateConstructorUsedError;
   String get direction => throw _privateConstructorUsedError;
   double? get score => throw _privateConstructorUsedError;
-  String? get imageUrl => throw _privateConstructorUsedError;
+  String? get imageUrl =>
+      throw _privateConstructorUsedError; // For poets with profile images
+  /// Opening lines of a poem (newline-separated misras). `null` when the
+  /// API sends nothing, a blank string or its `"-"` placeholder.
+  @PlaceholderStringConverter()
+  String? get excerpt => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -1007,7 +1012,8 @@ abstract class $ContentCardCopyWith<$Res> {
       String language,
       String direction,
       double? score,
-      String? imageUrl});
+      String? imageUrl,
+      @PlaceholderStringConverter() String? excerpt});
 
   $ContentMetricsCopyWith<$Res>? get metrics;
 }
@@ -1036,6 +1042,7 @@ class _$ContentCardCopyWithImpl<$Res, $Val extends ContentCard>
     Object? direction = null,
     Object? score = freezed,
     Object? imageUrl = freezed,
+    Object? excerpt = freezed,
   }) {
     return _then(_value.copyWith(
       type: null == type
@@ -1082,6 +1089,10 @@ class _$ContentCardCopyWithImpl<$Res, $Val extends ContentCard>
           ? _value.imageUrl
           : imageUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      excerpt: freezed == excerpt
+          ? _value.excerpt
+          : excerpt // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 
@@ -1117,7 +1128,8 @@ abstract class _$$ContentCardImplCopyWith<$Res>
       String language,
       String direction,
       double? score,
-      String? imageUrl});
+      String? imageUrl,
+      @PlaceholderStringConverter() String? excerpt});
 
   @override
   $ContentMetricsCopyWith<$Res>? get metrics;
@@ -1145,6 +1157,7 @@ class __$$ContentCardImplCopyWithImpl<$Res>
     Object? direction = null,
     Object? score = freezed,
     Object? imageUrl = freezed,
+    Object? excerpt = freezed,
   }) {
     return _then(_$ContentCardImpl(
       type: null == type
@@ -1191,6 +1204,10 @@ class __$$ContentCardImplCopyWithImpl<$Res>
           ? _value.imageUrl
           : imageUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      excerpt: freezed == excerpt
+          ? _value.excerpt
+          : excerpt // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -1209,7 +1226,8 @@ class _$ContentCardImpl implements _ContentCard {
       this.language = 'ur',
       this.direction = 'rtl',
       this.score,
-      this.imageUrl});
+      this.imageUrl,
+      @PlaceholderStringConverter() this.excerpt});
 
   factory _$ContentCardImpl.fromJson(Map<String, dynamic> json) =>
       _$$ContentCardImplFromJson(json);
@@ -1239,10 +1257,16 @@ class _$ContentCardImpl implements _ContentCard {
   final double? score;
   @override
   final String? imageUrl;
+// For poets with profile images
+  /// Opening lines of a poem (newline-separated misras). `null` when the
+  /// API sends nothing, a blank string or its `"-"` placeholder.
+  @override
+  @PlaceholderStringConverter()
+  final String? excerpt;
 
   @override
   String toString() {
-    return 'ContentCard(type: $type, publicId: $publicId, primaryText: $primaryText, secondaryText: $secondaryText, badge: $badge, badgeKey: $badgeKey, metrics: $metrics, language: $language, direction: $direction, score: $score, imageUrl: $imageUrl)';
+    return 'ContentCard(type: $type, publicId: $publicId, primaryText: $primaryText, secondaryText: $secondaryText, badge: $badge, badgeKey: $badgeKey, metrics: $metrics, language: $language, direction: $direction, score: $score, imageUrl: $imageUrl, excerpt: $excerpt)';
   }
 
   @override
@@ -1267,7 +1291,8 @@ class _$ContentCardImpl implements _ContentCard {
                 other.direction == direction) &&
             (identical(other.score, score) || other.score == score) &&
             (identical(other.imageUrl, imageUrl) ||
-                other.imageUrl == imageUrl));
+                other.imageUrl == imageUrl) &&
+            (identical(other.excerpt, excerpt) || other.excerpt == excerpt));
   }
 
   @JsonKey(ignore: true)
@@ -1284,7 +1309,8 @@ class _$ContentCardImpl implements _ContentCard {
       language,
       direction,
       score,
-      imageUrl);
+      imageUrl,
+      excerpt);
 
   @JsonKey(ignore: true)
   @override
@@ -1312,7 +1338,8 @@ abstract class _ContentCard implements ContentCard {
       final String language,
       final String direction,
       final double? score,
-      final String? imageUrl}) = _$ContentCardImpl;
+      final String? imageUrl,
+      @PlaceholderStringConverter() final String? excerpt}) = _$ContentCardImpl;
 
   factory _ContentCard.fromJson(Map<String, dynamic> json) =
       _$ContentCardImpl.fromJson;
@@ -1339,6 +1366,11 @@ abstract class _ContentCard implements ContentCard {
   double? get score;
   @override
   String? get imageUrl;
+  @override // For poets with profile images
+  /// Opening lines of a poem (newline-separated misras). `null` when the
+  /// API sends nothing, a blank string or its `"-"` placeholder.
+  @PlaceholderStringConverter()
+  String? get excerpt;
   @override
   @JsonKey(ignore: true)
   _$$ContentCardImplCopyWith<_$ContentCardImpl> get copyWith =>
