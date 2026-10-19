@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../providers/poet_providers.dart';
+import 'poet_sign_in_prompt.dart';
 import '../models/poet_image_model.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'image_fullscreen_viewer.dart';
@@ -13,6 +14,10 @@ class PoetGalleryTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Guests get 401 from this endpoint: prompt instead of calling it.
+    if (!watchIsSignedIn(ref)) {
+      return const PoetSignInPrompt(section: PoetMembersSection.gallery);
+    }
     final gallery = ref.watch(poetGalleryProvider(publicId));
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
