@@ -4,6 +4,8 @@ import 'package:logger/logger.dart';
 import 'package:flutter_poetry_app/core/auth/auth_provider.dart';
 import 'package:flutter_poetry_app/core/network/dto/api_response.dart';
 import 'package:flutter_poetry_app/core/network/guest_service.dart';
+import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.dart';
+import 'package:flutter_poetry_app/features/main/tabs/poets/models/poet_model.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
 
 /// Service for all global search operations
@@ -133,17 +135,24 @@ class SearchService {
   }) async {
     if (_isGuest) {
       // Guests don't get couplet / verse / tag / category search — those
-      // surfaces aren't in the guest API. We fan out to the available
-      // /api/guest/poems/search + /api/guest/poets/search and synthesize a
-      // UnifiedSearchResponse so the existing search UI renders unchanged.
-      // The poem/poet sections work; couplets/verses/tags/categories are
-      // empty and the screen surfaces "Sign in to search couplets" inline.
-      final poems = type == 'poets_only'
-          ? null
-          : await _guest.searchPoems(q: query, page: page, size: size, lang: lang);
-      final poets = type == 'poems_only'
-          ? null
-          : await _guest.searchPoets(q: query, page: page, size: size, lang: lang);
+      // surfaces aren't in the guest API. We call only the guest searches
+      // the type needs (/api/guest/poems/search, /api/guest/poets/search, in
+      // parallel for 'all') and synthesize a UnifiedSearchResponse so the
+      // existing search UI renders unchanged. Any other single type returns
+      // empty with no request (guest calls share a 60/min rate limit).
+      final wantsPoems = type == 'all' || type == 'poems_only';
+      final wantsPoets = type == 'all' || type == 'poets_only';
+      // Future.wait so a failure in one never leaves the other unhandled.
+      final pages = await Future.wait<GuestPage<Object>?>([
+        wantsPoems
+            ? _guest.searchPoems(q: query, page: page, size: size, lang: lang)
+            : Future.value(null),
+        wantsPoets
+            ? _guest.searchPoets(q: query, page: page, size: size, lang: lang)
+            : Future.value(null),
+      ]);
+      final poems = pages[0] as GuestPage<PoemModel>?;
+      final poets = pages[1] as GuestPage<PoetModel>?;
 
       return UnifiedSearchResponse(
         totalResults: (poems?.items.length ?? 0) + (poets?.items.length ?? 0),

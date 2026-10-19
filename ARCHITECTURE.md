@@ -241,7 +241,7 @@ Flushing:
 - **State:** `globalSearchProvider` / `GlobalSearchNotifier` (`providers/global_search_provider.dart:669`) has a 300 ms debounce (`:222`) and an in-memory result cache.
 - **Endpoints:** `/api/search`, `/api/search/couplets`, `/autocomplete`, `/recommendations`, `/related`, `/trending` (`services/search_service.dart:20`).
 - **Guest behaviour:**
-  - `searchUnified` fans out to `/api/guest/poems/search` and `/api/guest/poets/search`, so couplets, tags and categories come back empty (`:134-140`).
+  - `searchUnified` calls only what the type needs: `all` → `/api/guest/poems/search` and `/api/guest/poets/search` in parallel; `poems_only` / `poets_only` → that one; any other type (`couplets_only`, `verses_only`, `categories_only`, `tags_only`) → empty, **no request** (it used to call both, against the 60/min guest limit). Couplets, verses, tags and categories are always empty for guests. Tests: `test/features/search/services/search_service_guest_test.dart`.
   - Autocomplete returns empty for guests and for queries under 2 characters (`:262`).
   - Related searches return empty for guests (`:410`).
 - **Taps** (one helper, `utils/search_result_navigation.dart`; route names in `AppRoutes`):
