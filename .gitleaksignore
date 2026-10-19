@@ -225,3 +225,10 @@ eb6e29e0f88c5be1d152defe5c5010ee3c790507:lib/firebase_options.dart:gcp-api-key:6
 # lib/firebase_options.dart · gcp-api-key · commit b67347e 2026-01-08 · still tracked at HEAD
 # KNOWN — committed before 2026-10-19, pending rotation (see poetry-backend/docs/SECURITY.md)
 b67347e1c37c80ea348fa4703b2c6e3b7253c35f:lib/firebase_options.dart:gcp-api-key:58
+
+# --- Added 2026-10-19 after fixing the multiline anchor in sukhan-generic-password-literal.
+# The rule previously matched only at end-of-file, so these were never reported. Real
+# values (e.g. the production DB password in deployment docs) are pending rotation;
+# access_token entries in API docs are examples to review (see poetry-backend/docs/SECURITY.md).
+# API_DOCUMENTATION.md:2482 | rule sukhan-generic-password-literal | commit 7230b91 2025-11-15 | KNOWN — committed before 2026-10-19, pending rotation
+7230b9196ec9fa70d8f7deddcf8f01196e455f06:API_DOCUMENTATION.md:sukhan-generic-password-literal:2482

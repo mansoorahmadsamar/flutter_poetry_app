@@ -17,9 +17,7 @@
       "Bash(gitleaks protect --staged --redact)",
       "Bash(TRACKER=sukhan python3 /Users/mansoorahmadsamar/Documents/Development/dolce-ict/tools/tracker.py:*)",
       "Bash(flutter analyze)",
-      "Bash(dart analyze)",
-      "Bash(flutter test)",
-      "Bash(flutter test:*)"
+      "Bash(dart analyze)"
     ],
     "deny": [
       "Read(./.env)",

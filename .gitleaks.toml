@@ -53,7 +53,7 @@ tags = ["sukhan", "google", "credential"]
 [[rules]]
 id = "sukhan-generic-password-literal"
 description = "Any password/secret assigned a literal value (nested YAML keys included)"
-regex = '''(?i)\b(?:password|passwd|secret|api[._-]?key|access[._-]?token)\s*(?::|=)\s*(?:"([^"\s$]{6,})"|'([^'\s$]{6,})'|([^\s'"$#,;{}()\[\]]{6,}))\s*$'''
+regex = '''(?im)\b(?:password|passwd|secret|api[._-]?key|access[._-]?token)\s*(?::|=)\s*(?:"([^"\s$]{6,})"|'([^'\s$]{6,})'|([^\s'"$#,;{}()\[\]]{6,}))\s*$'''
 secretGroup = 0
 keywords = ["password", "passwd", "secret", "api_key", "apikey", "api-key", "access_token", "accesstoken"]
 tags = ["sukhan", "credential"]
