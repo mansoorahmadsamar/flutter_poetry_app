@@ -45,12 +45,25 @@ class PoetsPaginationNotifier extends StateNotifier<PoetsPaginationState> {
 
   PoetsFilterType get currentFilter => _currentFilter;
 
-  /// Load initial page of poets
+  /// Bumped whenever the list starts over (new filter, first load, refresh).
+  /// A response requested under an older generation belongs to a list that
+  /// is no longer shown and is dropped — otherwise a page of the previous
+  /// filter could land after a switch and be appended to the new one.
+  int _generation = 0;
+
+  bool _isStale(int generation) => !mounted || generation != _generation;
+
+  /// Load initial page of poets.
+  ///
+  /// Always starts over, even while a load is in flight: an earlier load may
+  /// be for a filter that is no longer selected, and its result is dropped.
   Future<void> loadInitial() async {
-    if (state.isLoading) return;
+    final generation = ++_generation;
 
     state = state.copyWith(
       isLoading: true,
+      isLoadingMore: false,
+      isRefreshing: false,
       error: null,
       poets: [],
       currentPage: 0,
@@ -59,6 +72,7 @@ class PoetsPaginationNotifier extends StateNotifier<PoetsPaginationState> {
 
     try {
       final result = await _fetchPoets(0);
+      if (_isStale(generation)) return;
       state = state.copyWith(
         isLoading: false,
         poets: result.content,
@@ -66,6 +80,7 @@ class PoetsPaginationNotifier extends StateNotifier<PoetsPaginationState> {
         hasMore: !result.last,
       );
     } catch (e) {
+      if (_isStale(generation)) return;
       state = state.copyWith(
         isLoading: false,
         error: e.toString(),
@@ -77,11 +92,13 @@ class PoetsPaginationNotifier extends StateNotifier<PoetsPaginationState> {
   Future<void> loadMore() async {
     if (state.isLoadingMore || !state.hasMore || state.isLoading) return;
 
+    final generation = _generation;
     state = state.copyWith(isLoadingMore: true, error: null);
 
     try {
       final nextPage = state.currentPage + 1;
       final result = await _fetchPoets(nextPage);
+      if (_isStale(generation)) return;
 
       // A poet already listed (the same poet on two pages) is skipped, and a
       // page that adds nobody new ends paging so the list can't keep
@@ -99,6 +116,7 @@ class PoetsPaginationNotifier extends StateNotifier<PoetsPaginationState> {
         hasMore: !result.last && fresh.isNotEmpty,
       );
     } catch (e) {
+      if (_isStale(generation)) return;
       state = state.copyWith(
         isLoadingMore: false,
         error: e.toString(),
@@ -110,18 +128,28 @@ class PoetsPaginationNotifier extends StateNotifier<PoetsPaginationState> {
   Future<void> refresh() async {
     if (state.isRefreshing) return;
 
-    state = state.copyWith(isRefreshing: true, error: null);
+    final generation = ++_generation;
+    state = state.copyWith(
+      isRefreshing: true,
+      isLoadingMore: false,
+      error: null,
+    );
 
     try {
       final result = await _fetchPoets(0);
+      if (_isStale(generation)) return;
+      // Supersedes any first load still in flight, so clear its flag too.
       state = state.copyWith(
+        isLoading: false,
         isRefreshing: false,
         poets: result.content,
         currentPage: 0,
         hasMore: !result.last,
       );
     } catch (e) {
+      if (_isStale(generation)) return;
       state = state.copyWith(
+        isLoading: false,
         isRefreshing: false,
         error: e.toString(),
       );
