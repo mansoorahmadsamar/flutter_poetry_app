@@ -139,7 +139,8 @@ Known consequences:
 |---|---|
 | `/api/guest/discover` | Discover, **and the guest Feed** |
 | `/api/guest/poems`, `/poems/{id}`, `/poems/search` | `PoetService.getPoemsByPoet/getPoemById`, `SearchService.searchUnified` |
-| `/api/guest/poets`, `/poets/{id}`, `/poets/search` | every `PoetService` list method, profile, search |
+| `/api/guest/poets`, `/poets/{id}`, `/poets/search` | `PoetService` list methods without a guest filter, profile, search; the fallback for the filters below |
+| `/api/guest/poets/featured`, `/trending`, `/era/{era}`, `/gender/{gender}` | `PoetService.getFeaturedPoets / getTrendingPoets / getPoetsByEra / getPoetsByGender` via `GuestService.getFilteredPoets` (contract: `docs/contracts/guest-poets.md`, backend `fix/search-2`, **not deployed yet**) |
 | `/api/guest/couplets/trending` | `GuestService.getTrendingCouplets` |
 
 Services that branch on `isGuest`: `FeedService`, `DiscoverService`, `SearchService`, `PoetService`, `UnifiedBookmarksNotifier`, `PoetsDiscoveryNotifier`, `reaction_providers.dart:26`. Services with **no guest branch**, which therefore call authenticated endpoints for guests:
@@ -147,7 +148,7 @@ Services that branch on `isGuest`: `FeedService`, `DiscoverService`, `SearchServ
 - `HashtagService` (all of `/api/hashtags/**`). Whether the backend allows anonymous access to these is **UNVERIFIED**.
 - The image-poetry services and the like and bookmark services. Writes are gated in the UI by `ensureSignedIn()` (`features/auth/widgets/ensure_signed_in.dart`).
 
-In guest mode, every `PoetService` list variant (featured, trending, by gender, by era, by tag, top) falls back to the plain `/api/guest/poets` list and **ignores the filter** (e.g. `poet_service.dart:232-236`).
+In guest mode, featured, trending, era and gender call the guest filter endpoints (T-045). This app version ships before those endpoints are deployed, so `GuestService.getFilteredPoets` falls back to the plain `/api/guest/poets` list when the backend answers **404, 401 or 405** (today's backend sends 404 "Poet not found" for `/featured` and `/trending`, which match `/poets/{publicId}`), and remembers that per filter family (`featured`, `trending`, `era`, `gender`) for the life of the service, so each costs one wasted request at most. Other errors (5xx, offline, 429) are thrown as before. Tag, top-by-views and top-by-poem-count still use the plain list and ignore their filter. The Poets tab still hides the era/gender sections for guests (`poets_discovery_provider.dart`): while the backend lacks the endpoints the fallback would show an unfiltered list under a "Classical" heading. Tests: `test/features/main/tabs/poets/services/poet_service_guest_filters_test.dart`.
 
 ---
 
@@ -401,7 +402,7 @@ Production is the only backend with real data, and there is no staging (`stage-a
 - All five tabs fetch on `/main` entry because of the `IndexedStack` (`main_screen.dart:75`).
 - No retries, no offline detection, single 30 s timeout; `AppError` is unused.
 - Feed events are dropped when a batch POST fails (`feed_event_tracker.dart:85-90`).
-- Guest poet lists ignore their filter (featured, trending, era, gender, tag all return the same list) (`poet_service.dart:104-455`).
+- Guest poet lists for tag and top-by-views/poem-count ignore their filter; featured/trending/era/gender do too until the T-045 backend endpoints are deployed (the app falls back).
 - Hashtag endpoints have no guest path.
 - Search preview poem, couplet, category and tag cards have no `onTap` (`app_search_preview_results.dart:174-177`).
 - Filtered couplet search results cannot open their poem (`couplet.poem` is null) (`app_search_screen.dart:250-258`).

@@ -53,6 +53,14 @@
 - Fixtures: `unified_search_dil_ur.json` (Urdu `دل`) and `unified_search_jigar.json` (Roman `jigar`: 0 couplets,
   5 verse hits whose poet fields are `"-"`); `realRomanJigarResponse()` loads the latter with image URLs removed.
 
+### Guest API helpers
+
+- `test/helpers/fake_guest_api.dart` — `AdapterDioClient` (a `DioClient` over a `FakeDioAdapter`, so 404/401/405
+  surface as real `DioException`s), `guestPoetPage` / `guestPoetJson` (the Spring page envelope of
+  `docs/contracts/guest-poets.md`), and `clampedGuestPoetsRoute`, which pages like the backend: `page` clamped to
+  0..4, `size` to 1..20. An unregistered path answers 404 — that is how "the backend doesn't have this endpoint yet"
+  is simulated. Fixture: `test/fixtures/guest/poets_featured_page.json`.
+
 ### Feed card helpers
 
 - `test/helpers/feed_card_harness.dart` — `pumpFeedCard` (no router) and `pumpFeedCardInRouter`, which mounts the card

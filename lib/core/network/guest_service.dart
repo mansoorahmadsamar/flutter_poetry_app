@@ -180,6 +180,51 @@ class GuestService {
     return PoetModel.fromJson(data);
   }
 
+  /// HTTP statuses a backend answers for a guest path it doesn't have yet:
+  /// 404 (`/featured` and `/trending` hit `/poets/{publicId}` → "Poet not
+  /// found"; unmapped paths), and 401/405 from an older security chain.
+  static const _missingEndpointStatuses = {401, 404, 405};
+
+  /// Filters ([GuestPoetFilter.kind]) this backend turned out not to have;
+  /// they go straight to [getPoets] for the rest of this service's life, so
+  /// each costs one wasted request at most (guest calls share a 60/min
+  /// limit).
+  final Set<String> _unsupportedPoetFilters = {};
+
+  /// Poets for a guest filter (`docs/contracts/guest-poets.md`): featured,
+  /// trending, era or gender — same query parameters and envelope as
+  /// [getPoets].
+  ///
+  /// The filter endpoints ship after this app version, so when the backend
+  /// does not have one (see [_missingEndpointStatuses]) this falls back to
+  /// the unfiltered [getPoets] list instead of failing. Any other error
+  /// (5xx, offline, 429) is thrown as before.
+  Future<GuestPage<PoetModel>> getFilteredPoets(
+    GuestPoetFilter filter, {
+    int page = 0,
+    int size = 20,
+    String lang = 'ur',
+  }) async {
+    if (!_unsupportedPoetFilters.contains(filter.kind)) {
+      try {
+        final response = await _get(filter.path, {
+          'page': _clampPage(page),
+          'size': _clampSize(size),
+          'lang': lang,
+        });
+        return _pageFromEnvelope(response, PoetModel.fromJson);
+      } on DioException catch (e) {
+        if (!_missingEndpointStatuses.contains(e.response?.statusCode)) {
+          rethrow;
+        }
+        _unsupportedPoetFilters.add(filter.kind);
+        _logger.w('Guest poet filter "${filter.kind}" not on this backend '
+            '(${e.response?.statusCode}); using /api/guest/poets');
+      }
+    }
+    return getPoets(page: page, size: size, lang: lang);
+  }
+
   Future<GuestPage<PoetModel>> searchPoets({
     required String q,
     int page = 0,
@@ -347,6 +392,34 @@ class GuestService {
     if (value is String) return int.tryParse(value) ?? 0;
     return 0;
   }
+}
+
+/// A guest poet filter and its endpoint (`docs/contracts/guest-poets.md`).
+class GuestPoetFilter {
+  const GuestPoetFilter._(this.kind, this.path);
+
+  /// `GET /api/guest/poets/featured`.
+  static const featured =
+      GuestPoetFilter._('featured', '/api/guest/poets/featured');
+
+  /// `GET /api/guest/poets/trending`.
+  static const trending =
+      GuestPoetFilter._('trending', '/api/guest/poets/trending');
+
+  /// `GET /api/guest/poets/era/{era}` — `CLASSICAL`, `MODERN`,
+  /// `CONTEMPORARY`, `EMERGING`.
+  GuestPoetFilter.era(String era)
+      : this._('era', '/api/guest/poets/era/${Uri.encodeComponent(era)}');
+
+  /// `GET /api/guest/poets/gender/{gender}` — `MALE`, `FEMALE`, `OTHER`.
+  GuestPoetFilter.gender(String gender)
+      : this._('gender',
+            '/api/guest/poets/gender/${Uri.encodeComponent(gender)}');
+
+  /// One endpoint family (all eras share `era`): a backend that lacks one
+  /// value lacks them all.
+  final String kind;
+  final String path;
 }
 
 /// Anonymous endpoints rate-limit at 60/min per IP. Thrown when the backend

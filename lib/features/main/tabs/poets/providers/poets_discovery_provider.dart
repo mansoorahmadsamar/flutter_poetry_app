@@ -54,11 +54,12 @@ class PoetsDiscoveryNotifier extends StateNotifier<PoetsDiscoveryState> {
     state = state.copyWith(status: PoetsDiscoveryStatus.loading);
 
     try {
-      // Era/gender sections have no guest API equivalent. Routing them to
-      // the flat guest directory would mislabel the data ("Classical
-      // Poets" showing an unfiltered list), so for guests we skip those
-      // three sections entirely. The screen also hides their headers +
-      // filter chips (see poets_list_screen).
+      // Era/gender sections stay hidden for guests: the guest filter
+      // endpoints (T-045) are not deployed yet, and until they are,
+      // PoetService falls back to the flat guest directory, which would
+      // mislabel the data ("Classical Poets" showing an unfiltered list).
+      // The screen also hides their headers + filter chips (see
+      // poets_list_screen).
       final results = await Future.wait([
         _poetService.getTrendingPoets(page: 0, size: _sectionSize, lang: _language),
         _poetService.getFeaturedPoets(page: 0, size: _sectionSize, lang: _language),

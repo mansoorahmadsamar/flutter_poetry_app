@@ -145,10 +145,9 @@ class PoetService {
     String lang = 'ur',
   }) async {
     if (_isGuest) {
-      // Guest API has a single "featured" surface — same list backs both
-      // featured and trending sections.
-      final guestPage =
-          await _guest.getPoets(page: page, size: size, lang: lang);
+      final guestPage = await _guest.getFilteredPoets(
+          GuestPoetFilter.featured,
+          page: page, size: size, lang: lang);
       return _adaptGuestPage(guestPage, size);
     }
     try {
@@ -188,8 +187,9 @@ class PoetService {
     String lang = 'ur',
   }) async {
     if (_isGuest) {
-      final guestPage =
-          await _guest.getPoets(page: page, size: size, lang: lang);
+      final guestPage = await _guest.getFilteredPoets(
+          GuestPoetFilter.trending,
+          page: page, size: size, lang: lang);
       return _adaptGuestPage(guestPage, size);
     }
     try {
@@ -230,9 +230,9 @@ class PoetService {
     String lang = 'ur',
   }) async {
     if (_isGuest) {
-      // Guest API has no gender filter — fall back to the flat directory.
-      final guestPage =
-          await _guest.getPoets(page: page, size: size, lang: lang);
+      final guestPage = await _guest.getFilteredPoets(
+          GuestPoetFilter.gender(gender),
+          page: page, size: size, lang: lang);
       return _adaptGuestPage(guestPage, size);
     }
     try {
@@ -273,9 +273,9 @@ class PoetService {
     String lang = 'ur',
   }) async {
     if (_isGuest) {
-      // Guest API has no era filter — fall back to the flat directory.
-      final guestPage =
-          await _guest.getPoets(page: page, size: size, lang: lang);
+      final guestPage = await _guest.getFilteredPoets(
+          GuestPoetFilter.era(era),
+          page: page, size: size, lang: lang);
       return _adaptGuestPage(guestPage, size);
     }
     try {
