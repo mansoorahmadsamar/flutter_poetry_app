@@ -41,6 +41,16 @@
   refresh endpoint's own 401, guest paths, router not rebuilt on refresh, logout keeping language/search history,
   Google `deviceType`.
 
+### Search test helpers
+
+- `test/features/search/helpers/search_test_harness.dart` — `pumpSearchScreen` pumps the real `AppSearchScreen` and
+  router (stub destination screens) over a `FakeGlobalSearchNotifier` with a fixed state; fixtures from
+  `test/fixtures/search/`.
+- `test/features/search/helpers/fake_search_backend.dart` — `FakeSearchBackend`: the real `GlobalSearchNotifier` and
+  `SearchService` over a `FakeDioAdapter` that answers `/api/search` from a fixture (`type=all`) or with synthetic
+  single-type pages, so tests **count requests** (each one is a `search_queries` row on the real backend). Set
+  `onSearch` to hold a response open (`Completer`) or fail it.
+
 ### Three things every test must know
 
 1. **Fonts.** The app uses `google_fonts`, which fetches fonts over HTTP at runtime. Every test file that can reach

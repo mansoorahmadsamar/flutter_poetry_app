@@ -54,6 +54,20 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
   final _resultCache = <String, UnifiedSearchResponse>{};  // insertion-ordered in Dart
   static const _maxCacheSize = 5;
 
+  /// Items per type on every `/api/search` page — the first (`type=all`)
+  /// page and each `loadMore` page. The backend pages each type with
+  /// `PageRequest.of(page, size)`, so a different size for page 1 would start
+  /// at the wrong offset and skip or repeat results.
+  static const pageSize = 10;
+
+  /// Normalized query that [GlobalSearchState.unifiedResults] holds results
+  /// for, or null. A tab switch for this query reuses them.
+  String? _resultsQuery;
+
+  /// Bumped by every [executeSearch]; a response that comes back after a
+  /// newer search started is dropped instead of overwriting it.
+  int _searchGeneration = 0;
+
   GlobalSearchNotifier(
     this._searchService,
     this._historyService,
@@ -290,13 +304,18 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
   ///
   /// Parameters:
   /// - [query]: Optional query (uses currentQuery if null)
-  /// - [segment]: Optional tab to show the results in. Set in the same state
-  ///   update — unlike [setActiveSegment], which re-runs the current query
-  ///   first (an extra request and an extra search-log row).
+  /// - [segment]: Optional tab to show the results in, set in the same state
+  ///   update.
+  ///
+  /// Every call is one `/api/search` request, which the backend logs as a
+  /// search (it feeds trending searches) — so tab switches go through
+  /// [setActiveSegment], which reuses loaded results.
   Future<void> executeSearch({String? query, DiscoverSegment? segment}) async {
     final searchQuery = query?.trim() ?? state.currentQuery;
 
     if (searchQuery.isEmpty) return;
+
+    final generation = ++_searchGeneration;
 
     // Normalize Urdu text (diacritics, letter variants) for consistent matching
     final normalizedQuery = AppSearchUrduNormalizer.normalize(searchQuery);
@@ -306,6 +325,7 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
 
     // Check LRU cache first — show cached result instantly, then refresh
     final cachedResult = _getCachedResult(normalizedQuery);
+    _resultsQuery = cachedResult == null ? null : normalizedQuery;
 
     // Update state to searching mode
     state = state.copyWith(
@@ -325,12 +345,15 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
           query: normalizedQuery,
           type: 'all',  // Search all content types
           lang: _languageCode,
+          size: pageSize,
         ),
         _searchService.getRelatedSearches(
           query: normalizedQuery,
           limit: 5,
         ),
       ]);
+
+      if (generation != _searchGeneration) return; // a newer search owns state
 
       final unifiedResults = results[0] as UnifiedSearchResponse;
       final relatedSearches = results[1] as RelatedSearchesResponse;
@@ -340,6 +363,7 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
 
       // Cache the result for back-navigation
       _cacheResult(normalizedQuery, unifiedResults);
+      _resultsQuery = normalizedQuery;
 
       // Update state with results — reset pagination (page 0 just fetched)
       state = state.copyWith(
@@ -357,6 +381,7 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
       final history = await _historyService.getHistory();
       state = state.copyWith(recentSearches: history);
     } catch (e, stackTrace) {
+      if (generation != _searchGeneration) return;
       _logger.e('❌ ERROR in executeSearch: $e');
       _logger.e('❌ Stack trace: $stackTrace');
       state = state.copyWith(
@@ -392,6 +417,7 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
 
     final normalizedQuery = AppSearchUrduNormalizer.normalize(query);
     final typeParam = _segmentToTypeParam(segment);
+    final generation = _searchGeneration;
 
     state = state.copyWith(isLoadingMore: true);
 
@@ -401,8 +427,12 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
         type: typeParam,
         page: page,
         lang: _languageCode,
-        size: 20,
+        size: pageSize,
       );
+
+      // A new search started while this page was loading: it belongs to the
+      // old results, and the new search has already reset the paging state.
+      if (generation != _searchGeneration) return;
 
       // Merge: append new items to existing lists, update hasMore flags
       final merged = _mergeResults(current, moreResults, segment);
@@ -422,6 +452,7 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
 
       _logger.i('✅ Loaded page $page for ${segment.name} — appended ${_newItemCount(moreResults, segment)} items');
     } catch (e) {
+      if (generation != _searchGeneration) return;
       _logger.e('❌ Failed to load more for ${segment.name}: $e');
       state = state.copyWith(isLoadingMore: false);
     }
@@ -546,18 +577,26 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
     }
   }
 
-  /// Set active segment and re-execute search if needed
+  /// Switches the results tab.
   ///
-  /// Parameters:
-  /// - [segment]: New active segment
+  /// The first (`type=all`) page already holds every tab's first page, and
+  /// further pages are merged into it, so a tab switch for the same query
+  /// makes no request (each `/api/search` call is logged server-side and
+  /// feeds trending searches). Only when nothing is loaded for the current
+  /// query — e.g. the search failed — does it search again.
   void setActiveSegment(DiscoverSegment segment) {
     state = state.copyWith(activeSegment: segment);
 
-    // Re-execute search with segment filter if in results mode
-    if (state.mode == SearchMode.results) {
+    final showsResults =
+        state.mode == SearchMode.results || state.mode == SearchMode.error;
+    if (showsResults && !_hasResultsForCurrentQuery) {
       executeSearch();
     }
   }
+
+  bool get _hasResultsForCurrentQuery =>
+      state.unifiedResults != null &&
+      _resultsQuery == AppSearchUrduNormalizer.normalize(state.currentQuery);
 
   /// Set couplet sort option and re-execute search
   ///
