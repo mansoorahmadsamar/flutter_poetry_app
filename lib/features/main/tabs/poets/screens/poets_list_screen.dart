@@ -35,7 +35,7 @@ class _PoetsListScreenState extends ConsumerState<PoetsListScreen>
 
   /// True when no user is signed in. Era/gender discovery sections are
   /// hidden for guests (no guest API equivalent — see poets_discovery_provider).
-  bool get _isGuest => ref.watch(authProvider).isGuest;
+  bool get _isGuest => ref.watch(authProvider.select((s) => s.isGuest));
   late final AnimationController _searchPulseController;
   late final Animation<double> _searchPulseAnimation;
 

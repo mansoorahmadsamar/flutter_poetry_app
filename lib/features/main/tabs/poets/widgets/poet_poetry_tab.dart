@@ -138,7 +138,7 @@ class _PoetPoetryTabState extends ConsumerState<PoetPoetryTab> {
 
   @override
   Widget build(BuildContext context) {
-    final isGuest = ref.watch(authProvider).isGuest;
+    final isGuest = ref.watch(authProvider.select((s) => s.isGuest));
 
     // For guests, the guest API has no `/poems/poet/{id}` endpoint, so the
     // per-poetry-type sections will all be empty. Surface an inline CTA at

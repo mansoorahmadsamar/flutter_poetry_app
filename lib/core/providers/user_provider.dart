@@ -12,11 +12,12 @@ final _logger = Logger();
 /// Uses autoDispose to clear cache when not in use (e.g., after logout)
 final userProfileProvider =
     FutureProvider.autoDispose<UserModel>((ref) async {
-  // Watch auth state to invalidate when user changes
-  final authState = ref.watch(authProvider);
+  // Re-run only when the user signs in or out — not on token refreshes.
+  final isAuthenticated =
+      ref.watch(authProvider.select((s) => s.isAuthenticated));
 
   // Only fetch if user is authenticated
-  if (!authState.isAuthenticated) {
+  if (!isAuthenticated) {
     throw Exception('User not authenticated');
   }
 

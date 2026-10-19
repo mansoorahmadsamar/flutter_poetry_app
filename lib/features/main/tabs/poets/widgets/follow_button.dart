@@ -34,7 +34,7 @@ class FollowButton extends ConsumerWidget {
     // For guests, render the button as "Follow" (never as a loader). Tapping
     // it opens the sign-in sheet rather than calling the auth-only follow
     // endpoint. Avoids 401s and gives the user a clear, contextual prompt.
-    if (ref.watch(authProvider).isGuest) {
+    if (ref.watch(authProvider.select((s) => s.isGuest))) {
       return _buildButton(
         context,
         ref,
