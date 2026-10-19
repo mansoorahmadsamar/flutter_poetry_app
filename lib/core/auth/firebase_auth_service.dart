@@ -3,6 +3,8 @@ import 'dart:io';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
@@ -14,20 +16,42 @@ import '../storage/secure_storage.dart';
 /// Firebase Authentication Service
 /// Handles Google Sign-In via Firebase Auth and backend token verification
 class FirebaseAuthService {
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    scopes: ['email', 'profile', 'openid'],
-  );
+  // Created on first use, so constructing the service (e.g. in tests) never
+  // touches the Firebase or Google Sign-In plugins.
+  late final FirebaseAuth _firebaseAuth =
+      _injectedFirebaseAuth ?? FirebaseAuth.instance;
+  late final GoogleSignIn _googleSignIn = _injectedGoogleSignIn ??
+      GoogleSignIn(scopes: ['email', 'profile', 'openid']);
+  final FirebaseAuth? _injectedFirebaseAuth;
+  final GoogleSignIn? _injectedGoogleSignIn;
+  final http.Client Function()? _httpClientFactory;
+  final TargetPlatform? _platform;
   final SecureStorageService _secureStorage;
   final Logger _logger = Logger();
 
   // Token storage keys
   static const String _firebaseTokenKey = 'firebase_token';
 
-  FirebaseAuthService(this._secureStorage);
+  /// The optional arguments replace the plugins and the network in tests.
+  FirebaseAuthService(
+    this._secureStorage, {
+    FirebaseAuth? firebaseAuth,
+    GoogleSignIn? googleSignIn,
+    http.Client Function()? httpClientFactory,
+    TargetPlatform? platform,
+  })  : _injectedFirebaseAuth = firebaseAuth,
+        _injectedGoogleSignIn = googleSignIn,
+        _httpClientFactory = httpClientFactory,
+        _platform = platform;
+
+  /// The `deviceType` sent to `/api/auth/firebase/verify`.
+  String get _deviceType =>
+      deviceTypeFor(_platform ?? defaultTargetPlatform, isWeb: kIsWeb);
 
   /// Create HTTP client that accepts self-signed certificates for production server
   http.Client _createHttpClient() {
+    final factory = _httpClientFactory;
+    if (factory != null) return factory();
     if (appConfig.baseApiUrl.contains('134.199.243.167')) {
       final ioClient = HttpClient()
         ..badCertificateCallback = (X509Certificate cert, String host, int port) {
@@ -115,7 +139,7 @@ class FirebaseAuthService {
         body: json.encode({
           'firebaseToken': firebaseToken,
           'email': userCredential.user?.email,
-          'deviceType': 'android', // or detect dynamically
+          'deviceType': _deviceType,
         }),
       );
       client.close();
@@ -341,7 +365,7 @@ class FirebaseAuthService {
         body: json.encode({
           'firebaseToken': firebaseToken,
           'email': email,
-          'deviceType': Platform.isIOS ? 'ios' : 'android',
+          'deviceType': _deviceType,
         }),
       );
       client.close();
@@ -670,47 +694,67 @@ class FirebaseAuthService {
     return _secureStorage.getToken(_firebaseTokenKey);
   }
 
-  /// Sign out
+  /// Sign out: tell the backend to revoke the refresh token (best effort),
+  /// then clear the session on this device.
   Future<void> signOut() async {
-    try {
-      _logger.i('🔐 Signing out...');
+    _logger.i('🔐 Signing out...');
 
-      // Get refresh token for logout endpoint
-      final refreshToken = await _secureStorage.getRefreshToken();
-
-      // Call backend logout endpoint
-      if (refreshToken != null) {
-        try {
-          _logger.i('   Calling backend logout endpoint...');
-          final client = _createHttpClient();
-          await client.post(
-            Uri.parse('${appConfig.baseApiUrl}/api/auth/logout'),
-            headers: {'Content-Type': 'application/json'},
-            body: json.encode({'refreshToken': refreshToken}),
-          );
-          client.close();
-          _logger.i('✅ Backend logout successful');
-        } catch (e) {
-          _logger.e('⚠️  Backend logout failed: $e');
-          // Continue with client-side logout even if backend fails
-        }
+    final refreshToken = await _secureStorage.getRefreshToken();
+    if (refreshToken != null) {
+      try {
+        _logger.i('   Calling backend logout endpoint...');
+        final client = _createHttpClient();
+        await client.post(
+          Uri.parse('${appConfig.baseApiUrl}/api/auth/logout'),
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode({'refreshToken': refreshToken}),
+        );
+        client.close();
+        _logger.i('✅ Backend logout successful');
+      } catch (e) {
+        _logger.e('⚠️  Backend logout failed: $e');
+        // Continue with client-side logout even if backend fails
       }
+    }
 
-      // Sign out from Firebase
+    await clearLocalSession();
+    _logger.i('✅ Sign out completed successfully');
+  }
+
+  /// Clears the session on this device only — no backend call. Used when the
+  /// backend has already ended the session (refresh token refused).
+  ///
+  /// Tokens are deleted first, so a Firebase or Google Sign-In failure can
+  /// never leave a half-signed-in user behind.
+  Future<void> clearLocalSession() async {
+    await _secureStorage.deleteAccessToken();
+    await _secureStorage.deleteRefreshToken();
+    await _secureStorage.deleteToken(_firebaseTokenKey);
+    await _secureStorage.deleteUserEmail();
+    await _secureStorage.deleteUserId();
+
+    try {
       await _firebaseAuth.signOut();
-      await _googleSignIn.signOut();
-
-      // Clear all stored tokens and data
-      await _secureStorage.deleteAccessToken();
-      await _secureStorage.deleteRefreshToken();
-      await _secureStorage.deleteToken(_firebaseTokenKey);
-      await _secureStorage.deleteUserEmail();
-      await _secureStorage.deleteUserId();
-
-      _logger.i('✅ Sign out completed successfully');
     } catch (e) {
-      _logger.e('❌ Sign out error: $e');
-      rethrow;
+      _logger.w('⚠️  Firebase sign-out failed: $e');
+    }
+    try {
+      await _googleSignIn.signOut();
+    } catch (e) {
+      _logger.w('⚠️  Google sign-out failed: $e');
     }
   }
 }
+
+/// The backend's `deviceType` for a platform: "ios", "android" or "web"
+/// (FirebaseLoginRequest). Platforms the app doesn't ship on report
+/// "android", as every sign-in did before this was detected.
+String deviceTypeFor(TargetPlatform platform, {bool isWeb = false}) {
+  if (isWeb) return 'web';
+  return platform == TargetPlatform.iOS ? 'ios' : 'android';
+}
+
+/// The app's [FirebaseAuthService]; overridden in tests.
+final firebaseAuthServiceProvider = Provider<FirebaseAuthService>((ref) {
+  return FirebaseAuthService(ref.watch(secureStorageProvider));
+});

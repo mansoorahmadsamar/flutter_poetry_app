@@ -23,7 +23,7 @@ final reactionServiceProvider = Provider<ReactionService>((ref) {
 final reactionTypesProvider = FutureProvider<List<ReactionType>>((ref) async {
   // Reacting is account-only (the tap is gated by the sign-in sheet), so a
   // guest never needs the type list. Skip the authed call to avoid a 401.
-  if (ref.watch(authProvider).isGuest) {
+  if (ref.watch(authProvider.select((s) => s.isGuest))) {
     return const <ReactionType>[];
   }
   final service = ref.watch(reactionServiceProvider);

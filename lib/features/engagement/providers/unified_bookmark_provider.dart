@@ -25,7 +25,7 @@ final unifiedBookmarksProvider = StateNotifierProvider.family<
   (ref, filters) => UnifiedBookmarksNotifier(
     service: ref.watch(unifiedBookmarkServiceProvider),
     filters: filters,
-    isGuest: ref.watch(authProvider).isGuest,
+    isGuest: ref.watch(authProvider.select((s) => s.isGuest)),
   ),
 );
 
@@ -269,7 +269,7 @@ class UnifiedBookmarksNotifier
 final bookmarkStatsProvider =
     FutureProvider.autoDispose<BookmarkStats>((ref) async {
   // Account-only; guests get zeroed stats instead of a 401.
-  if (ref.watch(authProvider).isGuest) {
+  if (ref.watch(authProvider.select((s) => s.isGuest))) {
     return const BookmarkStats();
   }
   final service = ref.watch(unifiedBookmarkServiceProvider);

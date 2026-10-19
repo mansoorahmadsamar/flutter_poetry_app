@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../../core/auth/auth_provider.dart';
 import '../../core/routing/app_router.dart';
+import 'widgets/session_expired_notice.dart';
 
 /// Stunning login screen with WOW factor for Jahān-e-Sukhan
 class LoginScreen extends ConsumerStatefulWidget {
@@ -121,6 +122,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
+    final sessionExpired = authState.sessionExpired;
 
     return Scaffold(
       body: Stack(
@@ -146,10 +148,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                   scale: _scaleAnimation,
                   child: Column(
                     children: [
-                      const SizedBox(height: 60),
+                      // The expiry notice takes the logo's place so the
+                      // sign-in card still fits on small phones.
+                      if (sessionExpired) ...[
+                        const SizedBox(height: 16),
+                        const SessionExpiredNotice(),
+                      ] else ...[
+                        const SizedBox(height: 60),
 
-                      // Logo with golden glow
-                      _buildGlowingLogo(),
+                        // Logo with golden glow
+                        _buildGlowingLogo(),
+                      ],
 
                       const Spacer(),
 
@@ -367,9 +376,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
           // account (App Store Guideline 5.1.1(v)). Account actions inside the
           // app then prompt sign-in.
           TextButton(
+            key: const Key('continue-as-guest'),
             onPressed: authState.isLoading
                 ? null
-                : () => context.go(AppRoutes.main),
+                : () {
+                    ref
+                        .read(authProvider.notifier)
+                        .acknowledgeSessionExpired();
+                    context.go(AppRoutes.main);
+                  },
             child: Text(
               'Continue as guest',
               style: TextStyle(

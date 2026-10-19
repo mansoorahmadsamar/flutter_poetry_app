@@ -113,6 +113,6 @@ final poetsDiscoveryProvider =
     StateNotifierProvider<PoetsDiscoveryNotifier, PoetsDiscoveryState>((ref) {
   final poetService = ref.watch(poetServiceProvider);
   final language = ref.watch(selectedLanguageProvider);
-  final isGuest = ref.watch(authProvider).isGuest;
+  final isGuest = ref.watch(authProvider.select((s) => s.isGuest));
   return PoetsDiscoveryNotifier(poetService, language, isGuest);
 });

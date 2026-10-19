@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_poetry_app/core/constants/app_constants.dart';
 
 final Logger _logger = Logger();
 
@@ -12,7 +13,7 @@ final bookmarkSearchHistoryProvider =
 );
 
 class BookmarkSearchHistoryNotifier extends StateNotifier<List<String>> {
-  static const String _historyKey = 'bookmark_search_history';
+  static const String _historyKey = AppConstants.bookmarkSearchHistoryKey;
   static const int _maxHistoryItems = 10;
 
   BookmarkSearchHistoryNotifier() : super([]) {

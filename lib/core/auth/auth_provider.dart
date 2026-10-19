@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import '../network/dio_client.dart';
+import '../utils/clock.dart';
 import '../storage/preferences_service.dart';
 import '../storage/secure_storage.dart';
 import '../../features/discover/providers/discover_provider.dart';
@@ -17,6 +18,8 @@ import '../../features/feed/providers/feed_engagement_provider.dart';
 import '../../features/feed/providers/feed_provider.dart';
 import '../../features/search/providers/search_providers.dart';
 import 'firebase_auth_service.dart';
+import 'jwt_expiry.dart';
+import 'token_refresher.dart';
 import 'auth_state.dart';
 
 /// Authentication provider for managing auth state
@@ -31,47 +34,79 @@ class AuthNotifier extends StateNotifier<AuthState> {
   final Ref _ref;
   final Logger _logger = Logger();
   late final FirebaseAuthService _firebaseAuthService;
+  late final DateTime Function() _now;
+
+  /// The sign-out in progress after a refused refresh, shared by every
+  /// request that reports it.
+  Future<void>? _sessionExpiry;
 
   AuthNotifier(this._secureStorage, this._ref) : super(const AuthState()) {
-    // Initialize Firebase Auth Service
-    _firebaseAuthService = FirebaseAuthService(_secureStorage);
+    _firebaseAuthService = _ref.read(firebaseAuthServiceProvider);
+    _now = _ref.read(clockProvider);
     _checkAuthStatus();
   }
 
-  /// Check if user is already authenticated on app start
+  TokenRefresher get _tokenRefresher =>
+      _ref.read(dioClientProvider).tokenRefresher;
+
+  /// Restore the stored session on app start.
+  ///
+  /// Stored tokens are only trusted while the access token's `exp` is in the
+  /// future. An expired access token is refreshed first; if the refresh is
+  /// refused (or the refresh token has expired too) the user is signed out
+  /// and lands on the login screen with a "session expired" message. If the
+  /// server can't be reached the user stays signed in — being offline is not
+  /// a reason to lose the session.
   Future<void> _checkAuthStatus() async {
     _logger.i('🔍 Checking authentication status on app start...');
-    state = state.copyWith(isLoading: true);
+    state = state.copyWith(isLoading: true, isRestoringSession: true);
 
     try {
-      final accessToken = await _secureStorage.getAccessToken();
-      final refreshToken = await _secureStorage.getRefreshToken();
+      var accessToken = await _secureStorage.getAccessToken();
+      var refreshToken = await _secureStorage.getRefreshToken();
       final userEmail = await _secureStorage.getUserEmail();
 
-      if (accessToken != null && refreshToken != null) {
-        _logger.i('✅ User is authenticated, restoring session');
-        state = state.copyWith(
-          isAuthenticated: true,
-          isLoading: false,
-          accessToken: accessToken,
-          refreshToken: refreshToken,
-          userEmail: userEmail,
-        );
-
-        // Backfill numeric userId for X-User-Id header if not stored or stale UUID
-        final storedUserId = await _secureStorage.getUserId();
-        if (storedUserId == null || storedUserId.isEmpty || storedUserId.contains('-')) {
-          _logger.i('🔄 User ID missing or stale, fetching from profile...');
-          _backfillUserId();
-        }
-      } else {
+      if (accessToken == null || refreshToken == null) {
         _logger.i('⚠️  No stored tokens found, user is not authenticated');
-        state = state.copyWith(isLoading: false);
+        state = const AuthState();
+        return;
+      }
+
+      if (isJwtExpired(accessToken, now: _now())) {
+        _logger.i('⏰ Stored access token has expired, refreshing...');
+        final outcome = await _tokenRefresher.refresh();
+        switch (outcome.kind) {
+          case RefreshOutcomeKind.rejected:
+            _logger.w('Session could not be refreshed; signing out');
+            await _endExpiredSession();
+            return;
+          case RefreshOutcomeKind.unavailable:
+            _logger.w('Server unreachable; keeping the stored session');
+            break;
+          case RefreshOutcomeKind.refreshed:
+            accessToken = outcome.accessToken!;
+            refreshToken = await _secureStorage.getRefreshToken() ?? refreshToken;
+            break;
+        }
+      }
+
+      _logger.i('✅ User is authenticated, restoring session');
+      state = AuthState(
+        isAuthenticated: true,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        userEmail: userEmail,
+      );
+
+      // Backfill numeric userId for X-User-Id header if not stored or stale UUID
+      final storedUserId = await _secureStorage.getUserId();
+      if (storedUserId == null || storedUserId.isEmpty || storedUserId.contains('-')) {
+        _logger.i('🔄 User ID missing or stale, fetching from profile...');
+        _backfillUserId();
       }
     } catch (e) {
       _logger.e('❌ Error checking auth status: $e');
-      state = state.copyWith(
-        isLoading: false,
+      state = const AuthState(
         errorMessage: 'Failed to check authentication status',
       );
     }
@@ -138,6 +173,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         refreshToken: refreshToken,
         userEmail: email,
         errorMessage: null,
+        sessionExpired: false,
       );
 
       _logger.i('');
@@ -222,6 +258,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         refreshToken: refreshToken,
         userEmail: email,
         errorMessage: null,
+        sessionExpired: false,
       );
 
       _logger.i('');
@@ -268,83 +305,111 @@ class AuthNotifier extends StateNotifier<AuthState> {
     } catch (_) {
       // Best-effort; ignore.
     }
-    _ref.invalidate(feedProvider);
-    _ref.invalidate(discoverProvider);
-    _ref.invalidate(featuredPoetsProvider);
-    _ref.invalidate(trendingPoetsProvider);
-    _ref.invalidate(allPoetsProvider);
+    final container = _ref.container;
+    container.invalidate(feedProvider);
+    container.invalidate(discoverProvider);
+    container.invalidate(featuredPoetsProvider);
+    container.invalidate(trendingPoetsProvider);
+    container.invalidate(allPoetsProvider);
   }
 
-  /// Refresh access token
+  /// Refresh the access token now (e.g. so a new role appears in it).
+  ///
+  /// Returns false when it could not refresh. A refused refresh signs the
+  /// user out (see [expireSession]); a network failure does not.
   Future<bool> refreshAccessToken() async {
     _logger.i('🔄 Auth Notifier - Refreshing access token...');
-
-    try {
-      final newAccessToken = await _firebaseAuthService.refreshAccessToken();
-
-      if (newAccessToken != null) {
-        state = state.copyWith(accessToken: newAccessToken);
+    final outcome = await _tokenRefresher.refresh();
+    switch (outcome.kind) {
+      case RefreshOutcomeKind.refreshed:
+        state = state.copyWith(
+          accessToken: outcome.accessToken,
+          refreshToken: await _secureStorage.getRefreshToken(),
+        );
         _logger.i('✅ Access token refreshed successfully');
         return true;
-      } else {
-        _logger.e('❌ Token refresh failed');
-        // Token refresh failed, force logout
-        await logout();
+      case RefreshOutcomeKind.rejected:
+        await expireSession();
         return false;
-      }
-    } catch (e) {
-      _logger.e('❌ Token refresh error: $e');
-      await logout();
-      return false;
+      case RefreshOutcomeKind.unavailable:
+        _logger.w('⚠️  Token refresh unavailable (offline?)');
+        return false;
     }
+  }
+
+  /// Sign the user out because their session can no longer be refreshed.
+  ///
+  /// Called by the network layer when a refresh is refused. Clears the
+  /// session on this device only (the backend already ended it) and sets
+  /// [AuthState.sessionExpired] so the login screen can say why. Safe to call
+  /// many times: concurrent calls share one sign-out, and it does nothing for
+  /// a user who is not signed in (guests are never sent to login by it).
+  Future<void> expireSession() {
+    if (!state.isAuthenticated) return Future.value();
+    return _sessionExpiry ??=
+        _endExpiredSession().whenComplete(() => _sessionExpiry = null);
+  }
+
+  Future<void> _endExpiredSession() async {
+    _logger.i('🔐 Session expired — clearing local session');
+    try {
+      await _firebaseAuthService.clearLocalSession();
+    } catch (e) {
+      _logger.e('❌ Clearing local session failed: $e');
+    }
+    await _clearUserData();
+    state = const AuthState(sessionExpired: true);
+  }
+
+  /// The user has read the "session expired" notice (e.g. chose to continue
+  /// as a guest).
+  void acknowledgeSessionExpired() {
+    if (state.sessionExpired) {
+      state = state.copyWith(sessionExpired: false);
+    }
+  }
+
+  /// Remove what belongs to the signed-in user from this device and drop
+  /// every provider that may hold their data. The language choice and (unless
+  /// [includeSearchHistory]) search history are device settings and stay.
+  Future<void> _clearUserData({bool includeSearchHistory = false}) async {
+    try {
+      final prefs = _ref.read(preferencesServiceProvider);
+      await prefs.clearUserData(includeSearchHistory: includeSearchHistory);
+    } catch (e) {
+      _logger.w('⚠️  Failed to clear preferences: $e');
+    }
+
+    // Through the container: in debug builds `Ref.invalidate` asserts by
+    // reading the provider, which would first CREATE every provider below
+    // (firing their network loads) only to throw them away.
+    final container = _ref.container;
+
+    container.invalidate(feedProvider);
+    container.invalidate(feedEngagementProvider);
+    container.invalidate(discoverProvider);
+    container.invalidate(bookmarkedCoupletsProvider);
+    container.invalidate(unifiedBookmarksProvider);
+    container.invalidate(bookmarkActionProvider);
+    container.invalidate(bookmarkSearchProvider);
+    container.invalidate(bookmarkSearchHistoryProvider);
+    container.invalidate(coupletsProvider);
+    container.invalidate(coupletProvider);
+    container.invalidate(coupletActionProvider);
+    container.invalidate(searchHistoryProvider);
+    container.invalidate(searchQueryProvider);
   }
 
   /// Logout
   Future<void> logout() async {
-    _logger.i('');
-    _logger.i('═══════════════════════════════════════════════════════');
     _logger.i('🔐 LOGGING OUT USER');
-    _logger.i('═══════════════════════════════════════════════════════');
 
     try {
       state = state.copyWith(isLoading: true);
-
-      _logger.i('   Calling Firebase Auth Service logout...');
       await _firebaseAuthService.signOut();
-
-      // Clear search history from SharedPreferences
-      _logger.i('   Clearing SharedPreferences...');
-      try {
-        final prefs = _ref.read(preferencesServiceProvider);
-        await prefs.clearAll();
-      } catch (e) {
-        _logger.w('⚠️  Failed to clear preferences: $e');
-      }
-
-      // Invalidate all user-specific providers to clear cached data
-      _logger.i('   Invalidating cached providers...');
-      _ref.invalidate(feedProvider);
-      _ref.invalidate(feedEngagementProvider);
-      _ref.invalidate(discoverProvider);
-      _ref.invalidate(bookmarkedCoupletsProvider);
-      _ref.invalidate(unifiedBookmarksProvider);
-      _ref.invalidate(bookmarkActionProvider);
-      _ref.invalidate(bookmarkSearchProvider);
-      _ref.invalidate(bookmarkSearchHistoryProvider);
-      _ref.invalidate(coupletsProvider);
-      _ref.invalidate(coupletProvider);
-      _ref.invalidate(coupletActionProvider);
-      _ref.invalidate(searchHistoryProvider);
-      _ref.invalidate(searchQueryProvider);
-
-      _logger.i('✅ Logout successful');
-
+      await _clearUserData();
       state = const AuthState();
-
-      _logger.i('═══════════════════════════════════════════════════════');
       _logger.i('✅ USER LOGGED OUT - ALL DATA CLEARED');
-      _logger.i('═══════════════════════════════════════════════════════');
-      _logger.i('');
     } catch (e) {
       _logger.e('❌ Logout error: $e');
       state = state.copyWith(
@@ -392,28 +457,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       _logger.i('   Signing out of Firebase + clearing secure storage...');
       await _firebaseAuthService.signOut();
 
-      _logger.i('   Clearing SharedPreferences...');
-      try {
-        final prefs = _ref.read(preferencesServiceProvider);
-        await prefs.clearAll();
-      } catch (e) {
-        _logger.w('⚠️  Failed to clear preferences: $e');
-      }
-
-      _logger.i('   Invalidating cached providers...');
-      _ref.invalidate(feedProvider);
-      _ref.invalidate(feedEngagementProvider);
-      _ref.invalidate(discoverProvider);
-      _ref.invalidate(bookmarkedCoupletsProvider);
-      _ref.invalidate(unifiedBookmarksProvider);
-      _ref.invalidate(bookmarkActionProvider);
-      _ref.invalidate(bookmarkSearchProvider);
-      _ref.invalidate(bookmarkSearchHistoryProvider);
-      _ref.invalidate(coupletsProvider);
-      _ref.invalidate(coupletProvider);
-      _ref.invalidate(coupletActionProvider);
-      _ref.invalidate(searchHistoryProvider);
-      _ref.invalidate(searchQueryProvider);
+      // Deleting the account also forgets what was searched on it.
+      await _clearUserData(includeSearchHistory: true);
 
       // Resetting to default AuthState clears tokens and sets isAuthenticated
       // to false; the GoRouter redirect listening on auth state will send the

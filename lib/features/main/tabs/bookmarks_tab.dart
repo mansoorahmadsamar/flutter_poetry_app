@@ -105,7 +105,7 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
     // instead of a 401 error from `/api/users/me/bookmarks`. Tab stays
     // visible in the bottom nav so the surface is discoverable — required
     // for App Store Guideline 5.1.1(v).
-    if (ref.watch(authProvider).isGuest) {
+    if (ref.watch(authProvider.select((s) => s.isGuest))) {
       return const GuestLockedTab(
         title: 'Bookmarks',
         message:

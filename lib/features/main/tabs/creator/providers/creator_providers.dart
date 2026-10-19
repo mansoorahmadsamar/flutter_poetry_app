@@ -20,8 +20,7 @@ final creatorServiceProvider = Provider<CreatorService>((ref) {
 /// The user's owned poet profile, or null if they haven't onboarded.
 /// 404 from the backend is treated as "no poet" — anything else rethrows.
 final ownedPoetProvider = FutureProvider.autoDispose<OwnedPoet?>((ref) async {
-  final auth = ref.watch(authProvider);
-  if (!auth.isAuthenticated) return null;
+  if (!ref.watch(authProvider.select((s) => s.isAuthenticated))) return null;
   final service = ref.watch(creatorServiceProvider);
   try {
     return await service.getMyPoetProfile();
@@ -34,8 +33,7 @@ final ownedPoetProvider = FutureProvider.autoDispose<OwnedPoet?>((ref) async {
 /// All translations for the current user's poet (one entry per language).
 final creatorTranslationsProvider =
     FutureProvider.autoDispose<List<CreatorTranslation>>((ref) async {
-  final auth = ref.watch(authProvider);
-  if (!auth.isAuthenticated) return const [];
+  if (!ref.watch(authProvider.select((s) => s.isAuthenticated))) return const [];
   final service = ref.watch(creatorServiceProvider);
   try {
     return await service.getMyTranslations();

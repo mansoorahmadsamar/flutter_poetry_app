@@ -9,6 +9,16 @@ class AuthState extends Equatable {
   final String? userEmail;
   final String? errorMessage;
 
+  /// True only while the stored session is being restored at app start.
+  /// The router holds the splash screen during it. Unlike [isLoading] it is
+  /// not set by sign-in or logout, so those never move the user to splash.
+  final bool isRestoringSession;
+
+  /// True after the app signed the user out because their session could no
+  /// longer be refreshed. The login screen explains this; cleared on sign-in
+  /// or "Continue as guest".
+  final bool sessionExpired;
+
   const AuthState({
     this.isAuthenticated = false,
     this.isLoading = false,
@@ -16,6 +26,8 @@ class AuthState extends Equatable {
     this.refreshToken,
     this.userEmail,
     this.errorMessage,
+    this.isRestoringSession = false,
+    this.sessionExpired = false,
   });
 
   /// True when the user has finished resolving any stored session and is
@@ -30,6 +42,8 @@ class AuthState extends Equatable {
     String? refreshToken,
     String? userEmail,
     String? errorMessage,
+    bool? isRestoringSession,
+    bool? sessionExpired,
   }) {
     return AuthState(
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
@@ -38,6 +52,8 @@ class AuthState extends Equatable {
       refreshToken: refreshToken ?? this.refreshToken,
       userEmail: userEmail ?? this.userEmail,
       errorMessage: errorMessage ?? this.errorMessage,
+      isRestoringSession: isRestoringSession ?? this.isRestoringSession,
+      sessionExpired: sessionExpired ?? this.sessionExpired,
     );
   }
 
@@ -49,5 +65,7 @@ class AuthState extends Equatable {
         refreshToken,
         userEmail,
         errorMessage,
+        isRestoringSession,
+        sessionExpired,
       ];
 }
