@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
@@ -24,6 +25,7 @@ class FirebaseAuthService {
   final FirebaseAuth? _injectedFirebaseAuth;
   final GoogleSignIn? _injectedGoogleSignIn;
   final http.Client Function()? _httpClientFactory;
+  final TargetPlatform? _platform;
   final SecureStorageService _secureStorage;
   final Logger _logger = Logger();
 
@@ -36,9 +38,15 @@ class FirebaseAuthService {
     FirebaseAuth? firebaseAuth,
     GoogleSignIn? googleSignIn,
     http.Client Function()? httpClientFactory,
+    TargetPlatform? platform,
   })  : _injectedFirebaseAuth = firebaseAuth,
         _injectedGoogleSignIn = googleSignIn,
-        _httpClientFactory = httpClientFactory;
+        _httpClientFactory = httpClientFactory,
+        _platform = platform;
+
+  /// The `deviceType` sent to `/api/auth/firebase/verify`.
+  String get _deviceType =>
+      deviceTypeFor(_platform ?? defaultTargetPlatform, isWeb: kIsWeb);
 
   /// Create HTTP client that accepts self-signed certificates for production server
   http.Client _createHttpClient() {
@@ -131,7 +139,7 @@ class FirebaseAuthService {
         body: json.encode({
           'firebaseToken': firebaseToken,
           'email': userCredential.user?.email,
-          'deviceType': 'android', // or detect dynamically
+          'deviceType': _deviceType,
         }),
       );
       client.close();
@@ -357,7 +365,7 @@ class FirebaseAuthService {
         body: json.encode({
           'firebaseToken': firebaseToken,
           'email': email,
-          'deviceType': Platform.isIOS ? 'ios' : 'android',
+          'deviceType': _deviceType,
         }),
       );
       client.close();
@@ -736,6 +744,14 @@ class FirebaseAuthService {
       _logger.w('⚠️  Google sign-out failed: $e');
     }
   }
+}
+
+/// The backend's `deviceType` for a platform: "ios", "android" or "web"
+/// (FirebaseLoginRequest). Platforms the app doesn't ship on report
+/// "android", as every sign-in did before this was detected.
+String deviceTypeFor(TargetPlatform platform, {bool isWeb = false}) {
+  if (isWeb) return 'web';
+  return platform == TargetPlatform.iOS ? 'ios' : 'android';
 }
 
 /// The app's [FirebaseAuthService]; overridden in tests.
