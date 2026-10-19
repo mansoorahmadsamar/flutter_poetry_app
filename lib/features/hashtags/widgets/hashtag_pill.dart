@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/design_system/app_colors.dart';
+import '../../../core/utils/color_parser.dart';
 import '../models/hashtag_model.dart';
 
 /// Renders a single hashtag pill. Tapping navigates to the hashtag page.
@@ -25,9 +26,7 @@ class HashtagPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final color = hashtag.color != null
-        ? Color(int.parse(hashtag.color!.replaceAll('#', '0xFF')))
-        : AppColors.primary;
+    final color = parseHexColor(hashtag.color, fallback: AppColors.primary);
 
     return Material(
       color: Colors.transparent,

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/poet_profile_model.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
+import 'package:flutter_poetry_app/core/utils/color_parser.dart';
 import '../providers/poet_providers.dart';
 
 class PoetOverviewTab extends ConsumerWidget {
@@ -77,10 +78,9 @@ class PoetOverviewTab extends ConsumerWidget {
               children: poet.tags!
                   .map((tag) => Chip(
                         label: Text(tag.name),
-                        backgroundColor: (tag.color != null
-                                ? Color(int.parse('0xff${tag.color!.replaceFirst('#', '')}'))
-                                : Colors.grey)
-                            .withValues(alpha: 0.3),
+                        backgroundColor:
+                            parseHexColor(tag.color, fallback: Colors.grey)
+                                .withValues(alpha: 0.3),
                       ))
                   .toList(),
             ),
