@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../providers/poet_providers.dart';
+import 'poet_sign_in_prompt.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 
 class PoetVideosTab extends ConsumerWidget {
@@ -12,6 +13,10 @@ class PoetVideosTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Guests get 401 from this endpoint: prompt instead of calling it.
+    if (!watchIsSignedIn(ref)) {
+      return const PoetSignInPrompt(section: PoetMembersSection.videos);
+    }
     final videos = ref.watch(poetVideosProvider(publicId));
     final isDark = Theme.of(context).brightness == Brightness.dark;
 

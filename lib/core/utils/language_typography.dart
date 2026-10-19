@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../design_system/app_typography.dart';
+
 /// Language-aware typography utilities for proper visual weight balance
 class LanguageTypography {
   /// Font size multipliers for visual weight balance
@@ -91,7 +93,7 @@ class LanguageTypography {
         languageCode.toLowerCase() == 'ar' ||
         languageCode.toLowerCase() == 'fa') {
       return TextStyle(
-        fontFamily: 'JameelNooriNastaleeq',
+        fontFamily: AppTypography.urduFontFamily,
         fontSize: adjustedSize,
         height: lineHeight,
         fontWeight: fontWeight ?? FontWeight.w400,

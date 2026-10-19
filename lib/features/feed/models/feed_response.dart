@@ -88,7 +88,9 @@ FeedItem _poemItemFromCard(ContentCard card) {
     lang: card.language,
     contentData: PoemContentData(
       title: card.primaryText,
-      excerpt: card.primaryText,
+      // The guest API sends the opening lines as `excerpt`; never substitute
+      // the title, or the card shows the title twice and no verse.
+      excerpt: card.excerpt == card.primaryText ? null : card.excerpt,
       poetName: card.secondaryText,
       poetProfileImageUrl: card.imageUrl,
       poetryType: card.badgeKey,

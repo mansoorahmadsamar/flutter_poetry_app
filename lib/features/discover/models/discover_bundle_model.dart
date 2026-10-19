@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import '../../../core/utils/api_placeholder.dart';
 import '../../hashtags/models/hashtag_model.dart';
 
 part 'discover_bundle_model.freezed.dart';
@@ -77,6 +78,9 @@ class ContentCard with _$ContentCard {
     @Default('rtl') String direction,
     double? score,
     String? imageUrl, // For poets with profile images
+    /// Opening lines of a poem (newline-separated misras). `null` when the
+    /// API sends nothing, a blank string or its `"-"` placeholder.
+    @PlaceholderStringConverter() String? excerpt,
   }) = _ContentCard;
 
   factory ContentCard.fromJson(Map<String, dynamic> json) =>

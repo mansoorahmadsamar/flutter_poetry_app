@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/design_system/app_colors.dart';
 import '../../../core/providers/language_provider.dart';
+import '../../../core/utils/color_parser.dart';
 import '../models/hashtag_model.dart';
 import '../services/hashtag_service.dart';
 import '../widgets/hashtag_couplets_tab.dart';
@@ -66,9 +67,8 @@ class _HashtagDetailScreenState extends ConsumerState<HashtagDetailScreen>
     final isRtl = ref.watch(selectedLanguageProvider) == 'ur';
     final displayName = _meta?.name ?? widget.slug;
 
-    final hashtagColor = _meta?.color != null
-        ? Color(int.parse(_meta!.color!.replaceAll('#', '0xFF')))
-        : AppColors.primary;
+    final hashtagColor =
+        parseHexColor(_meta?.color, fallback: AppColors.primary);
 
     return Directionality(
       textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,

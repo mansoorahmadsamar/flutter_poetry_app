@@ -115,6 +115,10 @@ class FeedEngagementRow extends StatelessWidget {
                 icon: isLiked
                     ? Icons.favorite_rounded
                     : Icons.favorite_border_rounded,
+                semanticLabel: isLiked ? 'Unlike' : 'Like',
+                semanticValue: likeCount > 0
+                    ? '${_formatCount(likeCount)} ${likeCount == 1 ? 'like' : 'likes'}'
+                    : null,
                 color: isLiked ? AppColors.feedLiked : null,
                 count: likeCount,
                 onTap: onLike,
@@ -125,6 +129,7 @@ class FeedEngagementRow extends StatelessWidget {
             // Share button — icon only
             _EngagementButton(
               icon: Icons.share_outlined,
+              semanticLabel: 'Share',
               count: 0,
               onTap: onShare,
             ),
@@ -143,6 +148,7 @@ class FeedEngagementRow extends StatelessWidget {
               icon: isBookmarked
                   ? Icons.bookmark_rounded
                   : Icons.bookmark_border_rounded,
+              semanticLabel: isBookmarked ? 'Remove bookmark' : 'Bookmark',
               color: isBookmarked ? AppColors.secondary : null,
               count: 0,
               onTap: onBookmark,
@@ -156,12 +162,20 @@ class FeedEngagementRow extends StatelessWidget {
 
 class _EngagementButton extends StatelessWidget {
   final IconData icon;
+
+  /// What the button does, read by TalkBack/VoiceOver instead of the icon.
+  final String semanticLabel;
+
+  /// Optional state read after the label, e.g. "12 likes".
+  final String? semanticValue;
   final Color? color;
   final int count;
   final VoidCallback? onTap;
 
   const _EngagementButton({
     required this.icon,
+    required this.semanticLabel,
+    this.semanticValue,
     this.color,
     required this.count,
     this.onTap,
@@ -173,34 +187,41 @@ class _EngagementButton extends StatelessWidget {
     final defaultColor =
         isDark ? AppColors.engagementIconDark : AppColors.engagementIcon;
 
-    return InkWell(
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      value: semanticValue,
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 10,
-          vertical: 8,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: AppSpacing.feedEngagementIconSize,
-              color: color ?? defaultColor,
-            ),
-            if (count > 0) ...[
-              const SizedBox(width: AppSpacing.xs),
-              Text(
-                _formatCount(count),
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: color ?? defaultColor,
-                ),
+      excludeSemantics: true,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: 8,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: AppSpacing.feedEngagementIconSize,
+                color: color ?? defaultColor,
               ),
+              if (count > 0) ...[
+                const SizedBox(width: AppSpacing.xs),
+                Text(
+                  _formatCount(count),
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: color ?? defaultColor,
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

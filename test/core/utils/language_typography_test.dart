@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
 import 'package:flutter_poetry_app/core/utils/language_typography.dart';
 
 void main() {
@@ -90,7 +93,25 @@ void main() {
     test('Urdu uses the bundled Nastaliq font, not a Google font', () {
       final style =
           LanguageTypography.createStyle(baseFontSize: 18, languageCode: 'ur');
-      expect(style.fontFamily, 'JameelNooriNastaleeq');
+      expect(style.fontFamily, AppTypography.urduFontFamily);
+    });
+
+    test('regression: the Urdu font family is the one pubspec.yaml bundles', () {
+      // 'JameelNooriNastaleeq' (no spaces) matched no declared family, so
+      // Urdu text silently fell back to the platform font.
+      final pubspec = File('pubspec.yaml').readAsStringSync();
+      expect(
+        pubspec,
+        contains('- family: ${AppTypography.urduFontFamily}\n'),
+      );
+      for (final lang in ['ur', 'ar', 'fa']) {
+        expect(
+          LanguageTypography.createStyle(baseFontSize: 18, languageCode: lang)
+              .fontFamily,
+          'Jameel Noori Nastaleeq',
+          reason: lang,
+        );
+      }
     });
 
     test('applies the language size multiplier to the base font size', () {

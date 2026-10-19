@@ -8,6 +8,7 @@ import '../../features/discover/models/discover_bundle_model.dart';
 import '../../features/hashtags/models/hashtag_model.dart';
 import '../../features/main/tabs/poets/models/poem_model.dart';
 import '../../features/main/tabs/poets/models/poet_model.dart';
+import '../utils/api_placeholder.dart';
 import 'dio_client.dart';
 
 /// Service wrapping the anonymous `/api/guest/**` API surface.
@@ -261,12 +262,13 @@ class GuestService {
 
   ContentCard _poemSummaryToCard(Map<String, dynamic> j) {
     final image = j['poetProfileImageUrl']?.toString();
+    final title = presentOrNull(j['title']?.toString());
+    final excerpt = presentOrNull(j['excerpt']?.toString());
     return ContentCard(
       type: 'POEM',
       publicId: j['publicId']?.toString() ?? '',
-      primaryText: (j['title']?.toString().isNotEmpty ?? false)
-          ? j['title'].toString()
-          : (j['excerpt']?.toString() ?? ''),
+      primaryText: title ?? excerpt ?? '',
+      excerpt: excerpt,
       secondaryText: j['poetName']?.toString(),
       badgeKey: j['poetryType']?.toString(),
       badge: j['poetryTypeName']?.toString(),

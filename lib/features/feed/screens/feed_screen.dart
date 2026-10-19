@@ -89,6 +89,7 @@ class FeedScreenState extends ConsumerState<FeedScreen>
               actions: [
                 IconButton(
                   icon: const Icon(Icons.notifications_outlined),
+                  tooltip: 'Notifications',
                   onPressed: () {
                     // TODO: Show notifications
                   },

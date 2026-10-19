@@ -16,6 +16,7 @@ import '../models/feed_item.dart';
 import '../providers/feed_engagement_provider.dart';
 import '../providers/feed_provider.dart';
 import 'feed_engagement_row.dart';
+import 'feed_poet_avatar.dart';
 import 'social_proof_badge.dart';
 
 class PoemFeedCard extends ConsumerWidget {
@@ -222,26 +223,10 @@ class PoemFeedCard extends ConsumerWidget {
   ) {
     return Row(
       children: [
-        // Poet avatar
-        GestureDetector(
-          onTap: () {
-            if (data.poetPublicId != null) {
-              context.push('/main/poets/${data.poetPublicId}');
-            }
-          },
-          child: ClipOval(
-            child: data.poetProfileImageUrl != null
-                ? CachedNetworkImage(
-                    imageUrl: data.poetProfileImageUrl!,
-                    width: AppSpacing.feedAvatarSize,
-                    height: AppSpacing.feedAvatarSize,
-                    fit: BoxFit.cover,
-                    memCacheWidth: 88,
-                    placeholder: (_, __) => _avatarPlaceholder(isDark),
-                    errorWidget: (_, __, ___) => _avatarPlaceholder(isDark),
-                  )
-                : _avatarPlaceholder(isDark),
-          ),
+        FeedPoetAvatar(
+          poetPublicId: data.poetPublicId,
+          poetName: data.poetName,
+          imageUrl: data.poetProfileImageUrl,
         ),
         const SizedBox(width: AppSpacing.sm),
 
@@ -375,23 +360,6 @@ class PoemFeedCard extends ConsumerWidget {
     );
   }
 
-  Widget _avatarPlaceholder(bool isDark) {
-    return Container(
-      width: AppSpacing.feedAvatarSize,
-      height: AppSpacing.feedAvatarSize,
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.borderDark : AppColors.shimmerBase,
-        shape: BoxShape.circle,
-      ),
-      child: Icon(
-        Icons.person_outline,
-        size: AppSpacing.iconSm,
-        color: isDark
-            ? AppColors.textSecondaryDark
-            : AppColors.textSecondaryLight,
-      ),
-    );
-  }
 
   void _onTap(BuildContext context, WidgetRef ref) {
     ref.read(feedProvider.notifier).trackAction(item, 'open_item');
