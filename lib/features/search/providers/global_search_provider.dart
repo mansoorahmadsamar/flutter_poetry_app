@@ -434,7 +434,7 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
       // old results, and the new search has already reset the paging state.
       if (generation != _searchGeneration) return;
 
-      // Merge into the latest results (another tab may have paged meanwhile).
+      // Merge into the state as it is now, not as it was when the request left.
       final latest = state.unifiedResults ?? current;
       final merged = segment.merge(latest, moreResults);
 
