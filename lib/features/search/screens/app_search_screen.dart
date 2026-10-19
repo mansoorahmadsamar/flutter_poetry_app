@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/features/search/models/global_search_state.dart';
+import 'package:flutter_poetry_app/features/search/models/search_models.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
+import 'package:flutter_poetry_app/features/search/utils/search_result_navigation.dart';
 import 'package:flutter_poetry_app/features/search/widgets/app_search_bar.dart';
 import 'package:flutter_poetry_app/features/search/widgets/app_search_segment_tabs.dart';
 import 'package:flutter_poetry_app/features/search/widgets/app_search_idle_content.dart';
@@ -183,12 +184,8 @@ class _AppSearchScreenState extends ConsumerState<AppSearchScreen> {
           key: const ValueKey('idle'),
           onRecentTap: _executeQuery,
           onTrendingTap: _executeQuery,
-          onPoetTap: (poet) {
-            context.pushNamed(
-              'poet-detail',
-              pathParameters: {'publicId': poet.publicId},
-            );
-          },
+          onPoetTap: (poet) =>
+              SearchResultNavigation.openPoet(context, poet.publicId),
           onCategoryTap: (category) {
             _executeQuery(category.primaryText);
           },
@@ -225,6 +222,13 @@ class _AppSearchScreenState extends ConsumerState<AppSearchScreen> {
         return AppSearchPreviewResults(
           key: const ValueKey('preview'),
           onRelatedSearchTap: _executeQuery,
+          onPoetTap: (poet) =>
+              SearchResultNavigation.openPoet(context, poet.publicId),
+          onPoemTap: (poem) =>
+              SearchResultNavigation.openPoem(context, poem.publicId),
+          onCoupletTap: _openCoupletPoem,
+          onCategoryTap: _searchCategory,
+          onTagTap: (tag) => SearchResultNavigation.openHashtag(context, tag.slug),
         );
 
       case _DisplayMode.filtered:
@@ -235,27 +239,12 @@ class _AppSearchScreenState extends ConsumerState<AppSearchScreen> {
         return AppSearchFilteredResults(
           key: ValueKey('filtered_${activeSegment.name}'),
           segment: activeSegment,
-          onPoetTap: (poet) {
-            context.pushNamed(
-              'poet-detail',
-              pathParameters: {'publicId': poet.publicId},
-            );
-          },
-          onPoemTap: (poem) {
-            context.pushNamed(
-              'poem-detail',
-              pathParameters: {'publicId': poem.publicId},
-            );
-          },
-          onCoupletTap: (couplet) {
-            // Navigate to poem detail with the couplet's poem
-            if (couplet.poem != null) {
-              context.pushNamed(
-                'poem-detail',
-                pathParameters: {'publicId': couplet.poem!.publicId},
-              );
-            }
-          },
+          onPoetTap: (poet) =>
+              SearchResultNavigation.openPoet(context, poet.publicId),
+          onPoemTap: (poem) =>
+              SearchResultNavigation.openPoem(context, poem.publicId),
+          onCoupletTap: _openCoupletPoem,
+          onCategoryTap: _searchCategory,
         );
     }
   }
@@ -264,10 +253,26 @@ class _AppSearchScreenState extends ConsumerState<AppSearchScreen> {
   // Actions
   // ---------------------------------------------------------------------------
 
-  void _executeQuery(String query) {
+  void _executeQuery(String query, {DiscoverSegment? segment}) {
     _searchController.text = query;
-    ref.read(globalSearchProvider.notifier).executeSearch(query: query);
+    ref
+        .read(globalSearchProvider.notifier)
+        .executeSearch(query: query, segment: segment);
     _searchFocusNode.unfocus();
+  }
+
+  /// A couplet opens its parent poem — never `/main/poems/:coupletId`.
+  /// Cards without a poem id are built without a tap handler, so this only
+  /// runs when there is one.
+  void _openCoupletPoem(CoupletSearchResult couplet) {
+    final poemId = couplet.poemIdToOpen;
+    if (poemId != null) SearchResultNavigation.openPoem(context, poemId);
+  }
+
+  /// There is no category screen; like the Discover category grid and the
+  /// idle categories, a category result searches for its name, shown in "All".
+  void _searchCategory(AutocompleteCategory category) {
+    _executeQuery(category.name, segment: DiscoverSegment.all);
   }
 
   Widget _buildErrorState(bool isDark, String errorMessage) {
