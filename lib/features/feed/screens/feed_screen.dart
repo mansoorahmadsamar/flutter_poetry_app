@@ -4,6 +4,8 @@ import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/widgets/standard_app_bar.dart';
 import '../providers/feed_provider.dart';
+import 'package:flutter_poetry_app/core/network/request_failure.dart';
+import '../widgets/feed_error_view.dart';
 import '../widgets/feed_item_builder.dart';
 import '../widgets/feed_shimmer.dart';
 
@@ -89,6 +91,7 @@ class FeedScreenState extends ConsumerState<FeedScreen>
               actions: [
                 IconButton(
                   icon: const Icon(Icons.notifications_outlined),
+                  tooltip: 'Notifications',
                   onPressed: () {
                     // TODO: Show notifications
                   },
@@ -119,8 +122,8 @@ class FeedScreenState extends ConsumerState<FeedScreen>
             else if (state.error != null && state.items.isEmpty)
               SliverFillRemaining(
                 hasScrollBody: false,
-                child: _ErrorView(
-                  error: state.error!,
+                child: FeedErrorView(
+                  kind: state.errorKind ?? RequestFailureKind.other,
                   onRetry: () =>
                       ref.read(feedProvider.notifier).loadFirstPage(),
                   isDark: isDark,
@@ -233,74 +236,6 @@ class _EmptyFeed extends StatelessWidget {
   }
 }
 
-class _ErrorView extends StatelessWidget {
-  final String error;
-  final VoidCallback onRetry;
-  final bool isDark;
-
-  const _ErrorView({
-    required this.error,
-    required this.onRetry,
-    required this.isDark,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.xl),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.cloud_off_outlined,
-              size: AppSpacing.xxxl,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondaryLight,
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              'Could not load feed',
-              style: textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: isDark
-                    ? AppColors.textPrimaryDark
-                    : AppColors.textPrimaryLight,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              'Check your connection and try again.',
-              style: textTheme.bodyMedium?.copyWith(
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondaryLight,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            ElevatedButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _LoadingMore extends StatelessWidget {
   const _LoadingMore();
 
@@ -377,10 +312,10 @@ class _EndOfFeed extends StatelessWidget {
         child: Text(
           'You\'re all caught up!',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: isDark
-                ? AppColors.textSecondaryDark
-                : AppColors.textSecondaryLight,
-          ),
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondaryLight,
+              ),
         ),
       ),
     );

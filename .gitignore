@@ -1,6 +1,7 @@
 # Miscellaneous
 *.class
 *.lock
+!/pubspec.lock
 *.log
 *.pyc
 *.swp
@@ -123,3 +124,32 @@ app.*.symbols
 # Firebase sensitive files
 *-firebase-adminsdk-*.json
 .github/*.base64
+# Google Cloud / GCP service account JSON keys (NEVER COMMIT)
+sukhan-*.json
+*-service-account*.json
+*-gcp-key*.json
+
+# Local debugging artifacts
+api_responses.json
+feature_image.png
+
+# Android local Kotlin cache
+android/.kotlin/
+
+# --- Secrets (engineering setup, 2026-10-19) --------------------------------
+# Ignoring a file does NOT untrack one that is already committed, and does not
+# un-leak it: those need rotation (see .gitleaksignore and poetry-backend/docs/SECURITY.md).
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.p8
+key.properties
+*.keystore
+*.jks
+*service-account*.json
+*-firebase-adminsdk-*.json
+client_secret*.json
+
+# Personal Claude Code settings: machine-local, may hold credentials (T-049)
+.claude/settings.local.json

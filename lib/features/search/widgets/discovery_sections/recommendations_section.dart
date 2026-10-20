@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
+import 'package:flutter_poetry_app/core/utils/language_typography.dart';
+import 'package:flutter_poetry_app/features/search/models/search_origin.dart';
 
 /// Recommendations discovery section
 ///
@@ -108,7 +110,7 @@ class RecommendationsSection extends ConsumerWidget {
     bool isDark,
     double screenWidth,
   ) {
-    final isUrdu = _isUrduText(title);
+    final isUrdu = LanguageTypography.isMostlyArabicScript(title);
 
     return Container(
       decoration: BoxDecoration(
@@ -134,7 +136,8 @@ class RecommendationsSection extends ConsumerWidget {
         onTap: () {
           // TODO: Navigate to content detail based on publicId
           // For now, execute search with title
-          ref.read(globalSearchProvider.notifier).executeSearch(query: title);
+          ref.read(globalSearchProvider.notifier).executeSearch(
+              query: title, origin: SearchOrigin.browse);
         },
         borderRadius: BorderRadius.circular(20),
         child: Padding(
@@ -193,12 +196,5 @@ class RecommendationsSection extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  /// Detect if text is primarily Urdu
-  bool _isUrduText(String text) {
-    final urduPattern = RegExp(r'[\u0600-\u06FF]');
-    final urduMatches = urduPattern.allMatches(text).length;
-    return urduMatches > text.length / 3;
   }
 }

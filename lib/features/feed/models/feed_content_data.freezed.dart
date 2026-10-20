@@ -28,10 +28,18 @@ mixin _$CoupletContentData {
   int? get poetDeathYear => throw _privateConstructorUsedError;
   String? get poetName => throw _privateConstructorUsedError;
   String? get poemPublicId => throw _privateConstructorUsedError;
+
+  /// The couplet's number in its poem, so a tap can open the poem at it.
+  /// The signed-in feed does not send it yet; `0`/absent read as null.
+  @PositiveIntConverter()
+  int? get coupletNumber => throw _privateConstructorUsedError;
   int get likeCount => throw _privateConstructorUsedError;
   int get shareCount => throw _privateConstructorUsedError;
   int get bookmarkCount => throw _privateConstructorUsedError;
   List<String> get tagSlugs =>
+      throw _privateConstructorUsedError; // Couplet themes (max 3, server-ranked); absent on production today.
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes =>
       throw _privateConstructorUsedError; // Reactions system (Section 19)
   Map<String, dynamic>? get reactions => throw _privateConstructorUsedError;
 
@@ -56,10 +64,12 @@ abstract class $CoupletContentDataCopyWith<$Res> {
       int? poetDeathYear,
       String? poetName,
       String? poemPublicId,
+      @PositiveIntConverter() int? coupletNumber,
       int likeCount,
       int shareCount,
       int bookmarkCount,
       List<String> tagSlugs,
+      @CoupletThemesConverter() List<CoupletTheme> themes,
       Map<String, dynamic>? reactions});
 }
 
@@ -84,10 +94,12 @@ class _$CoupletContentDataCopyWithImpl<$Res, $Val extends CoupletContentData>
     Object? poetDeathYear = freezed,
     Object? poetName = freezed,
     Object? poemPublicId = freezed,
+    Object? coupletNumber = freezed,
     Object? likeCount = null,
     Object? shareCount = null,
     Object? bookmarkCount = null,
     Object? tagSlugs = null,
+    Object? themes = null,
     Object? reactions = freezed,
   }) {
     return _then(_value.copyWith(
@@ -123,6 +135,10 @@ class _$CoupletContentDataCopyWithImpl<$Res, $Val extends CoupletContentData>
           ? _value.poemPublicId
           : poemPublicId // ignore: cast_nullable_to_non_nullable
               as String?,
+      coupletNumber: freezed == coupletNumber
+          ? _value.coupletNumber
+          : coupletNumber // ignore: cast_nullable_to_non_nullable
+              as int?,
       likeCount: null == likeCount
           ? _value.likeCount
           : likeCount // ignore: cast_nullable_to_non_nullable
@@ -139,6 +155,10 @@ class _$CoupletContentDataCopyWithImpl<$Res, $Val extends CoupletContentData>
           ? _value.tagSlugs
           : tagSlugs // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      themes: null == themes
+          ? _value.themes
+          : themes // ignore: cast_nullable_to_non_nullable
+              as List<CoupletTheme>,
       reactions: freezed == reactions
           ? _value.reactions
           : reactions // ignore: cast_nullable_to_non_nullable
@@ -164,10 +184,12 @@ abstract class _$$CoupletContentDataImplCopyWith<$Res>
       int? poetDeathYear,
       String? poetName,
       String? poemPublicId,
+      @PositiveIntConverter() int? coupletNumber,
       int likeCount,
       int shareCount,
       int bookmarkCount,
       List<String> tagSlugs,
+      @CoupletThemesConverter() List<CoupletTheme> themes,
       Map<String, dynamic>? reactions});
 }
 
@@ -190,10 +212,12 @@ class __$$CoupletContentDataImplCopyWithImpl<$Res>
     Object? poetDeathYear = freezed,
     Object? poetName = freezed,
     Object? poemPublicId = freezed,
+    Object? coupletNumber = freezed,
     Object? likeCount = null,
     Object? shareCount = null,
     Object? bookmarkCount = null,
     Object? tagSlugs = null,
+    Object? themes = null,
     Object? reactions = freezed,
   }) {
     return _then(_$CoupletContentDataImpl(
@@ -229,6 +253,10 @@ class __$$CoupletContentDataImplCopyWithImpl<$Res>
           ? _value.poemPublicId
           : poemPublicId // ignore: cast_nullable_to_non_nullable
               as String?,
+      coupletNumber: freezed == coupletNumber
+          ? _value.coupletNumber
+          : coupletNumber // ignore: cast_nullable_to_non_nullable
+              as int?,
       likeCount: null == likeCount
           ? _value.likeCount
           : likeCount // ignore: cast_nullable_to_non_nullable
@@ -245,6 +273,10 @@ class __$$CoupletContentDataImplCopyWithImpl<$Res>
           ? _value._tagSlugs
           : tagSlugs // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      themes: null == themes
+          ? _value._themes
+          : themes // ignore: cast_nullable_to_non_nullable
+              as List<CoupletTheme>,
       reactions: freezed == reactions
           ? _value._reactions
           : reactions // ignore: cast_nullable_to_non_nullable
@@ -265,12 +297,16 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
       this.poetDeathYear,
       this.poetName,
       this.poemPublicId,
+      @PositiveIntConverter() this.coupletNumber,
       this.likeCount = 0,
       this.shareCount = 0,
       this.bookmarkCount = 0,
       final List<String> tagSlugs = const [],
+      @CoupletThemesConverter()
+      final List<CoupletTheme> themes = const <CoupletTheme>[],
       final Map<String, dynamic>? reactions})
       : _tagSlugs = tagSlugs,
+        _themes = themes,
         _reactions = reactions;
 
   factory _$CoupletContentDataImpl.fromJson(Map<String, dynamic> json) =>
@@ -292,6 +328,12 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
   final String? poetName;
   @override
   final String? poemPublicId;
+
+  /// The couplet's number in its poem, so a tap can open the poem at it.
+  /// The signed-in feed does not send it yet; `0`/absent read as null.
+  @override
+  @PositiveIntConverter()
+  final int? coupletNumber;
   @override
   @JsonKey()
   final int likeCount;
@@ -310,6 +352,18 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
     return EqualUnmodifiableListView(_tagSlugs);
   }
 
+// Couplet themes (max 3, server-ranked); absent on production today.
+  final List<CoupletTheme> _themes;
+// Couplet themes (max 3, server-ranked); absent on production today.
+  @override
+  @JsonKey()
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes {
+    if (_themes is EqualUnmodifiableListView) return _themes;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_themes);
+  }
+
 // Reactions system (Section 19)
   final Map<String, dynamic>? _reactions;
 // Reactions system (Section 19)
@@ -324,7 +378,7 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
 
   @override
   String toString() {
-    return 'CoupletContentData(versesTextArabic: $versesTextArabic, versesTextRoman: $versesTextRoman, poetPublicId: $poetPublicId, poetProfileImageUrl: $poetProfileImageUrl, poetBirthYear: $poetBirthYear, poetDeathYear: $poetDeathYear, poetName: $poetName, poemPublicId: $poemPublicId, likeCount: $likeCount, shareCount: $shareCount, bookmarkCount: $bookmarkCount, tagSlugs: $tagSlugs, reactions: $reactions)';
+    return 'CoupletContentData(versesTextArabic: $versesTextArabic, versesTextRoman: $versesTextRoman, poetPublicId: $poetPublicId, poetProfileImageUrl: $poetProfileImageUrl, poetBirthYear: $poetBirthYear, poetDeathYear: $poetDeathYear, poetName: $poetName, poemPublicId: $poemPublicId, coupletNumber: $coupletNumber, likeCount: $likeCount, shareCount: $shareCount, bookmarkCount: $bookmarkCount, tagSlugs: $tagSlugs, themes: $themes, reactions: $reactions)';
   }
 
   @override
@@ -348,6 +402,8 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
                 other.poetName == poetName) &&
             (identical(other.poemPublicId, poemPublicId) ||
                 other.poemPublicId == poemPublicId) &&
+            (identical(other.coupletNumber, coupletNumber) ||
+                other.coupletNumber == coupletNumber) &&
             (identical(other.likeCount, likeCount) ||
                 other.likeCount == likeCount) &&
             (identical(other.shareCount, shareCount) ||
@@ -355,6 +411,7 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
             (identical(other.bookmarkCount, bookmarkCount) ||
                 other.bookmarkCount == bookmarkCount) &&
             const DeepCollectionEquality().equals(other._tagSlugs, _tagSlugs) &&
+            const DeepCollectionEquality().equals(other._themes, _themes) &&
             const DeepCollectionEquality()
                 .equals(other._reactions, _reactions));
   }
@@ -371,10 +428,12 @@ class _$CoupletContentDataImpl implements _CoupletContentData {
       poetDeathYear,
       poetName,
       poemPublicId,
+      coupletNumber,
       likeCount,
       shareCount,
       bookmarkCount,
       const DeepCollectionEquality().hash(_tagSlugs),
+      const DeepCollectionEquality().hash(_themes),
       const DeepCollectionEquality().hash(_reactions));
 
   @JsonKey(ignore: true)
@@ -402,10 +461,12 @@ abstract class _CoupletContentData implements CoupletContentData {
       final int? poetDeathYear,
       final String? poetName,
       final String? poemPublicId,
+      @PositiveIntConverter() final int? coupletNumber,
       final int likeCount,
       final int shareCount,
       final int bookmarkCount,
       final List<String> tagSlugs,
+      @CoupletThemesConverter() final List<CoupletTheme> themes,
       final Map<String, dynamic>? reactions}) = _$CoupletContentDataImpl;
 
   factory _CoupletContentData.fromJson(Map<String, dynamic> json) =
@@ -428,6 +489,12 @@ abstract class _CoupletContentData implements CoupletContentData {
   @override
   String? get poemPublicId;
   @override
+
+  /// The couplet's number in its poem, so a tap can open the poem at it.
+  /// The signed-in feed does not send it yet; `0`/absent read as null.
+  @PositiveIntConverter()
+  int? get coupletNumber;
+  @override
   int get likeCount;
   @override
   int get shareCount;
@@ -435,6 +502,9 @@ abstract class _CoupletContentData implements CoupletContentData {
   int get bookmarkCount;
   @override
   List<String> get tagSlugs;
+  @override // Couplet themes (max 3, server-ranked); absent on production today.
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes;
   @override // Reactions system (Section 19)
   Map<String, dynamic>? get reactions;
   @override

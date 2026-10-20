@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop
+      - main
   workflow_dispatch:
     inputs:
       track:
@@ -37,12 +38,20 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.27.1'
+          flutter-version: '3.44.4'
           channel: 'stable'
           cache: true
 
       - name: Get dependencies
-        run: flutter pub get
+        run: flutter pub get --enforce-lockfile  # fail, never re-resolve, if pubspec.lock is stale
+
+      # Quality gate: nothing ships unless analysis has no errors and every
+      # test passes. Runs before any secret is decoded or anything is built.
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+
+      - name: Run tests
+        run: flutter test
 
       - name: Decode google-services.json
         run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 --decode > android/app/google-services.json
@@ -90,12 +99,27 @@ jobs:
       - name: Decode Play Store service account
         run: echo "${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}" | base64 --decode > ${{ runner.temp }}/play-store-credentials.json
 
+      - name: Resolve Play Store track
+        id: resolve_track
+        run: |
+          # Manual dispatch: honor the chosen track.
+          # Push to main → production. Push to develop (or anything else) → alpha.
+          if [ -n "${{ inputs.track }}" ]; then
+            TRACK="${{ inputs.track }}"
+          elif [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            TRACK="production"
+          else
+            TRACK="alpha"
+          fi
+          echo "track=${TRACK}" >> $GITHUB_OUTPUT
+          echo "🛤  Releasing to track: ${TRACK}"
+
       - name: Upload to Google Play
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJson: ${{ runner.temp }}/play-store-credentials.json
           packageName: com.techhikes.poetry_app
           releaseFiles: build/app/outputs/bundle/release/app-release.aab
-          track: ${{ inputs.track || 'alpha' }}
+          track: ${{ steps.resolve_track.outputs.track }}
           status: completed
           whatsNewDirectory: distribution/whatsnew

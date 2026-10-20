@@ -5,6 +5,7 @@ import 'package:flutter_poetry_app/features/main/tabs/poets/models/poet_model.da
 import 'package:flutter_poetry_app/features/main/tabs/poets/providers/poet_providers.dart';
 import 'package:flutter_poetry_app/core/network/dto/api_response.dart';
 import 'package:flutter_poetry_app/features/search/models/search_state.dart';
+import 'package:flutter_poetry_app/core/constants/app_constants.dart';
 
 final _logger = Logger();
 
@@ -67,7 +68,7 @@ final searchHistoryProvider =
 
 /// Search history notifier with SharedPreferences persistence
 class SearchHistoryNotifier extends StateNotifier<List<String>> {
-  static const String _historyKey = 'search_history';
+  static const String _historyKey = AppConstants.searchHistoryKey;
   static const int _maxHistoryItems = 10;
 
   SearchHistoryNotifier() : super([]) {

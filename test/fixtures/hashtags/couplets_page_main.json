@@ -1,0 +1,51 @@
+{
+  "success": true,
+  "message": "Found 27 couplets for #bahar",
+  "data": {
+    "content": [
+      {
+        "publicId": "cpl-bahar-1",
+        "coupletNumber": 3,
+        "coupletType": "REGULAR",
+        "coupletTypeName": "-",
+        "likeCount": 4,
+        "bookmarkCount": 1,
+        "shareCount": 0,
+        "reactions": {"total": 4, "byType": {"LIKE": 4}, "userReaction": "-"},
+        "isBookmarked": null,
+        "verses": [
+          {"publicId": "vrs-1", "verseNumber": 5, "coupletNumber": 3, "verseType": "REGULAR", "verseText": "گلوں میں رنگ بھرے باد نو بہار چلے", "romanizedText": "-", "translation": "-"},
+          {"publicId": "vrs-2", "verseNumber": 6, "coupletNumber": 3, "verseType": "REGULAR", "verseText": "چلے بھی آؤ کہ گلشن کا کاروبار چلے", "romanizedText": "-", "translation": "-"}
+        ],
+        "tagSlugs": ["bahar", "ishq"],
+        "createdAt": "2025-03-14T09:26:53.589"
+      },
+      {
+        "publicId": "cpl-bahar-2",
+        "coupletNumber": 0,
+        "coupletType": null,
+        "coupletTypeName": "-",
+        "likeCount": 0,
+        "bookmarkCount": 0,
+        "shareCount": 0,
+        "reactions": null,
+        "isBookmarked": null,
+        "verses": [
+          {"publicId": "vrs-3", "verseNumber": 1, "coupletNumber": 1, "verseType": null, "verseText": "Bahar aai to jaise ek bar laut aae hain", "romanizedText": "-", "translation": "-"}
+        ],
+        "tagSlugs": null,
+        "createdAt": null
+      }
+    ],
+    "pageable": {"pageNumber": 0, "pageSize": 15, "sort": {"empty": true, "sorted": false, "unsorted": true}, "offset": 0, "paged": true, "unpaged": false},
+    "last": false,
+    "totalElements": 27,
+    "totalPages": 2,
+    "size": 15,
+    "number": 0,
+    "sort": {"empty": true, "sorted": false, "unsorted": true},
+    "first": true,
+    "numberOfElements": 2,
+    "empty": false
+  }
+}

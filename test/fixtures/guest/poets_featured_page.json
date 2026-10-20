@@ -1,0 +1,41 @@
+{
+  "_comment": "Shape of GET /api/guest/poets/featured (and /trending, /era/{era}, /gender/{gender}) from docs/contracts/guest-poets.md (backend fix/search-2, pinned by GuestPoetFiltersIT). Not yet deployed. The first poet is the contract example (image URL replaced by \"-\" so tests never load images); the second is synthetic, covering an Urdu name, era null and poemCount 0.",
+  "success": true,
+  "message": "Featured poets retrieved",
+  "data": {
+    "content": [
+      {
+        "publicId": "0d24be0d-4a51-4d33-8a16-4c3809c71155",
+        "name": "Mirza Ghalib",
+        "shortBio": "-",
+        "profileImageUrl": "-",
+        "birthYear": 1797,
+        "deathYear": 1869,
+        "era": "CLASSICAL",
+        "country": "-",
+        "countryFlag": "-",
+        "poemCount": 7
+      },
+      {
+        "publicId": "7a3c1f52-9b0e-4c1d-8e2f-5d6a7b8c9d0e",
+        "name": "پروین شاکر",
+        "shortBio": "-",
+        "profileImageUrl": "-",
+        "birthYear": 1952,
+        "deathYear": 1994,
+        "era": null,
+        "country": "-",
+        "countryFlag": "-",
+        "poemCount": 0
+      }
+    ],
+    "totalElements": 2,
+    "totalPages": 1,
+    "number": 0,
+    "size": 10,
+    "first": true,
+    "last": true,
+    "numberOfElements": 2,
+    "empty": false
+  }
+}

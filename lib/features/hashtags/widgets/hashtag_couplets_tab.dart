@@ -4,10 +4,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/design_system/app_colors.dart';
 import '../../../core/providers/language_provider.dart';
-import '../../../core/widgets/localized_text.dart';
+import '../../../core/routing/content_locations.dart';
 import '../../main/tabs/poets/models/couplet_model.dart';
 import '../services/hashtag_service.dart';
-import 'hashtag_pill.dart';
+import 'hashtag_couplet_tile.dart';
 
 class HashtagCoupletsTab extends ConsumerStatefulWidget {
   final String slug;
@@ -65,7 +65,7 @@ class _HashtagCoupletsTabState extends ConsumerState<HashtagCoupletsTab>
 
       if (!mounted) return;
       setState(() {
-        _couplets.addAll(result.content);
+        _couplets.addAll(result.content.where(HashtagCoupletTile.hasVerseText));
         _currentPage = page;
         _hasMore = !result.last;
         _isLoading = false;
@@ -160,111 +160,22 @@ class _HashtagCoupletsTabState extends ConsumerState<HashtagCoupletsTab>
           }
 
           final couplet = _couplets[index];
-          return _CoupletListTile(
+          final poemId = couplet.poemPublicId;
+          return HashtagCoupletTile(
+            key: ValueKey('hashtag-couplet-${couplet.publicId}'),
             couplet: couplet,
             isDark: isDark,
             isRtl: isRtl,
-            onTap: () =>
-                context.push('/main/poems/${couplet.poemPublicId}'),
+            hashtagSlug: widget.slug,
+            // Production's CoupletDto has no poem id (T-177): such a couplet
+            // shows its verses but opens nothing, rather than /main/poems/null.
+            // With a couplet number the poem opens scrolled to the couplet.
+            onTap: poemId == null
+                ? null
+                : () => context.push(ContentLocations.poem(poemId,
+                    coupletNumber: couplet.coupletNumber)),
           );
         },
-      ),
-    );
-  }
-}
-
-class _CoupletListTile extends StatelessWidget {
-  final CoupletDetailResponse couplet;
-  final bool isDark;
-  final bool isRtl;
-  final VoidCallback onTap;
-
-  const _CoupletListTile({
-    required this.couplet,
-    required this.isDark,
-    required this.isRtl,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final verses = couplet.verses;
-    final verseText = verses
-        .map((v) => v.text)
-        .where((t) => t.isNotEmpty)
-        .join('\n');
-
-    return Material(
-      color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-      borderRadius: BorderRadius.circular(12),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              LocalizedText(
-                verseText,
-                style: TextStyle(
-                  fontSize: isRtl ? 18 : 16,
-                  fontWeight: FontWeight.w500,
-                  height: isRtl ? 2.0 : 1.6,
-                  color: isDark
-                      ? AppColors.textPrimaryDark
-                      : AppColors.textPrimaryLight,
-                ),
-                maxLines: 4,
-                overflow: TextOverflow.ellipsis,
-              ),
-              if (couplet.tagSlugs.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                HashtagSlugRow(slugs: couplet.tagSlugs),
-              ],
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Text(
-                    couplet.poetName,
-                    style: TextStyle(
-                      fontFamily: isRtl ? 'Jameel Noori Nastaleeq' : null,
-                      fontSize: isRtl ? 14 : 12,
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w600,
-                      height: isRtl ? 1.6 : 1.3,
-                    ),
-                  ),
-                  if (couplet.poemTitle != null) ...[
-                    Text(
-                      ' — ',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: isDark
-                            ? AppColors.textSecondaryDark
-                            : AppColors.textSecondaryLight,
-                      ),
-                    ),
-                    Expanded(
-                      child: LocalizedText(
-                        couplet.poemTitle!,
-                        style: TextStyle(
-                          fontSize: isRtl ? 13 : 12,
-                          color: isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondaryLight,
-                          height: isRtl ? 1.6 : 1.3,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

@@ -5,6 +5,7 @@ import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
 import 'package:flutter_poetry_app/features/search/models/global_search_state.dart';
+import 'package:flutter_poetry_app/features/search/models/search_origin.dart';
 
 /// Premium discover hero header with integrated search
 ///
@@ -269,7 +270,8 @@ class _DiscoverHeroHeaderState extends ConsumerState<DiscoverHeroHeader> {
         },
         onSubmitted: (value) {
           if (value.trim().isNotEmpty) {
-            ref.read(globalSearchProvider.notifier).executeSearch(query: value);
+            ref.read(globalSearchProvider.notifier).executeSearch(
+                query: value, origin: SearchOrigin.typed);
           }
         },
       ),

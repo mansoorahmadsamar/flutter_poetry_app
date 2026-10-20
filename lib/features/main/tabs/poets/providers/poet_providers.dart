@@ -19,7 +19,7 @@ final Logger _logger = Logger();
 // ============= SERVICE PROVIDER =============
 final poetServiceProvider = Provider<PoetService>((ref) {
   final dioClient = ref.watch(dioClientProvider);
-  return PoetService(dioClient.dio);
+  return PoetService(dioClient.dio, ref);
 });
 
 // ============= SEARCH & FILTER STATE =============

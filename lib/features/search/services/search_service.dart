@@ -1,7 +1,13 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
+import 'package:flutter_poetry_app/core/auth/auth_provider.dart';
 import 'package:flutter_poetry_app/core/network/dto/api_response.dart';
+import 'package:flutter_poetry_app/core/network/guest_service.dart';
+import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.dart';
+import 'package:flutter_poetry_app/features/main/tabs/poets/models/poet_model.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
+import 'package:flutter_poetry_app/features/search/models/search_origin.dart';
 
 /// Service for all global search operations
 /// Implements 5 backend API endpoints:
@@ -12,10 +18,14 @@ import 'package:flutter_poetry_app/features/search/models/search_models.dart';
 /// 5. Trending searches
 class SearchService {
   final Dio _dio;
+  final Ref _ref;
   final Logger _logger = Logger();
   static const String _baseEndpoint = '/api/search';
 
-  SearchService(this._dio);
+  SearchService(this._dio, this._ref);
+
+  bool get _isGuest => _ref.read(authProvider).isGuest;
+  GuestService get _guest => _ref.read(guestServiceProvider);
 
   // ============================================================================
   // COUPLET SEARCH
@@ -115,6 +125,8 @@ class SearchService {
   /// - [lang]: Language code (ur, en, hi) - defaults to 'ur'
   /// - [page]: Page number (0-based) - defaults to 0
   /// - [size]: Page size - defaults to 10
+  /// - [origin]: why the search was made, sent as `origin` (T-183); further
+  ///   pages pass the origin of the search they page
   ///
   /// Returns: Unified search results with all content types and pagination flags
   Future<UnifiedSearchResponse> searchUnified({
@@ -123,7 +135,43 @@ class SearchService {
     String lang = 'ur',
     int page = 0,
     int size = 10,
+    SearchOrigin? origin,
   }) async {
+    if (_isGuest) {
+      // Guests don't get couplet / verse / tag / category search — those
+      // surfaces aren't in the guest API. We call only the guest searches
+      // the type needs (/api/guest/poems/search, /api/guest/poets/search, in
+      // parallel for 'all') and synthesize a UnifiedSearchResponse so the
+      // existing search UI renders unchanged. Any other single type returns
+      // empty with no request (guest calls share a 60/min rate limit).
+      final wantsPoems = type == 'all' || type == 'poems_only';
+      final wantsPoets = type == 'all' || type == 'poets_only';
+      // Future.wait so a failure in one never leaves the other unhandled.
+      final pages = await Future.wait<GuestPage<Object>?>([
+        wantsPoems
+            ? _guest.searchPoems(q: query, page: page, size: size, lang: lang)
+            : Future.value(null),
+        wantsPoets
+            ? _guest.searchPoets(q: query, page: page, size: size, lang: lang)
+            : Future.value(null),
+      ]);
+      final poems = pages[0] as GuestPage<PoemModel>?;
+      final poets = pages[1] as GuestPage<PoetModel>?;
+
+      return UnifiedSearchResponse(
+        totalResults: (poems?.items.length ?? 0) + (poets?.items.length ?? 0),
+        poemCount: poems?.items.length ?? 0,
+        poetCount: poets?.items.length ?? 0,
+        poems: poems?.items ?? const [],
+        poets: poets?.items ?? const [],
+        totalPoems: poems?.totalElements ?? 0,
+        totalPoets: poets?.totalElements ?? 0,
+        hasMorePoems: poems != null && !poems.isLast,
+        hasMorePoets: poets != null && !poets.isLast,
+        currentPage: page,
+        pageSize: size,
+      );
+    }
     try {
       _logger.i('🔍 Unified search: "$query" (type: $type, lang: $lang, page: $page, size: $size)');
 
@@ -135,6 +183,7 @@ class SearchService {
           'lang': lang,
           'page': page,
           'size': size,
+          if (origin != null) SearchOrigin.queryParameter: origin.apiValue,
         },
       );
 
@@ -186,6 +235,7 @@ class SearchService {
     required int page,
     String lang = 'ur',
     int size = 10,
+    SearchOrigin? origin,
   }) async {
     return searchUnified(
       query: query,
@@ -193,6 +243,7 @@ class SearchService {
       lang: lang,
       page: page,
       size: size,
+      origin: origin,
     );
   }
 
@@ -221,7 +272,10 @@ class SearchService {
     String lang = 'ur',
     CancelToken? cancelToken,
   }) async {
-    // Early return for short queries
+    // Guests call the same endpoint: /api/search/** is permitAll on the
+    // backend (SecurityConfig, main and develop), so it needs no token. It
+    // used to return empty for guests, so they never saw live suggestions
+    // (T-182). The backend rejects queries under 2 characters with a 400.
     if (query.trim().length < 2) {
       return const AutocompleteResponse(
         poets: [],
@@ -260,15 +314,11 @@ class SearchService {
       _logger.e('❌ Error fetching autocomplete: ${e.message}');
       rethrow;
     } catch (e) {
+      // A parse failure or `success: false` used to be swallowed here as an
+      // empty list, indistinguishable from "no suggestions" (T-182). The
+      // notifier degrades the same way, but logs it.
       _logger.e('❌ Unexpected error in autocomplete: $e');
-      // Return empty response on error (graceful degradation)
-      return const AutocompleteResponse(
-        poets: [],
-        poems: [],
-        tags: [],
-        categories: [],
-        totalCount: 0,
-      );
+      rethrow;
     }
   }
 
@@ -368,6 +418,17 @@ class SearchService {
     required String query,
     int limit = 5,
   }) async {
+    // Related searches use session/auth analysis — no guest endpoint. Return
+    // empty for guests instead of hitting the authed route (401).
+    if (_isGuest) {
+      return RelatedSearchesResponse(
+        query: query,
+        relatedSearches: const [],
+        totalCount: 0,
+        timeWindow: '30d',
+      );
+    }
+
     try {
       _logger.d('🔗 Fetching related searches for: "$query"');
 

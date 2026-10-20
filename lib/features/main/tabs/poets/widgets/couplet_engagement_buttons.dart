@@ -8,6 +8,7 @@ import 'package:flutter_poetry_app/features/engagement/providers/couplet_provide
 import 'package:flutter_poetry_app/features/engagement/providers/reaction_providers.dart';
 import 'package:flutter_poetry_app/features/engagement/widgets/reaction_button.dart';
 import 'package:flutter_poetry_app/features/image_poetry/widgets/share_options_sheet.dart';
+import 'package:flutter_poetry_app/features/engagement/models/reaction_models.dart';
 
 class CoupletEngagementButtons extends ConsumerWidget {
   final CoupletModel couplet;
@@ -21,7 +22,7 @@ class CoupletEngagementButtons extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isBookmarked = couplet.isBookmarkedByCurrentUser;
+    final isBookmarked = couplet.isBookmarkedByCurrentUser ?? false;
 
     // Parse user reaction from couplet's reactions map
     final String? userReaction = _getUserReaction(couplet.reactions);
@@ -83,7 +84,7 @@ class CoupletEngagementButtons extends ConsumerWidget {
   }
 
   Future<void> _handleBookmark(BuildContext context, WidgetRef ref) async {
-    final isBookmarked = couplet.isBookmarkedByCurrentUser;
+    final isBookmarked = couplet.isBookmarkedByCurrentUser ?? false;
     final currentLang = ref.read(selectedLanguageProvider);
 
     try {
@@ -99,7 +100,7 @@ class CoupletEngagementButtons extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              enrichedCouplet.isBookmarkedByCurrentUser
+              (enrichedCouplet.isBookmarkedByCurrentUser ?? false)
                   ? 'Couplet bookmarked'
                   : 'Couplet removed from bookmarks',
             ),
@@ -129,8 +130,7 @@ class CoupletEngagementButtons extends ConsumerWidget {
   }
 
   String? _getUserReaction(Map<String, dynamic>? reactions) {
-    if (reactions == null) return null;
-    return reactions['userReaction'] as String?;
+    return userReactionIn(reactions);
   }
 
   Map<String, int>? _parseReactionsByType(Map<String, dynamic>? reactions) {

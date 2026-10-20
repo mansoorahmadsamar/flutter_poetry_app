@@ -91,7 +91,13 @@ class _ReactionButtonState extends ConsumerState<ReactionButton>
 
   void _showPicker() {
     final reactionTypes = ref.read(reactionTypesProvider).valueOrNull;
-    if (reactionTypes == null || reactionTypes.isEmpty) return;
+    // No reaction types means the user is a guest (the provider returns an
+    // empty list for guests). Route the long-press through onReact so it hits
+    // the same sign-in prompt as a tap, instead of doing nothing.
+    if (reactionTypes == null || reactionTypes.isEmpty) {
+      widget.onReact('LOVE');
+      return;
+    }
 
     final isUrdu = ref.read(selectedLanguageProvider) == 'ur';
 
@@ -154,10 +160,12 @@ class _ReactionButtonState extends ConsumerState<ReactionButton>
 
     // Find current emoji
     String? currentEmoji;
+    String? currentLabel;
     if (hasReaction) {
       for (final type in reactionTypes) {
         if (type.key == widget.userReaction) {
           currentEmoji = type.emoji;
+          currentLabel = type.englishLabel;
           break;
         }
       }
@@ -166,81 +174,103 @@ class _ReactionButtonState extends ConsumerState<ReactionButton>
 
     return CompositedTransformTarget(
       link: _layerLink,
-      child: GestureDetector(
+      child: Semantics(
+        button: true,
+        label: 'React',
+        value: _semanticValue(currentLabel),
         onTap: _onTap,
+        onTapHint: 'like',
         onLongPress: _onLongPress,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Emoji / heart icon with bounce animation
-              ScaleTransition(
-                scale: _bounceAnimation,
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 200),
-                  switchInCurve: Curves.easeOut,
-                  switchOutCurve: Curves.easeIn,
-                  transitionBuilder: (child, animation) {
-                    return ScaleTransition(
-                      scale: animation,
-                      child: FadeTransition(opacity: animation, child: child),
-                    );
-                  },
-                  child: hasReaction
-                      ? Text(
-                          currentEmoji!,
-                          key: ValueKey('emoji_${widget.userReaction}'),
-                          style: TextStyle(fontSize: emojiSize),
-                        )
-                      : Icon(
-                          Icons.favorite_border_rounded,
-                          key: const ValueKey('heart_outline'),
-                          size: iconSize,
-                          color: isDark
-                              ? AppColors.engagementIconDark
-                              : AppColors.engagementIcon,
-                        ),
-                ),
-              ),
-
-              // Count
-              if (widget.totalCount > 0) ...[
-                const SizedBox(width: AppSpacing.xs),
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 250),
-                  transitionBuilder: (child, animation) {
-                    return SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(0, 0.5),
-                        end: Offset.zero,
-                      ).animate(animation),
-                      child:
-                          FadeTransition(opacity: animation, child: child),
-                    );
-                  },
-                  child: Text(
-                    _formatCount(widget.totalCount),
-                    key: ValueKey(widget.totalCount),
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: hasReaction
-                          ? (isDark
-                              ? AppColors.textPrimaryDark
-                              : AppColors.textPrimaryLight)
-                          : (isDark
-                              ? AppColors.engagementIconDark
-                              : AppColors.engagementIcon),
-                    ),
+        onLongPressHint: 'choose a reaction',
+        excludeSemantics: true,
+        child: GestureDetector(
+          onTap: _onTap,
+          onLongPress: _onLongPress,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Emoji / heart icon with bounce animation
+                ScaleTransition(
+                  scale: _bounceAnimation,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    switchInCurve: Curves.easeOut,
+                    switchOutCurve: Curves.easeIn,
+                    transitionBuilder: (child, animation) {
+                      return ScaleTransition(
+                        scale: animation,
+                        child: FadeTransition(opacity: animation, child: child),
+                      );
+                    },
+                    child: hasReaction
+                        ? Text(
+                            currentEmoji!,
+                            key: ValueKey('emoji_${widget.userReaction}'),
+                            style: TextStyle(fontSize: emojiSize),
+                          )
+                        : Icon(
+                            Icons.favorite_border_rounded,
+                            key: const ValueKey('heart_outline'),
+                            size: iconSize,
+                            color: isDark
+                                ? AppColors.engagementIconDark
+                                : AppColors.engagementIcon,
+                          ),
                   ),
                 ),
+
+                // Count
+                if (widget.totalCount > 0) ...[
+                  const SizedBox(width: AppSpacing.xs),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 250),
+                    transitionBuilder: (child, animation) {
+                      return SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(0, 0.5),
+                          end: Offset.zero,
+                        ).animate(animation),
+                        child: FadeTransition(opacity: animation, child: child),
+                      );
+                    },
+                    child: Text(
+                      _formatCount(widget.totalCount),
+                      key: ValueKey(widget.totalCount),
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: hasReaction
+                            ? (isDark
+                                ? AppColors.textPrimaryDark
+                                : AppColors.textPrimaryLight)
+                            : (isDark
+                                ? AppColors.engagementIconDark
+                                : AppColors.engagementIcon),
+                      ),
+                    ),
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  /// Read after the "React" label: the user's reaction, then the total, so a
+  /// screen reader says "React, Your reaction: love, 12 reactions" rather
+  /// than a bare number.
+  String? _semanticValue(String? reactionLabel) {
+    final parts = <String>[
+      if (widget.userReaction != null)
+        'Your reaction: ${(reactionLabel ?? widget.userReaction!.replaceAll('_', ' ')).toLowerCase()}',
+      if (widget.totalCount > 0)
+        '${_formatCount(widget.totalCount)} ${widget.totalCount == 1 ? 'reaction' : 'reactions'}',
+    ];
+    return parts.isEmpty ? null : parts.join(', ');
   }
 
   String _formatCount(int count) {

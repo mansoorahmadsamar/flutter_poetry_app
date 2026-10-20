@@ -77,8 +77,8 @@ MIIKzAIBAzCCCnYGCSqGSIb3DQEHAaCCCmcEggpjMIIKXzCCBbYGCSqGSIb3DQEHAaCCBacEggWjMIIF
 The `key.properties` file is created at `android/key.properties`:
 
 ```properties
-storePassword=poetry_release_2024
-keyPassword=poetry_release_2024
+storePassword=<from your password manager>
+keyPassword=<from your password manager>
 keyAlias=poetry_app
 storeFile=../keystore/release.keystore
 ```

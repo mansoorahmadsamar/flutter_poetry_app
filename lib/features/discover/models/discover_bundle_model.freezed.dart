@@ -982,7 +982,31 @@ mixin _$ContentCard {
   String get language => throw _privateConstructorUsedError;
   String get direction => throw _privateConstructorUsedError;
   double? get score => throw _privateConstructorUsedError;
-  String? get imageUrl => throw _privateConstructorUsedError;
+  String? get imageUrl =>
+      throw _privateConstructorUsedError; // For poets with profile images
+  /// Opening lines of a poem (newline-separated misras). `null` when the
+  /// API sends nothing, a blank string or its `"-"` placeholder.
+  @PlaceholderStringConverter()
+  String? get excerpt => throw _privateConstructorUsedError;
+
+  /// The poet behind a POEM / COUPLET card, under the same name the
+  /// signed-in feed's `contentData` uses. `null` when absent or `"-"`.
+  @PlaceholderStringConverter()
+  String? get poetPublicId => throw _privateConstructorUsedError;
+
+  /// The parent poem of a COUPLET card (what a tap opens), under the same
+  /// name signed-in couplets use. `null` when absent or `"-"`.
+  @PlaceholderStringConverter()
+  String? get poemPublicId => throw _privateConstructorUsedError;
+
+  /// A COUPLET card's number in its poem (opens the poem at it). `null`
+  /// when absent or `0`.
+  @PositiveIntConverter()
+  int? get coupletNumber => throw _privateConstructorUsedError;
+
+  /// A COUPLET card's themes (max 3, server-ranked); absent on production.
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -1007,7 +1031,12 @@ abstract class $ContentCardCopyWith<$Res> {
       String language,
       String direction,
       double? score,
-      String? imageUrl});
+      String? imageUrl,
+      @PlaceholderStringConverter() String? excerpt,
+      @PlaceholderStringConverter() String? poetPublicId,
+      @PlaceholderStringConverter() String? poemPublicId,
+      @PositiveIntConverter() int? coupletNumber,
+      @CoupletThemesConverter() List<CoupletTheme> themes});
 
   $ContentMetricsCopyWith<$Res>? get metrics;
 }
@@ -1036,6 +1065,11 @@ class _$ContentCardCopyWithImpl<$Res, $Val extends ContentCard>
     Object? direction = null,
     Object? score = freezed,
     Object? imageUrl = freezed,
+    Object? excerpt = freezed,
+    Object? poetPublicId = freezed,
+    Object? poemPublicId = freezed,
+    Object? coupletNumber = freezed,
+    Object? themes = null,
   }) {
     return _then(_value.copyWith(
       type: null == type
@@ -1082,6 +1116,26 @@ class _$ContentCardCopyWithImpl<$Res, $Val extends ContentCard>
           ? _value.imageUrl
           : imageUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      excerpt: freezed == excerpt
+          ? _value.excerpt
+          : excerpt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetPublicId: freezed == poetPublicId
+          ? _value.poetPublicId
+          : poetPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poemPublicId: freezed == poemPublicId
+          ? _value.poemPublicId
+          : poemPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      coupletNumber: freezed == coupletNumber
+          ? _value.coupletNumber
+          : coupletNumber // ignore: cast_nullable_to_non_nullable
+              as int?,
+      themes: null == themes
+          ? _value.themes
+          : themes // ignore: cast_nullable_to_non_nullable
+              as List<CoupletTheme>,
     ) as $Val);
   }
 
@@ -1117,7 +1171,12 @@ abstract class _$$ContentCardImplCopyWith<$Res>
       String language,
       String direction,
       double? score,
-      String? imageUrl});
+      String? imageUrl,
+      @PlaceholderStringConverter() String? excerpt,
+      @PlaceholderStringConverter() String? poetPublicId,
+      @PlaceholderStringConverter() String? poemPublicId,
+      @PositiveIntConverter() int? coupletNumber,
+      @CoupletThemesConverter() List<CoupletTheme> themes});
 
   @override
   $ContentMetricsCopyWith<$Res>? get metrics;
@@ -1145,6 +1204,11 @@ class __$$ContentCardImplCopyWithImpl<$Res>
     Object? direction = null,
     Object? score = freezed,
     Object? imageUrl = freezed,
+    Object? excerpt = freezed,
+    Object? poetPublicId = freezed,
+    Object? poemPublicId = freezed,
+    Object? coupletNumber = freezed,
+    Object? themes = null,
   }) {
     return _then(_$ContentCardImpl(
       type: null == type
@@ -1191,6 +1255,26 @@ class __$$ContentCardImplCopyWithImpl<$Res>
           ? _value.imageUrl
           : imageUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      excerpt: freezed == excerpt
+          ? _value.excerpt
+          : excerpt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetPublicId: freezed == poetPublicId
+          ? _value.poetPublicId
+          : poetPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poemPublicId: freezed == poemPublicId
+          ? _value.poemPublicId
+          : poemPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      coupletNumber: freezed == coupletNumber
+          ? _value.coupletNumber
+          : coupletNumber // ignore: cast_nullable_to_non_nullable
+              as int?,
+      themes: null == themes
+          ? _value._themes
+          : themes // ignore: cast_nullable_to_non_nullable
+              as List<CoupletTheme>,
     ));
   }
 }
@@ -1209,7 +1293,14 @@ class _$ContentCardImpl implements _ContentCard {
       this.language = 'ur',
       this.direction = 'rtl',
       this.score,
-      this.imageUrl});
+      this.imageUrl,
+      @PlaceholderStringConverter() this.excerpt,
+      @PlaceholderStringConverter() this.poetPublicId,
+      @PlaceholderStringConverter() this.poemPublicId,
+      @PositiveIntConverter() this.coupletNumber,
+      @CoupletThemesConverter()
+      final List<CoupletTheme> themes = const <CoupletTheme>[]})
+      : _themes = themes;
 
   factory _$ContentCardImpl.fromJson(Map<String, dynamic> json) =>
       _$$ContentCardImplFromJson(json);
@@ -1239,10 +1330,47 @@ class _$ContentCardImpl implements _ContentCard {
   final double? score;
   @override
   final String? imageUrl;
+// For poets with profile images
+  /// Opening lines of a poem (newline-separated misras). `null` when the
+  /// API sends nothing, a blank string or its `"-"` placeholder.
+  @override
+  @PlaceholderStringConverter()
+  final String? excerpt;
+
+  /// The poet behind a POEM / COUPLET card, under the same name the
+  /// signed-in feed's `contentData` uses. `null` when absent or `"-"`.
+  @override
+  @PlaceholderStringConverter()
+  final String? poetPublicId;
+
+  /// The parent poem of a COUPLET card (what a tap opens), under the same
+  /// name signed-in couplets use. `null` when absent or `"-"`.
+  @override
+  @PlaceholderStringConverter()
+  final String? poemPublicId;
+
+  /// A COUPLET card's number in its poem (opens the poem at it). `null`
+  /// when absent or `0`.
+  @override
+  @PositiveIntConverter()
+  final int? coupletNumber;
+
+  /// A COUPLET card's themes (max 3, server-ranked); absent on production.
+  final List<CoupletTheme> _themes;
+
+  /// A COUPLET card's themes (max 3, server-ranked); absent on production.
+  @override
+  @JsonKey()
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes {
+    if (_themes is EqualUnmodifiableListView) return _themes;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_themes);
+  }
 
   @override
   String toString() {
-    return 'ContentCard(type: $type, publicId: $publicId, primaryText: $primaryText, secondaryText: $secondaryText, badge: $badge, badgeKey: $badgeKey, metrics: $metrics, language: $language, direction: $direction, score: $score, imageUrl: $imageUrl)';
+    return 'ContentCard(type: $type, publicId: $publicId, primaryText: $primaryText, secondaryText: $secondaryText, badge: $badge, badgeKey: $badgeKey, metrics: $metrics, language: $language, direction: $direction, score: $score, imageUrl: $imageUrl, excerpt: $excerpt, poetPublicId: $poetPublicId, poemPublicId: $poemPublicId, coupletNumber: $coupletNumber, themes: $themes)';
   }
 
   @override
@@ -1267,7 +1395,15 @@ class _$ContentCardImpl implements _ContentCard {
                 other.direction == direction) &&
             (identical(other.score, score) || other.score == score) &&
             (identical(other.imageUrl, imageUrl) ||
-                other.imageUrl == imageUrl));
+                other.imageUrl == imageUrl) &&
+            (identical(other.excerpt, excerpt) || other.excerpt == excerpt) &&
+            (identical(other.poetPublicId, poetPublicId) ||
+                other.poetPublicId == poetPublicId) &&
+            (identical(other.poemPublicId, poemPublicId) ||
+                other.poemPublicId == poemPublicId) &&
+            (identical(other.coupletNumber, coupletNumber) ||
+                other.coupletNumber == coupletNumber) &&
+            const DeepCollectionEquality().equals(other._themes, _themes));
   }
 
   @JsonKey(ignore: true)
@@ -1284,7 +1420,12 @@ class _$ContentCardImpl implements _ContentCard {
       language,
       direction,
       score,
-      imageUrl);
+      imageUrl,
+      excerpt,
+      poetPublicId,
+      poemPublicId,
+      coupletNumber,
+      const DeepCollectionEquality().hash(_themes));
 
   @JsonKey(ignore: true)
   @override
@@ -1302,17 +1443,23 @@ class _$ContentCardImpl implements _ContentCard {
 
 abstract class _ContentCard implements ContentCard {
   const factory _ContentCard(
-      {required final String type,
-      required final String publicId,
-      required final String primaryText,
-      final String? secondaryText,
-      final String? badge,
-      final String? badgeKey,
-      final ContentMetrics? metrics,
-      final String language,
-      final String direction,
-      final double? score,
-      final String? imageUrl}) = _$ContentCardImpl;
+          {required final String type,
+          required final String publicId,
+          required final String primaryText,
+          final String? secondaryText,
+          final String? badge,
+          final String? badgeKey,
+          final ContentMetrics? metrics,
+          final String language,
+          final String direction,
+          final double? score,
+          final String? imageUrl,
+          @PlaceholderStringConverter() final String? excerpt,
+          @PlaceholderStringConverter() final String? poetPublicId,
+          @PlaceholderStringConverter() final String? poemPublicId,
+          @PositiveIntConverter() final int? coupletNumber,
+          @CoupletThemesConverter() final List<CoupletTheme> themes}) =
+      _$ContentCardImpl;
 
   factory _ContentCard.fromJson(Map<String, dynamic> json) =
       _$ContentCardImpl.fromJson;
@@ -1339,6 +1486,34 @@ abstract class _ContentCard implements ContentCard {
   double? get score;
   @override
   String? get imageUrl;
+  @override // For poets with profile images
+  /// Opening lines of a poem (newline-separated misras). `null` when the
+  /// API sends nothing, a blank string or its `"-"` placeholder.
+  @PlaceholderStringConverter()
+  String? get excerpt;
+  @override
+
+  /// The poet behind a POEM / COUPLET card, under the same name the
+  /// signed-in feed's `contentData` uses. `null` when absent or `"-"`.
+  @PlaceholderStringConverter()
+  String? get poetPublicId;
+  @override
+
+  /// The parent poem of a COUPLET card (what a tap opens), under the same
+  /// name signed-in couplets use. `null` when absent or `"-"`.
+  @PlaceholderStringConverter()
+  String? get poemPublicId;
+  @override
+
+  /// A COUPLET card's number in its poem (opens the poem at it). `null`
+  /// when absent or `0`.
+  @PositiveIntConverter()
+  int? get coupletNumber;
+  @override
+
+  /// A COUPLET card's themes (max 3, server-ranked); absent on production.
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes;
   @override
   @JsonKey(ignore: true)
   _$$ContentCardImplCopyWith<_$ContentCardImpl> get copyWith =>

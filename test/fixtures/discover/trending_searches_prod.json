@@ -1,0 +1,15 @@
+{
+  "_comment": "discover bundle trendingSearches built from production GET /api/search/trending?timeframe=day&limit=4 (and week), 2026-10-20: both returned Ghazal 85, Nazam 74, Naat 57, Rubai 37 in that order. DiscoverService.convertToTrendingSearches maps count -> searchCount and index+1 -> rank.",
+  "daily": [
+    {"query": "Ghazal", "searchCount": 85, "rank": 1},
+    {"query": "Nazam", "searchCount": 74, "rank": 2},
+    {"query": "Naat", "searchCount": 57, "rank": 3},
+    {"query": "Rubai", "searchCount": 37, "rank": 4}
+  ],
+  "weekly": [
+    {"query": "Ghazal", "searchCount": 85, "rank": 1},
+    {"query": "Nazam", "searchCount": 74, "rank": 2},
+    {"query": "Naat", "searchCount": 57, "rank": 3},
+    {"query": "Rubai", "searchCount": 37, "rank": 4}
+  ]
+}

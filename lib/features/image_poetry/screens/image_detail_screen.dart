@@ -4,6 +4,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
+import 'package:flutter_poetry_app/features/auth/widgets/ensure_signed_in.dart';
 import 'package:flutter_poetry_app/features/image_poetry/widgets/image_viewer.dart';
 import 'package:flutter_poetry_app/features/image_poetry/widgets/collection_dialog.dart';
 import 'package:flutter_poetry_app/features/image_poetry/providers/image_collection_providers.dart';
@@ -452,6 +453,14 @@ class _ImageDetailScreenState extends ConsumerState<ImageDetailScreen> {
   }
 
   Future<void> _showCollectionDialog(String imageId) async {
+    if (!await ensureSignedIn(
+      context,
+      ref,
+      'Sign in to save this image to a collection.',
+    )) {
+      return;
+    }
+    if (!mounted) return;
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => CollectionDialog(imageId: imageId),
@@ -464,6 +473,13 @@ class _ImageDetailScreenState extends ConsumerState<ImageDetailScreen> {
   }
 
   Future<void> _toggleFavorite(String imageId) async {
+    if (!await ensureSignedIn(
+      context,
+      ref,
+      'Sign in to favorite this image.',
+    )) {
+      return;
+    }
     try {
       final isFavorite = await ref
           .read(collectionActionProvider.notifier)
@@ -490,6 +506,13 @@ class _ImageDetailScreenState extends ConsumerState<ImageDetailScreen> {
   }
 
   Future<void> _toggleBookmark(String imageId) async {
+    if (!await ensureSignedIn(
+      context,
+      ref,
+      'Sign in to bookmark this image.',
+    )) {
+      return;
+    }
     final currentLang = ref.read(selectedLanguageProvider);
 
     try {

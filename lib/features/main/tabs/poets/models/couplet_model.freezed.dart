@@ -29,10 +29,13 @@ mixin _$CoupletModel {
   int get bookmarkCount => throw _privateConstructorUsedError;
   int get shareCount => throw _privateConstructorUsedError;
   @JsonKey(name: 'isLiked')
-  bool get isLikedByCurrentUser => throw _privateConstructorUsedError;
+  bool? get isLikedByCurrentUser => throw _privateConstructorUsedError;
   @JsonKey(name: 'isBookmarked')
-  bool get isBookmarkedByCurrentUser => throw _privateConstructorUsedError;
-  List<String> get tagSlugs => throw _privateConstructorUsedError;
+  bool? get isBookmarkedByCurrentUser => throw _privateConstructorUsedError;
+  List<String> get tagSlugs =>
+      throw _privateConstructorUsedError; // Couplet themes (max 3, server-ranked); absent on production today.
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes => throw _privateConstructorUsedError;
   DateTime? get createdAt =>
       throw _privateConstructorUsedError; // Reactions system (Section 19)
   Map<String, dynamic>? get reactions => throw _privateConstructorUsedError;
@@ -58,9 +61,10 @@ abstract class $CoupletModelCopyWith<$Res> {
       int likeCount,
       int bookmarkCount,
       int shareCount,
-      @JsonKey(name: 'isLiked') bool isLikedByCurrentUser,
-      @JsonKey(name: 'isBookmarked') bool isBookmarkedByCurrentUser,
+      @JsonKey(name: 'isLiked') bool? isLikedByCurrentUser,
+      @JsonKey(name: 'isBookmarked') bool? isBookmarkedByCurrentUser,
       List<String> tagSlugs,
+      @CoupletThemesConverter() List<CoupletTheme> themes,
       DateTime? createdAt,
       Map<String, dynamic>? reactions});
 }
@@ -86,9 +90,10 @@ class _$CoupletModelCopyWithImpl<$Res, $Val extends CoupletModel>
     Object? likeCount = null,
     Object? bookmarkCount = null,
     Object? shareCount = null,
-    Object? isLikedByCurrentUser = null,
-    Object? isBookmarkedByCurrentUser = null,
+    Object? isLikedByCurrentUser = freezed,
+    Object? isBookmarkedByCurrentUser = freezed,
     Object? tagSlugs = null,
+    Object? themes = null,
     Object? createdAt = freezed,
     Object? reactions = freezed,
   }) {
@@ -125,18 +130,22 @@ class _$CoupletModelCopyWithImpl<$Res, $Val extends CoupletModel>
           ? _value.shareCount
           : shareCount // ignore: cast_nullable_to_non_nullable
               as int,
-      isLikedByCurrentUser: null == isLikedByCurrentUser
+      isLikedByCurrentUser: freezed == isLikedByCurrentUser
           ? _value.isLikedByCurrentUser
           : isLikedByCurrentUser // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isBookmarkedByCurrentUser: null == isBookmarkedByCurrentUser
+              as bool?,
+      isBookmarkedByCurrentUser: freezed == isBookmarkedByCurrentUser
           ? _value.isBookmarkedByCurrentUser
           : isBookmarkedByCurrentUser // ignore: cast_nullable_to_non_nullable
-              as bool,
+              as bool?,
       tagSlugs: null == tagSlugs
           ? _value.tagSlugs
           : tagSlugs // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      themes: null == themes
+          ? _value.themes
+          : themes // ignore: cast_nullable_to_non_nullable
+              as List<CoupletTheme>,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -166,9 +175,10 @@ abstract class _$$CoupletModelImplCopyWith<$Res>
       int likeCount,
       int bookmarkCount,
       int shareCount,
-      @JsonKey(name: 'isLiked') bool isLikedByCurrentUser,
-      @JsonKey(name: 'isBookmarked') bool isBookmarkedByCurrentUser,
+      @JsonKey(name: 'isLiked') bool? isLikedByCurrentUser,
+      @JsonKey(name: 'isBookmarked') bool? isBookmarkedByCurrentUser,
       List<String> tagSlugs,
+      @CoupletThemesConverter() List<CoupletTheme> themes,
       DateTime? createdAt,
       Map<String, dynamic>? reactions});
 }
@@ -192,9 +202,10 @@ class __$$CoupletModelImplCopyWithImpl<$Res>
     Object? likeCount = null,
     Object? bookmarkCount = null,
     Object? shareCount = null,
-    Object? isLikedByCurrentUser = null,
-    Object? isBookmarkedByCurrentUser = null,
+    Object? isLikedByCurrentUser = freezed,
+    Object? isBookmarkedByCurrentUser = freezed,
     Object? tagSlugs = null,
+    Object? themes = null,
     Object? createdAt = freezed,
     Object? reactions = freezed,
   }) {
@@ -231,18 +242,22 @@ class __$$CoupletModelImplCopyWithImpl<$Res>
           ? _value.shareCount
           : shareCount // ignore: cast_nullable_to_non_nullable
               as int,
-      isLikedByCurrentUser: null == isLikedByCurrentUser
+      isLikedByCurrentUser: freezed == isLikedByCurrentUser
           ? _value.isLikedByCurrentUser
           : isLikedByCurrentUser // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isBookmarkedByCurrentUser: null == isBookmarkedByCurrentUser
+              as bool?,
+      isBookmarkedByCurrentUser: freezed == isBookmarkedByCurrentUser
           ? _value.isBookmarkedByCurrentUser
           : isBookmarkedByCurrentUser // ignore: cast_nullable_to_non_nullable
-              as bool,
+              as bool?,
       tagSlugs: null == tagSlugs
           ? _value._tagSlugs
           : tagSlugs // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      themes: null == themes
+          ? _value._themes
+          : themes // ignore: cast_nullable_to_non_nullable
+              as List<CoupletTheme>,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -267,13 +282,16 @@ class _$CoupletModelImpl implements _CoupletModel {
       this.likeCount = 0,
       this.bookmarkCount = 0,
       this.shareCount = 0,
-      @JsonKey(name: 'isLiked') required this.isLikedByCurrentUser,
-      @JsonKey(name: 'isBookmarked') required this.isBookmarkedByCurrentUser,
+      @JsonKey(name: 'isLiked') this.isLikedByCurrentUser,
+      @JsonKey(name: 'isBookmarked') this.isBookmarkedByCurrentUser,
       final List<String> tagSlugs = const [],
+      @CoupletThemesConverter()
+      final List<CoupletTheme> themes = const <CoupletTheme>[],
       this.createdAt,
       final Map<String, dynamic>? reactions})
       : _verses = verses,
         _tagSlugs = tagSlugs,
+        _themes = themes,
         _reactions = reactions;
 
   factory _$CoupletModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -306,10 +324,10 @@ class _$CoupletModelImpl implements _CoupletModel {
   final int shareCount;
   @override
   @JsonKey(name: 'isLiked')
-  final bool isLikedByCurrentUser;
+  final bool? isLikedByCurrentUser;
   @override
   @JsonKey(name: 'isBookmarked')
-  final bool isBookmarkedByCurrentUser;
+  final bool? isBookmarkedByCurrentUser;
   final List<String> _tagSlugs;
   @override
   @JsonKey()
@@ -317,6 +335,18 @@ class _$CoupletModelImpl implements _CoupletModel {
     if (_tagSlugs is EqualUnmodifiableListView) return _tagSlugs;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_tagSlugs);
+  }
+
+// Couplet themes (max 3, server-ranked); absent on production today.
+  final List<CoupletTheme> _themes;
+// Couplet themes (max 3, server-ranked); absent on production today.
+  @override
+  @JsonKey()
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes {
+    if (_themes is EqualUnmodifiableListView) return _themes;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_themes);
   }
 
   @override
@@ -335,7 +365,7 @@ class _$CoupletModelImpl implements _CoupletModel {
 
   @override
   String toString() {
-    return 'CoupletModel(publicId: $publicId, coupletNumber: $coupletNumber, coupletType: $coupletType, coupletTypeName: $coupletTypeName, verses: $verses, likeCount: $likeCount, bookmarkCount: $bookmarkCount, shareCount: $shareCount, isLikedByCurrentUser: $isLikedByCurrentUser, isBookmarkedByCurrentUser: $isBookmarkedByCurrentUser, tagSlugs: $tagSlugs, createdAt: $createdAt, reactions: $reactions)';
+    return 'CoupletModel(publicId: $publicId, coupletNumber: $coupletNumber, coupletType: $coupletType, coupletTypeName: $coupletTypeName, verses: $verses, likeCount: $likeCount, bookmarkCount: $bookmarkCount, shareCount: $shareCount, isLikedByCurrentUser: $isLikedByCurrentUser, isBookmarkedByCurrentUser: $isBookmarkedByCurrentUser, tagSlugs: $tagSlugs, themes: $themes, createdAt: $createdAt, reactions: $reactions)';
   }
 
   @override
@@ -364,6 +394,7 @@ class _$CoupletModelImpl implements _CoupletModel {
                     isBookmarkedByCurrentUser) ||
                 other.isBookmarkedByCurrentUser == isBookmarkedByCurrentUser) &&
             const DeepCollectionEquality().equals(other._tagSlugs, _tagSlugs) &&
+            const DeepCollectionEquality().equals(other._themes, _themes) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             const DeepCollectionEquality()
@@ -385,6 +416,7 @@ class _$CoupletModelImpl implements _CoupletModel {
       isLikedByCurrentUser,
       isBookmarkedByCurrentUser,
       const DeepCollectionEquality().hash(_tagSlugs),
+      const DeepCollectionEquality().hash(_themes),
       createdAt,
       const DeepCollectionEquality().hash(_reactions));
 
@@ -412,10 +444,10 @@ abstract class _CoupletModel implements CoupletModel {
       final int likeCount,
       final int bookmarkCount,
       final int shareCount,
-      @JsonKey(name: 'isLiked') required final bool isLikedByCurrentUser,
-      @JsonKey(name: 'isBookmarked')
-      required final bool isBookmarkedByCurrentUser,
+      @JsonKey(name: 'isLiked') final bool? isLikedByCurrentUser,
+      @JsonKey(name: 'isBookmarked') final bool? isBookmarkedByCurrentUser,
       final List<String> tagSlugs,
+      @CoupletThemesConverter() final List<CoupletTheme> themes,
       final DateTime? createdAt,
       final Map<String, dynamic>? reactions}) = _$CoupletModelImpl;
 
@@ -440,12 +472,15 @@ abstract class _CoupletModel implements CoupletModel {
   int get shareCount;
   @override
   @JsonKey(name: 'isLiked')
-  bool get isLikedByCurrentUser;
+  bool? get isLikedByCurrentUser;
   @override
   @JsonKey(name: 'isBookmarked')
-  bool get isBookmarkedByCurrentUser;
+  bool? get isBookmarkedByCurrentUser;
   @override
   List<String> get tagSlugs;
+  @override // Couplet themes (max 3, server-ranked); absent on production today.
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes;
   @override
   DateTime? get createdAt;
   @override // Reactions system (Section 19)
@@ -465,26 +500,36 @@ CoupletDetailResponse _$CoupletDetailResponseFromJson(
 mixin _$CoupletDetailResponse {
   String get publicId => throw _privateConstructorUsedError;
   int get coupletNumber => throw _privateConstructorUsedError;
-  String get coupletType => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get coupletType => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
   String? get coupletTypeName => throw _privateConstructorUsedError;
   List<VerseModel> get verses =>
       throw _privateConstructorUsedError; // Poem context
-  String get poemPublicId => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get poemPublicId => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
   String? get poemTitle => throw _privateConstructorUsedError;
   int? get totalCoupletsInPoem => throw _privateConstructorUsedError;
   String? get poetryType => throw _privateConstructorUsedError; // Poet context
-  String get poetPublicId => throw _privateConstructorUsedError;
-  String get poetName => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get poetPublicId => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get poetName => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
   String? get poetProfileImageUrl =>
       throw _privateConstructorUsedError; // Engagement
   int get likeCount => throw _privateConstructorUsedError;
   int get bookmarkCount => throw _privateConstructorUsedError;
   int get shareCount => throw _privateConstructorUsedError;
   @JsonKey(name: 'isLiked')
-  bool get isLikedByCurrentUser => throw _privateConstructorUsedError;
+  bool? get isLikedByCurrentUser => throw _privateConstructorUsedError;
   @JsonKey(name: 'isBookmarked')
-  bool get isBookmarkedByCurrentUser => throw _privateConstructorUsedError;
-  List<String> get tagSlugs => throw _privateConstructorUsedError;
+  bool? get isBookmarkedByCurrentUser => throw _privateConstructorUsedError;
+  List<String> get tagSlugs =>
+      throw _privateConstructorUsedError; // Couplet themes (max 3, server-ranked); absent on production today.
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get updatedAt =>
       throw _privateConstructorUsedError; // Reactions system (Section 19)
@@ -505,22 +550,23 @@ abstract class $CoupletDetailResponseCopyWith<$Res> {
   $Res call(
       {String publicId,
       int coupletNumber,
-      String coupletType,
-      String? coupletTypeName,
+      @PlaceholderStringConverter() String? coupletType,
+      @PlaceholderStringConverter() String? coupletTypeName,
       List<VerseModel> verses,
-      String poemPublicId,
-      String? poemTitle,
+      @PlaceholderStringConverter() String? poemPublicId,
+      @PlaceholderStringConverter() String? poemTitle,
       int? totalCoupletsInPoem,
       String? poetryType,
-      String poetPublicId,
-      String poetName,
-      String? poetProfileImageUrl,
+      @PlaceholderStringConverter() String? poetPublicId,
+      @PlaceholderStringConverter() String? poetName,
+      @PlaceholderStringConverter() String? poetProfileImageUrl,
       int likeCount,
       int bookmarkCount,
       int shareCount,
-      @JsonKey(name: 'isLiked') bool isLikedByCurrentUser,
-      @JsonKey(name: 'isBookmarked') bool isBookmarkedByCurrentUser,
+      @JsonKey(name: 'isLiked') bool? isLikedByCurrentUser,
+      @JsonKey(name: 'isBookmarked') bool? isBookmarkedByCurrentUser,
       List<String> tagSlugs,
+      @CoupletThemesConverter() List<CoupletTheme> themes,
       DateTime? createdAt,
       DateTime? updatedAt,
       Map<String, dynamic>? reactions});
@@ -542,22 +588,23 @@ class _$CoupletDetailResponseCopyWithImpl<$Res,
   $Res call({
     Object? publicId = null,
     Object? coupletNumber = null,
-    Object? coupletType = null,
+    Object? coupletType = freezed,
     Object? coupletTypeName = freezed,
     Object? verses = null,
-    Object? poemPublicId = null,
+    Object? poemPublicId = freezed,
     Object? poemTitle = freezed,
     Object? totalCoupletsInPoem = freezed,
     Object? poetryType = freezed,
-    Object? poetPublicId = null,
-    Object? poetName = null,
+    Object? poetPublicId = freezed,
+    Object? poetName = freezed,
     Object? poetProfileImageUrl = freezed,
     Object? likeCount = null,
     Object? bookmarkCount = null,
     Object? shareCount = null,
-    Object? isLikedByCurrentUser = null,
-    Object? isBookmarkedByCurrentUser = null,
+    Object? isLikedByCurrentUser = freezed,
+    Object? isBookmarkedByCurrentUser = freezed,
     Object? tagSlugs = null,
+    Object? themes = null,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
     Object? reactions = freezed,
@@ -571,10 +618,10 @@ class _$CoupletDetailResponseCopyWithImpl<$Res,
           ? _value.coupletNumber
           : coupletNumber // ignore: cast_nullable_to_non_nullable
               as int,
-      coupletType: null == coupletType
+      coupletType: freezed == coupletType
           ? _value.coupletType
           : coupletType // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       coupletTypeName: freezed == coupletTypeName
           ? _value.coupletTypeName
           : coupletTypeName // ignore: cast_nullable_to_non_nullable
@@ -583,10 +630,10 @@ class _$CoupletDetailResponseCopyWithImpl<$Res,
           ? _value.verses
           : verses // ignore: cast_nullable_to_non_nullable
               as List<VerseModel>,
-      poemPublicId: null == poemPublicId
+      poemPublicId: freezed == poemPublicId
           ? _value.poemPublicId
           : poemPublicId // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       poemTitle: freezed == poemTitle
           ? _value.poemTitle
           : poemTitle // ignore: cast_nullable_to_non_nullable
@@ -599,14 +646,14 @@ class _$CoupletDetailResponseCopyWithImpl<$Res,
           ? _value.poetryType
           : poetryType // ignore: cast_nullable_to_non_nullable
               as String?,
-      poetPublicId: null == poetPublicId
+      poetPublicId: freezed == poetPublicId
           ? _value.poetPublicId
           : poetPublicId // ignore: cast_nullable_to_non_nullable
-              as String,
-      poetName: null == poetName
+              as String?,
+      poetName: freezed == poetName
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       poetProfileImageUrl: freezed == poetProfileImageUrl
           ? _value.poetProfileImageUrl
           : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
@@ -623,18 +670,22 @@ class _$CoupletDetailResponseCopyWithImpl<$Res,
           ? _value.shareCount
           : shareCount // ignore: cast_nullable_to_non_nullable
               as int,
-      isLikedByCurrentUser: null == isLikedByCurrentUser
+      isLikedByCurrentUser: freezed == isLikedByCurrentUser
           ? _value.isLikedByCurrentUser
           : isLikedByCurrentUser // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isBookmarkedByCurrentUser: null == isBookmarkedByCurrentUser
+              as bool?,
+      isBookmarkedByCurrentUser: freezed == isBookmarkedByCurrentUser
           ? _value.isBookmarkedByCurrentUser
           : isBookmarkedByCurrentUser // ignore: cast_nullable_to_non_nullable
-              as bool,
+              as bool?,
       tagSlugs: null == tagSlugs
           ? _value.tagSlugs
           : tagSlugs // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      themes: null == themes
+          ? _value.themes
+          : themes // ignore: cast_nullable_to_non_nullable
+              as List<CoupletTheme>,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -663,22 +714,23 @@ abstract class _$$CoupletDetailResponseImplCopyWith<$Res>
   $Res call(
       {String publicId,
       int coupletNumber,
-      String coupletType,
-      String? coupletTypeName,
+      @PlaceholderStringConverter() String? coupletType,
+      @PlaceholderStringConverter() String? coupletTypeName,
       List<VerseModel> verses,
-      String poemPublicId,
-      String? poemTitle,
+      @PlaceholderStringConverter() String? poemPublicId,
+      @PlaceholderStringConverter() String? poemTitle,
       int? totalCoupletsInPoem,
       String? poetryType,
-      String poetPublicId,
-      String poetName,
-      String? poetProfileImageUrl,
+      @PlaceholderStringConverter() String? poetPublicId,
+      @PlaceholderStringConverter() String? poetName,
+      @PlaceholderStringConverter() String? poetProfileImageUrl,
       int likeCount,
       int bookmarkCount,
       int shareCount,
-      @JsonKey(name: 'isLiked') bool isLikedByCurrentUser,
-      @JsonKey(name: 'isBookmarked') bool isBookmarkedByCurrentUser,
+      @JsonKey(name: 'isLiked') bool? isLikedByCurrentUser,
+      @JsonKey(name: 'isBookmarked') bool? isBookmarkedByCurrentUser,
       List<String> tagSlugs,
+      @CoupletThemesConverter() List<CoupletTheme> themes,
       DateTime? createdAt,
       DateTime? updatedAt,
       Map<String, dynamic>? reactions});
@@ -698,22 +750,23 @@ class __$$CoupletDetailResponseImplCopyWithImpl<$Res>
   $Res call({
     Object? publicId = null,
     Object? coupletNumber = null,
-    Object? coupletType = null,
+    Object? coupletType = freezed,
     Object? coupletTypeName = freezed,
     Object? verses = null,
-    Object? poemPublicId = null,
+    Object? poemPublicId = freezed,
     Object? poemTitle = freezed,
     Object? totalCoupletsInPoem = freezed,
     Object? poetryType = freezed,
-    Object? poetPublicId = null,
-    Object? poetName = null,
+    Object? poetPublicId = freezed,
+    Object? poetName = freezed,
     Object? poetProfileImageUrl = freezed,
     Object? likeCount = null,
     Object? bookmarkCount = null,
     Object? shareCount = null,
-    Object? isLikedByCurrentUser = null,
-    Object? isBookmarkedByCurrentUser = null,
+    Object? isLikedByCurrentUser = freezed,
+    Object? isBookmarkedByCurrentUser = freezed,
     Object? tagSlugs = null,
+    Object? themes = null,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
     Object? reactions = freezed,
@@ -727,10 +780,10 @@ class __$$CoupletDetailResponseImplCopyWithImpl<$Res>
           ? _value.coupletNumber
           : coupletNumber // ignore: cast_nullable_to_non_nullable
               as int,
-      coupletType: null == coupletType
+      coupletType: freezed == coupletType
           ? _value.coupletType
           : coupletType // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       coupletTypeName: freezed == coupletTypeName
           ? _value.coupletTypeName
           : coupletTypeName // ignore: cast_nullable_to_non_nullable
@@ -739,10 +792,10 @@ class __$$CoupletDetailResponseImplCopyWithImpl<$Res>
           ? _value._verses
           : verses // ignore: cast_nullable_to_non_nullable
               as List<VerseModel>,
-      poemPublicId: null == poemPublicId
+      poemPublicId: freezed == poemPublicId
           ? _value.poemPublicId
           : poemPublicId // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       poemTitle: freezed == poemTitle
           ? _value.poemTitle
           : poemTitle // ignore: cast_nullable_to_non_nullable
@@ -755,14 +808,14 @@ class __$$CoupletDetailResponseImplCopyWithImpl<$Res>
           ? _value.poetryType
           : poetryType // ignore: cast_nullable_to_non_nullable
               as String?,
-      poetPublicId: null == poetPublicId
+      poetPublicId: freezed == poetPublicId
           ? _value.poetPublicId
           : poetPublicId // ignore: cast_nullable_to_non_nullable
-              as String,
-      poetName: null == poetName
+              as String?,
+      poetName: freezed == poetName
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       poetProfileImageUrl: freezed == poetProfileImageUrl
           ? _value.poetProfileImageUrl
           : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
@@ -779,18 +832,22 @@ class __$$CoupletDetailResponseImplCopyWithImpl<$Res>
           ? _value.shareCount
           : shareCount // ignore: cast_nullable_to_non_nullable
               as int,
-      isLikedByCurrentUser: null == isLikedByCurrentUser
+      isLikedByCurrentUser: freezed == isLikedByCurrentUser
           ? _value.isLikedByCurrentUser
           : isLikedByCurrentUser // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isBookmarkedByCurrentUser: null == isBookmarkedByCurrentUser
+              as bool?,
+      isBookmarkedByCurrentUser: freezed == isBookmarkedByCurrentUser
           ? _value.isBookmarkedByCurrentUser
           : isBookmarkedByCurrentUser // ignore: cast_nullable_to_non_nullable
-              as bool,
+              as bool?,
       tagSlugs: null == tagSlugs
           ? _value._tagSlugs
           : tagSlugs // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      themes: null == themes
+          ? _value._themes
+          : themes // ignore: cast_nullable_to_non_nullable
+              as List<CoupletTheme>,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -812,28 +869,31 @@ class __$$CoupletDetailResponseImplCopyWithImpl<$Res>
 class _$CoupletDetailResponseImpl implements _CoupletDetailResponse {
   const _$CoupletDetailResponseImpl(
       {required this.publicId,
-      required this.coupletNumber,
-      required this.coupletType,
-      this.coupletTypeName,
-      required final List<VerseModel> verses,
-      required this.poemPublicId,
-      this.poemTitle,
+      this.coupletNumber = 0,
+      @PlaceholderStringConverter() this.coupletType,
+      @PlaceholderStringConverter() this.coupletTypeName,
+      final List<VerseModel> verses = const [],
+      @PlaceholderStringConverter() this.poemPublicId,
+      @PlaceholderStringConverter() this.poemTitle,
       this.totalCoupletsInPoem,
       this.poetryType,
-      required this.poetPublicId,
-      required this.poetName,
-      this.poetProfileImageUrl,
+      @PlaceholderStringConverter() this.poetPublicId,
+      @PlaceholderStringConverter() this.poetName,
+      @PlaceholderStringConverter() this.poetProfileImageUrl,
       this.likeCount = 0,
       this.bookmarkCount = 0,
       this.shareCount = 0,
-      @JsonKey(name: 'isLiked') required this.isLikedByCurrentUser,
-      @JsonKey(name: 'isBookmarked') required this.isBookmarkedByCurrentUser,
+      @JsonKey(name: 'isLiked') this.isLikedByCurrentUser,
+      @JsonKey(name: 'isBookmarked') this.isBookmarkedByCurrentUser,
       final List<String> tagSlugs = const [],
+      @CoupletThemesConverter()
+      final List<CoupletTheme> themes = const <CoupletTheme>[],
       this.createdAt,
       this.updatedAt,
       final Map<String, dynamic>? reactions})
       : _verses = verses,
         _tagSlugs = tagSlugs,
+        _themes = themes,
         _reactions = reactions;
 
   factory _$CoupletDetailResponseImpl.fromJson(Map<String, dynamic> json) =>
@@ -842,13 +902,17 @@ class _$CoupletDetailResponseImpl implements _CoupletDetailResponse {
   @override
   final String publicId;
   @override
+  @JsonKey()
   final int coupletNumber;
   @override
-  final String coupletType;
+  @PlaceholderStringConverter()
+  final String? coupletType;
   @override
+  @PlaceholderStringConverter()
   final String? coupletTypeName;
   final List<VerseModel> _verses;
   @override
+  @JsonKey()
   List<VerseModel> get verses {
     if (_verses is EqualUnmodifiableListView) return _verses;
     // ignore: implicit_dynamic_type
@@ -857,8 +921,10 @@ class _$CoupletDetailResponseImpl implements _CoupletDetailResponse {
 
 // Poem context
   @override
-  final String poemPublicId;
+  @PlaceholderStringConverter()
+  final String? poemPublicId;
   @override
+  @PlaceholderStringConverter()
   final String? poemTitle;
   @override
   final int? totalCoupletsInPoem;
@@ -866,10 +932,13 @@ class _$CoupletDetailResponseImpl implements _CoupletDetailResponse {
   final String? poetryType;
 // Poet context
   @override
-  final String poetPublicId;
+  @PlaceholderStringConverter()
+  final String? poetPublicId;
   @override
-  final String poetName;
+  @PlaceholderStringConverter()
+  final String? poetName;
   @override
+  @PlaceholderStringConverter()
   final String? poetProfileImageUrl;
 // Engagement
   @override
@@ -883,10 +952,10 @@ class _$CoupletDetailResponseImpl implements _CoupletDetailResponse {
   final int shareCount;
   @override
   @JsonKey(name: 'isLiked')
-  final bool isLikedByCurrentUser;
+  final bool? isLikedByCurrentUser;
   @override
   @JsonKey(name: 'isBookmarked')
-  final bool isBookmarkedByCurrentUser;
+  final bool? isBookmarkedByCurrentUser;
   final List<String> _tagSlugs;
   @override
   @JsonKey()
@@ -894,6 +963,18 @@ class _$CoupletDetailResponseImpl implements _CoupletDetailResponse {
     if (_tagSlugs is EqualUnmodifiableListView) return _tagSlugs;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_tagSlugs);
+  }
+
+// Couplet themes (max 3, server-ranked); absent on production today.
+  final List<CoupletTheme> _themes;
+// Couplet themes (max 3, server-ranked); absent on production today.
+  @override
+  @JsonKey()
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes {
+    if (_themes is EqualUnmodifiableListView) return _themes;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_themes);
   }
 
   @override
@@ -914,7 +995,7 @@ class _$CoupletDetailResponseImpl implements _CoupletDetailResponse {
 
   @override
   String toString() {
-    return 'CoupletDetailResponse(publicId: $publicId, coupletNumber: $coupletNumber, coupletType: $coupletType, coupletTypeName: $coupletTypeName, verses: $verses, poemPublicId: $poemPublicId, poemTitle: $poemTitle, totalCoupletsInPoem: $totalCoupletsInPoem, poetryType: $poetryType, poetPublicId: $poetPublicId, poetName: $poetName, poetProfileImageUrl: $poetProfileImageUrl, likeCount: $likeCount, bookmarkCount: $bookmarkCount, shareCount: $shareCount, isLikedByCurrentUser: $isLikedByCurrentUser, isBookmarkedByCurrentUser: $isBookmarkedByCurrentUser, tagSlugs: $tagSlugs, createdAt: $createdAt, updatedAt: $updatedAt, reactions: $reactions)';
+    return 'CoupletDetailResponse(publicId: $publicId, coupletNumber: $coupletNumber, coupletType: $coupletType, coupletTypeName: $coupletTypeName, verses: $verses, poemPublicId: $poemPublicId, poemTitle: $poemTitle, totalCoupletsInPoem: $totalCoupletsInPoem, poetryType: $poetryType, poetPublicId: $poetPublicId, poetName: $poetName, poetProfileImageUrl: $poetProfileImageUrl, likeCount: $likeCount, bookmarkCount: $bookmarkCount, shareCount: $shareCount, isLikedByCurrentUser: $isLikedByCurrentUser, isBookmarkedByCurrentUser: $isBookmarkedByCurrentUser, tagSlugs: $tagSlugs, themes: $themes, createdAt: $createdAt, updatedAt: $updatedAt, reactions: $reactions)';
   }
 
   @override
@@ -957,6 +1038,7 @@ class _$CoupletDetailResponseImpl implements _CoupletDetailResponse {
                     isBookmarkedByCurrentUser) ||
                 other.isBookmarkedByCurrentUser == isBookmarkedByCurrentUser) &&
             const DeepCollectionEquality().equals(other._tagSlugs, _tagSlugs) &&
+            const DeepCollectionEquality().equals(other._themes, _themes) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
@@ -987,6 +1069,7 @@ class _$CoupletDetailResponseImpl implements _CoupletDetailResponse {
         isLikedByCurrentUser,
         isBookmarkedByCurrentUser,
         const DeepCollectionEquality().hash(_tagSlugs),
+        const DeepCollectionEquality().hash(_themes),
         createdAt,
         updatedAt,
         const DeepCollectionEquality().hash(_reactions)
@@ -1010,24 +1093,24 @@ class _$CoupletDetailResponseImpl implements _CoupletDetailResponse {
 abstract class _CoupletDetailResponse implements CoupletDetailResponse {
   const factory _CoupletDetailResponse(
       {required final String publicId,
-      required final int coupletNumber,
-      required final String coupletType,
-      final String? coupletTypeName,
-      required final List<VerseModel> verses,
-      required final String poemPublicId,
-      final String? poemTitle,
+      final int coupletNumber,
+      @PlaceholderStringConverter() final String? coupletType,
+      @PlaceholderStringConverter() final String? coupletTypeName,
+      final List<VerseModel> verses,
+      @PlaceholderStringConverter() final String? poemPublicId,
+      @PlaceholderStringConverter() final String? poemTitle,
       final int? totalCoupletsInPoem,
       final String? poetryType,
-      required final String poetPublicId,
-      required final String poetName,
-      final String? poetProfileImageUrl,
+      @PlaceholderStringConverter() final String? poetPublicId,
+      @PlaceholderStringConverter() final String? poetName,
+      @PlaceholderStringConverter() final String? poetProfileImageUrl,
       final int likeCount,
       final int bookmarkCount,
       final int shareCount,
-      @JsonKey(name: 'isLiked') required final bool isLikedByCurrentUser,
-      @JsonKey(name: 'isBookmarked')
-      required final bool isBookmarkedByCurrentUser,
+      @JsonKey(name: 'isLiked') final bool? isLikedByCurrentUser,
+      @JsonKey(name: 'isBookmarked') final bool? isBookmarkedByCurrentUser,
       final List<String> tagSlugs,
+      @CoupletThemesConverter() final List<CoupletTheme> themes,
       final DateTime? createdAt,
       final DateTime? updatedAt,
       final Map<String, dynamic>? reactions}) = _$CoupletDetailResponseImpl;
@@ -1040,24 +1123,31 @@ abstract class _CoupletDetailResponse implements CoupletDetailResponse {
   @override
   int get coupletNumber;
   @override
-  String get coupletType;
+  @PlaceholderStringConverter()
+  String? get coupletType;
   @override
+  @PlaceholderStringConverter()
   String? get coupletTypeName;
   @override
   List<VerseModel> get verses;
   @override // Poem context
-  String get poemPublicId;
+  @PlaceholderStringConverter()
+  String? get poemPublicId;
   @override
+  @PlaceholderStringConverter()
   String? get poemTitle;
   @override
   int? get totalCoupletsInPoem;
   @override
   String? get poetryType;
   @override // Poet context
-  String get poetPublicId;
+  @PlaceholderStringConverter()
+  String? get poetPublicId;
   @override
-  String get poetName;
+  @PlaceholderStringConverter()
+  String? get poetName;
   @override
+  @PlaceholderStringConverter()
   String? get poetProfileImageUrl;
   @override // Engagement
   int get likeCount;
@@ -1067,12 +1157,15 @@ abstract class _CoupletDetailResponse implements CoupletDetailResponse {
   int get shareCount;
   @override
   @JsonKey(name: 'isLiked')
-  bool get isLikedByCurrentUser;
+  bool? get isLikedByCurrentUser;
   @override
   @JsonKey(name: 'isBookmarked')
-  bool get isBookmarkedByCurrentUser;
+  bool? get isBookmarkedByCurrentUser;
   @override
   List<String> get tagSlugs;
+  @override // Couplet themes (max 3, server-ranked); absent on production today.
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes;
   @override
   DateTime? get createdAt;
   @override
@@ -1111,10 +1204,13 @@ mixin _$BookmarkedCoupletResponse {
   int get likeCount => throw _privateConstructorUsedError;
   int get bookmarkCount => throw _privateConstructorUsedError;
   @JsonKey(name: 'isLiked')
-  bool get isLikedByCurrentUser => throw _privateConstructorUsedError;
+  bool? get isLikedByCurrentUser => throw _privateConstructorUsedError;
   @JsonKey(name: 'isBookmarked')
-  bool get isBookmarkedByCurrentUser => throw _privateConstructorUsedError;
-  List<String> get tagSlugs => throw _privateConstructorUsedError;
+  bool? get isBookmarkedByCurrentUser => throw _privateConstructorUsedError;
+  List<String> get tagSlugs =>
+      throw _privateConstructorUsedError; // Couplet themes (max 3, server-ranked); absent on production today.
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes => throw _privateConstructorUsedError;
   DateTime? get bookmarkedAt => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -1145,9 +1241,10 @@ abstract class $BookmarkedCoupletResponseCopyWith<$Res> {
       String? poetProfileImageUrl,
       int likeCount,
       int bookmarkCount,
-      @JsonKey(name: 'isLiked') bool isLikedByCurrentUser,
-      @JsonKey(name: 'isBookmarked') bool isBookmarkedByCurrentUser,
+      @JsonKey(name: 'isLiked') bool? isLikedByCurrentUser,
+      @JsonKey(name: 'isBookmarked') bool? isBookmarkedByCurrentUser,
       List<String> tagSlugs,
+      @CoupletThemesConverter() List<CoupletTheme> themes,
       DateTime? bookmarkedAt});
 }
 
@@ -1180,9 +1277,10 @@ class _$BookmarkedCoupletResponseCopyWithImpl<$Res,
     Object? poetProfileImageUrl = freezed,
     Object? likeCount = null,
     Object? bookmarkCount = null,
-    Object? isLikedByCurrentUser = null,
-    Object? isBookmarkedByCurrentUser = null,
+    Object? isLikedByCurrentUser = freezed,
+    Object? isBookmarkedByCurrentUser = freezed,
     Object? tagSlugs = null,
+    Object? themes = null,
     Object? bookmarkedAt = freezed,
   }) {
     return _then(_value.copyWith(
@@ -1246,18 +1344,22 @@ class _$BookmarkedCoupletResponseCopyWithImpl<$Res,
           ? _value.bookmarkCount
           : bookmarkCount // ignore: cast_nullable_to_non_nullable
               as int,
-      isLikedByCurrentUser: null == isLikedByCurrentUser
+      isLikedByCurrentUser: freezed == isLikedByCurrentUser
           ? _value.isLikedByCurrentUser
           : isLikedByCurrentUser // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isBookmarkedByCurrentUser: null == isBookmarkedByCurrentUser
+              as bool?,
+      isBookmarkedByCurrentUser: freezed == isBookmarkedByCurrentUser
           ? _value.isBookmarkedByCurrentUser
           : isBookmarkedByCurrentUser // ignore: cast_nullable_to_non_nullable
-              as bool,
+              as bool?,
       tagSlugs: null == tagSlugs
           ? _value.tagSlugs
           : tagSlugs // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      themes: null == themes
+          ? _value.themes
+          : themes // ignore: cast_nullable_to_non_nullable
+              as List<CoupletTheme>,
       bookmarkedAt: freezed == bookmarkedAt
           ? _value.bookmarkedAt
           : bookmarkedAt // ignore: cast_nullable_to_non_nullable
@@ -1291,9 +1393,10 @@ abstract class _$$BookmarkedCoupletResponseImplCopyWith<$Res>
       String? poetProfileImageUrl,
       int likeCount,
       int bookmarkCount,
-      @JsonKey(name: 'isLiked') bool isLikedByCurrentUser,
-      @JsonKey(name: 'isBookmarked') bool isBookmarkedByCurrentUser,
+      @JsonKey(name: 'isLiked') bool? isLikedByCurrentUser,
+      @JsonKey(name: 'isBookmarked') bool? isBookmarkedByCurrentUser,
       List<String> tagSlugs,
+      @CoupletThemesConverter() List<CoupletTheme> themes,
       DateTime? bookmarkedAt});
 }
 
@@ -1325,9 +1428,10 @@ class __$$BookmarkedCoupletResponseImplCopyWithImpl<$Res>
     Object? poetProfileImageUrl = freezed,
     Object? likeCount = null,
     Object? bookmarkCount = null,
-    Object? isLikedByCurrentUser = null,
-    Object? isBookmarkedByCurrentUser = null,
+    Object? isLikedByCurrentUser = freezed,
+    Object? isBookmarkedByCurrentUser = freezed,
     Object? tagSlugs = null,
+    Object? themes = null,
     Object? bookmarkedAt = freezed,
   }) {
     return _then(_$BookmarkedCoupletResponseImpl(
@@ -1391,18 +1495,22 @@ class __$$BookmarkedCoupletResponseImplCopyWithImpl<$Res>
           ? _value.bookmarkCount
           : bookmarkCount // ignore: cast_nullable_to_non_nullable
               as int,
-      isLikedByCurrentUser: null == isLikedByCurrentUser
+      isLikedByCurrentUser: freezed == isLikedByCurrentUser
           ? _value.isLikedByCurrentUser
           : isLikedByCurrentUser // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isBookmarkedByCurrentUser: null == isBookmarkedByCurrentUser
+              as bool?,
+      isBookmarkedByCurrentUser: freezed == isBookmarkedByCurrentUser
           ? _value.isBookmarkedByCurrentUser
           : isBookmarkedByCurrentUser // ignore: cast_nullable_to_non_nullable
-              as bool,
+              as bool?,
       tagSlugs: null == tagSlugs
           ? _value._tagSlugs
           : tagSlugs // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      themes: null == themes
+          ? _value._themes
+          : themes // ignore: cast_nullable_to_non_nullable
+              as List<CoupletTheme>,
       bookmarkedAt: freezed == bookmarkedAt
           ? _value.bookmarkedAt
           : bookmarkedAt // ignore: cast_nullable_to_non_nullable
@@ -1430,12 +1538,15 @@ class _$BookmarkedCoupletResponseImpl implements _BookmarkedCoupletResponse {
       this.poetProfileImageUrl,
       this.likeCount = 0,
       this.bookmarkCount = 0,
-      @JsonKey(name: 'isLiked') required this.isLikedByCurrentUser,
-      @JsonKey(name: 'isBookmarked') required this.isBookmarkedByCurrentUser,
+      @JsonKey(name: 'isLiked') this.isLikedByCurrentUser,
+      @JsonKey(name: 'isBookmarked') this.isBookmarkedByCurrentUser,
       final List<String> tagSlugs = const [],
+      @CoupletThemesConverter()
+      final List<CoupletTheme> themes = const <CoupletTheme>[],
       this.bookmarkedAt})
       : _verses = verses,
-        _tagSlugs = tagSlugs;
+        _tagSlugs = tagSlugs,
+        _themes = themes;
 
   factory _$BookmarkedCoupletResponseImpl.fromJson(Map<String, dynamic> json) =>
       _$$BookmarkedCoupletResponseImplFromJson(json);
@@ -1483,10 +1594,10 @@ class _$BookmarkedCoupletResponseImpl implements _BookmarkedCoupletResponse {
   final int bookmarkCount;
   @override
   @JsonKey(name: 'isLiked')
-  final bool isLikedByCurrentUser;
+  final bool? isLikedByCurrentUser;
   @override
   @JsonKey(name: 'isBookmarked')
-  final bool isBookmarkedByCurrentUser;
+  final bool? isBookmarkedByCurrentUser;
   final List<String> _tagSlugs;
   @override
   @JsonKey()
@@ -1496,12 +1607,24 @@ class _$BookmarkedCoupletResponseImpl implements _BookmarkedCoupletResponse {
     return EqualUnmodifiableListView(_tagSlugs);
   }
 
+// Couplet themes (max 3, server-ranked); absent on production today.
+  final List<CoupletTheme> _themes;
+// Couplet themes (max 3, server-ranked); absent on production today.
+  @override
+  @JsonKey()
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes {
+    if (_themes is EqualUnmodifiableListView) return _themes;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_themes);
+  }
+
   @override
   final DateTime? bookmarkedAt;
 
   @override
   String toString() {
-    return 'BookmarkedCoupletResponse(coupletPublicId: $coupletPublicId, coupletNumber: $coupletNumber, coupletType: $coupletType, coupletTypeName: $coupletTypeName, verses: $verses, poemPublicId: $poemPublicId, poemTitle: $poemTitle, poemExcerpt: $poemExcerpt, poetryType: $poetryType, totalCoupletsInPoem: $totalCoupletsInPoem, poetPublicId: $poetPublicId, poetName: $poetName, poetProfileImageUrl: $poetProfileImageUrl, likeCount: $likeCount, bookmarkCount: $bookmarkCount, isLikedByCurrentUser: $isLikedByCurrentUser, isBookmarkedByCurrentUser: $isBookmarkedByCurrentUser, tagSlugs: $tagSlugs, bookmarkedAt: $bookmarkedAt)';
+    return 'BookmarkedCoupletResponse(coupletPublicId: $coupletPublicId, coupletNumber: $coupletNumber, coupletType: $coupletType, coupletTypeName: $coupletTypeName, verses: $verses, poemPublicId: $poemPublicId, poemTitle: $poemTitle, poemExcerpt: $poemExcerpt, poetryType: $poetryType, totalCoupletsInPoem: $totalCoupletsInPoem, poetPublicId: $poetPublicId, poetName: $poetName, poetProfileImageUrl: $poetProfileImageUrl, likeCount: $likeCount, bookmarkCount: $bookmarkCount, isLikedByCurrentUser: $isLikedByCurrentUser, isBookmarkedByCurrentUser: $isBookmarkedByCurrentUser, tagSlugs: $tagSlugs, themes: $themes, bookmarkedAt: $bookmarkedAt)';
   }
 
   @override
@@ -1544,6 +1667,7 @@ class _$BookmarkedCoupletResponseImpl implements _BookmarkedCoupletResponse {
                     isBookmarkedByCurrentUser) ||
                 other.isBookmarkedByCurrentUser == isBookmarkedByCurrentUser) &&
             const DeepCollectionEquality().equals(other._tagSlugs, _tagSlugs) &&
+            const DeepCollectionEquality().equals(other._themes, _themes) &&
             (identical(other.bookmarkedAt, bookmarkedAt) ||
                 other.bookmarkedAt == bookmarkedAt));
   }
@@ -1570,6 +1694,7 @@ class _$BookmarkedCoupletResponseImpl implements _BookmarkedCoupletResponse {
         isLikedByCurrentUser,
         isBookmarkedByCurrentUser,
         const DeepCollectionEquality().hash(_tagSlugs),
+        const DeepCollectionEquality().hash(_themes),
         bookmarkedAt
       ]);
 
@@ -1605,10 +1730,10 @@ abstract class _BookmarkedCoupletResponse implements BookmarkedCoupletResponse {
       final String? poetProfileImageUrl,
       final int likeCount,
       final int bookmarkCount,
-      @JsonKey(name: 'isLiked') required final bool isLikedByCurrentUser,
-      @JsonKey(name: 'isBookmarked')
-      required final bool isBookmarkedByCurrentUser,
+      @JsonKey(name: 'isLiked') final bool? isLikedByCurrentUser,
+      @JsonKey(name: 'isBookmarked') final bool? isBookmarkedByCurrentUser,
       final List<String> tagSlugs,
+      @CoupletThemesConverter() final List<CoupletTheme> themes,
       final DateTime? bookmarkedAt}) = _$BookmarkedCoupletResponseImpl;
 
   factory _BookmarkedCoupletResponse.fromJson(Map<String, dynamic> json) =
@@ -1646,12 +1771,15 @@ abstract class _BookmarkedCoupletResponse implements BookmarkedCoupletResponse {
   int get bookmarkCount;
   @override
   @JsonKey(name: 'isLiked')
-  bool get isLikedByCurrentUser;
+  bool? get isLikedByCurrentUser;
   @override
   @JsonKey(name: 'isBookmarked')
-  bool get isBookmarkedByCurrentUser;
+  bool? get isBookmarkedByCurrentUser;
   @override
   List<String> get tagSlugs;
+  @override // Couplet themes (max 3, server-ranked); absent on production today.
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes;
   @override
   DateTime? get bookmarkedAt;
   @override

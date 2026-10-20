@@ -1,0 +1,26 @@
+{
+  "_comment": "Couplet `themes[]` as the theme-tagging backend change will send them (contract: up to 3, server-filtered and ranked; names from the taxonomy draft v0.2). Production sends no `themes` field yet. `ranked` is the normal shape; `four` is one more than the app shows; `messy` is every malformed entry the app must tolerate (placeholder/absent slugs, `-` names, non-object entries, a duplicate slug, a theme with no name at all).",
+  "ranked": [
+    {"slug": "hijr", "nameUr": "ہجر", "nameEn": "Separation", "nameHi": "हिज्र", "confidence": 0.91},
+    {"slug": "intezar", "nameUr": "انتظار", "nameEn": "Waiting", "nameHi": "इंतिज़ार", "confidence": 0.8},
+    {"slug": "yaad", "nameUr": "یاد", "nameEn": "Remembrance", "nameHi": "याद", "confidence": 0.66}
+  ],
+  "four": [
+    {"slug": "hijr", "nameUr": "ہجر", "nameEn": "Separation", "nameHi": "हिज्र", "confidence": 0.91},
+    {"slug": "intezar", "nameUr": "انتظار", "nameEn": "Waiting", "nameHi": "इंतिज़ार", "confidence": 0.8},
+    {"slug": "yaad", "nameUr": "یاد", "nameEn": "Remembrance", "nameHi": "याद", "confidence": 0.66},
+    {"slug": "wafa", "nameUr": "وفا", "nameEn": "Fidelity", "nameHi": "वफ़ा", "confidence": 0.61}
+  ],
+  "messy": [
+    {"slug": "-", "nameUr": "بے نام", "nameEn": "No slug"},
+    {"nameEn": "Slug missing"},
+    {"slug": null, "nameEn": "Slug null"},
+    "hijr",
+    7,
+    null,
+    {"slug": "wafa", "nameUr": "-", "nameEn": "Fidelity", "nameHi": null, "confidence": "high"},
+    {"slug": "wafa", "nameUr": "وفا", "nameEn": "Duplicate"},
+    {"slug": "naam-nahin", "nameUr": "-", "nameEn": "  ", "nameHi": null, "confidence": 0.7},
+    {"slug": "tanhai", "nameUr": "تنہائی", "confidence": 0.65}
+  ]
+}

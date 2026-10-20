@@ -1,4 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import '../../../core/utils/api_placeholder.dart';
+import '../../hashtags/models/couplet_theme.dart';
 import '../../hashtags/models/hashtag_model.dart';
 
 part 'discover_bundle_model.freezed.dart';
@@ -77,6 +79,20 @@ class ContentCard with _$ContentCard {
     @Default('rtl') String direction,
     double? score,
     String? imageUrl, // For poets with profile images
+    /// Opening lines of a poem (newline-separated misras). `null` when the
+    /// API sends nothing, a blank string or its `"-"` placeholder.
+    @PlaceholderStringConverter() String? excerpt,
+    /// The poet behind a POEM / COUPLET card, under the same name the
+    /// signed-in feed's `contentData` uses. `null` when absent or `"-"`.
+    @PlaceholderStringConverter() String? poetPublicId,
+    /// The parent poem of a COUPLET card (what a tap opens), under the same
+    /// name signed-in couplets use. `null` when absent or `"-"`.
+    @PlaceholderStringConverter() String? poemPublicId,
+    /// A COUPLET card's number in its poem (opens the poem at it). `null`
+    /// when absent or `0`.
+    @PositiveIntConverter() int? coupletNumber,
+    /// A COUPLET card's themes (max 3, server-ranked); absent on production.
+    @CoupletThemesConverter() @Default(<CoupletTheme>[]) List<CoupletTheme> themes,
   }) = _ContentCard;
 
   factory ContentCard.fromJson(Map<String, dynamic> json) =>

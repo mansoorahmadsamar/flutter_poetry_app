@@ -4,9 +4,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
+import 'package:flutter_poetry_app/core/utils/api_placeholder.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:flutter_poetry_app/core/utils/language_typography.dart';
 
 /// Inline autocomplete suggestions (NOT a floating overlay).
 ///
@@ -16,14 +18,25 @@ import 'package:shimmer/shimmer.dart';
 /// 3. Shimmer placeholders when loading
 ///
 /// Only watches autocomplete-related state via `.select()`.
+///
+/// Poet and poem rows open that poet/poem, tag rows open the hashtag page.
+/// A row whose id/slug is missing (or `"-"`) falls back to a text search for
+/// its label, as do category rows (there is no category screen).
 class AppSearchSuggestions extends ConsumerWidget {
+  /// Runs a text search for the given label.
   final ValueChanged<String> onSuggestionTap;
   final VoidCallback onSearchTap;
+  final ValueChanged<AutocompletePoet> onPoetTap;
+  final ValueChanged<AutocompletePoem> onPoemTap;
+  final ValueChanged<AutocompleteTag> onTagTap;
 
   const AppSearchSuggestions({
     super.key,
     required this.onSuggestionTap,
     required this.onSearchTap,
+    required this.onPoetTap,
+    required this.onPoemTap,
+    required this.onTagTap,
   });
 
   @override
@@ -75,7 +88,26 @@ class AppSearchSuggestions extends ConsumerWidget {
     final groups = <Widget>[];
     int groupIndex = 0;
 
-    if (autocomplete.poets.isNotEmpty) {
+    // A suggestion without a label (null, blank or "-") has nothing to show
+    // and nothing to search for, so it gets no row.
+    final poets = [
+      for (final p in autocomplete.poets)
+        if (presentOrNull(p.name) != null) p,
+    ];
+    final poems = [
+      for (final p in autocomplete.poems)
+        if (presentOrNull(p.title) != null) p,
+    ];
+    final tags = [
+      for (final t in autocomplete.tags)
+        if (presentOrNull(t.name) != null) t,
+    ];
+    final categories = [
+      for (final c in autocomplete.categories)
+        if (presentOrNull(c.name) != null) c,
+    ];
+
+    if (poets.isNotEmpty) {
       groups.add(_StaggeredEntrance(
         delay: Duration(milliseconds: 30 * groupIndex),
         child: _SuggestionGroup(
@@ -83,11 +115,14 @@ class AppSearchSuggestions extends ConsumerWidget {
           icon: Icons.person_rounded,
           isDark: isDark,
           isUrdu: isUrdu,
-          children: autocomplete.poets.map((poet) {
+          children: poets.map((poet) {
             return _PoetSuggestionRow(
+              key: ValueKey('suggestion-poet-${poet.publicId}'),
               poet: poet,
               isDark: isDark,
-              onTap: () => onSuggestionTap(poet.name),
+              onTap: presentOrNull(poet.publicId) != null
+                  ? () => onPoetTap(poet)
+                  : () => onSuggestionTap(poet.name),
             );
           }).toList(),
         ),
@@ -95,7 +130,7 @@ class AppSearchSuggestions extends ConsumerWidget {
       groupIndex++;
     }
 
-    if (autocomplete.poems.isNotEmpty) {
+    if (poems.isNotEmpty) {
       groups.add(_StaggeredEntrance(
         delay: Duration(milliseconds: 30 * groupIndex),
         child: _SuggestionGroup(
@@ -103,12 +138,15 @@ class AppSearchSuggestions extends ConsumerWidget {
           icon: Icons.auto_stories_rounded,
           isDark: isDark,
           isUrdu: isUrdu,
-          children: autocomplete.poems.map((poem) {
+          children: poems.map((poem) {
             return _TextSuggestionRow(
+              key: ValueKey('suggestion-poem-${poem.publicId}'),
               text: poem.title,
-              subtitle: poem.poetName,
+              subtitle: presentOrNull(poem.poetName),
               isDark: isDark,
-              onTap: () => onSuggestionTap(poem.title),
+              onTap: presentOrNull(poem.publicId) != null
+                  ? () => onPoemTap(poem)
+                  : () => onSuggestionTap(poem.title),
             );
           }).toList(),
         ),
@@ -116,7 +154,7 @@ class AppSearchSuggestions extends ConsumerWidget {
       groupIndex++;
     }
 
-    if (autocomplete.tags.isNotEmpty) {
+    if (tags.isNotEmpty) {
       groups.add(_StaggeredEntrance(
         delay: Duration(milliseconds: 30 * groupIndex),
         child: _SuggestionGroup(
@@ -124,11 +162,14 @@ class AppSearchSuggestions extends ConsumerWidget {
           icon: Icons.tag_rounded,
           isDark: isDark,
           isUrdu: isUrdu,
-          children: autocomplete.tags.map((tag) {
+          children: tags.map((tag) {
             return _TextSuggestionRow(
+              key: ValueKey('suggestion-tag-${tag.publicId}'),
               text: tag.name,
               isDark: isDark,
-              onTap: () => onSuggestionTap(tag.name),
+              onTap: presentOrNull(tag.slug) != null
+                  ? () => onTagTap(tag)
+                  : () => onSuggestionTap(tag.name),
             );
           }).toList(),
         ),
@@ -136,7 +177,7 @@ class AppSearchSuggestions extends ConsumerWidget {
       groupIndex++;
     }
 
-    if (autocomplete.categories.isNotEmpty) {
+    if (categories.isNotEmpty) {
       groups.add(_StaggeredEntrance(
         delay: Duration(milliseconds: 30 * groupIndex),
         child: _SuggestionGroup(
@@ -144,8 +185,9 @@ class AppSearchSuggestions extends ConsumerWidget {
           icon: Icons.category_rounded,
           isDark: isDark,
           isUrdu: isUrdu,
-          children: autocomplete.categories.map((cat) {
+          children: categories.map((cat) {
             return _TextSuggestionRow(
+              key: ValueKey('suggestion-category-${cat.publicId}'),
               text: cat.name,
               trailing: cat.poemCount > 0
                   ? Text(
@@ -256,41 +298,48 @@ class _SearchActionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.md,
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.search_rounded,
-              size: 20,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondaryLight,
-            ),
-            SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Text(
-                isUrdu ? 'تلاش کریں: "$query"' : 'Search for "$query"',
-                textDirection: isUrdu ? TextDirection.rtl : TextDirection.ltr,
-                style: TextStyle(
-                  fontFamily: isUrdu ? 'Jameel Noori Nastaleeq' : null,
-                  fontSize: isUrdu ? 16 : 14,
-                  color: AppColors.primary,
-                  height: isUrdu ? 1.8 : 1.4,
+    // The trailing "→" is decorative: the row reads as one button with the
+    // "Search for …" text as its label.
+    return Semantics(
+      button: true,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.md,
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.search_rounded,
+                size: 20,
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondaryLight,
+              ),
+              SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Text(
+                  isUrdu ? 'تلاش کریں: "$query"' : 'Search for "$query"',
+                  textDirection: isUrdu ? TextDirection.rtl : TextDirection.ltr,
+                  style: TextStyle(
+                    fontFamily: isUrdu ? 'Jameel Noori Nastaleeq' : null,
+                    fontSize: isUrdu ? 16 : 14,
+                    color: AppColors.primary,
+                    height: isUrdu ? 1.8 : 1.4,
+                  ),
                 ),
               ),
-            ),
-            Icon(
-              Icons.arrow_forward_rounded,
-              size: 18,
-              color: AppColors.primary,
-            ),
-          ],
+              ExcludeSemantics(
+                child: Icon(
+                  Icons.arrow_forward_rounded,
+                  size: 18,
+                  color: AppColors.primary,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -370,6 +419,7 @@ class _PoetSuggestionRow extends StatelessWidget {
   final VoidCallback onTap;
 
   const _PoetSuggestionRow({
+    super.key,
     required this.poet,
     required this.isDark,
     required this.onTap,
@@ -377,7 +427,8 @@ class _PoetSuggestionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isUrdu = _isUrduText(poet.name);
+    final isUrdu = LanguageTypography.containsArabicScript(poet.name);
+    final imageUrl = presentOrNull(poet.profileImageUrl);
 
     return InkWell(
       onTap: onTap,
@@ -391,9 +442,9 @@ class _PoetSuggestionRow extends StatelessWidget {
             // Avatar
             ClipRRect(
               borderRadius: BorderRadius.circular(20),
-              child: poet.profileImageUrl != null
+              child: imageUrl != null
                   ? CachedNetworkImage(
-                      imageUrl: poet.profileImageUrl!,
+                      imageUrl: imageUrl,
                       width: 40,
                       height: 40,
                       fit: BoxFit.cover,
@@ -465,6 +516,7 @@ class _TextSuggestionRow extends StatelessWidget {
   final VoidCallback onTap;
 
   const _TextSuggestionRow({
+    super.key,
     required this.text,
     this.subtitle,
     this.trailing,
@@ -474,7 +526,7 @@ class _TextSuggestionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isUrdu = _isUrduText(text);
+    final isUrdu = LanguageTypography.containsArabicScript(text);
 
     return InkWell(
       onTap: onTap,
@@ -507,18 +559,18 @@ class _TextSuggestionRow extends StatelessWidget {
                     SizedBox(height: 2),
                     Text(
                       subtitle!,
-                      textDirection: _isUrduText(subtitle!)
+                      textDirection: LanguageTypography.containsArabicScript(subtitle!)
                           ? TextDirection.rtl
                           : TextDirection.ltr,
                       style: TextStyle(
-                        fontFamily: _isUrduText(subtitle!)
+                        fontFamily: LanguageTypography.containsArabicScript(subtitle!)
                             ? 'Jameel Noori Nastaleeq'
                             : null,
-                        fontSize: _isUrduText(subtitle!) ? 13 : 12,
+                        fontSize: LanguageTypography.containsArabicScript(subtitle!) ? 13 : 12,
                         color: isDark
                             ? AppColors.textSecondaryDark
                             : AppColors.textSecondaryLight,
-                        height: _isUrduText(subtitle!) ? 1.6 : 1.3,
+                        height: LanguageTypography.containsArabicScript(subtitle!) ? 1.6 : 1.3,
                       ),
                     ),
                   ],
@@ -589,12 +641,4 @@ class _SuggestionSkeleton extends StatelessWidget {
       ),
     );
   }
-}
-
-// ---------------------------------------------------------------------------
-// Shared helper
-// ---------------------------------------------------------------------------
-
-bool _isUrduText(String text) {
-  return RegExp(r'[\u0600-\u06FF]').hasMatch(text);
 }

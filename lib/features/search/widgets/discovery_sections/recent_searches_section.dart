@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
+import 'package:flutter_poetry_app/core/utils/language_typography.dart';
+import 'package:flutter_poetry_app/features/search/models/search_origin.dart';
 
 /// Recent searches discovery section
 ///
@@ -125,11 +127,12 @@ class RecentSearchesSection extends ConsumerWidget {
     String query,
     bool isDark,
   ) {
-    final isUrdu = _isUrduText(query);
+    final isUrdu = LanguageTypography.isMostlyArabicScript(query);
 
     return GestureDetector(
       onTap: () {
-        ref.read(globalSearchProvider.notifier).executeSearch(query: query);
+        ref.read(globalSearchProvider.notifier).executeSearch(
+            query: query, origin: SearchOrigin.history);
       },
       child: Container(
         height: 34,
@@ -225,12 +228,5 @@ class RecentSearchesSection extends ConsumerWidget {
         ],
       ),
     );
-  }
-
-  /// Detect if text is primarily Urdu
-  bool _isUrduText(String text) {
-    final urduPattern = RegExp(r'[\u0600-\u06FF]');
-    final urduMatches = urduPattern.allMatches(text).length;
-    return urduMatches > text.length / 3;
   }
 }

@@ -14,24 +14,35 @@ class SearchResultsGrid extends ConsumerStatefulWidget {
 }
 
 class _SearchResultsGridState extends ConsumerState<SearchResultsGrid> {
-  final ScrollController _scrollController = ScrollController();
+  /// Start loading the next page when this close to the end of the list.
+  static const double _loadMoreThresholdPx = 600;
+
+  /// The grid is a sliver, so it scrolls with the enclosing
+  /// [CustomScrollView]; listen to that scrollable's position. (A private
+  /// ScrollController here was never attached, so page 2 never loaded.)
+  ScrollPosition? _position;
 
   @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_onScroll);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final position = Scrollable.maybeOf(context)?.position;
+    if (position != _position) {
+      _position?.removeListener(_onScroll);
+      _position = position?..addListener(_onScroll);
+    }
   }
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    _position?.removeListener(_onScroll);
     super.dispose();
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent * 0.8) {
-      // Load more when 80% scrolled
+    final position = _position;
+    if (position == null || !position.hasContentDimensions) return;
+    if (position.extentAfter < _loadMoreThresholdPx) {
+      // The notifier ignores calls while a page is loading or after the last.
       ref.read(poetSearchPaginationProvider.notifier).loadMore();
     }
   }

@@ -6,29 +6,43 @@ import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/features/search/models/global_search_state.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
+import 'package:flutter_poetry_app/features/search/utils/search_segment_results.dart';
 import 'package:flutter_poetry_app/features/search/widgets/app_search_couplet_card.dart';
 import 'package:flutter_poetry_app/features/search/widgets/app_search_poet_card.dart';
 import 'package:flutter_poetry_app/features/search/widgets/app_search_poem_card.dart';
+import 'package:flutter_poetry_app/features/search/widgets/app_search_verse_card.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poet_model.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.dart';
+import 'package:flutter_poetry_app/core/utils/language_typography.dart';
 
 /// Virtualized infinite-scroll list for a single segment.
 ///
 /// Uses `ListView.builder` for true virtualization (NOT Column + .map().toList()).
 /// Loads more at 80% scroll threshold. Page size: 20 items.
 /// Each card wrapped in RepaintBoundary for scroll performance.
+///
+/// The tap callbacks are required so no result type renders as a dead card.
+/// Couplets and verses without a parent poem id are rendered as not tappable.
 class AppSearchFilteredResults extends ConsumerStatefulWidget {
   final DiscoverSegment segment;
-  final ValueChanged<PoetModel>? onPoetTap;
-  final ValueChanged<PoemModel>? onPoemTap;
-  final ValueChanged<CoupletSearchResult>? onCoupletTap;
+  final ValueChanged<PoetModel> onPoetTap;
+  final ValueChanged<PoemModel> onPoemTap;
+
+  /// Called only for couplets with a [CoupletSearchResult.poemIdToOpen].
+  final ValueChanged<CoupletSearchResult> onCoupletTap;
+
+  /// Called only for verses with a [VerseSearchResult.poemIdToOpen].
+  final ValueChanged<VerseSearchResult> onVerseTap;
+  final ValueChanged<AutocompleteCategory> onCategoryTap;
 
   const AppSearchFilteredResults({
     super.key,
     required this.segment,
-    this.onPoetTap,
-    this.onPoemTap,
-    this.onCoupletTap,
+    required this.onPoetTap,
+    required this.onPoemTap,
+    required this.onCoupletTap,
+    required this.onVerseTap,
+    required this.onCategoryTap,
   });
 
   @override
@@ -120,51 +134,15 @@ class _AppSearchFilteredResultsState
     );
   }
 
-  bool _hasMoreForSegment(UnifiedSearchResponse results) {
-    switch (widget.segment) {
-      case DiscoverSegment.poets:
-        return results.hasMorePoets;
-      case DiscoverSegment.poems:
-        return results.hasMorePoems;
-      case DiscoverSegment.verses:
-        return results.hasMoreCouplets;
-      case DiscoverSegment.categories:
-        return results.hasMoreCategories;
-      default:
-        return false;
-    }
-  }
+  bool _hasMoreForSegment(UnifiedSearchResponse results) =>
+      widget.segment.hasMore(results);
 
   /// Total count in DB for this segment (for header label)
-  int _getTotalCount(UnifiedSearchResponse results) {
-    switch (widget.segment) {
-      case DiscoverSegment.poets:
-        return results.totalPoets;
-      case DiscoverSegment.poems:
-        return results.totalPoems;
-      case DiscoverSegment.verses:
-        return results.totalCouplets;
-      case DiscoverSegment.categories:
-        return results.totalCategories;
-      default:
-        return 0;
-    }
-  }
+  int _getTotalCount(UnifiedSearchResponse results) =>
+      widget.segment.total(results);
 
-  int _getItemCount(UnifiedSearchResponse results) {
-    switch (widget.segment) {
-      case DiscoverSegment.poets:
-        return results.poets.length;
-      case DiscoverSegment.poems:
-        return results.poems.length;
-      case DiscoverSegment.verses:
-        return results.couplets.length;
-      case DiscoverSegment.categories:
-        return results.categories.length;
-      default:
-        return 0;
-    }
-  }
+  int _getItemCount(UnifiedSearchResponse results) =>
+      widget.segment.loadedCount(results);
 
   Widget _buildItem(
     UnifiedSearchResponse results,
@@ -177,37 +155,54 @@ class _AppSearchFilteredResultsState
         if (index >= results.poets.length) return const SizedBox.shrink();
         final poet = results.poets[index];
         return AppSearchPoetCard(
+          key: ValueKey('search-poet-${poet.publicId}'),
           poet: poet,
           searchQuery: query,
-          onTap: widget.onPoetTap != null ? () => widget.onPoetTap!(poet) : null,
+          onTap: () => widget.onPoetTap(poet),
         );
 
       case DiscoverSegment.poems:
         if (index >= results.poems.length) return const SizedBox.shrink();
         final poem = results.poems[index];
         return AppSearchPoemCard(
+          key: ValueKey('search-poem-${poem.publicId}'),
           poem: poem,
           searchQuery: query,
-          onTap: widget.onPoemTap != null ? () => widget.onPoemTap!(poem) : null,
+          onTap: () => widget.onPoemTap(poem),
         );
 
       case DiscoverSegment.verses:
         if (index >= results.couplets.length) return const SizedBox.shrink();
         final couplet = results.couplets[index];
         return AppSearchCoupletCard(
+          key: ValueKey('search-couplet-${couplet.publicId}'),
           couplet: couplet,
           searchQuery: query,
-          onTap: widget.onCoupletTap != null
-              ? () => widget.onCoupletTap!(couplet)
-              : null,
+          onTap: couplet.poemIdToOpen == null
+              ? null
+              : () => widget.onCoupletTap(couplet),
+        );
+
+      case DiscoverSegment.misras:
+        if (index >= results.verses.length) return const SizedBox.shrink();
+        final verse = results.verses[index];
+        return AppSearchVerseCard(
+          key: ValueKey('search-verse-${verse.resultKey}'),
+          result: verse,
+          searchQuery: query,
+          onTap: verse.poemIdToOpen == null
+              ? null
+              : () => widget.onVerseTap(verse),
         );
 
       case DiscoverSegment.categories:
         if (index >= results.categories.length) return const SizedBox.shrink();
         final category = results.categories[index];
         return _CategoryListItem(
+          key: ValueKey('search-category-${category.publicId}'),
           category: category,
           isDark: isDark,
+          onTap: () => widget.onCategoryTap(category),
         );
 
       default:
@@ -254,6 +249,8 @@ class _AppSearchFilteredResultsState
         return isUrdu ? 'غزلیں' : 'poems';
       case DiscoverSegment.verses:
         return isUrdu ? 'اشعار' : 'verses';
+      case DiscoverSegment.misras:
+        return isUrdu ? 'مصرعے' : 'lines';
       case DiscoverSegment.categories:
         return isUrdu ? 'زمرے' : 'categories';
       default:
@@ -331,6 +328,7 @@ class _AppSearchFilteredResultsState
           itemBuilder: (_, __) => const AppSearchPoemSkeleton(),
         );
       case DiscoverSegment.verses:
+      case DiscoverSegment.misras:
         return ListView.builder(
           padding: EdgeInsets.only(top: AppSpacing.md),
           itemCount: 4,
@@ -353,15 +351,18 @@ class _AppSearchFilteredResultsState
 class _CategoryListItem extends StatelessWidget {
   final AutocompleteCategory category;
   final bool isDark;
+  final VoidCallback onTap;
 
   const _CategoryListItem({
+    super.key,
     required this.category,
     required this.isDark,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isUrdu = _isUrduText(category.name);
+    final isUrdu = LanguageTypography.containsArabicScript(category.name);
 
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -369,6 +370,7 @@ class _CategoryListItem extends StatelessWidget {
         vertical: AppSpacing.xs,
       ),
       child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         splashColor: AppColors.primary.withValues(alpha: 0.08),
         child: Container(
@@ -456,9 +458,5 @@ class _CategoryListItem extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  bool _isUrduText(String text) {
-    return RegExp(r'[\u0600-\u06FF]').hasMatch(text);
   }
 }

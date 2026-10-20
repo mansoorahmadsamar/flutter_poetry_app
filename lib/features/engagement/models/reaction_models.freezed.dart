@@ -217,6 +217,7 @@ ReactionSummary _$ReactionSummaryFromJson(Map<String, dynamic> json) {
 mixin _$ReactionSummary {
   int get total => throw _privateConstructorUsedError;
   Map<String, int>? get byType => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
   String? get userReaction => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -231,7 +232,10 @@ abstract class $ReactionSummaryCopyWith<$Res> {
           ReactionSummary value, $Res Function(ReactionSummary) then) =
       _$ReactionSummaryCopyWithImpl<$Res, ReactionSummary>;
   @useResult
-  $Res call({int total, Map<String, int>? byType, String? userReaction});
+  $Res call(
+      {int total,
+      Map<String, int>? byType,
+      @PlaceholderStringConverter() String? userReaction});
 }
 
 /// @nodoc
@@ -276,7 +280,10 @@ abstract class _$$ReactionSummaryImplCopyWith<$Res>
       __$$ReactionSummaryImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int total, Map<String, int>? byType, String? userReaction});
+  $Res call(
+      {int total,
+      Map<String, int>? byType,
+      @PlaceholderStringConverter() String? userReaction});
 }
 
 /// @nodoc
@@ -315,7 +322,9 @@ class __$$ReactionSummaryImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$ReactionSummaryImpl extends _ReactionSummary {
   const _$ReactionSummaryImpl(
-      {this.total = 0, final Map<String, int>? byType, this.userReaction})
+      {this.total = 0,
+      final Map<String, int>? byType,
+      @PlaceholderStringConverter() this.userReaction})
       : _byType = byType,
         super._();
 
@@ -336,6 +345,7 @@ class _$ReactionSummaryImpl extends _ReactionSummary {
   }
 
   @override
+  @PlaceholderStringConverter()
   final String? userReaction;
 
   @override
@@ -376,9 +386,10 @@ class _$ReactionSummaryImpl extends _ReactionSummary {
 
 abstract class _ReactionSummary extends ReactionSummary {
   const factory _ReactionSummary(
-      {final int total,
-      final Map<String, int>? byType,
-      final String? userReaction}) = _$ReactionSummaryImpl;
+          {final int total,
+          final Map<String, int>? byType,
+          @PlaceholderStringConverter() final String? userReaction}) =
+      _$ReactionSummaryImpl;
   const _ReactionSummary._() : super._();
 
   factory _ReactionSummary.fromJson(Map<String, dynamic> json) =
@@ -389,6 +400,7 @@ abstract class _ReactionSummary extends ReactionSummary {
   @override
   Map<String, int>? get byType;
   @override
+  @PlaceholderStringConverter()
   String? get userReaction;
   @override
   @JsonKey(ignore: true)
@@ -402,6 +414,7 @@ ReactionResponse _$ReactionResponseFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$ReactionResponse {
+  @PlaceholderStringConverter()
   String? get userReaction => throw _privateConstructorUsedError;
   int get totalReactionCount => throw _privateConstructorUsedError;
   Map<String, int>? get reactionCounts => throw _privateConstructorUsedError;
@@ -420,7 +433,7 @@ abstract class $ReactionResponseCopyWith<$Res> {
       _$ReactionResponseCopyWithImpl<$Res, ReactionResponse>;
   @useResult
   $Res call(
-      {String? userReaction,
+      {@PlaceholderStringConverter() String? userReaction,
       int totalReactionCount,
       Map<String, int>? reactionCounts,
       String? message});
@@ -474,7 +487,7 @@ abstract class _$$ReactionResponseImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String? userReaction,
+      {@PlaceholderStringConverter() String? userReaction,
       int totalReactionCount,
       Map<String, int>? reactionCounts,
       String? message});
@@ -521,7 +534,7 @@ class __$$ReactionResponseImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$ReactionResponseImpl implements _ReactionResponse {
   const _$ReactionResponseImpl(
-      {this.userReaction,
+      {@PlaceholderStringConverter() this.userReaction,
       this.totalReactionCount = 0,
       final Map<String, int>? reactionCounts,
       this.message})
@@ -531,6 +544,7 @@ class _$ReactionResponseImpl implements _ReactionResponse {
       _$$ReactionResponseImplFromJson(json);
 
   @override
+  @PlaceholderStringConverter()
   final String? userReaction;
   @override
   @JsonKey()
@@ -589,7 +603,7 @@ class _$ReactionResponseImpl implements _ReactionResponse {
 
 abstract class _ReactionResponse implements ReactionResponse {
   const factory _ReactionResponse(
-      {final String? userReaction,
+      {@PlaceholderStringConverter() final String? userReaction,
       final int totalReactionCount,
       final Map<String, int>? reactionCounts,
       final String? message}) = _$ReactionResponseImpl;
@@ -598,6 +612,7 @@ abstract class _ReactionResponse implements ReactionResponse {
       _$ReactionResponseImpl.fromJson;
 
   @override
+  @PlaceholderStringConverter()
   String? get userReaction;
   @override
   int get totalReactionCount;

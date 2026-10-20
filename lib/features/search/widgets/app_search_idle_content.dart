@@ -6,6 +6,7 @@ import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
 import 'package:flutter_poetry_app/features/discover/models/discover_bundle_model.dart';
+import 'package:flutter_poetry_app/core/utils/language_typography.dart';
 
 /// Idle state content — shown when search input is empty.
 ///
@@ -162,7 +163,7 @@ class _RecentSearchesSection extends StatelessWidget {
               separatorBuilder: (_, __) => SizedBox(width: AppSpacing.sm),
               itemBuilder: (_, index) {
                 final query = searches[index];
-                final isQueryUrdu = _isUrduText(query);
+                final isQueryUrdu = LanguageTypography.containsArabicScript(query);
                 return GestureDetector(
                   onTap: () => onTap(query),
                   child: Container(
@@ -270,7 +271,7 @@ class _TrendingSearchesSection extends StatelessWidget {
               separatorBuilder: (_, __) => SizedBox(width: AppSpacing.sm),
               itemBuilder: (_, index) {
                 final query = searches[index];
-                final isQueryUrdu = _isUrduText(query);
+                final isQueryUrdu = LanguageTypography.containsArabicScript(query);
                 return GestureDetector(
                   onTap: () => onTap(query),
                   child: Container(
@@ -405,23 +406,23 @@ class _PopularPoetsSection extends StatelessWidget {
                         // Name
                         Text(
                           poet.primaryText,
-                          textDirection: _isUrduText(poet.primaryText)
+                          textDirection: LanguageTypography.containsArabicScript(poet.primaryText)
                               ? TextDirection.rtl
                               : TextDirection.ltr,
                           textAlign: TextAlign.center,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontFamily: _isUrduText(poet.primaryText)
+                            fontFamily: LanguageTypography.containsArabicScript(poet.primaryText)
                                 ? 'Jameel Noori Nastaleeq'
                                 : null,
-                            fontSize: _isUrduText(poet.primaryText) ? 12 : 11,
+                            fontSize: LanguageTypography.containsArabicScript(poet.primaryText) ? 12 : 11,
                             fontWeight: FontWeight.w600,
                             color: isDark
                                 ? AppColors.textPrimaryDark
                                 : AppColors.textPrimaryLight,
                             height:
-                                _isUrduText(poet.primaryText) ? 1.5 : 1.2,
+                                LanguageTypography.containsArabicScript(poet.primaryText) ? 1.5 : 1.2,
                           ),
                         ),
                       ],
@@ -514,7 +515,7 @@ class _CategoriesSection extends StatelessWidget {
               spacing: AppSpacing.sm,
               runSpacing: AppSpacing.sm,
               children: categories.map((cat) {
-                final isTextUrdu = _isUrduText(cat.primaryText);
+                final isTextUrdu = LanguageTypography.containsArabicScript(cat.primaryText);
                 return GestureDetector(
                   onTap: () => onTap(cat),
                   child: Container(
@@ -576,8 +577,4 @@ TextStyle _headerStyle(bool isUrdu, bool isDark) {
     color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
     height: isUrdu ? 1.8 : 1.4,
   );
-}
-
-bool _isUrduText(String text) {
-  return RegExp(r'[\u0600-\u06FF]').hasMatch(text);
 }

@@ -17,6 +17,8 @@ _$CoupletContentDataImpl _$$CoupletContentDataImplFromJson(
       poetDeathYear: (json['poetDeathYear'] as num?)?.toInt(),
       poetName: json['poetName'] as String?,
       poemPublicId: json['poemPublicId'] as String?,
+      coupletNumber:
+          const PositiveIntConverter().fromJson(json['coupletNumber']),
       likeCount: (json['likeCount'] as num?)?.toInt() ?? 0,
       shareCount: (json['shareCount'] as num?)?.toInt() ?? 0,
       bookmarkCount: (json['bookmarkCount'] as num?)?.toInt() ?? 0,
@@ -24,6 +26,9 @@ _$CoupletContentDataImpl _$$CoupletContentDataImplFromJson(
               ?.map((e) => e as String)
               .toList() ??
           const [],
+      themes: json['themes'] == null
+          ? const <CoupletTheme>[]
+          : const CoupletThemesConverter().fromJson(json['themes']),
       reactions: json['reactions'] as Map<String, dynamic>?,
     );
 
@@ -38,10 +43,13 @@ Map<String, dynamic> _$$CoupletContentDataImplToJson(
       'poetDeathYear': instance.poetDeathYear,
       'poetName': instance.poetName,
       'poemPublicId': instance.poemPublicId,
+      'coupletNumber':
+          const PositiveIntConverter().toJson(instance.coupletNumber),
       'likeCount': instance.likeCount,
       'shareCount': instance.shareCount,
       'bookmarkCount': instance.bookmarkCount,
       'tagSlugs': instance.tagSlugs,
+      'themes': const CoupletThemesConverter().toJson(instance.themes),
       'reactions': instance.reactions,
     };
 

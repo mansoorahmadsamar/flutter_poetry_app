@@ -110,6 +110,16 @@ _$ContentCardImpl _$$ContentCardImplFromJson(Map<String, dynamic> json) =>
       direction: json['direction'] as String? ?? 'rtl',
       score: (json['score'] as num?)?.toDouble(),
       imageUrl: json['imageUrl'] as String?,
+      excerpt: const PlaceholderStringConverter().fromJson(json['excerpt']),
+      poetPublicId:
+          const PlaceholderStringConverter().fromJson(json['poetPublicId']),
+      poemPublicId:
+          const PlaceholderStringConverter().fromJson(json['poemPublicId']),
+      coupletNumber:
+          const PositiveIntConverter().fromJson(json['coupletNumber']),
+      themes: json['themes'] == null
+          ? const <CoupletTheme>[]
+          : const CoupletThemesConverter().fromJson(json['themes']),
     );
 
 Map<String, dynamic> _$$ContentCardImplToJson(_$ContentCardImpl instance) =>
@@ -125,6 +135,14 @@ Map<String, dynamic> _$$ContentCardImplToJson(_$ContentCardImpl instance) =>
       'direction': instance.direction,
       'score': instance.score,
       'imageUrl': instance.imageUrl,
+      'excerpt': const PlaceholderStringConverter().toJson(instance.excerpt),
+      'poetPublicId':
+          const PlaceholderStringConverter().toJson(instance.poetPublicId),
+      'poemPublicId':
+          const PlaceholderStringConverter().toJson(instance.poemPublicId),
+      'coupletNumber':
+          const PositiveIntConverter().toJson(instance.coupletNumber),
+      'themes': const CoupletThemesConverter().toJson(instance.themes),
     };
 
 _$ContentMetricsImpl _$$ContentMetricsImplFromJson(Map<String, dynamic> json) =>

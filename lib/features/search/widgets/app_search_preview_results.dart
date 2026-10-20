@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
+import 'package:flutter_poetry_app/core/utils/api_placeholder.dart';
+import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.dart';
+import 'package:flutter_poetry_app/features/main/tabs/poets/models/poet_model.dart';
 import 'package:flutter_poetry_app/features/search/models/global_search_state.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
+import 'package:flutter_poetry_app/features/search/utils/search_segment_results.dart';
 import 'package:flutter_poetry_app/features/search/widgets/app_search_couplet_card.dart';
 import 'package:flutter_poetry_app/features/search/widgets/app_search_poet_card.dart';
 import 'package:flutter_poetry_app/features/search/widgets/app_search_poem_card.dart';
+import 'package:flutter_poetry_app/features/search/widgets/app_search_verse_card.dart';
+import 'package:flutter_poetry_app/core/utils/language_typography.dart';
 
 /// Smart grouped overview (the "سب" tab experience).
 ///
@@ -18,12 +23,35 @@ import 'package:flutter_poetry_app/features/search/widgets/app_search_poem_card.
 /// Shows all non-empty content types grouped with counts + "سب دیکھیں".
 ///
 /// Only watches `unifiedResults` and `relatedSearches` via `.select()`.
+///
+/// Every visible result is either tappable or rendered without a tap
+/// affordance: the callbacks are required so a new result type cannot ship
+/// as a dead card. Couplets and verses without a parent poem id and tags
+/// without a slug are rendered as not tappable.
 class AppSearchPreviewResults extends ConsumerWidget {
   final ValueChanged<String> onRelatedSearchTap;
+  final ValueChanged<PoetModel> onPoetTap;
+  final ValueChanged<PoemModel> onPoemTap;
+
+  /// Called only for couplets with a [CoupletSearchResult.poemIdToOpen].
+  final ValueChanged<CoupletSearchResult> onCoupletTap;
+
+  /// Called only for verses with a [VerseSearchResult.poemIdToOpen].
+  final ValueChanged<VerseSearchResult> onVerseTap;
+  final ValueChanged<AutocompleteCategory> onCategoryTap;
+
+  /// Called only for tags with a slug.
+  final ValueChanged<AutocompleteTag> onTagTap;
 
   const AppSearchPreviewResults({
     super.key,
     required this.onRelatedSearchTap,
+    required this.onPoetTap,
+    required this.onPoemTap,
+    required this.onCoupletTap,
+    required this.onVerseTap,
+    required this.onCategoryTap,
+    required this.onTagTap,
   });
 
   @override
@@ -66,7 +94,7 @@ class AppSearchPreviewResults extends ConsumerWidget {
               AppSpacing.sm,
             ),
             child: Text(
-              _resultsText(query, unified.totalResults, languageCode),
+              _resultsText(query, unified.totalAcrossTabs, languageCode),
               textDirection: isUrdu ? TextDirection.rtl : TextDirection.ltr,
               style: TextStyle(
                 fontFamily: isUrdu ? 'Jameel Noori Nastaleeq' : null,
@@ -107,11 +135,11 @@ class AppSearchPreviewResults extends ConsumerWidget {
                   itemBuilder: (context, index) {
                     final poet = unified.poets[index];
                     return _MiniPoetCard(
+                      key: ValueKey('search-poet-${poet.publicId}'),
                       name: poet.name,
-                      imageUrl: poet.profileImageUrl,
+                      imageUrl: presentOrNull(poet.profileImageUrl),
                       isDark: isDark,
-                      onTap: () =>
-                          context.push('/main/poets/${poet.publicId}'),
+                      onTap: () => onPoetTap(poet),
                     );
                   },
                 ),
@@ -139,10 +167,53 @@ class AppSearchPreviewResults extends ConsumerWidget {
           SliverList.builder(
             itemCount: unified.couplets.take(3).length,
             itemBuilder: (context, index) {
+              final couplet = unified.couplets[index];
               return RepaintBoundary(
                 child: AppSearchCoupletCard(
-                  couplet: unified.couplets[index],
+                  key: ValueKey('search-couplet-${couplet.publicId}'),
+                  couplet: couplet,
                   searchQuery: query,
+                  onTap: couplet.poemIdToOpen == null
+                      ? null
+                      : () => onCoupletTap(couplet),
+                ),
+              );
+            },
+          ),
+          SliverToBoxAdapter(child: SizedBox(height: AppSpacing.lg)),
+        ],
+
+        // Matching single lines (max 3) — e.g. Roman `jigar` hits that are
+        // neither a couplet nor a poem title.
+        if (unified.verses.isNotEmpty) ...[
+          SliverToBoxAdapter(
+            child: _SectionHeader(
+              title: _misrasTitle(languageCode),
+              count: unified.verseCount,
+              icon: Icons.short_text_rounded,
+              isDark: isDark,
+              isUrdu: isUrdu,
+              languageCode: languageCode,
+              onSeeAll: unified.verses.length > _versePreviewCount ||
+                      unified.hasMoreVerses
+                  ? () => ref
+                      .read(globalSearchProvider.notifier)
+                      .setActiveSegment(DiscoverSegment.misras)
+                  : null,
+            ),
+          ),
+          SliverList.builder(
+            itemCount: unified.verses.take(_versePreviewCount).length,
+            itemBuilder: (context, index) {
+              final verse = unified.verses[index];
+              return RepaintBoundary(
+                child: AppSearchVerseCard(
+                  key: ValueKey('search-verse-${verse.resultKey}'),
+                  result: verse,
+                  searchQuery: query,
+                  onTap: verse.poemIdToOpen == null
+                      ? null
+                      : () => onVerseTap(verse),
                 ),
               );
             },
@@ -170,10 +241,13 @@ class AppSearchPreviewResults extends ConsumerWidget {
           SliverList.builder(
             itemCount: unified.poems.take(3).length,
             itemBuilder: (context, index) {
+              final poem = unified.poems[index];
               return RepaintBoundary(
                 child: AppSearchPoemCard(
-                  poem: unified.poems[index],
+                  key: ValueKey('search-poem-${poem.publicId}'),
+                  poem: poem,
                   searchQuery: query,
+                  onTap: () => onPoemTap(poem),
                 ),
               );
             },
@@ -190,6 +264,7 @@ class AppSearchPreviewResults extends ConsumerWidget {
               isDark: isDark,
               isUrdu: isUrdu,
               languageCode: languageCode,
+              onTap: onCategoryTap,
             ),
           ),
 
@@ -201,6 +276,7 @@ class AppSearchPreviewResults extends ConsumerWidget {
               isDark: isDark,
               isUrdu: isUrdu,
               languageCode: languageCode,
+              onTap: onTagTap,
             ),
           ),
 
@@ -297,6 +373,10 @@ class AppSearchPreviewResults extends ConsumerWidget {
       l == 'ur' ? 'شعراء' : (l == 'hi' ? 'कवि' : 'Poets');
   String _versesTitle(String l) =>
       l == 'ur' ? 'اشعار' : (l == 'hi' ? 'शेर' : 'Verses');
+  static const _versePreviewCount = 3;
+
+  String _misrasTitle(String l) =>
+      l == 'ur' ? 'مصرعے' : (l == 'hi' ? 'मिसरे' : 'Lines');
   String _poemsTitle(String l) =>
       l == 'ur' ? 'غزلیں / نظمیں' : (l == 'hi' ? 'ग़ज़लें' : 'Poems');
   String _categoriesTitle(String l) =>
@@ -483,6 +563,7 @@ class _MiniPoetCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const _MiniPoetCard({
+    super.key,
     required this.name,
     this.imageUrl,
     required this.isDark,
@@ -491,7 +572,7 @@ class _MiniPoetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isUrdu = _isUrduText(name);
+    final isUrdu = LanguageTypography.containsArabicScript(name);
 
     return GestureDetector(
       onTap: onTap,
@@ -558,6 +639,7 @@ class _CategoriesChips extends StatelessWidget {
   final bool isDark;
   final bool isUrdu;
   final String languageCode;
+  final ValueChanged<AutocompleteCategory> onTap;
 
   const _CategoriesChips({
     required this.title,
@@ -565,6 +647,7 @@ class _CategoriesChips extends StatelessWidget {
     required this.isDark,
     required this.isUrdu,
     required this.languageCode,
+    required this.onTap,
   });
 
   @override
@@ -591,26 +674,31 @@ class _CategoriesChips extends StatelessWidget {
               spacing: AppSpacing.sm,
               runSpacing: AppSpacing.sm,
               children: categories.map((cat) {
-                final isTextUrdu = _isUrduText(cat.name);
-                return Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.sm,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
-                  ),
-                  child: Text(
-                    cat.name,
-                    textDirection: isTextUrdu ? TextDirection.rtl : TextDirection.ltr,
-                    style: TextStyle(
-                      fontFamily: isTextUrdu ? 'Jameel Noori Nastaleeq' : null,
-                      fontSize: isTextUrdu ? 14 : 13,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.primary,
-                      height: isTextUrdu ? 1.8 : 1.4,
+                final isTextUrdu = LanguageTypography.containsArabicScript(cat.name);
+                return _ChipTapTarget(
+                  key: ValueKey('search-category-${cat.publicId}'),
+                  borderRadius: 12,
+                  onTap: () => onTap(cat),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.sm,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+                    ),
+                    child: Text(
+                      cat.name,
+                      textDirection: isTextUrdu ? TextDirection.rtl : TextDirection.ltr,
+                      style: TextStyle(
+                        fontFamily: isTextUrdu ? 'Jameel Noori Nastaleeq' : null,
+                        fontSize: isTextUrdu ? 14 : 13,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.primary,
+                        height: isTextUrdu ? 1.8 : 1.4,
+                      ),
                     ),
                   ),
                 );
@@ -632,12 +720,14 @@ class _TagsChips extends StatelessWidget {
   final bool isDark;
   final bool isUrdu;
   final String languageCode;
+  final ValueChanged<AutocompleteTag> onTap;
 
   const _TagsChips({
     required this.tags,
     required this.isDark,
     required this.isUrdu,
     required this.languageCode,
+    required this.onTap,
   });
 
   @override
@@ -667,27 +757,34 @@ class _TagsChips extends StatelessWidget {
               spacing: AppSpacing.sm,
               runSpacing: AppSpacing.sm,
               children: tags.map((tag) {
-                final isTextUrdu = _isUrduText(tag.name);
-                return Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.sm,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isDark ? AppColors.surfaceDark : AppColors.verseBackground,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: isDark ? AppColors.borderDark : AppColors.borderLight,
+                final isTextUrdu = LanguageTypography.containsArabicScript(tag.name);
+                return _ChipTapTarget(
+                  key: ValueKey('search-tag-${tag.publicId}'),
+                  borderRadius: 20,
+                  onTap: presentOrNull(tag.slug) == null
+                      ? null
+                      : () => onTap(tag),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.sm,
                     ),
-                  ),
-                  child: Text(
-                    tag.name,
-                    textDirection: isTextUrdu ? TextDirection.rtl : TextDirection.ltr,
-                    style: TextStyle(
-                      fontFamily: isTextUrdu ? 'Jameel Noori Nastaleeq' : null,
-                      fontSize: isTextUrdu ? 14 : 13,
-                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
-                      height: isTextUrdu ? 1.8 : 1.4,
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.surfaceDark : AppColors.verseBackground,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: isDark ? AppColors.borderDark : AppColors.borderLight,
+                      ),
+                    ),
+                    child: Text(
+                      tag.name,
+                      textDirection: isTextUrdu ? TextDirection.rtl : TextDirection.ltr,
+                      style: TextStyle(
+                        fontFamily: isTextUrdu ? 'Jameel Noori Nastaleeq' : null,
+                        fontSize: isTextUrdu ? 14 : 13,
+                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                        height: isTextUrdu ? 1.8 : 1.4,
+                      ),
                     ),
                   ),
                 );
@@ -695,6 +792,36 @@ class _TagsChips extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Chip tap target (ink ripple + button semantics; inert when onTap is null)
+// ---------------------------------------------------------------------------
+
+class _ChipTapTarget extends StatelessWidget {
+  final double borderRadius;
+  final VoidCallback? onTap;
+  final Widget child;
+
+  const _ChipTapTarget({
+    super.key,
+    required this.borderRadius,
+    required this.onTap,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (onTap == null) return child;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(borderRadius),
+        child: child,
       ),
     );
   }
@@ -741,7 +868,7 @@ class _RelatedSearches extends StatelessWidget {
             spacing: AppSpacing.sm,
             runSpacing: AppSpacing.sm,
             children: searches.map((search) {
-              final isTextUrdu = _isUrduText(search.query);
+              final isTextUrdu = LanguageTypography.containsArabicScript(search.query);
               return GestureDetector(
                 onTap: () => onTap(search.query),
                 child: Container(
@@ -788,8 +915,4 @@ TextStyle _headerStyle(bool isUrdu, bool isDark) {
     color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
     height: isUrdu ? 1.8 : 1.4,
   );
-}
-
-bool _isUrduText(String text) {
-  return RegExp(r'[\u0600-\u06FF]').hasMatch(text);
 }

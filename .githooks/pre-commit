@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+#
+# Sukhan flutter_poetry_app — pre-commit gate.
+#
+# This is not advice, it refuses. A rule that lives only in a document is
+# obeyed when someone remembers to read it; this one cannot be forgotten.
+#
+# Install (once per clone — the owner's choice, nothing installs it for you):
+#     git config core.hooksPath .githooks
+#
+# Bypass is deliberate and visible: `git commit --no-verify`. If you use it,
+# SAY SO IN THE COMMIT MESSAGE and say why. A silent bypass is a defect.
+
+set -uo pipefail
+
+REPO="$(git rev-parse --show-toplevel)"
+CONFIG="$REPO/.gitleaks.toml"
+FAILED=0
+
+red()   { printf '\033[31m%s\033[0m\n' "$*"; }
+green() { printf '\033[32m%s\033[0m\n' "$*"; }
+amber() { printf '\033[33m%s\033[0m\n' "$*"; }
+
+# --- 1. Secrets -------------------------------------------------------------
+# Sukhan is live. Release keystore passwords, the Play service account and the
+# Firebase admin key live in gitignored files and CI secrets; this gate keeps
+# them out of commits. Pushing to develop/main releases to the Play Store.
+# Secrets already in history are pinned in .gitleaksignore pending rotation;
+# a NEW one in the staged diff is always refused.
+if command -v gitleaks >/dev/null 2>&1; then
+  if gitleaks protect --staged --no-banner --redact \
+       --config "$CONFIG" --source "$REPO" >/dev/null 2>&1; then
+    green "✓ no secrets in staged changes"
+  else
+    red   "✗ SECRET DETECTED in staged changes — commit refused"
+    echo
+    # --verbose shows file, line and rule; --redact keeps the value off screen.
+    gitleaks protect --staged --no-banner --redact --verbose \
+      --config "$CONFIG" --source "$REPO" 2>&1 | tail -40
+    echo
+    red   "Remove the secret. Put it in the environment / a gitignored file instead,"
+    red   "and if it was ever real, ROTATE it — unstaging does not un-leak it."
+    red   "If this is a false positive, add a narrow rule to .gitleaks.toml —"
+    red   "never widen the allowlist to silence a real finding."
+    red   "Bypass only deliberately: git commit --no-verify, and state the bypass"
+    red   "and the reason in the commit message."
+    FAILED=1
+  fi
+else
+  # Same choice as Dolce: warn loudly and continue (fail open), so a fresh
+  # machine is not blocked. Install gitleaks to make this gate real.
+  amber "! gitleaks not installed — secret scan SKIPPED"
+  amber "  Install: brew install gitleaks   (or https://github.com/gitleaks/gitleaks#installing)"
+fi
+
+# --- 2. Tests accompany code -----------------------------------------------
+# The prime rule: code ships with tests, in the same commit. This is a nudge,
+# not a refusal — it cannot tell an exhaustive test from a token one, and a
+# hook that cries wolf gets bypassed by habit.
+staged() { git diff --cached --name-only --diff-filter=ACM; }
+
+CODE=0; TESTS=0
+while IFS= read -r f; do
+  case "$f" in
+    test/*|integration_test/*|*_test.dart) TESTS=1 ;;
+    lib/*.dart) CODE=1 ;;
+  esac
+done < <(staged)
+
+if [[ $CODE -eq 1 && $TESTS -eq 0 ]]; then
+  amber "! code changed but no test file is staged"
+  amber "  The prime rule is: code ships with tests, in the same commit."
+  amber "  If this change genuinely needs none (docs, config, rename), continue."
+fi
+
+# --- 3. Debug leftovers -----------------------------------------------------
+LEFTOVER=$(staged | grep -E '\.dart$' | while IFS= read -r f; do [[ -f "$f" ]] && printf '%s\0' "$f"; done | xargs -0 grep -lnE '(^|[^A-Za-z_.])print\(|solo: *true|debugDumpApp\(' 2>/dev/null || true)
+if [[ -n "$LEFTOVER" ]]; then
+  amber "! debug leftovers (print( / solo: true / debugDumpApp) in:"
+  echo "$LEFTOVER" | sed 's/^/    /'
+  amber "  `solo: true` in a test silently skips every other test in the file."
+fi
+
+echo
+if [[ $FAILED -eq 1 ]]; then
+  red "commit refused."
+  exit 1
+fi
+green "pre-commit checks passed."
+exit 0

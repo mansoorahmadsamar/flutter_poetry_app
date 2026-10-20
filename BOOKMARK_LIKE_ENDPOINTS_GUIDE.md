@@ -64,7 +64,7 @@ GET  /api/users/me/likes                   ← Correct!
 
 ```http
 POST http://localhost:8080/api/poems/abc123/bookmark
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Authorization: Bearer <JWT_TOKEN>
 Content-Type: application/json
 ```
 
@@ -112,7 +112,7 @@ Content-Type: application/json
 
 ```http
 POST http://localhost:8080/api/poems/abc123/like
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Authorization: Bearer <JWT_TOKEN>
 Content-Type: application/json
 ```
 
@@ -156,7 +156,7 @@ Content-Type: application/json
 
 ```http
 GET http://localhost:8080/api/poems/abc123/status
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Response:**

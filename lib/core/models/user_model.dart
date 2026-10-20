@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import '../utils/api_placeholder.dart';
+
 part 'user_model.g.dart';
 
 /// User model representing the authenticated user
@@ -8,21 +10,40 @@ part 'user_model.g.dart';
 class UserModel extends Equatable {
   final String id;
   final String email;
-  final String fullName;
-  final String username;
+
+  /// `GET /api/auth/me` builds its answer as a plain map
+  /// (`AuthController.getCurrentUser`), so the backend's `"-"` placeholder
+  /// does not apply: a NULL `users.full_name` / `username` / `provider`
+  /// arrives as JSON null. `full_name` is null when the sign-in provider
+  /// gave no name (e.g. Apple "Hide my name"); the profile used to fail to
+  /// load for those users (T-181).
+  @PlaceholderStringConverter()
+  final String? fullName;
+  @PlaceholderStringConverter()
+  final String? username;
+  @PlaceholderStringConverter()
   final String? profileImageUrl;
-  final String provider;
+  @PlaceholderStringConverter()
+  final String? provider;
+  @JsonKey(defaultValue: true)
   final bool isActive;
 
   const UserModel({
     required this.id,
     required this.email,
-    required this.fullName,
-    required this.username,
+    this.fullName,
+    this.username,
     this.profileImageUrl,
-    required this.provider,
-    required this.isActive,
+    this.provider,
+    this.isActive = true,
   });
+
+  /// The name to show: the full name, else the part of the email before `@`.
+  String get displayName =>
+      fullName ?? (email.contains('@') ? email.split('@').first : email);
+
+  /// `@username`, or null when the user has none.
+  String? get handle => username == null ? null : '@$username';
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>
       _$UserModelFromJson(json);

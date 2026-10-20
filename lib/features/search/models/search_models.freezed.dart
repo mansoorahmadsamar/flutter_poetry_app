@@ -287,7 +287,9 @@ AutocompletePoet _$AutocompletePoetFromJson(Map<String, dynamic> json) {
 mixin _$AutocompletePoet {
   String get publicId => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
   String? get profileImageUrl => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
   String? get era => throw _privateConstructorUsedError;
   double get score => throw _privateConstructorUsedError;
 
@@ -306,8 +308,8 @@ abstract class $AutocompletePoetCopyWith<$Res> {
   $Res call(
       {String publicId,
       String name,
-      String? profileImageUrl,
-      String? era,
+      @PlaceholderStringConverter() String? profileImageUrl,
+      @PlaceholderStringConverter() String? era,
       double score});
 }
 
@@ -366,8 +368,8 @@ abstract class _$$AutocompletePoetImplCopyWith<$Res>
   $Res call(
       {String publicId,
       String name,
-      String? profileImageUrl,
-      String? era,
+      @PlaceholderStringConverter() String? profileImageUrl,
+      @PlaceholderStringConverter() String? era,
       double score});
 }
 
@@ -419,8 +421,8 @@ class _$AutocompletePoetImpl implements _AutocompletePoet {
   const _$AutocompletePoetImpl(
       {required this.publicId,
       required this.name,
-      this.profileImageUrl,
-      this.era,
+      @PlaceholderStringConverter() this.profileImageUrl,
+      @PlaceholderStringConverter() this.era,
       this.score = 0.0});
 
   factory _$AutocompletePoetImpl.fromJson(Map<String, dynamic> json) =>
@@ -431,8 +433,10 @@ class _$AutocompletePoetImpl implements _AutocompletePoet {
   @override
   final String name;
   @override
+  @PlaceholderStringConverter()
   final String? profileImageUrl;
   @override
+  @PlaceholderStringConverter()
   final String? era;
   @override
   @JsonKey()
@@ -481,8 +485,8 @@ abstract class _AutocompletePoet implements AutocompletePoet {
   const factory _AutocompletePoet(
       {required final String publicId,
       required final String name,
-      final String? profileImageUrl,
-      final String? era,
+      @PlaceholderStringConverter() final String? profileImageUrl,
+      @PlaceholderStringConverter() final String? era,
       final double score}) = _$AutocompletePoetImpl;
 
   factory _AutocompletePoet.fromJson(Map<String, dynamic> json) =
@@ -493,8 +497,10 @@ abstract class _AutocompletePoet implements AutocompletePoet {
   @override
   String get name;
   @override
+  @PlaceholderStringConverter()
   String? get profileImageUrl;
   @override
+  @PlaceholderStringConverter()
   String? get era;
   @override
   double get score;
@@ -511,10 +517,14 @@ AutocompletePoem _$AutocompletePoemFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$AutocompletePoem {
   String get publicId => throw _privateConstructorUsedError;
-  String get title => throw _privateConstructorUsedError;
-  String get poetName => throw _privateConstructorUsedError;
-  String get poetPublicId => throw _privateConstructorUsedError;
-  String get poetryType => throw _privateConstructorUsedError;
+  String get title =>
+      throw _privateConstructorUsedError; // Absent ("-") for a poem whose poet or type is unknown (T-182).
+  @PlaceholderStringConverter()
+  String? get poetName => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get poetPublicId => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get poetryType => throw _privateConstructorUsedError;
   double get score => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -532,9 +542,9 @@ abstract class $AutocompletePoemCopyWith<$Res> {
   $Res call(
       {String publicId,
       String title,
-      String poetName,
-      String poetPublicId,
-      String poetryType,
+      @PlaceholderStringConverter() String? poetName,
+      @PlaceholderStringConverter() String? poetPublicId,
+      @PlaceholderStringConverter() String? poetryType,
       double score});
 }
 
@@ -553,9 +563,9 @@ class _$AutocompletePoemCopyWithImpl<$Res, $Val extends AutocompletePoem>
   $Res call({
     Object? publicId = null,
     Object? title = null,
-    Object? poetName = null,
-    Object? poetPublicId = null,
-    Object? poetryType = null,
+    Object? poetName = freezed,
+    Object? poetPublicId = freezed,
+    Object? poetryType = freezed,
     Object? score = null,
   }) {
     return _then(_value.copyWith(
@@ -567,18 +577,18 @@ class _$AutocompletePoemCopyWithImpl<$Res, $Val extends AutocompletePoem>
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      poetName: null == poetName
+      poetName: freezed == poetName
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
-              as String,
-      poetPublicId: null == poetPublicId
+              as String?,
+      poetPublicId: freezed == poetPublicId
           ? _value.poetPublicId
           : poetPublicId // ignore: cast_nullable_to_non_nullable
-              as String,
-      poetryType: null == poetryType
+              as String?,
+      poetryType: freezed == poetryType
           ? _value.poetryType
           : poetryType // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       score: null == score
           ? _value.score
           : score // ignore: cast_nullable_to_non_nullable
@@ -598,9 +608,9 @@ abstract class _$$AutocompletePoemImplCopyWith<$Res>
   $Res call(
       {String publicId,
       String title,
-      String poetName,
-      String poetPublicId,
-      String poetryType,
+      @PlaceholderStringConverter() String? poetName,
+      @PlaceholderStringConverter() String? poetPublicId,
+      @PlaceholderStringConverter() String? poetryType,
       double score});
 }
 
@@ -617,9 +627,9 @@ class __$$AutocompletePoemImplCopyWithImpl<$Res>
   $Res call({
     Object? publicId = null,
     Object? title = null,
-    Object? poetName = null,
-    Object? poetPublicId = null,
-    Object? poetryType = null,
+    Object? poetName = freezed,
+    Object? poetPublicId = freezed,
+    Object? poetryType = freezed,
     Object? score = null,
   }) {
     return _then(_$AutocompletePoemImpl(
@@ -631,18 +641,18 @@ class __$$AutocompletePoemImplCopyWithImpl<$Res>
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      poetName: null == poetName
+      poetName: freezed == poetName
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
-              as String,
-      poetPublicId: null == poetPublicId
+              as String?,
+      poetPublicId: freezed == poetPublicId
           ? _value.poetPublicId
           : poetPublicId // ignore: cast_nullable_to_non_nullable
-              as String,
-      poetryType: null == poetryType
+              as String?,
+      poetryType: freezed == poetryType
           ? _value.poetryType
           : poetryType // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       score: null == score
           ? _value.score
           : score // ignore: cast_nullable_to_non_nullable
@@ -657,9 +667,9 @@ class _$AutocompletePoemImpl implements _AutocompletePoem {
   const _$AutocompletePoemImpl(
       {required this.publicId,
       required this.title,
-      required this.poetName,
-      required this.poetPublicId,
-      required this.poetryType,
+      @PlaceholderStringConverter() this.poetName,
+      @PlaceholderStringConverter() this.poetPublicId,
+      @PlaceholderStringConverter() this.poetryType,
       this.score = 0.0});
 
   factory _$AutocompletePoemImpl.fromJson(Map<String, dynamic> json) =>
@@ -669,12 +679,16 @@ class _$AutocompletePoemImpl implements _AutocompletePoem {
   final String publicId;
   @override
   final String title;
+// Absent ("-") for a poem whose poet or type is unknown (T-182).
   @override
-  final String poetName;
+  @PlaceholderStringConverter()
+  final String? poetName;
   @override
-  final String poetPublicId;
+  @PlaceholderStringConverter()
+  final String? poetPublicId;
   @override
-  final String poetryType;
+  @PlaceholderStringConverter()
+  final String? poetryType;
   @override
   @JsonKey()
   final double score;
@@ -725,9 +739,9 @@ abstract class _AutocompletePoem implements AutocompletePoem {
   const factory _AutocompletePoem(
       {required final String publicId,
       required final String title,
-      required final String poetName,
-      required final String poetPublicId,
-      required final String poetryType,
+      @PlaceholderStringConverter() final String? poetName,
+      @PlaceholderStringConverter() final String? poetPublicId,
+      @PlaceholderStringConverter() final String? poetryType,
       final double score}) = _$AutocompletePoemImpl;
 
   factory _AutocompletePoem.fromJson(Map<String, dynamic> json) =
@@ -737,12 +751,15 @@ abstract class _AutocompletePoem implements AutocompletePoem {
   String get publicId;
   @override
   String get title;
+  @override // Absent ("-") for a poem whose poet or type is unknown (T-182).
+  @PlaceholderStringConverter()
+  String? get poetName;
   @override
-  String get poetName;
+  @PlaceholderStringConverter()
+  String? get poetPublicId;
   @override
-  String get poetPublicId;
-  @override
-  String get poetryType;
+  @PlaceholderStringConverter()
+  String? get poetryType;
   @override
   double get score;
   @override
@@ -759,8 +776,11 @@ AutocompleteTag _$AutocompleteTagFromJson(Map<String, dynamic> json) {
 mixin _$AutocompleteTag {
   String get publicId => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
-  String get slug => throw _privateConstructorUsedError;
-  String get tagType => throw _privateConstructorUsedError;
+  String get slug =>
+      throw _privateConstructorUsedError; // An enum on the backend (`TagDto.tagType` in /api/search results): a
+// null arrives as JSON null, which used to fail the whole search (T-181).
+  @PlaceholderStringConverter()
+  String? get tagType => throw _privateConstructorUsedError;
   double get score => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -779,7 +799,7 @@ abstract class $AutocompleteTagCopyWith<$Res> {
       {String publicId,
       String name,
       String slug,
-      String tagType,
+      @PlaceholderStringConverter() String? tagType,
       double score});
 }
 
@@ -799,7 +819,7 @@ class _$AutocompleteTagCopyWithImpl<$Res, $Val extends AutocompleteTag>
     Object? publicId = null,
     Object? name = null,
     Object? slug = null,
-    Object? tagType = null,
+    Object? tagType = freezed,
     Object? score = null,
   }) {
     return _then(_value.copyWith(
@@ -815,10 +835,10 @@ class _$AutocompleteTagCopyWithImpl<$Res, $Val extends AutocompleteTag>
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
               as String,
-      tagType: null == tagType
+      tagType: freezed == tagType
           ? _value.tagType
           : tagType // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       score: null == score
           ? _value.score
           : score // ignore: cast_nullable_to_non_nullable
@@ -839,7 +859,7 @@ abstract class _$$AutocompleteTagImplCopyWith<$Res>
       {String publicId,
       String name,
       String slug,
-      String tagType,
+      @PlaceholderStringConverter() String? tagType,
       double score});
 }
 
@@ -857,7 +877,7 @@ class __$$AutocompleteTagImplCopyWithImpl<$Res>
     Object? publicId = null,
     Object? name = null,
     Object? slug = null,
-    Object? tagType = null,
+    Object? tagType = freezed,
     Object? score = null,
   }) {
     return _then(_$AutocompleteTagImpl(
@@ -873,10 +893,10 @@ class __$$AutocompleteTagImplCopyWithImpl<$Res>
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
               as String,
-      tagType: null == tagType
+      tagType: freezed == tagType
           ? _value.tagType
           : tagType // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       score: null == score
           ? _value.score
           : score // ignore: cast_nullable_to_non_nullable
@@ -892,7 +912,7 @@ class _$AutocompleteTagImpl implements _AutocompleteTag {
       {required this.publicId,
       required this.name,
       required this.slug,
-      required this.tagType,
+      @PlaceholderStringConverter() this.tagType,
       this.score = 0.0});
 
   factory _$AutocompleteTagImpl.fromJson(Map<String, dynamic> json) =>
@@ -904,8 +924,11 @@ class _$AutocompleteTagImpl implements _AutocompleteTag {
   final String name;
   @override
   final String slug;
+// An enum on the backend (`TagDto.tagType` in /api/search results): a
+// null arrives as JSON null, which used to fail the whole search (T-181).
   @override
-  final String tagType;
+  @PlaceholderStringConverter()
+  final String? tagType;
   @override
   @JsonKey()
   final double score;
@@ -953,7 +976,7 @@ abstract class _AutocompleteTag implements AutocompleteTag {
       {required final String publicId,
       required final String name,
       required final String slug,
-      required final String tagType,
+      @PlaceholderStringConverter() final String? tagType,
       final double score}) = _$AutocompleteTagImpl;
 
   factory _AutocompleteTag.fromJson(Map<String, dynamic> json) =
@@ -965,8 +988,10 @@ abstract class _AutocompleteTag implements AutocompleteTag {
   String get name;
   @override
   String get slug;
-  @override
-  String get tagType;
+  @override // An enum on the backend (`TagDto.tagType` in /api/search results): a
+// null arrives as JSON null, which used to fail the whole search (T-181).
+  @PlaceholderStringConverter()
+  String? get tagType;
   @override
   double get score;
   @override
@@ -1345,7 +1370,21 @@ mixin _$CoupletSearchResult {
       throw _privateConstructorUsedError; // Made nullable - API returns null when not authenticated
   bool? get isBookmarked =>
       throw _privateConstructorUsedError; // Made nullable - API returns null when not authenticated
-  DateTime? get createdAt => throw _privateConstructorUsedError;
+  DateTime? get createdAt =>
+      throw _privateConstructorUsedError; // Added from API response
+// Flat parent fields (additive, nullable backend contract). Older
+// backends omit them and may send "-" — both parse to null.
+  @PlaceholderStringConverter()
+  String? get poemPublicId => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get poemTitle => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get poetPublicId => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get poetName =>
+      throw _privateConstructorUsedError; // Couplet themes (max 3, server-ranked); absent on production today.
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -1373,7 +1412,12 @@ abstract class $CoupletSearchResultCopyWith<$Res> {
       double engagementScore,
       bool? isLiked,
       bool? isBookmarked,
-      DateTime? createdAt});
+      DateTime? createdAt,
+      @PlaceholderStringConverter() String? poemPublicId,
+      @PlaceholderStringConverter() String? poemTitle,
+      @PlaceholderStringConverter() String? poetPublicId,
+      @PlaceholderStringConverter() String? poetName,
+      @CoupletThemesConverter() List<CoupletTheme> themes});
 
   $PoemSummaryCopyWith<$Res>? get poem;
   $PoetSummaryCopyWith<$Res>? get poet;
@@ -1406,6 +1450,11 @@ class _$CoupletSearchResultCopyWithImpl<$Res, $Val extends CoupletSearchResult>
     Object? isLiked = freezed,
     Object? isBookmarked = freezed,
     Object? createdAt = freezed,
+    Object? poemPublicId = freezed,
+    Object? poemTitle = freezed,
+    Object? poetPublicId = freezed,
+    Object? poetName = freezed,
+    Object? themes = null,
   }) {
     return _then(_value.copyWith(
       publicId: null == publicId
@@ -1464,6 +1513,26 @@ class _$CoupletSearchResultCopyWithImpl<$Res, $Val extends CoupletSearchResult>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      poemPublicId: freezed == poemPublicId
+          ? _value.poemPublicId
+          : poemPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poemTitle: freezed == poemTitle
+          ? _value.poemTitle
+          : poemTitle // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetPublicId: freezed == poetPublicId
+          ? _value.poetPublicId
+          : poetPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetName: freezed == poetName
+          ? _value.poetName
+          : poetName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      themes: null == themes
+          ? _value.themes
+          : themes // ignore: cast_nullable_to_non_nullable
+              as List<CoupletTheme>,
     ) as $Val);
   }
 
@@ -1514,7 +1583,12 @@ abstract class _$$CoupletSearchResultImplCopyWith<$Res>
       double engagementScore,
       bool? isLiked,
       bool? isBookmarked,
-      DateTime? createdAt});
+      DateTime? createdAt,
+      @PlaceholderStringConverter() String? poemPublicId,
+      @PlaceholderStringConverter() String? poemTitle,
+      @PlaceholderStringConverter() String? poetPublicId,
+      @PlaceholderStringConverter() String? poetName,
+      @CoupletThemesConverter() List<CoupletTheme> themes});
 
   @override
   $PoemSummaryCopyWith<$Res>? get poem;
@@ -1547,6 +1621,11 @@ class __$$CoupletSearchResultImplCopyWithImpl<$Res>
     Object? isLiked = freezed,
     Object? isBookmarked = freezed,
     Object? createdAt = freezed,
+    Object? poemPublicId = freezed,
+    Object? poemTitle = freezed,
+    Object? poetPublicId = freezed,
+    Object? poetName = freezed,
+    Object? themes = null,
   }) {
     return _then(_$CoupletSearchResultImpl(
       publicId: null == publicId
@@ -1605,13 +1684,33 @@ class __$$CoupletSearchResultImplCopyWithImpl<$Res>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      poemPublicId: freezed == poemPublicId
+          ? _value.poemPublicId
+          : poemPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poemTitle: freezed == poemTitle
+          ? _value.poemTitle
+          : poemTitle // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetPublicId: freezed == poetPublicId
+          ? _value.poetPublicId
+          : poetPublicId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      poetName: freezed == poetName
+          ? _value.poetName
+          : poetName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      themes: null == themes
+          ? _value._themes
+          : themes // ignore: cast_nullable_to_non_nullable
+              as List<CoupletTheme>,
     ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$CoupletSearchResultImpl implements _CoupletSearchResult {
+class _$CoupletSearchResultImpl extends _CoupletSearchResult {
   const _$CoupletSearchResultImpl(
       {required this.publicId,
       required this.coupletNumber,
@@ -1626,8 +1725,16 @@ class _$CoupletSearchResultImpl implements _CoupletSearchResult {
       this.engagementScore = 0.0,
       this.isLiked,
       this.isBookmarked,
-      this.createdAt})
-      : _verses = verses;
+      this.createdAt,
+      @PlaceholderStringConverter() this.poemPublicId,
+      @PlaceholderStringConverter() this.poemTitle,
+      @PlaceholderStringConverter() this.poetPublicId,
+      @PlaceholderStringConverter() this.poetName,
+      @CoupletThemesConverter()
+      final List<CoupletTheme> themes = const <CoupletTheme>[]})
+      : _verses = verses,
+        _themes = themes,
+        super._();
 
   factory _$CoupletSearchResultImpl.fromJson(Map<String, dynamic> json) =>
       _$$CoupletSearchResultImplFromJson(json);
@@ -1677,10 +1784,36 @@ class _$CoupletSearchResultImpl implements _CoupletSearchResult {
 // Made nullable - API returns null when not authenticated
   @override
   final DateTime? createdAt;
+// Added from API response
+// Flat parent fields (additive, nullable backend contract). Older
+// backends omit them and may send "-" — both parse to null.
+  @override
+  @PlaceholderStringConverter()
+  final String? poemPublicId;
+  @override
+  @PlaceholderStringConverter()
+  final String? poemTitle;
+  @override
+  @PlaceholderStringConverter()
+  final String? poetPublicId;
+  @override
+  @PlaceholderStringConverter()
+  final String? poetName;
+// Couplet themes (max 3, server-ranked); absent on production today.
+  final List<CoupletTheme> _themes;
+// Couplet themes (max 3, server-ranked); absent on production today.
+  @override
+  @JsonKey()
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes {
+    if (_themes is EqualUnmodifiableListView) return _themes;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_themes);
+  }
 
   @override
   String toString() {
-    return 'CoupletSearchResult(publicId: $publicId, coupletNumber: $coupletNumber, coupletType: $coupletType, coupletTypeName: $coupletTypeName, verses: $verses, poem: $poem, poet: $poet, likeCount: $likeCount, shareCount: $shareCount, bookmarkCount: $bookmarkCount, engagementScore: $engagementScore, isLiked: $isLiked, isBookmarked: $isBookmarked, createdAt: $createdAt)';
+    return 'CoupletSearchResult(publicId: $publicId, coupletNumber: $coupletNumber, coupletType: $coupletType, coupletTypeName: $coupletTypeName, verses: $verses, poem: $poem, poet: $poet, likeCount: $likeCount, shareCount: $shareCount, bookmarkCount: $bookmarkCount, engagementScore: $engagementScore, isLiked: $isLiked, isBookmarked: $isBookmarked, createdAt: $createdAt, poemPublicId: $poemPublicId, poemTitle: $poemTitle, poetPublicId: $poetPublicId, poetName: $poetName, themes: $themes)';
   }
 
   @override
@@ -1711,27 +1844,42 @@ class _$CoupletSearchResultImpl implements _CoupletSearchResult {
             (identical(other.isBookmarked, isBookmarked) ||
                 other.isBookmarked == isBookmarked) &&
             (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt));
+                other.createdAt == createdAt) &&
+            (identical(other.poemPublicId, poemPublicId) ||
+                other.poemPublicId == poemPublicId) &&
+            (identical(other.poemTitle, poemTitle) ||
+                other.poemTitle == poemTitle) &&
+            (identical(other.poetPublicId, poetPublicId) ||
+                other.poetPublicId == poetPublicId) &&
+            (identical(other.poetName, poetName) ||
+                other.poetName == poetName) &&
+            const DeepCollectionEquality().equals(other._themes, _themes));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      publicId,
-      coupletNumber,
-      coupletType,
-      coupletTypeName,
-      const DeepCollectionEquality().hash(_verses),
-      poem,
-      poet,
-      likeCount,
-      shareCount,
-      bookmarkCount,
-      engagementScore,
-      isLiked,
-      isBookmarked,
-      createdAt);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        publicId,
+        coupletNumber,
+        coupletType,
+        coupletTypeName,
+        const DeepCollectionEquality().hash(_verses),
+        poem,
+        poet,
+        likeCount,
+        shareCount,
+        bookmarkCount,
+        engagementScore,
+        isLiked,
+        isBookmarked,
+        createdAt,
+        poemPublicId,
+        poemTitle,
+        poetPublicId,
+        poetName,
+        const DeepCollectionEquality().hash(_themes)
+      ]);
 
   @JsonKey(ignore: true)
   @override
@@ -1748,22 +1896,29 @@ class _$CoupletSearchResultImpl implements _CoupletSearchResult {
   }
 }
 
-abstract class _CoupletSearchResult implements CoupletSearchResult {
+abstract class _CoupletSearchResult extends CoupletSearchResult {
   const factory _CoupletSearchResult(
-      {required final String publicId,
-      required final int coupletNumber,
-      final String? coupletType,
-      final String? coupletTypeName,
-      required final List<VerseModel> verses,
-      final PoemSummary? poem,
-      final PoetSummary? poet,
-      final int likeCount,
-      final int shareCount,
-      final int bookmarkCount,
-      final double engagementScore,
-      final bool? isLiked,
-      final bool? isBookmarked,
-      final DateTime? createdAt}) = _$CoupletSearchResultImpl;
+          {required final String publicId,
+          required final int coupletNumber,
+          final String? coupletType,
+          final String? coupletTypeName,
+          required final List<VerseModel> verses,
+          final PoemSummary? poem,
+          final PoetSummary? poet,
+          final int likeCount,
+          final int shareCount,
+          final int bookmarkCount,
+          final double engagementScore,
+          final bool? isLiked,
+          final bool? isBookmarked,
+          final DateTime? createdAt,
+          @PlaceholderStringConverter() final String? poemPublicId,
+          @PlaceholderStringConverter() final String? poemTitle,
+          @PlaceholderStringConverter() final String? poetPublicId,
+          @PlaceholderStringConverter() final String? poetName,
+          @CoupletThemesConverter() final List<CoupletTheme> themes}) =
+      _$CoupletSearchResultImpl;
+  const _CoupletSearchResult._() : super._();
 
   factory _CoupletSearchResult.fromJson(Map<String, dynamic> json) =
       _$CoupletSearchResultImpl.fromJson;
@@ -1796,6 +1951,23 @@ abstract class _CoupletSearchResult implements CoupletSearchResult {
   bool? get isBookmarked;
   @override // Made nullable - API returns null when not authenticated
   DateTime? get createdAt;
+  @override // Added from API response
+// Flat parent fields (additive, nullable backend contract). Older
+// backends omit them and may send "-" — both parse to null.
+  @PlaceholderStringConverter()
+  String? get poemPublicId;
+  @override
+  @PlaceholderStringConverter()
+  String? get poemTitle;
+  @override
+  @PlaceholderStringConverter()
+  String? get poetPublicId;
+  @override
+  @PlaceholderStringConverter()
+  String? get poetName;
+  @override // Couplet themes (max 3, server-ranked); absent on production today.
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes;
   @override
   @JsonKey(ignore: true)
   _$$CoupletSearchResultImplCopyWith<_$CoupletSearchResultImpl> get copyWith =>
@@ -1809,13 +1981,23 @@ VerseSearchResult _$VerseSearchResultFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$VerseSearchResult {
   VerseModel get verse => throw _privateConstructorUsedError;
-  String get poemPublicId => throw _privateConstructorUsedError;
-  String get poemTitle => throw _privateConstructorUsedError;
-  String get poetryType => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get poemPublicId => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get poemTitle => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get poetryType => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
   String? get poetryTypeName => throw _privateConstructorUsedError;
-  String get poetPublicId => throw _privateConstructorUsedError;
-  String get poetName => throw _privateConstructorUsedError;
-  String? get poetProfileImageUrl => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get poetPublicId => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get poetName => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get poetProfileImageUrl =>
+      throw _privateConstructorUsedError; // Themes of the verse's couplet, if the backend sends them.
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -1831,13 +2013,14 @@ abstract class $VerseSearchResultCopyWith<$Res> {
   @useResult
   $Res call(
       {VerseModel verse,
-      String poemPublicId,
-      String poemTitle,
-      String poetryType,
-      String? poetryTypeName,
-      String poetPublicId,
-      String poetName,
-      String? poetProfileImageUrl});
+      @PlaceholderStringConverter() String? poemPublicId,
+      @PlaceholderStringConverter() String? poemTitle,
+      @PlaceholderStringConverter() String? poetryType,
+      @PlaceholderStringConverter() String? poetryTypeName,
+      @PlaceholderStringConverter() String? poetPublicId,
+      @PlaceholderStringConverter() String? poetName,
+      @PlaceholderStringConverter() String? poetProfileImageUrl,
+      @CoupletThemesConverter() List<CoupletTheme> themes});
 
   $VerseModelCopyWith<$Res> get verse;
 }
@@ -1856,47 +2039,52 @@ class _$VerseSearchResultCopyWithImpl<$Res, $Val extends VerseSearchResult>
   @override
   $Res call({
     Object? verse = null,
-    Object? poemPublicId = null,
-    Object? poemTitle = null,
-    Object? poetryType = null,
+    Object? poemPublicId = freezed,
+    Object? poemTitle = freezed,
+    Object? poetryType = freezed,
     Object? poetryTypeName = freezed,
-    Object? poetPublicId = null,
-    Object? poetName = null,
+    Object? poetPublicId = freezed,
+    Object? poetName = freezed,
     Object? poetProfileImageUrl = freezed,
+    Object? themes = null,
   }) {
     return _then(_value.copyWith(
       verse: null == verse
           ? _value.verse
           : verse // ignore: cast_nullable_to_non_nullable
               as VerseModel,
-      poemPublicId: null == poemPublicId
+      poemPublicId: freezed == poemPublicId
           ? _value.poemPublicId
           : poemPublicId // ignore: cast_nullable_to_non_nullable
-              as String,
-      poemTitle: null == poemTitle
+              as String?,
+      poemTitle: freezed == poemTitle
           ? _value.poemTitle
           : poemTitle // ignore: cast_nullable_to_non_nullable
-              as String,
-      poetryType: null == poetryType
+              as String?,
+      poetryType: freezed == poetryType
           ? _value.poetryType
           : poetryType // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       poetryTypeName: freezed == poetryTypeName
           ? _value.poetryTypeName
           : poetryTypeName // ignore: cast_nullable_to_non_nullable
               as String?,
-      poetPublicId: null == poetPublicId
+      poetPublicId: freezed == poetPublicId
           ? _value.poetPublicId
           : poetPublicId // ignore: cast_nullable_to_non_nullable
-              as String,
-      poetName: null == poetName
+              as String?,
+      poetName: freezed == poetName
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       poetProfileImageUrl: freezed == poetProfileImageUrl
           ? _value.poetProfileImageUrl
           : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      themes: null == themes
+          ? _value.themes
+          : themes // ignore: cast_nullable_to_non_nullable
+              as List<CoupletTheme>,
     ) as $Val);
   }
 
@@ -1919,13 +2107,14 @@ abstract class _$$VerseSearchResultImplCopyWith<$Res>
   @useResult
   $Res call(
       {VerseModel verse,
-      String poemPublicId,
-      String poemTitle,
-      String poetryType,
-      String? poetryTypeName,
-      String poetPublicId,
-      String poetName,
-      String? poetProfileImageUrl});
+      @PlaceholderStringConverter() String? poemPublicId,
+      @PlaceholderStringConverter() String? poemTitle,
+      @PlaceholderStringConverter() String? poetryType,
+      @PlaceholderStringConverter() String? poetryTypeName,
+      @PlaceholderStringConverter() String? poetPublicId,
+      @PlaceholderStringConverter() String? poetName,
+      @PlaceholderStringConverter() String? poetProfileImageUrl,
+      @CoupletThemesConverter() List<CoupletTheme> themes});
 
   @override
   $VerseModelCopyWith<$Res> get verse;
@@ -1943,63 +2132,72 @@ class __$$VerseSearchResultImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? verse = null,
-    Object? poemPublicId = null,
-    Object? poemTitle = null,
-    Object? poetryType = null,
+    Object? poemPublicId = freezed,
+    Object? poemTitle = freezed,
+    Object? poetryType = freezed,
     Object? poetryTypeName = freezed,
-    Object? poetPublicId = null,
-    Object? poetName = null,
+    Object? poetPublicId = freezed,
+    Object? poetName = freezed,
     Object? poetProfileImageUrl = freezed,
+    Object? themes = null,
   }) {
     return _then(_$VerseSearchResultImpl(
       verse: null == verse
           ? _value.verse
           : verse // ignore: cast_nullable_to_non_nullable
               as VerseModel,
-      poemPublicId: null == poemPublicId
+      poemPublicId: freezed == poemPublicId
           ? _value.poemPublicId
           : poemPublicId // ignore: cast_nullable_to_non_nullable
-              as String,
-      poemTitle: null == poemTitle
+              as String?,
+      poemTitle: freezed == poemTitle
           ? _value.poemTitle
           : poemTitle // ignore: cast_nullable_to_non_nullable
-              as String,
-      poetryType: null == poetryType
+              as String?,
+      poetryType: freezed == poetryType
           ? _value.poetryType
           : poetryType // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       poetryTypeName: freezed == poetryTypeName
           ? _value.poetryTypeName
           : poetryTypeName // ignore: cast_nullable_to_non_nullable
               as String?,
-      poetPublicId: null == poetPublicId
+      poetPublicId: freezed == poetPublicId
           ? _value.poetPublicId
           : poetPublicId // ignore: cast_nullable_to_non_nullable
-              as String,
-      poetName: null == poetName
+              as String?,
+      poetName: freezed == poetName
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       poetProfileImageUrl: freezed == poetProfileImageUrl
           ? _value.poetProfileImageUrl
           : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      themes: null == themes
+          ? _value._themes
+          : themes // ignore: cast_nullable_to_non_nullable
+              as List<CoupletTheme>,
     ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$VerseSearchResultImpl implements _VerseSearchResult {
+class _$VerseSearchResultImpl extends _VerseSearchResult {
   const _$VerseSearchResultImpl(
       {required this.verse,
-      required this.poemPublicId,
-      required this.poemTitle,
-      required this.poetryType,
-      this.poetryTypeName,
-      required this.poetPublicId,
-      required this.poetName,
-      this.poetProfileImageUrl});
+      @PlaceholderStringConverter() this.poemPublicId,
+      @PlaceholderStringConverter() this.poemTitle,
+      @PlaceholderStringConverter() this.poetryType,
+      @PlaceholderStringConverter() this.poetryTypeName,
+      @PlaceholderStringConverter() this.poetPublicId,
+      @PlaceholderStringConverter() this.poetName,
+      @PlaceholderStringConverter() this.poetProfileImageUrl,
+      @CoupletThemesConverter()
+      final List<CoupletTheme> themes = const <CoupletTheme>[]})
+      : _themes = themes,
+        super._();
 
   factory _$VerseSearchResultImpl.fromJson(Map<String, dynamic> json) =>
       _$$VerseSearchResultImplFromJson(json);
@@ -2007,23 +2205,41 @@ class _$VerseSearchResultImpl implements _VerseSearchResult {
   @override
   final VerseModel verse;
   @override
-  final String poemPublicId;
+  @PlaceholderStringConverter()
+  final String? poemPublicId;
   @override
-  final String poemTitle;
+  @PlaceholderStringConverter()
+  final String? poemTitle;
   @override
-  final String poetryType;
+  @PlaceholderStringConverter()
+  final String? poetryType;
   @override
+  @PlaceholderStringConverter()
   final String? poetryTypeName;
   @override
-  final String poetPublicId;
+  @PlaceholderStringConverter()
+  final String? poetPublicId;
   @override
-  final String poetName;
+  @PlaceholderStringConverter()
+  final String? poetName;
   @override
+  @PlaceholderStringConverter()
   final String? poetProfileImageUrl;
+// Themes of the verse's couplet, if the backend sends them.
+  final List<CoupletTheme> _themes;
+// Themes of the verse's couplet, if the backend sends them.
+  @override
+  @JsonKey()
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes {
+    if (_themes is EqualUnmodifiableListView) return _themes;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_themes);
+  }
 
   @override
   String toString() {
-    return 'VerseSearchResult(verse: $verse, poemPublicId: $poemPublicId, poemTitle: $poemTitle, poetryType: $poetryType, poetryTypeName: $poetryTypeName, poetPublicId: $poetPublicId, poetName: $poetName, poetProfileImageUrl: $poetProfileImageUrl)';
+    return 'VerseSearchResult(verse: $verse, poemPublicId: $poemPublicId, poemTitle: $poemTitle, poetryType: $poetryType, poetryTypeName: $poetryTypeName, poetPublicId: $poetPublicId, poetName: $poetName, poetProfileImageUrl: $poetProfileImageUrl, themes: $themes)';
   }
 
   @override
@@ -2045,13 +2261,23 @@ class _$VerseSearchResultImpl implements _VerseSearchResult {
             (identical(other.poetName, poetName) ||
                 other.poetName == poetName) &&
             (identical(other.poetProfileImageUrl, poetProfileImageUrl) ||
-                other.poetProfileImageUrl == poetProfileImageUrl));
+                other.poetProfileImageUrl == poetProfileImageUrl) &&
+            const DeepCollectionEquality().equals(other._themes, _themes));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, verse, poemPublicId, poemTitle,
-      poetryType, poetryTypeName, poetPublicId, poetName, poetProfileImageUrl);
+  int get hashCode => Object.hash(
+      runtimeType,
+      verse,
+      poemPublicId,
+      poemTitle,
+      poetryType,
+      poetryTypeName,
+      poetPublicId,
+      poetName,
+      poetProfileImageUrl,
+      const DeepCollectionEquality().hash(_themes));
 
   @JsonKey(ignore: true)
   @override
@@ -2068,16 +2294,19 @@ class _$VerseSearchResultImpl implements _VerseSearchResult {
   }
 }
 
-abstract class _VerseSearchResult implements VerseSearchResult {
+abstract class _VerseSearchResult extends VerseSearchResult {
   const factory _VerseSearchResult(
-      {required final VerseModel verse,
-      required final String poemPublicId,
-      required final String poemTitle,
-      required final String poetryType,
-      final String? poetryTypeName,
-      required final String poetPublicId,
-      required final String poetName,
-      final String? poetProfileImageUrl}) = _$VerseSearchResultImpl;
+          {required final VerseModel verse,
+          @PlaceholderStringConverter() final String? poemPublicId,
+          @PlaceholderStringConverter() final String? poemTitle,
+          @PlaceholderStringConverter() final String? poetryType,
+          @PlaceholderStringConverter() final String? poetryTypeName,
+          @PlaceholderStringConverter() final String? poetPublicId,
+          @PlaceholderStringConverter() final String? poetName,
+          @PlaceholderStringConverter() final String? poetProfileImageUrl,
+          @CoupletThemesConverter() final List<CoupletTheme> themes}) =
+      _$VerseSearchResultImpl;
+  const _VerseSearchResult._() : super._();
 
   factory _VerseSearchResult.fromJson(Map<String, dynamic> json) =
       _$VerseSearchResultImpl.fromJson;
@@ -2085,19 +2314,29 @@ abstract class _VerseSearchResult implements VerseSearchResult {
   @override
   VerseModel get verse;
   @override
-  String get poemPublicId;
+  @PlaceholderStringConverter()
+  String? get poemPublicId;
   @override
-  String get poemTitle;
+  @PlaceholderStringConverter()
+  String? get poemTitle;
   @override
-  String get poetryType;
+  @PlaceholderStringConverter()
+  String? get poetryType;
   @override
+  @PlaceholderStringConverter()
   String? get poetryTypeName;
   @override
-  String get poetPublicId;
+  @PlaceholderStringConverter()
+  String? get poetPublicId;
   @override
-  String get poetName;
+  @PlaceholderStringConverter()
+  String? get poetName;
   @override
+  @PlaceholderStringConverter()
   String? get poetProfileImageUrl;
+  @override // Themes of the verse's couplet, if the backend sends them.
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes;
   @override
   @JsonKey(ignore: true)
   _$$VerseSearchResultImplCopyWith<_$VerseSearchResultImpl> get copyWith =>

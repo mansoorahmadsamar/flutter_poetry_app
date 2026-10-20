@@ -1,0 +1,20 @@
+{
+  "_comment": "GET /api/hashtags/hijr `data` for a THEME tag, as the theme-tagging backend change proposes (localized names, definition, parent). Synthetic: production does not send nameUr/nameEn/nameHi/definition/parent yet. Counts and colour follow production's HashtagDto (`-` colour).",
+  "slug": "hijr",
+  "name": "Separation",
+  "color": "-",
+  "languageCode": "ur",
+  "tagType": "THEME",
+  "coupletCount": 12,
+  "poemCount": 0,
+  "imageCount": 0,
+  "poetCount": 0,
+  "bookCount": 0,
+  "videoCount": 0,
+  "totalUsage": 12,
+  "nameUr": "ہجر",
+  "nameEn": "Separation",
+  "nameHi": "हिज्र",
+  "definition": "Parting from or absence of the beloved; firaq, judai, the night of separation.",
+  "parent": {"slug": "ishq", "nameUr": "عشق", "nameEn": "Love", "nameHi": "इश्क़"}
+}

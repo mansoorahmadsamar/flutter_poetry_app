@@ -29,7 +29,8 @@ _$ReactionSummaryImpl _$$ReactionSummaryImplFromJson(
       byType: (json['byType'] as Map<String, dynamic>?)?.map(
         (k, e) => MapEntry(k, (e as num).toInt()),
       ),
-      userReaction: json['userReaction'] as String?,
+      userReaction:
+          const PlaceholderStringConverter().fromJson(json['userReaction']),
     );
 
 Map<String, dynamic> _$$ReactionSummaryImplToJson(
@@ -37,13 +38,15 @@ Map<String, dynamic> _$$ReactionSummaryImplToJson(
     <String, dynamic>{
       'total': instance.total,
       'byType': instance.byType,
-      'userReaction': instance.userReaction,
+      'userReaction':
+          const PlaceholderStringConverter().toJson(instance.userReaction),
     };
 
 _$ReactionResponseImpl _$$ReactionResponseImplFromJson(
         Map<String, dynamic> json) =>
     _$ReactionResponseImpl(
-      userReaction: json['userReaction'] as String?,
+      userReaction:
+          const PlaceholderStringConverter().fromJson(json['userReaction']),
       totalReactionCount: (json['totalReactionCount'] as num?)?.toInt() ?? 0,
       reactionCounts: (json['reactionCounts'] as Map<String, dynamic>?)?.map(
         (k, e) => MapEntry(k, (e as num).toInt()),
@@ -54,7 +57,8 @@ _$ReactionResponseImpl _$$ReactionResponseImplFromJson(
 Map<String, dynamic> _$$ReactionResponseImplToJson(
         _$ReactionResponseImpl instance) =>
     <String, dynamic>{
-      'userReaction': instance.userReaction,
+      'userReaction':
+          const PlaceholderStringConverter().toJson(instance.userReaction),
       'totalReactionCount': instance.totalReactionCount,
       'reactionCounts': instance.reactionCounts,
       'message': instance.message,

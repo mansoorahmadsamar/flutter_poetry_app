@@ -6,11 +6,14 @@ import 'package:flutter_poetry_app/core/network/dio_client.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/features/search/models/global_search_state.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
+import 'package:flutter_poetry_app/features/search/models/search_origin.dart';
 import 'package:flutter_poetry_app/features/search/services/search_service.dart';
 import 'package:flutter_poetry_app/features/search/services/search_history_service.dart';
 import 'package:flutter_poetry_app/features/search/utils/app_search_urdu_normalizer.dart';
+import 'package:flutter_poetry_app/features/search/utils/search_segment_results.dart';
 import 'package:flutter_poetry_app/features/discover/services/discover_service.dart';
 import 'package:flutter_poetry_app/features/discover/models/discover_bundle_model.dart';
+import 'package:flutter_poetry_app/features/discover/utils/trending_order.dart';
 
 // ============================================================================
 // SERVICE PROVIDERS
@@ -19,7 +22,7 @@ import 'package:flutter_poetry_app/features/discover/models/discover_bundle_mode
 /// Provider for SearchService (API layer)
 final searchServiceProvider = Provider<SearchService>((ref) {
   final dioClient = ref.watch(dioClientProvider);
-  return SearchService(dioClient.dio);
+  return SearchService(dioClient.dio, ref);
 });
 
 /// Provider for SearchHistoryService (local storage)
@@ -53,6 +56,24 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
   /// Enables instant back-navigation without re-fetching
   final _resultCache = <String, UnifiedSearchResponse>{};  // insertion-ordered in Dart
   static const _maxCacheSize = 5;
+
+  /// Items per type on every `/api/search` page — the first (`type=all`)
+  /// page and each `loadMore` page. The backend pages each type with
+  /// `PageRequest.of(page, size)`, so a different size for page 1 would start
+  /// at the wrong offset and skip or repeat results.
+  static const pageSize = 10;
+
+  /// Normalized query that [GlobalSearchState.unifiedResults] holds results
+  /// for, or null. A tab switch for this query reuses them.
+  String? _resultsQuery;
+
+  /// Bumped by every [executeSearch]; a response that comes back after a
+  /// newer search started is dropped instead of overwriting it.
+  int _searchGeneration = 0;
+
+  /// Origin of the latest search ([executeSearch]); its further pages and a
+  /// re-run of the same search (retry) are sent with it (T-183).
+  SearchOrigin _origin = SearchOrigin.typed;
 
   GlobalSearchNotifier(
     this._searchService,
@@ -127,7 +148,7 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
 
   /// Convert TrendingSearches from bundle to legacy TrendingSearchesResponse
   TrendingSearchesResponse _convertTrendingSearches(TrendingSearches trending) {
-    final searches = trending.daily.map((item) => TrendingSearch(
+    final searches = byCountDescending(trending.daily).map((item) => TrendingSearch(
       query: item.query,
       normalizedQuery: item.query.toLowerCase(),
       count: item.searchCount,
@@ -261,19 +282,23 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
     } on DioException catch (e) {
       // Ignore cancelled requests
       if (e.type == DioExceptionType.cancel) return;
-
-      // Graceful degradation - clear autocomplete on error
-      state = state.copyWith(
-        autocompleteResults: null,
-        isLoadingAutocomplete: false,
-      );
+      _autocompleteFailed(query, e);
     } catch (e) {
-      // Graceful degradation - clear autocomplete on error
-      state = state.copyWith(
-        autocompleteResults: null,
-        isLoadingAutocomplete: false,
-      );
+      _autocompleteFailed(query, e);
     }
+  }
+
+  /// Graceful degradation: no suggestions (the "Search for …" row stays), and
+  /// the failure is logged instead of vanishing. A failure for a query the
+  /// user has already typed past is ignored, so it cannot clear (or stop the
+  /// spinner of) the suggestions for the current query.
+  void _autocompleteFailed(String query, Object error) {
+    _logger.w('Autocomplete failed for "$query": $error');
+    if (state.currentQuery != query) return;
+    state = state.copyWith(
+      autocompleteResults: null,
+      isLoadingAutocomplete: false,
+    );
   }
 
   // ==========================================================================
@@ -290,10 +315,29 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
   ///
   /// Parameters:
   /// - [query]: Optional query (uses currentQuery if null)
-  Future<void> executeSearch({String? query}) async {
+  /// - [segment]: Optional tab to show the results in, set in the same state
+  ///   update.
+  /// - [origin]: why the user searched, sent to the backend (T-183). Without
+  ///   one, a new [query] counts as [SearchOrigin.typed] and a re-run of the
+  ///   current query (no [query]: retry, or a tab switch with nothing loaded)
+  ///   keeps the origin of the search it repeats.
+  ///
+  /// Every call is one `/api/search` request, which the backend logs as a
+  /// search (it feeds trending searches) — so tab switches go through
+  /// [setActiveSegment], which reuses loaded results.
+  Future<void> executeSearch({
+    String? query,
+    DiscoverSegment? segment,
+    SearchOrigin? origin,
+  }) async {
     final searchQuery = query?.trim() ?? state.currentQuery;
 
     if (searchQuery.isEmpty) return;
+
+    final generation = ++_searchGeneration;
+    final searchOrigin =
+        origin ?? (query == null ? _origin : SearchOrigin.typed);
+    _origin = searchOrigin;
 
     // Normalize Urdu text (diacritics, letter variants) for consistent matching
     final normalizedQuery = AppSearchUrduNormalizer.normalize(searchQuery);
@@ -303,10 +347,12 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
 
     // Check LRU cache first — show cached result instantly, then refresh
     final cachedResult = _getCachedResult(normalizedQuery);
+    _resultsQuery = cachedResult == null ? null : normalizedQuery;
 
     // Update state to searching mode
     state = state.copyWith(
       currentQuery: searchQuery,
+      activeSegment: segment ?? state.activeSegment,
       mode: SearchMode.searching,
       isLoadingResults: true,
       autocompleteResults: null, // Hide autocomplete
@@ -321,6 +367,8 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
           query: normalizedQuery,
           type: 'all',  // Search all content types
           lang: _languageCode,
+          size: pageSize,
+          origin: searchOrigin,
         ),
         _searchService.getRelatedSearches(
           query: normalizedQuery,
@@ -328,14 +376,17 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
         ),
       ]);
 
+      if (generation != _searchGeneration) return; // a newer search owns state
+
       final unifiedResults = results[0] as UnifiedSearchResponse;
       final relatedSearches = results[1] as RelatedSearchesResponse;
 
       _logger.i('🔍 Setting state with unified results: totalResults=${unifiedResults.totalResults}');
-      _logger.i('   Poets: ${unifiedResults.poets.length}, Poems: ${unifiedResults.poems.length}, Couplets: ${unifiedResults.couplets.length}');
+      _logger.i('   Poets: ${unifiedResults.poets.length}, Poems: ${unifiedResults.poems.length}, Couplets: ${unifiedResults.couplets.length}, Verses: ${unifiedResults.verses.length}');
 
       // Cache the result for back-navigation
       _cacheResult(normalizedQuery, unifiedResults);
+      _resultsQuery = normalizedQuery;
 
       // Update state with results — reset pagination (page 0 just fetched)
       state = state.copyWith(
@@ -353,6 +404,7 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
       final history = await _historyService.getHistory();
       state = state.copyWith(recentSearches: history);
     } catch (e, stackTrace) {
+      if (generation != _searchGeneration) return;
       _logger.e('❌ ERROR in executeSearch: $e');
       _logger.e('❌ Stack trace: $stackTrace');
       state = state.copyWith(
@@ -369,8 +421,9 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
 
   /// Load more items for the currently active segment.
   ///
-  /// Uses `type=poems_only`, `type=verses_only`, etc. and the tracked
-  /// `nextPage` per segment. Appends results to the existing lists.
+  /// Fetches the segment's next page (`type=poems_only`, `verses_only`, …,
+  /// see [SearchSegmentResults]) at [pageSize] and merges it into the loaded
+  /// results, tracking the next page per segment.
   Future<void> loadMore() async {
     final segment = state.activeSegment;
     if (segment == DiscoverSegment.all) return; // Preview mode — no pagination
@@ -379,31 +432,36 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
     final current = state.unifiedResults;
     if (current == null) return;
 
-    // Check hasMore flag for this segment
-    if (!_hasMoreForSegment(current, segment)) return;
+    if (!segment.hasMore(current)) return;
 
     final page = state.nextPage[segment] ?? 1;
     final query = state.currentQuery;
     if (query.isEmpty) return;
 
     final normalizedQuery = AppSearchUrduNormalizer.normalize(query);
-    final typeParam = _segmentToTypeParam(segment);
+    final generation = _searchGeneration;
 
     state = state.copyWith(isLoadingMore: true);
 
     try {
       final moreResults = await _searchService.loadMore(
         query: normalizedQuery,
-        type: typeParam,
+        type: segment.apiType,
         page: page,
         lang: _languageCode,
-        size: 20,
+        size: pageSize,
+        // The page belongs to the search that produced these results.
+        origin: _origin,
       );
 
-      // Merge: append new items to existing lists, update hasMore flags
-      final merged = _mergeResults(current, moreResults, segment);
+      // A new search started while this page was loading: it belongs to the
+      // old results, and the new search has already reset the paging state.
+      if (generation != _searchGeneration) return;
 
-      // Update next page
+      // Merge into the state as it is now, not as it was when the request left.
+      final latest = state.unifiedResults ?? current;
+      final merged = segment.merge(latest, moreResults);
+
       final updatedNextPage = Map<DiscoverSegment, int>.from(state.nextPage);
       updatedNextPage[segment] = page + 1;
 
@@ -416,90 +474,12 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
       // Update LRU cache with merged results
       _cacheResult(normalizedQuery, merged);
 
-      _logger.i('✅ Loaded page $page for ${segment.name} — appended ${_newItemCount(moreResults, segment)} items');
+      _logger.i('✅ Loaded page $page for ${segment.name} — '
+          '${segment.loadedCount(merged) - segment.loadedCount(latest)} new items');
     } catch (e) {
+      if (generation != _searchGeneration) return;
       _logger.e('❌ Failed to load more for ${segment.name}: $e');
       state = state.copyWith(isLoadingMore: false);
-    }
-  }
-
-  /// Check if there are more items for a segment
-  bool _hasMoreForSegment(UnifiedSearchResponse results, DiscoverSegment segment) {
-    switch (segment) {
-      case DiscoverSegment.poets:
-        return results.hasMorePoets;
-      case DiscoverSegment.poems:
-        return results.hasMorePoems;
-      case DiscoverSegment.verses:
-        return results.hasMoreCouplets;
-      case DiscoverSegment.categories:
-        return results.hasMoreCategories;
-      case DiscoverSegment.all:
-        return false;
-    }
-  }
-
-  /// Map segment to API type parameter
-  String _segmentToTypeParam(DiscoverSegment segment) {
-    switch (segment) {
-      case DiscoverSegment.poets:
-        return 'poets_only';
-      case DiscoverSegment.poems:
-        return 'poems_only';
-      case DiscoverSegment.verses:
-        return 'couplets_only';
-      case DiscoverSegment.categories:
-        return 'categories_only';
-      case DiscoverSegment.all:
-        return 'all';
-    }
-  }
-
-  /// Merge paginated results into existing results
-  UnifiedSearchResponse _mergeResults(
-    UnifiedSearchResponse existing,
-    UnifiedSearchResponse more,
-    DiscoverSegment segment,
-  ) {
-    switch (segment) {
-      case DiscoverSegment.poets:
-        return existing.copyWith(
-          poets: [...existing.poets, ...more.poets],
-          hasMorePoets: more.hasMorePoets,
-        );
-      case DiscoverSegment.poems:
-        return existing.copyWith(
-          poems: [...existing.poems, ...more.poems],
-          hasMorePoems: more.hasMorePoems,
-        );
-      case DiscoverSegment.verses:
-        return existing.copyWith(
-          couplets: [...existing.couplets, ...more.couplets],
-          hasMoreCouplets: more.hasMoreCouplets,
-        );
-      case DiscoverSegment.categories:
-        return existing.copyWith(
-          categories: [...existing.categories, ...more.categories],
-          hasMoreCategories: more.hasMoreCategories,
-        );
-      case DiscoverSegment.all:
-        return existing;
-    }
-  }
-
-  /// Count new items from a paginated response for a segment
-  int _newItemCount(UnifiedSearchResponse results, DiscoverSegment segment) {
-    switch (segment) {
-      case DiscoverSegment.poets:
-        return results.poets.length;
-      case DiscoverSegment.poems:
-        return results.poems.length;
-      case DiscoverSegment.verses:
-        return results.couplets.length;
-      case DiscoverSegment.categories:
-        return results.categories.length;
-      case DiscoverSegment.all:
-        return 0;
     }
   }
 
@@ -507,66 +487,53 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
   // FILTERS & SORTING
   // ==========================================================================
 
-  /// Change sort option and re-execute search
-  ///
-  /// Sort options:
-  /// - relevance (BM25 scoring)
-  /// - likes (most liked)
-  /// - shares (most shared)
-  /// - bookmarks (most bookmarked)
-  /// - trending (engagement score)
-  ///
-  /// Parameters:
-  /// - [sortBy]: New sort option
+  // `/api/search` takes no sort or poet parameter (backend SearchController:
+  // q, type, lang, script, page, size), and every call is logged as a search
+  // that feeds trending. So these setters only record the choice: re-running
+  // the search returned the same results and logged another search. A sort
+  // that works server-side would go through `/api/search/couplets`, which
+  // accepts `sort` and `poet` and is not logged.
+  //
+  // Their only callers today are reachable from dead code
+  // (`main/tabs/search_tab.dart` → `CoupletSortDropdown`).
+
+  /// Records the sort option (relevance, likes, shares, bookmarks, trending).
+  /// Makes no request.
   void setSortBy(String sortBy) {
     if (state.sortBy == sortBy) return;
-
     state = state.copyWith(sortBy: sortBy);
-
-    // Re-execute search if in results mode
-    if (state.mode == SearchMode.results) {
-      executeSearch();
-    }
   }
 
-  /// Set poet filter and re-execute search
-  ///
-  /// Parameters:
-  /// - [poetId]: Poet publicId (null to clear filter)
+  /// Records the poet filter (poet publicId, or null to clear). Makes no
+  /// request.
   void setPoetFilter(String? poetId) {
     state = state.copyWith(selectedFilter: poetId);
-
-    // Re-execute search if in results mode
-    if (state.mode == SearchMode.results) {
-      executeSearch();
-    }
   }
 
-  /// Set active segment and re-execute search if needed
+  /// Switches the results tab.
   ///
-  /// Parameters:
-  /// - [segment]: New active segment
+  /// The first (`type=all`) page already holds every tab's first page, and
+  /// further pages are merged into it, so a tab switch for the same query
+  /// makes no request (each `/api/search` call is logged server-side and
+  /// feeds trending searches). Only when nothing is loaded for the current
+  /// query — e.g. the search failed — does it search again.
   void setActiveSegment(DiscoverSegment segment) {
     state = state.copyWith(activeSegment: segment);
 
-    // Re-execute search with segment filter if in results mode
-    if (state.mode == SearchMode.results) {
+    final showsResults =
+        state.mode == SearchMode.results || state.mode == SearchMode.error;
+    if (showsResults && !_hasResultsForCurrentQuery) {
       executeSearch();
     }
   }
 
-  /// Set couplet sort option and re-execute search
-  ///
-  /// Parameters:
-  /// - [sortOption]: New couplet sort option
+  bool get _hasResultsForCurrentQuery =>
+      state.unifiedResults != null &&
+      _resultsQuery == AppSearchUrduNormalizer.normalize(state.currentQuery);
+
+  /// Records the couplet sort option. Makes no request (see [setSortBy]).
   void setCoupletSort(CoupletSortOption sortOption) {
     state = state.copyWith(coupletSort: sortOption);
-
-    // Re-execute search if in verses segment
-    if (state.activeSegment == DiscoverSegment.verses &&
-        state.mode == SearchMode.results) {
-      executeSearch();
-    }
   }
 
   // ==========================================================================

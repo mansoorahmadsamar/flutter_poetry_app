@@ -6,8 +6,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/design_system/app_colors.dart';
 import '../../../core/providers/language_provider.dart';
-import '../models/discover_bundle_model.dart';
 import '../providers/discover_provider.dart';
+import '../utils/discover_navigation.dart';
 import '../widgets/category_grid.dart';
 import '../widgets/discover_hero.dart';
 import '../widgets/discover_shimmer.dart';
@@ -15,6 +15,7 @@ import '../widgets/horizontal_content_rail.dart';
 import '../widgets/poet_grid.dart';
 import '../widgets/trending_chips.dart';
 import '../../hashtags/widgets/hashtag_pill.dart';
+import '../../search/models/search_origin.dart';
 
 /// Premium discover screen with staggered section entrance animations.
 class DiscoverScreen extends ConsumerStatefulWidget {
@@ -142,7 +143,8 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen>
           child: TrendingChips(
             trending: discoverState.bundle!.trendingSearches,
             isRtl: isRtl,
-            onQueryTap: (query) => context.push('/search', extra: {'query': query}),
+            onQueryTap: (query) => context.push('/search',
+                extra: SearchRouteExtra.of(query, SearchOrigin.trending)),
           ),
         ),
       ));
@@ -177,7 +179,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen>
             items: discoverState.bundle!.editorsPicks.items,
             totalCount: discoverState.bundle!.editorsPicks.totalCount,
             isRtl: isRtl,
-            onItemTap: (ctx, item) => _navigateToContent(ctx, item),
+            onItemTap: openDiscoverCard,
             onSeeMore: () =>
                 _navigateToSectionListing(context, 'editors-picks', isRtl),
           ),
@@ -199,7 +201,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen>
             items: discoverState.bundle!.recommended.items,
             totalCount: discoverState.bundle!.recommended.totalCount,
             isRtl: isRtl,
-            onItemTap: (ctx, item) => _navigateToContent(ctx, item),
+            onItemTap: openDiscoverCard,
             onSeeMore: () =>
                 _navigateToSectionListing(context, 'recommended', isRtl),
           ),
@@ -246,9 +248,9 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen>
             categories: discoverState.bundle!.categories.items,
             totalCount: discoverState.bundle!.categories.totalCount,
             isRtl: isRtl,
-            onCategoryTap: (cat) => context.push('/search', extra: {
-              'query': cat.primaryText,
-            }),
+            onCategoryTap: (cat) => context.push('/search',
+                extra:
+                    SearchRouteExtra.of(cat.primaryText, SearchOrigin.browse)),
             onSeeMore: () =>
                 _navigateToSectionListing(context, 'categories', isRtl),
           ),
@@ -467,23 +469,6 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen>
         ),
       ],
     );
-  }
-
-  void _navigateToContent(BuildContext context, ContentCard item) {
-    switch (item.type) {
-      case 'POET':
-        context.push('/main/poets/${item.publicId}');
-      case 'POEM':
-        context.push('/main/poems/${item.publicId}');
-      case 'VERSE':
-      case 'COUPLET':
-        // TODO: Add couplet detail route when available
-        context.push('/main/poems/${item.publicId}');
-      case 'CATEGORY':
-        context.push('/search', extra: {'query': item.primaryText});
-      case 'TAG':
-        context.push('/search', extra: {'query': item.primaryText});
-    }
   }
 
   void _navigateToSectionListing(

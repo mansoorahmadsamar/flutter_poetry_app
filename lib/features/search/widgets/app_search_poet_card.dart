@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
+import 'package:flutter_poetry_app/core/utils/api_placeholder.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poet_model.dart';
 import 'package:flutter_poetry_app/features/search/utils/highlighted_text.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:flutter_poetry_app/core/utils/language_typography.dart';
 
 /// Poet result card for search results.
 ///
@@ -25,7 +27,7 @@ class AppSearchPoetCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isUrdu = _isUrduText(poet.name);
+    final isUrdu = LanguageTypography.containsArabicScript(poet.name);
 
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -121,11 +123,12 @@ class AppSearchPoetCard extends StatelessWidget {
   }
 
   Widget _buildAvatar(bool isDark) {
+    final imageUrl = presentOrNull(poet.profileImageUrl);
     return ClipRRect(
       borderRadius: BorderRadius.circular(28),
-      child: poet.profileImageUrl != null
+      child: imageUrl != null
           ? CachedNetworkImage(
-              imageUrl: poet.profileImageUrl!,
+              imageUrl: imageUrl,
               width: 56,
               height: 56,
               fit: BoxFit.cover,
@@ -158,9 +161,6 @@ class AppSearchPoetCard extends StatelessWidget {
     return '$birthYear - $deathYear';
   }
 
-  bool _isUrduText(String text) {
-    return RegExp(r'[\u0600-\u06FF]').hasMatch(text);
-  }
 }
 
 /// Shimmer skeleton matching AppSearchPoetCard dimensions.

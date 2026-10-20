@@ -31,7 +31,17 @@ mixin _$HashtagDto {
   int get poetCount => throw _privateConstructorUsedError;
   int get bookCount => throw _privateConstructorUsedError;
   int get videoCount => throw _privateConstructorUsedError;
-  int get totalUsage => throw _privateConstructorUsedError;
+  int get totalUsage =>
+      throw _privateConstructorUsedError; // Theme tags (couplet themes) may carry localized names and a one-line
+// definition. Production sends none of these yet; `"-"` reads as absent.
+  @PlaceholderStringConverter()
+  String? get nameUr => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get nameEn => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get nameHi => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get definition => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -57,7 +67,11 @@ abstract class $HashtagDtoCopyWith<$Res> {
       int poetCount,
       int bookCount,
       int videoCount,
-      int totalUsage});
+      int totalUsage,
+      @PlaceholderStringConverter() String? nameUr,
+      @PlaceholderStringConverter() String? nameEn,
+      @PlaceholderStringConverter() String? nameHi,
+      @PlaceholderStringConverter() String? definition});
 }
 
 /// @nodoc
@@ -85,6 +99,10 @@ class _$HashtagDtoCopyWithImpl<$Res, $Val extends HashtagDto>
     Object? bookCount = null,
     Object? videoCount = null,
     Object? totalUsage = null,
+    Object? nameUr = freezed,
+    Object? nameEn = freezed,
+    Object? nameHi = freezed,
+    Object? definition = freezed,
   }) {
     return _then(_value.copyWith(
       slug: null == slug
@@ -135,6 +153,22 @@ class _$HashtagDtoCopyWithImpl<$Res, $Val extends HashtagDto>
           ? _value.totalUsage
           : totalUsage // ignore: cast_nullable_to_non_nullable
               as int,
+      nameUr: freezed == nameUr
+          ? _value.nameUr
+          : nameUr // ignore: cast_nullable_to_non_nullable
+              as String?,
+      nameEn: freezed == nameEn
+          ? _value.nameEn
+          : nameEn // ignore: cast_nullable_to_non_nullable
+              as String?,
+      nameHi: freezed == nameHi
+          ? _value.nameHi
+          : nameHi // ignore: cast_nullable_to_non_nullable
+              as String?,
+      definition: freezed == definition
+          ? _value.definition
+          : definition // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -159,7 +193,11 @@ abstract class _$$HashtagDtoImplCopyWith<$Res>
       int poetCount,
       int bookCount,
       int videoCount,
-      int totalUsage});
+      int totalUsage,
+      @PlaceholderStringConverter() String? nameUr,
+      @PlaceholderStringConverter() String? nameEn,
+      @PlaceholderStringConverter() String? nameHi,
+      @PlaceholderStringConverter() String? definition});
 }
 
 /// @nodoc
@@ -185,6 +223,10 @@ class __$$HashtagDtoImplCopyWithImpl<$Res>
     Object? bookCount = null,
     Object? videoCount = null,
     Object? totalUsage = null,
+    Object? nameUr = freezed,
+    Object? nameEn = freezed,
+    Object? nameHi = freezed,
+    Object? definition = freezed,
   }) {
     return _then(_$HashtagDtoImpl(
       slug: null == slug
@@ -235,13 +277,29 @@ class __$$HashtagDtoImplCopyWithImpl<$Res>
           ? _value.totalUsage
           : totalUsage // ignore: cast_nullable_to_non_nullable
               as int,
+      nameUr: freezed == nameUr
+          ? _value.nameUr
+          : nameUr // ignore: cast_nullable_to_non_nullable
+              as String?,
+      nameEn: freezed == nameEn
+          ? _value.nameEn
+          : nameEn // ignore: cast_nullable_to_non_nullable
+              as String?,
+      nameHi: freezed == nameHi
+          ? _value.nameHi
+          : nameHi // ignore: cast_nullable_to_non_nullable
+              as String?,
+      definition: freezed == definition
+          ? _value.definition
+          : definition // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$HashtagDtoImpl implements _HashtagDto {
+class _$HashtagDtoImpl extends _HashtagDto {
   const _$HashtagDtoImpl(
       {required this.slug,
       this.name,
@@ -254,7 +312,12 @@ class _$HashtagDtoImpl implements _HashtagDto {
       this.poetCount = 0,
       this.bookCount = 0,
       this.videoCount = 0,
-      this.totalUsage = 0});
+      this.totalUsage = 0,
+      @PlaceholderStringConverter() this.nameUr,
+      @PlaceholderStringConverter() this.nameEn,
+      @PlaceholderStringConverter() this.nameHi,
+      @PlaceholderStringConverter() this.definition})
+      : super._();
 
   factory _$HashtagDtoImpl.fromJson(Map<String, dynamic> json) =>
       _$$HashtagDtoImplFromJson(json);
@@ -290,10 +353,24 @@ class _$HashtagDtoImpl implements _HashtagDto {
   @override
   @JsonKey()
   final int totalUsage;
+// Theme tags (couplet themes) may carry localized names and a one-line
+// definition. Production sends none of these yet; `"-"` reads as absent.
+  @override
+  @PlaceholderStringConverter()
+  final String? nameUr;
+  @override
+  @PlaceholderStringConverter()
+  final String? nameEn;
+  @override
+  @PlaceholderStringConverter()
+  final String? nameHi;
+  @override
+  @PlaceholderStringConverter()
+  final String? definition;
 
   @override
   String toString() {
-    return 'HashtagDto(slug: $slug, name: $name, color: $color, languageCode: $languageCode, tagType: $tagType, coupletCount: $coupletCount, poemCount: $poemCount, imageCount: $imageCount, poetCount: $poetCount, bookCount: $bookCount, videoCount: $videoCount, totalUsage: $totalUsage)';
+    return 'HashtagDto(slug: $slug, name: $name, color: $color, languageCode: $languageCode, tagType: $tagType, coupletCount: $coupletCount, poemCount: $poemCount, imageCount: $imageCount, poetCount: $poetCount, bookCount: $bookCount, videoCount: $videoCount, totalUsage: $totalUsage, nameUr: $nameUr, nameEn: $nameEn, nameHi: $nameHi, definition: $definition)';
   }
 
   @override
@@ -320,7 +397,12 @@ class _$HashtagDtoImpl implements _HashtagDto {
             (identical(other.videoCount, videoCount) ||
                 other.videoCount == videoCount) &&
             (identical(other.totalUsage, totalUsage) ||
-                other.totalUsage == totalUsage));
+                other.totalUsage == totalUsage) &&
+            (identical(other.nameUr, nameUr) || other.nameUr == nameUr) &&
+            (identical(other.nameEn, nameEn) || other.nameEn == nameEn) &&
+            (identical(other.nameHi, nameHi) || other.nameHi == nameHi) &&
+            (identical(other.definition, definition) ||
+                other.definition == definition));
   }
 
   @JsonKey(ignore: true)
@@ -338,7 +420,11 @@ class _$HashtagDtoImpl implements _HashtagDto {
       poetCount,
       bookCount,
       videoCount,
-      totalUsage);
+      totalUsage,
+      nameUr,
+      nameEn,
+      nameHi,
+      definition);
 
   @JsonKey(ignore: true)
   @override
@@ -354,20 +440,26 @@ class _$HashtagDtoImpl implements _HashtagDto {
   }
 }
 
-abstract class _HashtagDto implements HashtagDto {
+abstract class _HashtagDto extends HashtagDto {
   const factory _HashtagDto(
-      {required final String slug,
-      final String? name,
-      final String? color,
-      final String? languageCode,
-      final String? tagType,
-      final int coupletCount,
-      final int poemCount,
-      final int imageCount,
-      final int poetCount,
-      final int bookCount,
-      final int videoCount,
-      final int totalUsage}) = _$HashtagDtoImpl;
+          {required final String slug,
+          final String? name,
+          final String? color,
+          final String? languageCode,
+          final String? tagType,
+          final int coupletCount,
+          final int poemCount,
+          final int imageCount,
+          final int poetCount,
+          final int bookCount,
+          final int videoCount,
+          final int totalUsage,
+          @PlaceholderStringConverter() final String? nameUr,
+          @PlaceholderStringConverter() final String? nameEn,
+          @PlaceholderStringConverter() final String? nameHi,
+          @PlaceholderStringConverter() final String? definition}) =
+      _$HashtagDtoImpl;
+  const _HashtagDto._() : super._();
 
   factory _HashtagDto.fromJson(Map<String, dynamic> json) =
       _$HashtagDtoImpl.fromJson;
@@ -396,6 +488,19 @@ abstract class _HashtagDto implements HashtagDto {
   int get videoCount;
   @override
   int get totalUsage;
+  @override // Theme tags (couplet themes) may carry localized names and a one-line
+// definition. Production sends none of these yet; `"-"` reads as absent.
+  @PlaceholderStringConverter()
+  String? get nameUr;
+  @override
+  @PlaceholderStringConverter()
+  String? get nameEn;
+  @override
+  @PlaceholderStringConverter()
+  String? get nameHi;
+  @override
+  @PlaceholderStringConverter()
+  String? get definition;
   @override
   @JsonKey(ignore: true)
   _$$HashtagDtoImplCopyWith<_$HashtagDtoImpl> get copyWith =>

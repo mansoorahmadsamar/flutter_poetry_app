@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
+import 'package:flutter_poetry_app/core/utils/api_placeholder.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.dart';
 import 'package:flutter_poetry_app/features/search/utils/highlighted_text.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:flutter_poetry_app/core/utils/language_typography.dart';
 
 /// Poem result card for search results.
 ///
@@ -26,7 +28,8 @@ class AppSearchPoemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final displayTitle = poem.title ?? poem.poetryTypeName ?? poem.poetryType;
-    final isUrdu = _isUrduText(displayTitle);
+    final isUrdu = LanguageTypography.containsArabicScript(displayTitle);
+    final poetImageUrl = presentOrNull(poem.poetProfileImageUrl);
 
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -76,7 +79,7 @@ class AppSearchPoemCard extends StatelessWidget {
                             poem.poetryTypeName ??
                             poem.poetryType,
                         style: TextStyle(
-                          fontFamily: _isUrduText(
+                          fontFamily: LanguageTypography.containsArabicScript(
                                   poem.poetryTypeUrduName ?? '')
                               ? 'Jameel Noori Nastaleeq'
                               : null,
@@ -114,9 +117,9 @@ class AppSearchPoemCard extends StatelessWidget {
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(12),
-                          child: poem.poetProfileImageUrl != null
+                          child: poetImageUrl != null
                               ? CachedNetworkImage(
-                                  imageUrl: poem.poetProfileImageUrl!,
+                                  imageUrl: poetImageUrl,
                                   width: 24,
                                   height: 24,
                                   fit: BoxFit.cover,
@@ -133,18 +136,18 @@ class AppSearchPoemCard extends StatelessWidget {
                           child: HighlightedText(
                             text: poem.poetName,
                             query: searchQuery,
-                            textDirection: _isUrduText(poem.poetName)
+                            textDirection: LanguageTypography.containsArabicScript(poem.poetName)
                                 ? TextDirection.rtl
                                 : TextDirection.ltr,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontFamily: _isUrduText(poem.poetName)
+                              fontFamily: LanguageTypography.containsArabicScript(poem.poetName)
                                   ? 'Jameel Noori Nastaleeq'
                                   : null,
-                              fontSize: _isUrduText(poem.poetName) ? 13 : 12,
+                              fontSize: LanguageTypography.containsArabicScript(poem.poetName) ? 13 : 12,
                               color: AppColors.secondary,
-                              height: _isUrduText(poem.poetName) ? 1.6 : 1.3,
+                              height: LanguageTypography.containsArabicScript(poem.poetName) ? 1.6 : 1.3,
                             ),
                           ),
                         ),
@@ -188,9 +191,6 @@ class AppSearchPoemCard extends StatelessWidget {
     );
   }
 
-  bool _isUrduText(String text) {
-    return RegExp(r'[\u0600-\u06FF]').hasMatch(text);
-  }
 }
 
 /// Shimmer skeleton matching AppSearchPoemCard dimensions.

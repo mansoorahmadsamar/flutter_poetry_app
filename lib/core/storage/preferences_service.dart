@@ -36,9 +36,29 @@ class PreferencesService {
     return _prefs.getBool(AppConstants.onboardingCompletedKey) ?? false;
   }
 
-  // Clear all preferences
-  Future<void> clearAll() async {
-    await _prefs.clear();
+  /// Preferences that belong to the signed-in account: searches inside
+  /// their bookmarks and their creator settings.
+  static const userScopedKeys = <String>[
+    AppConstants.bookmarkSearchHistoryKey,
+    AppConstants.composeVariantPreferenceKey,
+  ];
+
+  /// What the person searched for on this device.
+  static const searchHistoryKeys = <String>[
+    AppConstants.searchHistoryKey,
+    AppConstants.globalSearchHistoryKey,
+  ];
+
+  /// Remove the signed-in account's preferences on logout. Device choices —
+  /// language, theme, onboarding, search history — stay.
+  /// [includeSearchHistory] also clears search history (account deletion).
+  Future<void> clearUserData({bool includeSearchHistory = false}) async {
+    for (final key in [
+      ...userScopedKeys,
+      if (includeSearchHistory) ...searchHistoryKeys,
+    ]) {
+      await _prefs.remove(key);
+    }
   }
 }
 

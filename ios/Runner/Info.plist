@@ -69,16 +69,13 @@
 			</array>
 		</dict>
 	</array>
-	<!-- Allow arbitrary loads for development (remove in production) -->
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
-	</dict>
-	<!-- Photo Library permissions for saving images -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>NSCameraUsageDescription</key>
+	<string>Sukhan needs camera access so you can capture photos to use as backgrounds for your poetry images.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>We need access to save your created poetry images to your photo library.</string>
+	<string>Sukhan needs permission to save your created poetry images to your photo library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>We need access to your photo library to select background images for your poetry creations.</string>
+	<string>Sukhan needs photo library access so you can choose images as backgrounds for your poetry.</string>
 </dict>
 </plist>

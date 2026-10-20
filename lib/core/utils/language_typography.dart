@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../design_system/app_typography.dart';
+
 /// Language-aware typography utilities for proper visual weight balance
 class LanguageTypography {
   /// Font size multipliers for visual weight balance
@@ -73,6 +75,31 @@ class LanguageTypography {
     return getTextDirection(languageCode) == TextDirection.rtl;
   }
 
+  /// Arabic-script letters (Urdu, Persian, Arabic): the basic Arabic block,
+  /// the one definition every search and feed widget uses.
+  static final _arabicScript = RegExp(r'[\u0600-\u06FF]');
+  static final _devanagariScript = RegExp(r'[\u0900-\u097F]');
+
+  /// Whether [text] contains any Arabic-script letter — e.g. a mixed
+  /// `dil دل` counts. Use for text that is either Urdu or Latin.
+  static bool containsArabicScript(String text) => _arabicScript.hasMatch(text);
+
+  /// Whether more than a third of [text] (UTF-16 units, spaces included) is
+  /// Arabic script — "primarily Urdu", so a Roman phrase with one Urdu word
+  /// stays left-to-right.
+  static bool isMostlyArabicScript(String text) =>
+      _arabicScript.allMatches(text).length > text.length / 3;
+
+  /// The language code whose typography fits [text]'s script, for content
+  /// that carries no language field (e.g. search hits): `ur` for Arabic
+  /// script (Nastaliq, RTL), `hi` for Devanagari, otherwise `en` (Latin —
+  /// English or Roman Urdu, LTR). Arabic script wins in mixed text.
+  static String languageCodeForScript(String text) {
+    if (containsArabicScript(text)) return 'ur';
+    if (_devanagariScript.hasMatch(text)) return 'hi';
+    return 'en';
+  }
+
   /// Create language-aware text style
   static TextStyle createStyle({
     required double baseFontSize,
@@ -91,7 +118,7 @@ class LanguageTypography {
         languageCode.toLowerCase() == 'ar' ||
         languageCode.toLowerCase() == 'fa') {
       return TextStyle(
-        fontFamily: 'JameelNooriNastaleeq',
+        fontFamily: AppTypography.urduFontFamily,
         fontSize: adjustedSize,
         height: lineHeight,
         fontWeight: fontWeight ?? FontWeight.w400,
@@ -107,6 +134,32 @@ class LanguageTypography {
       fontWeight: fontWeight ?? FontWeight.w400,
       color: color,
       letterSpacing: letterSpacing,
+    );
+  }
+
+  /// Style for a short label (a chip or tag) written in [languageCode]'s own
+  /// script: Nastaliq for Urdu/Arabic/Persian and Noto Sans Devanagari for
+  /// Hindi (Roboto has no Devanagari glyphs), Roboto otherwise. Size and line
+  /// height scale per language as in [createStyle].
+  static TextStyle labelStyleFor({
+    required String languageCode,
+    double baseFontSize = 12.0,
+    FontWeight? fontWeight,
+    Color? color,
+  }) {
+    if (languageCode.toLowerCase() == 'hi') {
+      return GoogleFonts.notoSansDevanagari(
+        fontSize: baseFontSize * hindiMultiplier,
+        height: hindiLineHeight,
+        fontWeight: fontWeight ?? FontWeight.w500,
+        color: color,
+      );
+    }
+    return createStyle(
+      baseFontSize: baseFontSize,
+      languageCode: languageCode,
+      fontWeight: fontWeight ?? FontWeight.w500,
+      color: color,
     );
   }
 
