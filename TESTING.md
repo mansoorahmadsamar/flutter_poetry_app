@@ -1,14 +1,14 @@
 # Testing Strategy — flutter_poetry_app (Sukhan)
 
-> **Status (2026-10-19): Phase 0 partly started.** What exists today: 24 unit tests in 2 files under `test/core/utils/`,
-> all passing (`flutter test` → `+24: All tests passed!`, run 2026-10-19 on Flutter 3.44.4). There are no widget tests,
-> no fakes for Dio or secure storage, no JSON fixtures, no golden tests and no automated device tests. Device QA is
-> manual, on an emulator with a release build (§7). The release workflows (`play-store-release.yml`,
-> `firebase-app-distribution.yml`) run `flutter analyze --no-fatal-infos --no-fatal-warnings` and `flutter test` before
-> building (added 2026-10-19 on `fix/app-misc`); there is still no pull-request check.
+> **Status (2026-10-20, `fix/app-qa-2026-10-20`):** `flutter test` → `+491: All tests passed!` (Flutter 3.44.4):
+> unit, model/fixture, mocked-network and widget tests with the helpers in §1. `flutter analyze` reports 147 issues
+> (the baseline; 0 errors). No golden tests and no automated device tests; device QA is manual, on an emulator with a
+> release build (§7). The release workflows (`play-store-release.yml`, `firebase-app-distribution.yml`) run
+> `flutter analyze --no-fatal-infos --no-fatal-warnings` and `flutter test` before building; there is still no
+> pull-request check.
 >
-> **Backlog:** everything in Phases 0–4 below. Untested today: networking/auth/refresh, every screen and widget, JSON
-> models, search normalisation and highlighting, feed, discover, hashtags, image poetry, creator mode.
+> **Backlog:** Phases 0–4 below. Still untested: image poetry, creator mode, most of poet/poem detail, bookmarks, and
+> the open rows of `docs/contracts/production-contract-audit.md`.
 >
 > This is the single source of truth for how this app is tested. AI assistants and developers: [AGENTS.md](AGENTS.md)
 > holds the mandatory "code ships with tests" rule; this file tells you *how* to meet it.
@@ -52,6 +52,10 @@
   `onSearch` to hold a response open (`Completer`) or fail it.
 - Fixtures: `unified_search_dil_ur.json` (Urdu `دل`) and `unified_search_jigar.json` (Roman `jigar`: 0 couplets,
   5 verse hits whose poet fields are `"-"`); `realRomanJigarResponse()` loads the latter with image URLs removed.
+- `FakeGlobalSearchNotifier.searches` records `(query, segment, origin)` — assert the `SearchOrigin` of every entry
+  point you add (T-183). `FakeSearchBackend.searches[i].queryParameters['origin']` shows what reached the API.
+- Live autocomplete end to end: `app_search_live_suggestions_test.dart` registers `/api/search/autocomplete` on
+  `FakeSearchBackend.adapter`, types, pumps past the 300 ms debounce and lets the real Dio finish in `runAsync`.
 
 ### Guest API helpers
 
@@ -60,6 +64,23 @@
   `docs/contracts/guest-poets.md`), and `clampedGuestPoetsRoute`, which pages like the backend: `page` clamped to
   0..4, `size` to 1..20. An unregistered path answers 404 — that is how "the backend doesn't have this endpoint yet"
   is simulated. Fixture: `test/fixtures/guest/poets_featured_page.json`.
+
+### Hashtag helpers
+
+- `test/helpers/fake_hashtag_service.dart` — `FakeHashtagService` (fixed metadata, empty tabs, records which tab
+  endpoints were requested), `hashtagServiceOverAdapter` (the real `HashtagService` over a `FakeDioAdapter`
+  answering `/api/hashtags/<slug>` and `/couplets`) and `pumpHashtagScreen` (the screen in a `GoRouter` whose poem
+  route shows `poem:<id>`; waits, bounded, for the spinners to go because a real Dio completes outside fake time).
+- Fixtures: `test/fixtures/hashtags/couplets_page_main.json` (production `CoupletDto`: no poem/poet fields, a null
+  `coupletType`) and `couplets_page_develop.json` (develop's T-012 fields, `"-"` when unknown).
+
+### Contract fixtures (T-181)
+
+The audit of app models against production DTOs is `docs/contracts/production-contract-audit.md`. Its fixtures:
+`test/fixtures/auth/me_null_name.json` (`/api/auth/me` with null columns), `test/fixtures/poets/profile_placeholders.json`
+(sparse `PoetProfileResponse`), `test/fixtures/search/autocomplete_dil_main.json` (`AutocompleteSuggestions`, with `"-"`
+and null scores), `test/fixtures/discover/trending_searches_prod.json` (production trending order, 2026-10-20). When a
+model gains a field, add its `"-"` / `null` / missing variant to the matching fixture test.
 
 ### Feed card helpers
 

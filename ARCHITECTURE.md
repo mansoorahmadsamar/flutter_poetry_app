@@ -152,6 +152,13 @@ In guest mode, featured, trending, era and gender call the guest filter endpoint
 
 ---
 
+**API contract.** Production (backend `main`) sends a null `String` as `"-"`, a null `Integer`/`Long` as `0` and every
+other null (`Boolean`, enum, list, date) as JSON `null`; hand-built maps (e.g. `/api/auth/me`) send raw nulls. Optional
+text in models uses `@PlaceholderStringConverter()`; flags and enum-strings get defaults. Field-by-field audit and what
+is still open: `docs/contracts/production-contract-audit.md` (T-181).
+
+---
+
 ## 6. Error model
 
 - `core/error/app_error.dart` defines `AppError` → `NetworkError`, `AuthError`, `ValidationError`, `CacheError`, `GenericError`, plus `errorFromStatusCode()`. **Nothing imports this file.**
@@ -235,7 +242,9 @@ Flushing:
   - Authenticated users call `GET /api/discover?lang`; guests call `/api/guest/discover`.
   - On a `DioException` it returns the **stale** cache if the bucket matches (`:89-100`).
   - The cache is cleared on sign-in (`auth_provider.dart:267`) but not on logout; the `isGuest` key covers that case.
-- Bundle sections: `trendingSearches`, `editorsPicks`, `recommended`, `featuredPoets`, `categories`, `trendingHashtags` (`models/discover_bundle_model.dart:11-17`). Taps go to `/main/poets/:id`, `/main/poems/:id` and `/search`. Section "see all" is a TODO no-op (`discover_screen.dart:489-496`).
+- Bundle sections: `trendingSearches`, `editorsPicks`, `recommended`, `featuredPoets`, `categories`, `trendingHashtags` (`models/discover_bundle_model.dart:11-17`). Section "see all" is a TODO no-op.
+- **Rail taps** go through `utils/discover_navigation.dart` (`openDiscoverCard`): POET → `/main/poets/:id`, POEM → `/main/poems/:id`, COUPLET/VERSE → their **poem** (`card.poemPublicId`; nothing without one — it used to push the couplet id), CATEGORY/TAG → `/search` with origin `browse`. Tests: `test/features/discover/utils/discover_navigation_test.dart`.
+- **Trending-search chips** (T-180): the backend sends them by count, descending (ES `terms` aggregation; production 2026-10-20: Ghazal 85, Nazam 74, Naat 57, Rubai 37). The badge number is the **rank** (1–4), not the count. `byCountDescending` (`utils/trending_order.dart`) re-sorts by `searchCount` (stable) for the chips and the search screen's idle list, in case the server order changes. A chip opens `/search` with origin `trending`.
 
 ### 9.5 Search: `features/search/`
 - **Screen:** `AppSearchScreen` (`/search`, `screens/app_search_screen.dart`) switches between four modes: idle (`AppSearchIdleContent`), suggestions (`AppSearchSuggestions`), preview "All" results (`AppSearchPreviewResults`) and filtered tab results (`AppSearchFilteredResults`). Tabs: سب (All) · شعراء · غزلیں · اشعار (couplets) · مصرعے (verse lines) · زمرے.
@@ -243,8 +252,11 @@ Flushing:
 - **Endpoints:** `/api/search`, `/api/search/couplets`, `/autocomplete`, `/recommendations`, `/related`, `/trending` (`services/search_service.dart:20`).
 - **Guest behaviour:**
   - `searchUnified` calls only what the type needs: `all` → `/api/guest/poems/search` and `/api/guest/poets/search` in parallel; `poems_only` / `poets_only` → that one; any other type (`couplets_only`, `verses_only`, `categories_only`, `tags_only`) → empty, **no request** (it used to call both, against the 60/min guest limit). Couplets, verses, tags and categories are always empty for guests. Tests: `test/features/search/services/search_service_guest_test.dart`.
-  - Autocomplete returns empty for guests and for queries under 2 characters (`:262`).
+  - Autocomplete (`/api/search/autocomplete`) is called for guests too: `/api/search/**` is `permitAll` on the backend (main and develop). It used to return empty for guests, so they never saw live suggestions (T-182). Queries under 2 characters make no request.
   - Related searches return empty for guests (`:410`).
+- **Autocomplete** (T-182): 300 ms debounce in `onQueryChanged`; the query is trimmed and Urdu-normalised (Roman passes through). A failure (network, 5xx, parse, `success:false`) is logged and leaves only the "Search for …" row; a failure for a query the user has typed past is ignored. Suggestion models read `"-"` as absent; rows without a label are not rendered. Tests: `test/features/search/screens/app_search_live_suggestions_test.dart`, `providers/global_search_autocomplete_test.dart`, `services/search_service_autocomplete_test.dart` (fixture `autocomplete_dil_main.json`, the backend `AutocompleteSuggestions` shape).
+- **Search origin** (T-183, client half): every `/api/search` request carries `origin` (`models/search_origin.dart`): `typed` (keyboard submit, the "Search for …" row), `suggestion` (an autocomplete row that runs a text search), `history` (a recent search), `trending` (a trending chip), `browse` (category chips and results, related searches, Discover CATEGORY/TAG cards, and any `/search` route query without an origin). `/search` takes `extra: SearchRouteExtra.of(query, origin)`. Load-more pages, the error-screen retry and a tab switch that has to re-search reuse the origin of the search they belong to. Production's `SearchController` ignores the parameter. Guest search uses `/api/guest/*/search` and sends no origin. Tests: `test/features/search/screens/app_search_origin_test.dart`, `providers/global_search_origin_test.dart`.
+- **"All" header** (T-179): shows `totalAcrossTabs` — the sum of the per-tab totals (`totalPoets + totalPoems + totalCouplets + totalVerses + totalCategories`), so it agrees with the tab labels. The backend's `totalResults` is the number of items on the current page (≤ 10 per type), e.g. 23 for "afsoos" while غزلیں showed 693. Tests: `test/features/search/screens/app_search_results_header_test.dart`.
 - **Taps** (one helper, `utils/search_result_navigation.dart`; route names in `AppRoutes`):
   - Poet → `/main/poets/:publicId`; poem → `/main/poems/:publicId` — in "All", every tab and autocomplete.
   - Couplet → its parent poem, `/main/poems/:poemPublicId`, from `CoupletSearchResult.poemIdToOpen` (the flat `poemPublicId` field, else the legacy nested `poem.publicId`). The backend is adding `poemPublicId`/`poemTitle`/`poetPublicId`/`poetName` (additive, nullable); until it ships, couplet results carry neither, so they render **without** a chevron or tap handler rather than as dead buttons.
@@ -278,7 +290,7 @@ Flushing:
 
 ### 9.7 Poem detail: `features/main/tabs/poets/screens/poem_detail_screen.dart`
 - `poemDetailProvider(publicId)` → `PoetService.getPoemById` (guests use `/api/guest/poems/:id`).
-- Reactions: `reactionTypesProvider` (`GET /api/reactions/types`) and `reactionActionProvider` (`POST /api/{type}/{id}/react`). Bookmarks: `bookmarkActionProvider` (`/api/poems/:id/bookmark`). Both writes are gated by `ensureSignedIn`.
+- Reactions: `reactionTypesProvider` (`GET /api/reactions/types`) and `reactionActionProvider` (`POST /api/{type}/{id}/react`). The DTOs send `userReaction: "-"` when the user has not reacted; readers use `userReactionIn(reactions)` (`engagement/models/reaction_models.dart`), which treats `"-"` as no reaction (every poem used to look reacted). Bookmarks: `bookmarkActionProvider` (`/api/poems/:id/bookmark`). Both writes are gated by `ensureSignedIn`.
 - Links to the poet (`:243`) and to a claim flow (`:146`).
 - Couplet rows (`PoemReadingCard`, `CoupletEngagementButtons`) open `ShareOptionsSheet` → "Share as Image" (§9.8).
 
@@ -294,6 +306,9 @@ Flushing:
 ### 9.9 Hashtags: `features/hashtags/`
 - `HashtagDetailScreen` (`/hashtags/:slug`) has the tabs Couplets, Poems, Images and Poets (`screens/hashtag_detail_screen.dart:146-149`).
 - `HashtagService` calls `/api/hashtags/trending`, `/:slug` and `/:slug/{poems,couplets,images,poets}`.
+- **Initial tab** (T-178): the screen opens on the first tab, in display order, whose metadata count is > 0 (`utils/hashtag_tabs.dart`), before any tab page is built, so an empty اشعار tab is never loaded; with every count 0 it stays on اشعار.
+- **Couplets tab** (T-177): `/:slug/couplets` returns the plain `CoupletDto`. On production (`main`) it has no `poemPublicId`/`poetPublicId`/`poetName` and `coupletType` can be null; `CoupletDetailResponse` used to require them, so the whole tab failed ("لوڈ نہیں ہو سکا"). All context fields are optional now (`"-"` = absent). `HashtagCoupletTile` opens `/main/poems/:poemPublicId` only when there is a poem id (no tap handler or chevron otherwise) and hides an absent poet/title; couplets with no line text are skipped. Backend `develop` (T-012) adds the four fields. Tests: `test/features/hashtags/`.
+- Image tiles use `hashtagImageUrl`: the thumbnail, else the image URL (`"-"` thumbnails fell through to nothing).
 - `HashtagPill`, `HashtagDetailScreen` and `PoetOverviewTab` parse API colours with `parseHexColor` (`core/utils/color_parser.dart`): `#RGB`, `#RRGGBB`, `#AARRGGBB`; `null`, `"-"` and junk fall back.
 
 ### 9.10 Bookmarks tab: `features/main/tabs/bookmarks/screens/app_bookmarks_screen.dart`
@@ -311,6 +326,7 @@ Flushing:
 
 ### 9.12 Profile: `features/main/tabs/profile_tab.dart`
 - Guests see `GuestLockedTab` (`:68-75`).
+- `/api/auth/me` is a hand-built map, so `fullName`, `username`, `provider` and `isActive` can be JSON null; `UserModel` treats them as optional (`displayName` falls back to the email's local part, `handle` is null without a username). A null name used to put the header in its error state.
 - Authenticated users see: `userProfileProvider` (`GET /api/auth/me`, `core/providers/user_provider.dart`), language picker (`GET /api/languages`, update via `/api/profile`, `core/services/language_service.dart:9-10`), app content pages (`GET /api/app-content`, `/:key`), logout, and delete account.
 
 ---
@@ -368,7 +384,7 @@ Logout and account deletion clear **all** SharedPreferences. The `feed_cache`, `
 
 ## 13. Tests, CI and release
 
-- **Tests:** `test/core/utils/language_typography_test.dart` (17) and `text_direction_helper_test.dart` (7), **24 tests** in total. No widget, network or golden tests. There is no `integration_test/`: adding the `integration_test` package breaks the Android build until Gradle is wired for it.
+- **Tests:** 491 unit, model, mocked-network and widget tests under `test/` (2026-10-20); see `TESTING.md` for helpers and fixtures. No golden tests. There is no `integration_test/`: adding the `integration_test` package breaks the Android build until Gradle is wired for it.
 - **CI** (`.github/workflows/`):
   - `play-store-release.yml` runs on **every push to `develop` or `main`**, and on manual dispatch with a choice of track.
     - Steps: Flutter **3.44.4** → `pub get` → decode secrets → `flutter build appbundle --release --build-name=MAJOR.MINOR.<run_number> --build-number=<run_number>` → upload to Play.
@@ -404,6 +420,8 @@ Production is the only backend with real data, and there is no staging (`stage-a
 - Feed events are dropped when a batch POST fails (`feed_event_tracker.dart:85-90`).
 - Guest poet lists for tag and top-by-views/poem-count ignore their filter; featured/trending/era/gender do too until the T-045 backend endpoints are deployed (the app falls back).
 - Hashtag endpoints have no guest path.
+- `/api/hashtags/{slug}/couplets` ignores `lang` on the backend (ES term query on `tagSlugs`, then an unordered `IN` fetch), so a page can mix scripts and lose the ES order (backend, UNVERIFIED on device).
+- Search tab counts show ES totals capped at 10,000 (`track_total_hits` default), so "10000" means "10,000 or more".
 - Search preview poem, couplet, category and tag cards have no `onTap` (`app_search_preview_results.dart:174-177`).
 - Filtered couplet search results cannot open their poem (`couplet.poem` is null) (`app_search_screen.dart:250-258`).
 - Search highlight drifts one character per preceding space (`highlighted_text.dart:144-150`).
