@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/design_system/app_colors.dart';
 import '../models/discover_bundle_model.dart';
+import '../utils/trending_order.dart';
 
 /// Trending searches section with Daily/Weekly toggle, staggered chip animation,
 /// and upward arrow indicators for top-ranked queries.
@@ -51,8 +52,8 @@ class _TrendingChipsState extends State<TrendingChips>
 
   @override
   Widget build(BuildContext context) {
-    final queries =
-        _showDaily ? widget.trending.daily : widget.trending.weekly;
+    final queries = byCountDescending(
+        _showDaily ? widget.trending.daily : widget.trending.weekly);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (queries.isEmpty) return const SizedBox.shrink();
@@ -155,6 +156,7 @@ class _TrendingChipsState extends State<TrendingChips>
                       child: SlideTransition(
                         position: slide,
                         child: _TrendingChip(
+                          key: ValueKey('trending-chip-$index'),
                           query: queries[index],
                           rank: index + 1,
                           isRtl: widget.isRtl,
@@ -228,6 +230,7 @@ class _TrendingChip extends StatelessWidget {
   final VoidCallback onTap;
 
   const _TrendingChip({
+    super.key,
     required this.query,
     required this.rank,
     required this.isRtl,

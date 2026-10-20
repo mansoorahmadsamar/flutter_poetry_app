@@ -12,6 +12,7 @@ import 'package:flutter_poetry_app/features/search/utils/app_search_urdu_normali
 import 'package:flutter_poetry_app/features/search/utils/search_segment_results.dart';
 import 'package:flutter_poetry_app/features/discover/services/discover_service.dart';
 import 'package:flutter_poetry_app/features/discover/models/discover_bundle_model.dart';
+import 'package:flutter_poetry_app/features/discover/utils/trending_order.dart';
 
 // ============================================================================
 // SERVICE PROVIDERS
@@ -142,7 +143,7 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
 
   /// Convert TrendingSearches from bundle to legacy TrendingSearchesResponse
   TrendingSearchesResponse _convertTrendingSearches(TrendingSearches trending) {
-    final searches = trending.daily.map((item) => TrendingSearch(
+    final searches = byCountDescending(trending.daily).map((item) => TrendingSearch(
       query: item.query,
       normalizedQuery: item.query.toLowerCase(),
       count: item.searchCount,
