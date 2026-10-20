@@ -272,10 +272,11 @@ class SearchService {
     String lang = 'ur',
     CancelToken? cancelToken,
   }) async {
-    // No guest autocomplete endpoint — return empty so guests don't hit the
-    // authed route (401) while typing. Guest search still works via
-    // searchUnified -> /api/guest/poems|poets/search.
-    if (_isGuest || query.trim().length < 2) {
+    // Guests call the same endpoint: /api/search/** is permitAll on the
+    // backend (SecurityConfig, main and develop), so it needs no token. It
+    // used to return empty for guests, so they never saw live suggestions
+    // (T-182). The backend rejects queries under 2 characters with a 400.
+    if (query.trim().length < 2) {
       return const AutocompleteResponse(
         poets: [],
         poems: [],
@@ -313,15 +314,11 @@ class SearchService {
       _logger.e('❌ Error fetching autocomplete: ${e.message}');
       rethrow;
     } catch (e) {
+      // A parse failure or `success: false` used to be swallowed here as an
+      // empty list, indistinguishable from "no suggestions" (T-182). The
+      // notifier degrades the same way, but logs it.
       _logger.e('❌ Unexpected error in autocomplete: $e');
-      // Return empty response on error (graceful degradation)
-      return const AutocompleteResponse(
-        poets: [],
-        poems: [],
-        tags: [],
-        categories: [],
-        totalCount: 0,
-      );
+      rethrow;
     }
   }
 

@@ -88,7 +88,26 @@ class AppSearchSuggestions extends ConsumerWidget {
     final groups = <Widget>[];
     int groupIndex = 0;
 
-    if (autocomplete.poets.isNotEmpty) {
+    // A suggestion without a label (null, blank or "-") has nothing to show
+    // and nothing to search for, so it gets no row.
+    final poets = [
+      for (final p in autocomplete.poets)
+        if (presentOrNull(p.name) != null) p,
+    ];
+    final poems = [
+      for (final p in autocomplete.poems)
+        if (presentOrNull(p.title) != null) p,
+    ];
+    final tags = [
+      for (final t in autocomplete.tags)
+        if (presentOrNull(t.name) != null) t,
+    ];
+    final categories = [
+      for (final c in autocomplete.categories)
+        if (presentOrNull(c.name) != null) c,
+    ];
+
+    if (poets.isNotEmpty) {
       groups.add(_StaggeredEntrance(
         delay: Duration(milliseconds: 30 * groupIndex),
         child: _SuggestionGroup(
@@ -96,7 +115,7 @@ class AppSearchSuggestions extends ConsumerWidget {
           icon: Icons.person_rounded,
           isDark: isDark,
           isUrdu: isUrdu,
-          children: autocomplete.poets.map((poet) {
+          children: poets.map((poet) {
             return _PoetSuggestionRow(
               key: ValueKey('suggestion-poet-${poet.publicId}'),
               poet: poet,
@@ -111,7 +130,7 @@ class AppSearchSuggestions extends ConsumerWidget {
       groupIndex++;
     }
 
-    if (autocomplete.poems.isNotEmpty) {
+    if (poems.isNotEmpty) {
       groups.add(_StaggeredEntrance(
         delay: Duration(milliseconds: 30 * groupIndex),
         child: _SuggestionGroup(
@@ -119,7 +138,7 @@ class AppSearchSuggestions extends ConsumerWidget {
           icon: Icons.auto_stories_rounded,
           isDark: isDark,
           isUrdu: isUrdu,
-          children: autocomplete.poems.map((poem) {
+          children: poems.map((poem) {
             return _TextSuggestionRow(
               key: ValueKey('suggestion-poem-${poem.publicId}'),
               text: poem.title,
@@ -135,7 +154,7 @@ class AppSearchSuggestions extends ConsumerWidget {
       groupIndex++;
     }
 
-    if (autocomplete.tags.isNotEmpty) {
+    if (tags.isNotEmpty) {
       groups.add(_StaggeredEntrance(
         delay: Duration(milliseconds: 30 * groupIndex),
         child: _SuggestionGroup(
@@ -143,7 +162,7 @@ class AppSearchSuggestions extends ConsumerWidget {
           icon: Icons.tag_rounded,
           isDark: isDark,
           isUrdu: isUrdu,
-          children: autocomplete.tags.map((tag) {
+          children: tags.map((tag) {
             return _TextSuggestionRow(
               key: ValueKey('suggestion-tag-${tag.publicId}'),
               text: tag.name,
@@ -158,7 +177,7 @@ class AppSearchSuggestions extends ConsumerWidget {
       groupIndex++;
     }
 
-    if (autocomplete.categories.isNotEmpty) {
+    if (categories.isNotEmpty) {
       groups.add(_StaggeredEntrance(
         delay: Duration(milliseconds: 30 * groupIndex),
         child: _SuggestionGroup(
@@ -166,7 +185,7 @@ class AppSearchSuggestions extends ConsumerWidget {
           icon: Icons.category_rounded,
           isDark: isDark,
           isUrdu: isUrdu,
-          children: autocomplete.categories.map((cat) {
+          children: categories.map((cat) {
             return _TextSuggestionRow(
               key: ValueKey('suggestion-category-${cat.publicId}'),
               text: cat.name,

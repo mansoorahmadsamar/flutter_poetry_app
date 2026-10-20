@@ -31,8 +31,8 @@ class AutocompletePoet with _$AutocompletePoet {
   const factory AutocompletePoet({
     required String publicId,
     required String name,
-    String? profileImageUrl,
-    String? era,
+    @PlaceholderStringConverter() String? profileImageUrl,
+    @PlaceholderStringConverter() String? era,
     @Default(0.0) double score,
   }) = _AutocompletePoet;
 
@@ -46,9 +46,10 @@ class AutocompletePoem with _$AutocompletePoem {
   const factory AutocompletePoem({
     required String publicId,
     required String title,
-    required String poetName,
-    required String poetPublicId,
-    required String poetryType,
+    // Absent ("-") for a poem whose poet or type is unknown (T-182).
+    @PlaceholderStringConverter() String? poetName,
+    @PlaceholderStringConverter() String? poetPublicId,
+    @PlaceholderStringConverter() String? poetryType,
     @Default(0.0) double score,
   }) = _AutocompletePoem;
 
@@ -63,7 +64,9 @@ class AutocompleteTag with _$AutocompleteTag {
     required String publicId,
     required String name,
     required String slug,
-    required String tagType,
+    // An enum on the backend (`TagDto.tagType` in /api/search results): a
+    // null arrives as JSON null, which used to fail the whole search (T-181).
+    @PlaceholderStringConverter() String? tagType,
     @Default(0.0) double score,
   }) = _AutocompleteTag;
 

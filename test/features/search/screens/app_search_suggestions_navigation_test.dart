@@ -122,7 +122,7 @@ void main() {
   });
 
   testWidgets(
-      'guest (autocomplete is always empty): "search for" row runs the search',
+      'no suggestions: "search for" row runs the search',
       (tester) async {
     final app = await pumpSearchScreen(
       tester,

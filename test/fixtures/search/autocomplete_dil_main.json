@@ -1,0 +1,24 @@
+{
+  "_comment": "GET /api/search/autocomplete?q=...&lang=ur in the AutocompleteSuggestions shape of backend main (identical on develop): poets/poems/tags/categories + totalCount (getTotalCount). Null Strings arrive as \"-\" (JacksonConfig), a null Float score as null, a null tagType/Integer as \"-\"/0. Values are synthetic; ids and Urdu names follow unified_search_dil_ur.json.",
+  "success": true,
+  "message": "Found 8 suggestions",
+  "data": {
+    "poets": [
+      {"publicId": "poet-dagh", "name": "داغ دہلوی", "profileImageUrl": "-", "era": "CLASSICAL", "score": 7.25},
+      {"publicId": "-", "name": "دلاور فگار", "profileImageUrl": "-", "era": "-", "score": null}
+    ],
+    "poems": [
+      {"publicId": "poem-dil-e-nadan", "title": "دل ناداں تجھے ہوا کیا ہے", "poetName": "مرزا غالب", "poetPublicId": "poet-ghalib", "poetryType": "GHAZAL", "score": 9.5},
+      {"publicId": "poem-no-poet", "title": "دل کی بات", "poetName": "-", "poetPublicId": "-", "poetryType": "-", "score": 3.1},
+      {"publicId": "poem-no-title", "title": "-", "poetName": "-", "poetPublicId": "-", "poetryType": "-", "score": 1.0}
+    ],
+    "tags": [
+      {"publicId": "tag-dil", "name": "دل", "slug": "dil", "tagType": "THEME", "color": "-", "usageCount": 0, "score": 4.0},
+      {"publicId": "tag-no-type", "name": "دلی", "slug": "dilli", "tagType": "-", "color": "#1A2B3C", "usageCount": 12, "score": null}
+    ],
+    "categories": [
+      {"publicId": "cat-dil", "name": "دل کی شاعری", "slug": "dil-ki-shayari", "parentCategoryName": "-", "poemCount": 42, "score": 2.0}
+    ],
+    "totalCount": 8
+  }
+}

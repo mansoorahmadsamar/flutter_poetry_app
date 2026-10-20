@@ -44,8 +44,9 @@ _$AutocompletePoetImpl _$$AutocompletePoetImplFromJson(
     _$AutocompletePoetImpl(
       publicId: json['publicId'] as String,
       name: json['name'] as String,
-      profileImageUrl: json['profileImageUrl'] as String?,
-      era: json['era'] as String?,
+      profileImageUrl:
+          const PlaceholderStringConverter().fromJson(json['profileImageUrl']),
+      era: const PlaceholderStringConverter().fromJson(json['era']),
       score: (json['score'] as num?)?.toDouble() ?? 0.0,
     );
 
@@ -54,8 +55,9 @@ Map<String, dynamic> _$$AutocompletePoetImplToJson(
     <String, dynamic>{
       'publicId': instance.publicId,
       'name': instance.name,
-      'profileImageUrl': instance.profileImageUrl,
-      'era': instance.era,
+      'profileImageUrl':
+          const PlaceholderStringConverter().toJson(instance.profileImageUrl),
+      'era': const PlaceholderStringConverter().toJson(instance.era),
       'score': instance.score,
     };
 
@@ -64,9 +66,11 @@ _$AutocompletePoemImpl _$$AutocompletePoemImplFromJson(
     _$AutocompletePoemImpl(
       publicId: json['publicId'] as String,
       title: json['title'] as String,
-      poetName: json['poetName'] as String,
-      poetPublicId: json['poetPublicId'] as String,
-      poetryType: json['poetryType'] as String,
+      poetName: const PlaceholderStringConverter().fromJson(json['poetName']),
+      poetPublicId:
+          const PlaceholderStringConverter().fromJson(json['poetPublicId']),
+      poetryType:
+          const PlaceholderStringConverter().fromJson(json['poetryType']),
       score: (json['score'] as num?)?.toDouble() ?? 0.0,
     );
 
@@ -75,9 +79,11 @@ Map<String, dynamic> _$$AutocompletePoemImplToJson(
     <String, dynamic>{
       'publicId': instance.publicId,
       'title': instance.title,
-      'poetName': instance.poetName,
-      'poetPublicId': instance.poetPublicId,
-      'poetryType': instance.poetryType,
+      'poetName': const PlaceholderStringConverter().toJson(instance.poetName),
+      'poetPublicId':
+          const PlaceholderStringConverter().toJson(instance.poetPublicId),
+      'poetryType':
+          const PlaceholderStringConverter().toJson(instance.poetryType),
       'score': instance.score,
     };
 
@@ -87,7 +93,7 @@ _$AutocompleteTagImpl _$$AutocompleteTagImplFromJson(
       publicId: json['publicId'] as String,
       name: json['name'] as String,
       slug: json['slug'] as String,
-      tagType: json['tagType'] as String,
+      tagType: const PlaceholderStringConverter().fromJson(json['tagType']),
       score: (json['score'] as num?)?.toDouble() ?? 0.0,
     );
 
@@ -97,7 +103,7 @@ Map<String, dynamic> _$$AutocompleteTagImplToJson(
       'publicId': instance.publicId,
       'name': instance.name,
       'slug': instance.slug,
-      'tagType': instance.tagType,
+      'tagType': const PlaceholderStringConverter().toJson(instance.tagType),
       'score': instance.score,
     };
 

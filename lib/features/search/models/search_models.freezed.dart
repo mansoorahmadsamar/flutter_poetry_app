@@ -287,7 +287,9 @@ AutocompletePoet _$AutocompletePoetFromJson(Map<String, dynamic> json) {
 mixin _$AutocompletePoet {
   String get publicId => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
   String? get profileImageUrl => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
   String? get era => throw _privateConstructorUsedError;
   double get score => throw _privateConstructorUsedError;
 
@@ -306,8 +308,8 @@ abstract class $AutocompletePoetCopyWith<$Res> {
   $Res call(
       {String publicId,
       String name,
-      String? profileImageUrl,
-      String? era,
+      @PlaceholderStringConverter() String? profileImageUrl,
+      @PlaceholderStringConverter() String? era,
       double score});
 }
 
@@ -366,8 +368,8 @@ abstract class _$$AutocompletePoetImplCopyWith<$Res>
   $Res call(
       {String publicId,
       String name,
-      String? profileImageUrl,
-      String? era,
+      @PlaceholderStringConverter() String? profileImageUrl,
+      @PlaceholderStringConverter() String? era,
       double score});
 }
 
@@ -419,8 +421,8 @@ class _$AutocompletePoetImpl implements _AutocompletePoet {
   const _$AutocompletePoetImpl(
       {required this.publicId,
       required this.name,
-      this.profileImageUrl,
-      this.era,
+      @PlaceholderStringConverter() this.profileImageUrl,
+      @PlaceholderStringConverter() this.era,
       this.score = 0.0});
 
   factory _$AutocompletePoetImpl.fromJson(Map<String, dynamic> json) =>
@@ -431,8 +433,10 @@ class _$AutocompletePoetImpl implements _AutocompletePoet {
   @override
   final String name;
   @override
+  @PlaceholderStringConverter()
   final String? profileImageUrl;
   @override
+  @PlaceholderStringConverter()
   final String? era;
   @override
   @JsonKey()
@@ -481,8 +485,8 @@ abstract class _AutocompletePoet implements AutocompletePoet {
   const factory _AutocompletePoet(
       {required final String publicId,
       required final String name,
-      final String? profileImageUrl,
-      final String? era,
+      @PlaceholderStringConverter() final String? profileImageUrl,
+      @PlaceholderStringConverter() final String? era,
       final double score}) = _$AutocompletePoetImpl;
 
   factory _AutocompletePoet.fromJson(Map<String, dynamic> json) =
@@ -493,8 +497,10 @@ abstract class _AutocompletePoet implements AutocompletePoet {
   @override
   String get name;
   @override
+  @PlaceholderStringConverter()
   String? get profileImageUrl;
   @override
+  @PlaceholderStringConverter()
   String? get era;
   @override
   double get score;
@@ -511,10 +517,14 @@ AutocompletePoem _$AutocompletePoemFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$AutocompletePoem {
   String get publicId => throw _privateConstructorUsedError;
-  String get title => throw _privateConstructorUsedError;
-  String get poetName => throw _privateConstructorUsedError;
-  String get poetPublicId => throw _privateConstructorUsedError;
-  String get poetryType => throw _privateConstructorUsedError;
+  String get title =>
+      throw _privateConstructorUsedError; // Absent ("-") for a poem whose poet or type is unknown (T-182).
+  @PlaceholderStringConverter()
+  String? get poetName => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get poetPublicId => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get poetryType => throw _privateConstructorUsedError;
   double get score => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -532,9 +542,9 @@ abstract class $AutocompletePoemCopyWith<$Res> {
   $Res call(
       {String publicId,
       String title,
-      String poetName,
-      String poetPublicId,
-      String poetryType,
+      @PlaceholderStringConverter() String? poetName,
+      @PlaceholderStringConverter() String? poetPublicId,
+      @PlaceholderStringConverter() String? poetryType,
       double score});
 }
 
@@ -553,9 +563,9 @@ class _$AutocompletePoemCopyWithImpl<$Res, $Val extends AutocompletePoem>
   $Res call({
     Object? publicId = null,
     Object? title = null,
-    Object? poetName = null,
-    Object? poetPublicId = null,
-    Object? poetryType = null,
+    Object? poetName = freezed,
+    Object? poetPublicId = freezed,
+    Object? poetryType = freezed,
     Object? score = null,
   }) {
     return _then(_value.copyWith(
@@ -567,18 +577,18 @@ class _$AutocompletePoemCopyWithImpl<$Res, $Val extends AutocompletePoem>
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      poetName: null == poetName
+      poetName: freezed == poetName
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
-              as String,
-      poetPublicId: null == poetPublicId
+              as String?,
+      poetPublicId: freezed == poetPublicId
           ? _value.poetPublicId
           : poetPublicId // ignore: cast_nullable_to_non_nullable
-              as String,
-      poetryType: null == poetryType
+              as String?,
+      poetryType: freezed == poetryType
           ? _value.poetryType
           : poetryType // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       score: null == score
           ? _value.score
           : score // ignore: cast_nullable_to_non_nullable
@@ -598,9 +608,9 @@ abstract class _$$AutocompletePoemImplCopyWith<$Res>
   $Res call(
       {String publicId,
       String title,
-      String poetName,
-      String poetPublicId,
-      String poetryType,
+      @PlaceholderStringConverter() String? poetName,
+      @PlaceholderStringConverter() String? poetPublicId,
+      @PlaceholderStringConverter() String? poetryType,
       double score});
 }
 
@@ -617,9 +627,9 @@ class __$$AutocompletePoemImplCopyWithImpl<$Res>
   $Res call({
     Object? publicId = null,
     Object? title = null,
-    Object? poetName = null,
-    Object? poetPublicId = null,
-    Object? poetryType = null,
+    Object? poetName = freezed,
+    Object? poetPublicId = freezed,
+    Object? poetryType = freezed,
     Object? score = null,
   }) {
     return _then(_$AutocompletePoemImpl(
@@ -631,18 +641,18 @@ class __$$AutocompletePoemImplCopyWithImpl<$Res>
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      poetName: null == poetName
+      poetName: freezed == poetName
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
-              as String,
-      poetPublicId: null == poetPublicId
+              as String?,
+      poetPublicId: freezed == poetPublicId
           ? _value.poetPublicId
           : poetPublicId // ignore: cast_nullable_to_non_nullable
-              as String,
-      poetryType: null == poetryType
+              as String?,
+      poetryType: freezed == poetryType
           ? _value.poetryType
           : poetryType // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       score: null == score
           ? _value.score
           : score // ignore: cast_nullable_to_non_nullable
@@ -657,9 +667,9 @@ class _$AutocompletePoemImpl implements _AutocompletePoem {
   const _$AutocompletePoemImpl(
       {required this.publicId,
       required this.title,
-      required this.poetName,
-      required this.poetPublicId,
-      required this.poetryType,
+      @PlaceholderStringConverter() this.poetName,
+      @PlaceholderStringConverter() this.poetPublicId,
+      @PlaceholderStringConverter() this.poetryType,
       this.score = 0.0});
 
   factory _$AutocompletePoemImpl.fromJson(Map<String, dynamic> json) =>
@@ -669,12 +679,16 @@ class _$AutocompletePoemImpl implements _AutocompletePoem {
   final String publicId;
   @override
   final String title;
+// Absent ("-") for a poem whose poet or type is unknown (T-182).
   @override
-  final String poetName;
+  @PlaceholderStringConverter()
+  final String? poetName;
   @override
-  final String poetPublicId;
+  @PlaceholderStringConverter()
+  final String? poetPublicId;
   @override
-  final String poetryType;
+  @PlaceholderStringConverter()
+  final String? poetryType;
   @override
   @JsonKey()
   final double score;
@@ -725,9 +739,9 @@ abstract class _AutocompletePoem implements AutocompletePoem {
   const factory _AutocompletePoem(
       {required final String publicId,
       required final String title,
-      required final String poetName,
-      required final String poetPublicId,
-      required final String poetryType,
+      @PlaceholderStringConverter() final String? poetName,
+      @PlaceholderStringConverter() final String? poetPublicId,
+      @PlaceholderStringConverter() final String? poetryType,
       final double score}) = _$AutocompletePoemImpl;
 
   factory _AutocompletePoem.fromJson(Map<String, dynamic> json) =
@@ -737,12 +751,15 @@ abstract class _AutocompletePoem implements AutocompletePoem {
   String get publicId;
   @override
   String get title;
+  @override // Absent ("-") for a poem whose poet or type is unknown (T-182).
+  @PlaceholderStringConverter()
+  String? get poetName;
   @override
-  String get poetName;
+  @PlaceholderStringConverter()
+  String? get poetPublicId;
   @override
-  String get poetPublicId;
-  @override
-  String get poetryType;
+  @PlaceholderStringConverter()
+  String? get poetryType;
   @override
   double get score;
   @override
@@ -759,8 +776,11 @@ AutocompleteTag _$AutocompleteTagFromJson(Map<String, dynamic> json) {
 mixin _$AutocompleteTag {
   String get publicId => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
-  String get slug => throw _privateConstructorUsedError;
-  String get tagType => throw _privateConstructorUsedError;
+  String get slug =>
+      throw _privateConstructorUsedError; // An enum on the backend (`TagDto.tagType` in /api/search results): a
+// null arrives as JSON null, which used to fail the whole search (T-181).
+  @PlaceholderStringConverter()
+  String? get tagType => throw _privateConstructorUsedError;
   double get score => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -779,7 +799,7 @@ abstract class $AutocompleteTagCopyWith<$Res> {
       {String publicId,
       String name,
       String slug,
-      String tagType,
+      @PlaceholderStringConverter() String? tagType,
       double score});
 }
 
@@ -799,7 +819,7 @@ class _$AutocompleteTagCopyWithImpl<$Res, $Val extends AutocompleteTag>
     Object? publicId = null,
     Object? name = null,
     Object? slug = null,
-    Object? tagType = null,
+    Object? tagType = freezed,
     Object? score = null,
   }) {
     return _then(_value.copyWith(
@@ -815,10 +835,10 @@ class _$AutocompleteTagCopyWithImpl<$Res, $Val extends AutocompleteTag>
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
               as String,
-      tagType: null == tagType
+      tagType: freezed == tagType
           ? _value.tagType
           : tagType // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       score: null == score
           ? _value.score
           : score // ignore: cast_nullable_to_non_nullable
@@ -839,7 +859,7 @@ abstract class _$$AutocompleteTagImplCopyWith<$Res>
       {String publicId,
       String name,
       String slug,
-      String tagType,
+      @PlaceholderStringConverter() String? tagType,
       double score});
 }
 
@@ -857,7 +877,7 @@ class __$$AutocompleteTagImplCopyWithImpl<$Res>
     Object? publicId = null,
     Object? name = null,
     Object? slug = null,
-    Object? tagType = null,
+    Object? tagType = freezed,
     Object? score = null,
   }) {
     return _then(_$AutocompleteTagImpl(
@@ -873,10 +893,10 @@ class __$$AutocompleteTagImplCopyWithImpl<$Res>
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
               as String,
-      tagType: null == tagType
+      tagType: freezed == tagType
           ? _value.tagType
           : tagType // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       score: null == score
           ? _value.score
           : score // ignore: cast_nullable_to_non_nullable
@@ -892,7 +912,7 @@ class _$AutocompleteTagImpl implements _AutocompleteTag {
       {required this.publicId,
       required this.name,
       required this.slug,
-      required this.tagType,
+      @PlaceholderStringConverter() this.tagType,
       this.score = 0.0});
 
   factory _$AutocompleteTagImpl.fromJson(Map<String, dynamic> json) =>
@@ -904,8 +924,11 @@ class _$AutocompleteTagImpl implements _AutocompleteTag {
   final String name;
   @override
   final String slug;
+// An enum on the backend (`TagDto.tagType` in /api/search results): a
+// null arrives as JSON null, which used to fail the whole search (T-181).
   @override
-  final String tagType;
+  @PlaceholderStringConverter()
+  final String? tagType;
   @override
   @JsonKey()
   final double score;
@@ -953,7 +976,7 @@ abstract class _AutocompleteTag implements AutocompleteTag {
       {required final String publicId,
       required final String name,
       required final String slug,
-      required final String tagType,
+      @PlaceholderStringConverter() final String? tagType,
       final double score}) = _$AutocompleteTagImpl;
 
   factory _AutocompleteTag.fromJson(Map<String, dynamic> json) =
@@ -965,8 +988,10 @@ abstract class _AutocompleteTag implements AutocompleteTag {
   String get name;
   @override
   String get slug;
-  @override
-  String get tagType;
+  @override // An enum on the backend (`TagDto.tagType` in /api/search results): a
+// null arrives as JSON null, which used to fail the whole search (T-181).
+  @PlaceholderStringConverter()
+  String? get tagType;
   @override
   double get score;
   @override

@@ -292,7 +292,7 @@ class AutocompleteSuggestions extends ConsumerWidget {
         ),
       ),
       subtitle: Text(
-        poem.poetName,
+        poem.poetName ?? '',
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w500,

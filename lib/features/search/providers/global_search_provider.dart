@@ -282,19 +282,23 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
     } on DioException catch (e) {
       // Ignore cancelled requests
       if (e.type == DioExceptionType.cancel) return;
-
-      // Graceful degradation - clear autocomplete on error
-      state = state.copyWith(
-        autocompleteResults: null,
-        isLoadingAutocomplete: false,
-      );
+      _autocompleteFailed(query, e);
     } catch (e) {
-      // Graceful degradation - clear autocomplete on error
-      state = state.copyWith(
-        autocompleteResults: null,
-        isLoadingAutocomplete: false,
-      );
+      _autocompleteFailed(query, e);
     }
+  }
+
+  /// Graceful degradation: no suggestions (the "Search for …" row stays), and
+  /// the failure is logged instead of vanishing. A failure for a query the
+  /// user has already typed past is ignored, so it cannot clear (or stop the
+  /// spinner of) the suggestions for the current query.
+  void _autocompleteFailed(String query, Object error) {
+    _logger.w('Autocomplete failed for "$query": $error');
+    if (state.currentQuery != query) return;
+    state = state.copyWith(
+      autocompleteResults: null,
+      isLoadingAutocomplete: false,
+    );
   }
 
   // ==========================================================================
