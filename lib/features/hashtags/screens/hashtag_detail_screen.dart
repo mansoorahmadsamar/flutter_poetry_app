@@ -6,6 +6,7 @@ import '../../../core/providers/language_provider.dart';
 import '../../../core/utils/color_parser.dart';
 import '../models/hashtag_model.dart';
 import '../services/hashtag_service.dart';
+import '../utils/hashtag_tabs.dart';
 import '../widgets/hashtag_couplets_tab.dart';
 import '../widgets/hashtag_poems_tab.dart';
 import '../widgets/hashtag_images_tab.dart';
@@ -31,7 +32,8 @@ class _HashtagDetailScreenState extends ConsumerState<HashtagDetailScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController =
+        TabController(length: HashtagTab.values.length, vsync: this);
     _loadMeta();
   }
 
@@ -49,6 +51,9 @@ class _HashtagDetailScreenState extends ConsumerState<HashtagDetailScreen>
         setState(() {
           _meta = meta;
           _isLoading = false;
+          // Open on the first tab that has content (T-178). The tab pages are
+          // built only after this, so the empty first tab never loads.
+          _tabController.index = initialHashtagTab(meta).index;
         });
       }
     } catch (e) {
