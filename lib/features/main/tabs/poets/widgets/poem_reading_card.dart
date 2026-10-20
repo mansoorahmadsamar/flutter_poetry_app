@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
+import 'package:flutter_poetry_app/core/utils/api_placeholder.dart';
+import 'package:flutter_poetry_app/core/utils/language_typography.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/couplet_providers.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/reaction_providers.dart';
 import 'package:flutter_poetry_app/features/engagement/widgets/reaction_button.dart';
@@ -18,7 +20,12 @@ const String _urduFontFamily = 'Jameel Noori Nastaleeq';
 
 class PoemReadingCard extends ConsumerWidget {
   final PoemModel poem;
-  final List<CoupletModel>? couplets;
+  /// The poem's API couplets; empty when the response has none (nazms and
+  /// other non-ghazal types), and the text is then read from the content
+  /// ([sherBlocksFor]). The card is built only once the poem has loaded, so
+  /// there is no loading state here (an empty list used to read as one:
+  /// T-207, an endless spinner).
+  final List<CoupletModel> couplets;
   final String selectedScript;
   final int? selectedSherIndex;
   final ValueChanged<int?> onSherSelected;
@@ -44,15 +51,45 @@ class PoemReadingCard extends ConsumerWidget {
   static Key coupletKey(int coupletNumber) =>
       ValueKey('poem-couplet-$coupletNumber');
 
+  /// Key of the message shown when the poem has no text at all.
+  static const emptyTextKey = Key('poem-text-empty');
+
+  /// The poem's shers (one string per sher, lines joined by `\n`) for
+  /// [script] when it has no API couplets — nazms and other non-ghazal
+  /// types, or a response whose couplets failed to load. In order: the
+  /// content's `fullText` split at blank lines; else its `verses`, grouped by
+  /// couplet number; else the list API's `excerpt`. Blank and `"-"` text is
+  /// absent. Empty when the poem has no text at all.
+  static List<String> sherBlocksFor(PoemModel poem, String script) {
+    final content = poem.getContentForLanguage(script);
+    final fullText = presentOrNull(content?.fullText);
+    if (fullText != null) return _parseShers(fullText);
+
+    final blocks = <String>[];
+    int? currentCouplet;
+    for (final verse in content?.verses ?? const <VerseModel>[]) {
+      final line = presentOrNull(verse.text);
+      if (line == null) continue;
+      final number = verse.coupletNumber;
+      if (blocks.isNotEmpty && number != null && number == currentCouplet) {
+        blocks[blocks.length - 1] = '${blocks.last}\n$line';
+      } else {
+        blocks.add(line);
+      }
+      currentCouplet = number;
+    }
+    if (blocks.isNotEmpty) return blocks;
+
+    final excerpt = presentOrNull(poem.excerpt);
+    return excerpt == null ? const [] : _parseShers(excerpt);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bool useCouplets = couplets != null && couplets!.isNotEmpty;
-    final content = poem.getContentForLanguage(selectedScript);
+    final bool useCouplets = couplets.isNotEmpty;
     final List<String> parsedShers =
-        (!useCouplets && content != null && content.fullText.isNotEmpty)
-            ? _parseShers(content.fullText)
-            : [];
+        useCouplets ? const [] : sherBlocksFor(poem, selectedScript);
 
     return Container(
       width: double.infinity,
@@ -64,21 +101,33 @@ class PoemReadingCard extends ConsumerWidget {
           color: isDark ? AppColors.borderDark : AppColors.borderLight,
         ),
       ),
-      child: couplets == null
-          ? _buildLoading()
-          : useCouplets
-              ? _buildCoupletList(context, ref)
-              : parsedShers.isNotEmpty
-                  ? _buildParsedSherList(context, ref, parsedShers)
-                  : _buildRawText(content?.fullText ?? ''),
+      child: useCouplets
+          ? _buildCoupletList(context, ref)
+          : parsedShers.isNotEmpty
+              ? _buildParsedSherList(context, ref, parsedShers)
+              : _buildEmptyText(),
     );
   }
 
-  Widget _buildLoading() {
-    return const SizedBox(
-      height: 120,
-      child: Center(
-        child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2),
+  /// The poem loaded but has no text in any form.
+  Widget _buildEmptyText() {
+    final message = switch (selectedScript) {
+      'ur' => 'اس کلام کا متن دستیاب نہیں',
+      'hi' => 'इस रचना का पाठ उपलब्ध नहीं है।',
+      _ => 'The text of this poem is not available.',
+    };
+    return Padding(
+      key: emptyTextKey,
+      padding: const EdgeInsets.symmetric(vertical: 24),
+      child: Text(
+        message,
+        textAlign: TextAlign.center,
+        textDirection: LanguageTypography.getTextDirection(selectedScript),
+        style: LanguageTypography.createStyle(
+          baseFontSize: 14,
+          languageCode: selectedScript,
+          color: AppColors.textSecondaryLight,
+        ),
       ),
     );
   }
@@ -89,9 +138,9 @@ class PoemReadingCard extends ConsumerWidget {
 
   Widget _buildCoupletList(BuildContext context, WidgetRef ref) {
     final items = <Widget>[];
-    for (int i = 0; i < couplets!.length; i++) {
-      items.add(_buildCoupletBlock(context, ref, i, couplets![i]));
-      if (i < couplets!.length - 1) items.add(_sherDivider());
+    for (int i = 0; i < couplets.length; i++) {
+      items.add(_buildCoupletBlock(context, ref, i, couplets[i]));
+      if (i < couplets.length - 1) items.add(_sherDivider());
     }
     return Column(children: items);
   }
@@ -431,14 +480,6 @@ class PoemReadingCard extends ConsumerWidget {
         .where((l) => l.isNotEmpty)
         .toList();
     return lines.map((line) => _verseLine(line)).toList();
-  }
-
-  // ────────────────────────────────────────────────────────────
-  // Raw text fallback
-  // ────────────────────────────────────────────────────────────
-
-  Widget _buildRawText(String text) {
-    return _scriptText(text, _verseStyle());
   }
 
   // ────────────────────────────────────────────────────────────

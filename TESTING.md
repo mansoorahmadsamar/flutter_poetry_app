@@ -1,6 +1,6 @@
 # Testing Strategy — flutter_poetry_app (Sukhan)
 
-> **Status (2026-10-20, `feat/themes-app`):** `flutter test` → `+628: All tests passed!` (Flutter 3.44.4):
+> **Status (2026-10-20, `feat/themes-app`):** `flutter test` → `+637: All tests passed!` (Flutter 3.44.4):
 > unit, model/fixture, mocked-network and widget tests with the helpers in §1. `flutter analyze` reports 147 issues
 > (the baseline; 0 errors). No golden tests and no automated device tests; device QA is manual, on an emulator with a
 > release build (§7). The release workflows (`play-store-release.yml`, `firebase-app-distribution.yml`) run
@@ -85,9 +85,12 @@
   production fixtures. A new couplet model gets a line there.
 - `pumpHashtagScreen` (`test/helpers/fake_hashtag_service.dart`) now also routes `/hashtags/:slug` to
   `hashtag:<slug>`, for chip taps.
-- Poem deep link: `test/features/main/tabs/poets/screens/poem_detail_deep_link_test.dart` mounts the **real** poem
-  route from `appRoutesProvider` under a stub `/main`, overrides `poemDetailProvider` with a 40-couplet ghazal, and
-  asserts route parsing, that couplet 30 is on screen and selected, and that old links stay at the top.
+- Poem detail: `test/helpers/poem_detail_harness.dart` — `pumpPoemDetail(tester, location, poem: …)` mounts the
+  **real** poem route from `appRoutesProvider` (`realPoemRoute`) under a stub `/main`, with `poemDetailProvider`
+  answering [poem] and nothing else fetched; `settle: false` pumps bounded frames for a screen that might spin
+  forever. Used by `poem_detail_deep_link_test.dart` (route parsing, a 40-couplet ghazal opened at couplet 30, old
+  links at the top) and `poem_detail_without_couplets_test.dart` (T-207: text, verses, excerpt or empty state — never
+  a spinner — in Urdu and English).
 - Theme chips sit in the middle of tappable cards; a test that taps the **card** should tap near a corner
   (`tester.tapAt(getTopLeft(card) + offset)`) once the card has themes, or it may hit a chip.
 - A `GoogleFonts.*` style (e.g. `labelStyleFor('hi')`) starts a font load that fails without runtime fetching; check

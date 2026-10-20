@@ -1,24 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_poetry_app/core/providers/language_provider.dart';
-import 'package:flutter_poetry_app/core/routing/app_router.dart';
-import 'package:flutter_poetry_app/features/engagement/models/reaction_models.dart';
-import 'package:flutter_poetry_app/features/engagement/providers/reaction_providers.dart';
 import 'package:flutter_poetry_app/features/engagement/widgets/reaction_button.dart';
 import 'package:flutter_poetry_app/features/hashtags/models/couplet_theme.dart';
 import 'package:flutter_poetry_app/features/hashtags/widgets/couplet_theme_chips.dart';
-import 'package:flutter_poetry_app/features/main/tabs/creator/providers/creator_providers.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/couplet_model.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.dart';
-import 'package:flutter_poetry_app/features/main/tabs/poets/providers/poem_providers.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/screens/poem_detail_screen.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/widgets/poem_reading_card.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../../../helpers/fake_hashtag_service.dart';
 import '../../../../../helpers/fixtures.dart';
+import '../../../../../helpers/poem_detail_harness.dart';
 
 /// `/main/poems/:publicId?couplet=<n>`: the poem opens scrolled to couplet n,
 /// highlighted with the existing selection; old links open at the top.
@@ -61,53 +54,9 @@ void main() {
         ],
       );
 
-  /// The app's real poem route (from `appRoutesProvider`), so the test covers
-  /// how the route reads `?couplet=`.
-  GoRoute realPoemRoute() {
-    final container = ProviderContainer();
-    addTearDown(container.dispose);
-    final main = container
-        .read(appRoutesProvider)
-        .whereType<GoRoute>()
-        .firstWhere((r) => r.path == AppRoutes.main);
-    return main.routes
-        .whereType<GoRoute>()
-        .firstWhere((r) => r.name == AppRoutes.poemDetailName);
-  }
-
   Future<GoRouter> pumpPoem(WidgetTester tester, String location,
-      {String lang = 'ur', PoemModel? poem}) async {
-    final router = GoRouter(
-      initialLocation: location,
-      routes: [
-        GoRoute(
-          path: AppRoutes.main,
-          builder: (_, __) => const SizedBox(),
-          routes: [realPoemRoute()],
-        ),
-        GoRoute(
-          path: '/hashtags/:slug',
-          builder: (_, state) =>
-              Text('hashtag:${state.pathParameters['slug']}'),
-        ),
-      ],
-    );
-    addTearDown(router.dispose);
-    await tester.pumpWidget(ProviderScope(
-      overrides: [
-        selectedLanguageProvider.overrideWithValue(lang),
-        poemDetailProvider.overrideWith((ref, id) async => poem ?? ghazal()),
-        poetPoemsProvider
-            .overrideWith((ref, params) async => emptyHashtagPage<PoemModel>()),
-        ownedPoetProvider.overrideWith((ref) async => null),
-        reactionTypesProvider
-            .overrideWith((ref) async => const <ReactionType>[]),
-      ],
-      child: MaterialApp.router(routerConfig: router),
-    ));
-    await tester.pumpAndSettle();
-    return router;
-  }
+          {String lang = 'ur', PoemModel? poem}) =>
+      pumpPoemDetail(tester, location, poem: poem ?? ghazal(), lang: lang);
 
   Finder couplet(int n) => find.byKey(PoemReadingCard.coupletKey(n));
 

@@ -294,7 +294,7 @@ Flushing:
 - Links to the poet (`:243`) and to a claim flow (`:146`).
 - Couplet rows (`PoemReadingCard`, `CoupletEngagementButtons`) open `ShareOptionsSheet` → "Share as Image" (§9.8).
 - **Open at a couplet:** the route reads `?couplet=<coupletNumber>` (`ContentLocations.coupletFrom`: positive whole numbers only) into `PoemDetailScreen.initialCoupletNumber`. When the poem's couplets first arrive, `CoupletDeepLink.targetIndex` (`utils/couplet_deep_link.dart`) finds the couplet **by number** (not position); the screen selects it with the existing `_selectedSherIndex` highlight (tinted block + action tray) and, after that frame, `Scrollable.ensureVisible` brings it a quarter of the way down the screen (350 ms). It runs once; the reader can deselect it. No parameter, `0`/junk, or a number the poem does not have → the poem opens at the top, as before. Couplet numbers are the same in every script, so one link works in Urdu, Roman and Devanagari. Tests: `test/features/main/tabs/poets/screens/poem_detail_deep_link_test.dart`, `utils/couplet_deep_link_test.dart`, `test/core/routing/content_locations_test.dart`.
-- **Known gap:** `PoemReadingCard` shows its loading spinner whenever `couplets` is null, and the screen passes null for an **empty** couplet list, so a poem whose response has no couplets (e.g. the guest endpoint's couplet load failed) spins forever instead of showing `fullText` (reproduced in a widget test, 2026-10-20; not fixed here).
+- **Poems without couplets** (T-207): `PoemReadingCard` is built only after the poem loads and has no loading state. With API couplets it lists them; otherwise `PoemReadingCard.sherBlocksFor` reads the text for the selected script: the content's `fullText` split at blank lines, else its `verses` grouped by couplet number, else the list API's `excerpt` (`"-"`/blank = absent); with no text at all it shows "اس کلام کا متن دستیاب نہیں" / "The text of this poem is not available.". It used to read an empty couplet list as "loading" and spin forever (nazms and other non-ghazal types, or a guest poem whose couplet load failed). Tests: `test/features/main/tabs/poets/screens/poem_detail_without_couplets_test.dart`.
 
 ### 9.8 Image poetry: `features/image_poetry/`
 - **Entry:** `ShareOptionsSheet` → `/image-poetry/generate/:coupletId` (`widgets/share_options_sheet.dart:83`). From there, `/image-poetry/templates` picks a template.
@@ -394,7 +394,7 @@ Logout and account deletion clear **all** SharedPreferences. The `feed_cache`, `
 
 ## 13. Tests, CI and release
 
-- **Tests:** 628 unit, model, mocked-network and widget tests under `test/` (2026-10-20); see `TESTING.md` for helpers and fixtures. No golden tests. There is no `integration_test/`: adding the `integration_test` package breaks the Android build until Gradle is wired for it.
+- **Tests:** 637 unit, model, mocked-network and widget tests under `test/` (2026-10-20); see `TESTING.md` for helpers and fixtures. No golden tests. There is no `integration_test/`: adding the `integration_test` package breaks the Android build until Gradle is wired for it.
 - **CI** (`.github/workflows/`):
   - `play-store-release.yml` runs on **every push to `develop` or `main`**, and on manual dispatch with a choice of track.
     - Steps: Flutter **3.44.4** → `pub get` → decode secrets → `flutter build appbundle --release --build-name=MAJOR.MINOR.<run_number> --build-number=<run_number>` → upload to Play.
@@ -442,5 +442,4 @@ Production is the only backend with real data, and there is no staging (`stage-a
 - CI runs analyze (errors only) and tests before building, but there is no PR check, and a push to `main` releases straight to the Play **production** track.
 - Several routes and screens are unreachable, and several dependencies are unused (§12).
 - Section "see all" on Discover is a TODO no-op (`discover_screen.dart:489-496`).
-- A poem with no couplets in its response shows an endless spinner instead of its text (`PoemReadingCard` treats `couplets == null` as loading; §9.7).
 - The signed-in feed's couplet `contentData` has no `coupletNumber`, so signed-in feed couplets open their poem at the top (backend `FeedItemHydrator`).

@@ -122,7 +122,7 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
           PoemReadingCard(
             key: ValueKey(_selectedScript),
             poem: poem,
-            couplets: couplets,
+            couplets: poem.couplets,
             selectedScript: _selectedScript,
             selectedSherIndex: _selectedSherIndex,
             onSherSelected: (i) => setState(() => _selectedSherIndex = i),
