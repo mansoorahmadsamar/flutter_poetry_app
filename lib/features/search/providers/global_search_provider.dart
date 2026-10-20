@@ -6,6 +6,7 @@ import 'package:flutter_poetry_app/core/network/dio_client.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/features/search/models/global_search_state.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
+import 'package:flutter_poetry_app/features/search/models/search_origin.dart';
 import 'package:flutter_poetry_app/features/search/services/search_service.dart';
 import 'package:flutter_poetry_app/features/search/services/search_history_service.dart';
 import 'package:flutter_poetry_app/features/search/utils/app_search_urdu_normalizer.dart';
@@ -69,6 +70,10 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
   /// Bumped by every [executeSearch]; a response that comes back after a
   /// newer search started is dropped instead of overwriting it.
   int _searchGeneration = 0;
+
+  /// Origin of the latest search ([executeSearch]); its further pages and a
+  /// re-run of the same search (retry) are sent with it (T-183).
+  SearchOrigin _origin = SearchOrigin.typed;
 
   GlobalSearchNotifier(
     this._searchService,
@@ -308,16 +313,27 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
   /// - [query]: Optional query (uses currentQuery if null)
   /// - [segment]: Optional tab to show the results in, set in the same state
   ///   update.
+  /// - [origin]: why the user searched, sent to the backend (T-183). Without
+  ///   one, a new [query] counts as [SearchOrigin.typed] and a re-run of the
+  ///   current query (no [query]: retry, or a tab switch with nothing loaded)
+  ///   keeps the origin of the search it repeats.
   ///
   /// Every call is one `/api/search` request, which the backend logs as a
   /// search (it feeds trending searches) — so tab switches go through
   /// [setActiveSegment], which reuses loaded results.
-  Future<void> executeSearch({String? query, DiscoverSegment? segment}) async {
+  Future<void> executeSearch({
+    String? query,
+    DiscoverSegment? segment,
+    SearchOrigin? origin,
+  }) async {
     final searchQuery = query?.trim() ?? state.currentQuery;
 
     if (searchQuery.isEmpty) return;
 
     final generation = ++_searchGeneration;
+    final searchOrigin =
+        origin ?? (query == null ? _origin : SearchOrigin.typed);
+    _origin = searchOrigin;
 
     // Normalize Urdu text (diacritics, letter variants) for consistent matching
     final normalizedQuery = AppSearchUrduNormalizer.normalize(searchQuery);
@@ -348,6 +364,7 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
           type: 'all',  // Search all content types
           lang: _languageCode,
           size: pageSize,
+          origin: searchOrigin,
         ),
         _searchService.getRelatedSearches(
           query: normalizedQuery,
@@ -429,6 +446,8 @@ class GlobalSearchNotifier extends StateNotifier<GlobalSearchState> {
         page: page,
         lang: _languageCode,
         size: pageSize,
+        // The page belongs to the search that produced these results.
+        origin: _origin,
       );
 
       // A new search started while this page was loading: it belongs to the

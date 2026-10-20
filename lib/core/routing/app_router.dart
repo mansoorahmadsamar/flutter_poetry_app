@@ -20,6 +20,7 @@ import '../../features/main/tabs/creator/screens/upload_book_screen.dart';
 import '../../features/main/tabs/creator/screens/creator_image_detail_screen.dart';
 import '../../features/main/tabs/creator/models/creator_image_model.dart';
 import '../../features/search/screens/poets_search_screen.dart';
+import '../../features/search/models/search_origin.dart';
 import '../../features/search/screens/app_search_screen.dart';
 import '../../features/search/screens/category_results_screen.dart';
 import '../../features/engagement/screens/bookmark_search_screen.dart';
@@ -356,7 +357,8 @@ final List<RouteBase> _appRoutes = [
     builder: (context, state) {
       final extra = state.extra as Map<String, dynamic>?;
       return AppSearchScreen(
-        initialQuery: extra?['query'] as String?,
+        initialQuery: extra?[SearchRouteExtra.query] as String?,
+        initialOrigin: SearchRouteExtra.originOf(extra),
       );
     },
   ),

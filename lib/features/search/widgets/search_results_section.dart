@@ -10,6 +10,7 @@ import 'package:flutter_poetry_app/features/search/utils/search_adapters.dart';
 import 'package:flutter_poetry_app/features/search/widgets/poet_result_card.dart';
 import 'package:flutter_poetry_app/features/search/widgets/couplet_sort_dropdown.dart';
 import 'package:flutter_poetry_app/core/utils/language_typography.dart';
+import 'package:flutter_poetry_app/features/search/models/search_origin.dart';
 
 /// Search results section with segment-aware rendering
 ///
@@ -500,6 +501,7 @@ class SearchResultsSection extends ConsumerWidget {
                 onPressed: () {
                   ref.read(globalSearchProvider.notifier).executeSearch(
                     query: query,
+                    origin: SearchOrigin.browse,
                   );
                 },
               );

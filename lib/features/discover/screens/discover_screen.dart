@@ -15,6 +15,7 @@ import '../widgets/horizontal_content_rail.dart';
 import '../widgets/poet_grid.dart';
 import '../widgets/trending_chips.dart';
 import '../../hashtags/widgets/hashtag_pill.dart';
+import '../../search/models/search_origin.dart';
 
 /// Premium discover screen with staggered section entrance animations.
 class DiscoverScreen extends ConsumerStatefulWidget {
@@ -142,7 +143,8 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen>
           child: TrendingChips(
             trending: discoverState.bundle!.trendingSearches,
             isRtl: isRtl,
-            onQueryTap: (query) => context.push('/search', extra: {'query': query}),
+            onQueryTap: (query) => context.push('/search',
+                extra: SearchRouteExtra.of(query, SearchOrigin.trending)),
           ),
         ),
       ));
@@ -246,9 +248,9 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen>
             categories: discoverState.bundle!.categories.items,
             totalCount: discoverState.bundle!.categories.totalCount,
             isRtl: isRtl,
-            onCategoryTap: (cat) => context.push('/search', extra: {
-              'query': cat.primaryText,
-            }),
+            onCategoryTap: (cat) => context.push('/search',
+                extra:
+                    SearchRouteExtra.of(cat.primaryText, SearchOrigin.browse)),
             onSeeMore: () =>
                 _navigateToSectionListing(context, 'categories', isRtl),
           ),
@@ -480,9 +482,9 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen>
         // TODO: Add couplet detail route when available
         context.push('/main/poems/${item.publicId}');
       case 'CATEGORY':
-        context.push('/search', extra: {'query': item.primaryText});
       case 'TAG':
-        context.push('/search', extra: {'query': item.primaryText});
+        context.push('/search',
+            extra: SearchRouteExtra.of(item.primaryText, SearchOrigin.browse));
     }
   }
 

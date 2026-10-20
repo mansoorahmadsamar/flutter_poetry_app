@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
 import 'package:flutter_poetry_app/core/utils/language_typography.dart';
+import 'package:flutter_poetry_app/features/search/models/search_origin.dart';
 
 /// Recent searches discovery section
 ///
@@ -130,7 +131,8 @@ class RecentSearchesSection extends ConsumerWidget {
 
     return GestureDetector(
       onTap: () {
-        ref.read(globalSearchProvider.notifier).executeSearch(query: query);
+        ref.read(globalSearchProvider.notifier).executeSearch(
+            query: query, origin: SearchOrigin.history);
       },
       child: Container(
         height: 34,

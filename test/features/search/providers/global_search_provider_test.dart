@@ -5,6 +5,7 @@ import 'package:flutter_poetry_app/features/discover/models/discover_bundle_mode
 import 'package:flutter_poetry_app/features/discover/services/discover_service.dart';
 import 'package:flutter_poetry_app/features/search/models/global_search_state.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
+import 'package:flutter_poetry_app/features/search/models/search_origin.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
 import 'package:flutter_poetry_app/features/search/services/search_history_service.dart';
 import 'package:flutter_poetry_app/features/search/services/search_service.dart';
@@ -74,6 +75,7 @@ class _RecordingSearchService implements SearchService {
     String lang = 'ur',
     int page = 0,
     int size = 10,
+    SearchOrigin? origin,
   }) async {
     queries.add(query);
     return response;

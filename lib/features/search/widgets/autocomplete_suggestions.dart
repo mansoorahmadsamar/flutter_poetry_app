@@ -8,6 +8,7 @@ import 'package:flutter_poetry_app/features/search/models/search_models.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
 import 'package:flutter_poetry_app/features/search/widgets/top_match_card.dart';
 import 'package:flutter_poetry_app/core/utils/language_typography.dart';
+import 'package:flutter_poetry_app/features/search/models/search_origin.dart';
 
 /// Autocomplete suggestions overlay widget
 ///
@@ -341,7 +342,8 @@ class AutocompleteSuggestions extends ConsumerWidget {
             : Colors.black.withValues(alpha: 0.3),
       ),
       onTap: () {
-        ref.read(globalSearchProvider.notifier).executeSearch(query: tag.name);
+        ref.read(globalSearchProvider.notifier).executeSearch(
+            query: tag.name, origin: SearchOrigin.suggestion);
       },
     );
   }
@@ -396,7 +398,8 @@ class AutocompleteSuggestions extends ConsumerWidget {
         ],
       ),
       onTap: () {
-        ref.read(globalSearchProvider.notifier).executeSearch(query: category.name);
+        ref.read(globalSearchProvider.notifier).executeSearch(
+            query: category.name, origin: SearchOrigin.suggestion);
       },
     );
   }

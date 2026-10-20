@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_poetry_app/features/search/models/global_search_state.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
+import 'package:flutter_poetry_app/features/search/models/search_origin.dart';
 import 'package:flutter_poetry_app/features/search/widgets/app_search_couplet_card.dart';
 
 import '../helpers/search_test_harness.dart';
@@ -123,7 +124,11 @@ void main() {
       await tapAndSettle(tester, byKey('search-category-${urduCategory.publicId}'));
 
       expect(app.notifier.searches, [
-        (query: urduCategory.name, segment: DiscoverSegment.all),
+        (
+          query: urduCategory.name,
+          segment: DiscoverSegment.all,
+          origin: SearchOrigin.browse,
+        ),
       ]);
       expect(currentPath(app.router), '/search');
     });
@@ -275,7 +280,11 @@ void main() {
       await tapAndSettle(tester, byKey('search-category-${urduCategory.publicId}'));
 
       expect(app.notifier.searches, [
-        (query: urduCategory.name, segment: DiscoverSegment.all),
+        (
+          query: urduCategory.name,
+          segment: DiscoverSegment.all,
+          origin: SearchOrigin.browse,
+        ),
       ]);
     });
   });

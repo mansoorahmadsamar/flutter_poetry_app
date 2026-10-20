@@ -5,6 +5,7 @@ import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
 import 'package:flutter_poetry_app/features/search/models/global_search_state.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
+import 'package:flutter_poetry_app/features/search/models/search_origin.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
 import 'package:flutter_poetry_app/features/search/utils/search_result_navigation.dart';
 import 'package:flutter_poetry_app/features/search/widgets/app_search_bar.dart';
@@ -34,7 +35,14 @@ import 'package:flutter_poetry_app/features/search/widgets/app_search_filtered_r
 class AppSearchScreen extends ConsumerStatefulWidget {
   final String? initialQuery;
 
-  const AppSearchScreen({super.key, this.initialQuery});
+  /// Why [initialQuery] is searched (e.g. a trending chip on Discover).
+  final SearchOrigin initialOrigin;
+
+  const AppSearchScreen({
+    super.key,
+    this.initialQuery,
+    this.initialOrigin = SearchOrigin.browse,
+  });
 
   @override
   ConsumerState<AppSearchScreen> createState() => _AppSearchScreenState();
@@ -51,7 +59,9 @@ class _AppSearchScreenState extends ConsumerState<AppSearchScreen> {
       final query = widget.initialQuery;
       if (query != null && query.trim().isNotEmpty) {
         _searchController.text = query;
-        ref.read(globalSearchProvider.notifier).executeSearch(query: query);
+        ref
+            .read(globalSearchProvider.notifier)
+            .executeSearch(query: query, origin: widget.initialOrigin);
       } else {
         _searchFocusNode.requestFocus();
       }
@@ -132,9 +142,8 @@ class _AppSearchScreenState extends ConsumerState<AppSearchScreen> {
                 },
                 onSubmitted: (value) {
                   if (value.trim().isNotEmpty) {
-                    ref
-                        .read(globalSearchProvider.notifier)
-                        .executeSearch(query: value);
+                    ref.read(globalSearchProvider.notifier).executeSearch(
+                        query: value, origin: SearchOrigin.typed);
                     _searchFocusNode.unfocus();
                   }
                 },
@@ -182,19 +191,22 @@ class _AppSearchScreenState extends ConsumerState<AppSearchScreen> {
       case _DisplayMode.idle:
         return AppSearchIdleContent(
           key: const ValueKey('idle'),
-          onRecentTap: _executeQuery,
-          onTrendingTap: _executeQuery,
+          onRecentTap: (query) =>
+              _executeQuery(query, origin: SearchOrigin.history),
+          onTrendingTap: (query) =>
+              _executeQuery(query, origin: SearchOrigin.trending),
           onPoetTap: (poet) =>
               SearchResultNavigation.openPoet(context, poet.publicId),
           onCategoryTap: (category) {
-            _executeQuery(category.primaryText);
+            _executeQuery(category.primaryText, origin: SearchOrigin.browse);
           },
         );
 
       case _DisplayMode.suggesting:
         return AppSearchSuggestions(
           key: const ValueKey('suggesting'),
-          onSuggestionTap: _executeQuery,
+          onSuggestionTap: (query) =>
+              _executeQuery(query, origin: SearchOrigin.suggestion),
           onPoetTap: (poet) {
             _searchFocusNode.unfocus();
             SearchResultNavigation.openPoet(context, poet.publicId);
@@ -210,7 +222,7 @@ class _AppSearchScreenState extends ConsumerState<AppSearchScreen> {
           onSearchTap: () {
             final query = ref.read(globalSearchProvider).currentQuery;
             if (query.isNotEmpty) {
-              _executeQuery(query);
+              _executeQuery(query, origin: SearchOrigin.typed);
             }
           },
         );
@@ -233,7 +245,8 @@ class _AppSearchScreenState extends ConsumerState<AppSearchScreen> {
 
         return AppSearchPreviewResults(
           key: const ValueKey('preview'),
-          onRelatedSearchTap: _executeQuery,
+          onRelatedSearchTap: (query) =>
+              _executeQuery(query, origin: SearchOrigin.browse),
           onPoetTap: (poet) =>
               SearchResultNavigation.openPoet(context, poet.publicId),
           onPoemTap: (poem) =>
@@ -267,11 +280,15 @@ class _AppSearchScreenState extends ConsumerState<AppSearchScreen> {
   // Actions
   // ---------------------------------------------------------------------------
 
-  void _executeQuery(String query, {DiscoverSegment? segment}) {
+  void _executeQuery(
+    String query, {
+    required SearchOrigin origin,
+    DiscoverSegment? segment,
+  }) {
     _searchController.text = query;
     ref
         .read(globalSearchProvider.notifier)
-        .executeSearch(query: query, segment: segment);
+        .executeSearch(query: query, segment: segment, origin: origin);
     _searchFocusNode.unfocus();
   }
 
@@ -293,7 +310,8 @@ class _AppSearchScreenState extends ConsumerState<AppSearchScreen> {
   /// There is no category screen; like the Discover category grid and the
   /// idle categories, a category result searches for its name, shown in "All".
   void _searchCategory(AutocompleteCategory category) {
-    _executeQuery(category.name, segment: DiscoverSegment.all);
+    _executeQuery(category.name,
+        segment: DiscoverSegment.all, origin: SearchOrigin.browse);
   }
 
   Widget _buildErrorState(bool isDark, String errorMessage) {

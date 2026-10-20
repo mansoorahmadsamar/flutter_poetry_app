@@ -12,6 +12,7 @@ import 'package:flutter_poetry_app/features/discover/models/discover_bundle_mode
 import 'package:flutter_poetry_app/features/discover/services/discover_service.dart';
 import 'package:flutter_poetry_app/features/search/models/global_search_state.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
+import 'package:flutter_poetry_app/features/search/models/search_origin.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
 import 'package:flutter_poetry_app/features/search/screens/app_search_screen.dart';
 import 'package:flutter_poetry_app/features/search/services/search_history_service.dart';
@@ -141,7 +142,8 @@ class FakeGlobalSearchNotifier extends GlobalSearchNotifier {
     state = initial;
   }
 
-  final searches = <({String? query, DiscoverSegment? segment})>[];
+  final searches =
+      <({String? query, DiscoverSegment? segment, SearchOrigin? origin})>[];
 
   /// Tabs switched to, in order. Switching never searches here; the real
   /// reuse-or-fetch rule is covered by `global_search_tab_switch_test.dart`.
@@ -154,8 +156,12 @@ class FakeGlobalSearchNotifier extends GlobalSearchNotifier {
   }
 
   @override
-  Future<void> executeSearch({String? query, DiscoverSegment? segment}) async {
-    searches.add((query: query, segment: segment));
+  Future<void> executeSearch({
+    String? query,
+    DiscoverSegment? segment,
+    SearchOrigin? origin,
+  }) async {
+    searches.add((query: query, segment: segment, origin: origin));
   }
 
   /// Pagination is not under test; a real call would hit the API.

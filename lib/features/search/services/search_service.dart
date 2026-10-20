@@ -7,6 +7,7 @@ import 'package:flutter_poetry_app/core/network/guest_service.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poet_model.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
+import 'package:flutter_poetry_app/features/search/models/search_origin.dart';
 
 /// Service for all global search operations
 /// Implements 5 backend API endpoints:
@@ -124,6 +125,8 @@ class SearchService {
   /// - [lang]: Language code (ur, en, hi) - defaults to 'ur'
   /// - [page]: Page number (0-based) - defaults to 0
   /// - [size]: Page size - defaults to 10
+  /// - [origin]: why the search was made, sent as `origin` (T-183); further
+  ///   pages pass the origin of the search they page
   ///
   /// Returns: Unified search results with all content types and pagination flags
   Future<UnifiedSearchResponse> searchUnified({
@@ -132,6 +135,7 @@ class SearchService {
     String lang = 'ur',
     int page = 0,
     int size = 10,
+    SearchOrigin? origin,
   }) async {
     if (_isGuest) {
       // Guests don't get couplet / verse / tag / category search — those
@@ -179,6 +183,7 @@ class SearchService {
           'lang': lang,
           'page': page,
           'size': size,
+          if (origin != null) SearchOrigin.queryParameter: origin.apiValue,
         },
       );
 
@@ -230,6 +235,7 @@ class SearchService {
     required int page,
     String lang = 'ur',
     int size = 10,
+    SearchOrigin? origin,
   }) async {
     return searchUnified(
       query: query,
@@ -237,6 +243,7 @@ class SearchService {
       lang: lang,
       page: page,
       size: size,
+      origin: origin,
     );
   }
 
