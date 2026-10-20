@@ -1,6 +1,6 @@
 # Testing Strategy — flutter_poetry_app (Sukhan)
 
-> **Status (2026-10-20, `fix/app-qa-2026-10-20`):** `flutter test` → `+491: All tests passed!` (Flutter 3.44.4):
+> **Status (2026-10-20, `feat/themes-app`):** `flutter test` → `+628: All tests passed!` (Flutter 3.44.4):
 > unit, model/fixture, mocked-network and widget tests with the helpers in §1. `flutter analyze` reports 147 issues
 > (the baseline; 0 errors). No golden tests and no automated device tests; device QA is manual, on an emulator with a
 > release build (§7). The release workflows (`play-store-release.yml`, `firebase-app-distribution.yml`) run
@@ -74,6 +74,25 @@
 - Fixtures: `test/fixtures/hashtags/couplets_page_main.json` (production `CoupletDto`: no poem/poet fields, a null
   `coupletType`) and `couplets_page_develop.json` (develop's T-012 fields, `"-"` when unknown).
 
+### Couplet themes and couplet deep links
+
+- Fixtures: `test/fixtures/themes/couplet_themes.json` — `ranked` (3 themes, taxonomy names in ur/en/hi), `four` (one
+  more than the app shows) and `messy` (every malformed entry the parser must survive: `"-"`/missing/null slugs,
+  non-objects, a duplicate, a theme with no name). `test/fixtures/hashtags/hashtag_meta_theme.json` — theme-tag hashtag
+  metadata with `nameUr`/`nameEn`/`nameHi`/`definition`/`parent` (synthetic; production sends none of them yet).
+- `test/features/hashtags/models/couplet_themes_models_test.dart` runs one contract (absent → none, `null`/`"-"`/map →
+  none, ranked kept in order, messy entries dropped) against **every** model that parses a couplet, starting from real
+  production fixtures. A new couplet model gets a line there.
+- `pumpHashtagScreen` (`test/helpers/fake_hashtag_service.dart`) now also routes `/hashtags/:slug` to
+  `hashtag:<slug>`, for chip taps.
+- Poem deep link: `test/features/main/tabs/poets/screens/poem_detail_deep_link_test.dart` mounts the **real** poem
+  route from `appRoutesProvider` under a stub `/main`, overrides `poemDetailProvider` with a 40-couplet ghazal, and
+  asserts route parsing, that couplet 30 is on screen and selected, and that old links stay at the top.
+- Theme chips sit in the middle of tappable cards; a test that taps the **card** should tap near a corner
+  (`tester.tapAt(getTopLeft(card) + offset)`) once the card has themes, or it may hit a chip.
+- A `GoogleFonts.*` style (e.g. `labelStyleFor('hi')`) starts a font load that fails without runtime fetching; check
+  such styles inside `testWidgets`, not plain `test`, or the failure escapes the test zone.
+
 ### Contract fixtures (T-181)
 
 The audit of app models against production DTOs is `docs/contracts/production-contract-audit.md`. Its fixtures:
@@ -85,8 +104,9 @@ model gains a field, add its `"-"` / `null` / missing variant to the matching fi
 ### Feed card helpers
 
 - `test/helpers/feed_card_harness.dart` — `pumpFeedCard` (no router) and `pumpFeedCardInRouter`, which mounts the card
-  in a `GoRouter` whose `/main/poets/:publicId` and `/main/poems/:publicId` routes show `poet:<id>` / `poem:<id>`, so a
-  tap test can assert where the tap went. It overrides `feedProvider` with an `IdleFeedService`, so a card tap that
+  in a `GoRouter` whose `/main/poets/:publicId`, `/main/poems/:publicId` and `/hashtags/:slug` routes show
+  `poet:<id>` / `poem:<id>` / `hashtag:<slug>`, so a tap test can assert where the tap went (a poem's `?couplet=` is in
+  `router.state.uri.queryParameters`). It overrides `feedProvider` with an `IdleFeedService`, so a card tap that
   records an engagement event loads and sends nothing. Guest cards are built from `test/fixtures/guest/discover_ur.json` through the
   real `GuestService` + `FeedResponse.fromGuestBundle` (see `guest_feed_poet_tap_test.dart`).
 
