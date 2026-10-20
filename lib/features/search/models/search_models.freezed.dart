@@ -1381,7 +1381,10 @@ mixin _$CoupletSearchResult {
   @PlaceholderStringConverter()
   String? get poetPublicId => throw _privateConstructorUsedError;
   @PlaceholderStringConverter()
-  String? get poetName => throw _privateConstructorUsedError;
+  String? get poetName =>
+      throw _privateConstructorUsedError; // Couplet themes (max 3, server-ranked); absent on production today.
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -1413,7 +1416,8 @@ abstract class $CoupletSearchResultCopyWith<$Res> {
       @PlaceholderStringConverter() String? poemPublicId,
       @PlaceholderStringConverter() String? poemTitle,
       @PlaceholderStringConverter() String? poetPublicId,
-      @PlaceholderStringConverter() String? poetName});
+      @PlaceholderStringConverter() String? poetName,
+      @CoupletThemesConverter() List<CoupletTheme> themes});
 
   $PoemSummaryCopyWith<$Res>? get poem;
   $PoetSummaryCopyWith<$Res>? get poet;
@@ -1450,6 +1454,7 @@ class _$CoupletSearchResultCopyWithImpl<$Res, $Val extends CoupletSearchResult>
     Object? poemTitle = freezed,
     Object? poetPublicId = freezed,
     Object? poetName = freezed,
+    Object? themes = null,
   }) {
     return _then(_value.copyWith(
       publicId: null == publicId
@@ -1524,6 +1529,10 @@ class _$CoupletSearchResultCopyWithImpl<$Res, $Val extends CoupletSearchResult>
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
               as String?,
+      themes: null == themes
+          ? _value.themes
+          : themes // ignore: cast_nullable_to_non_nullable
+              as List<CoupletTheme>,
     ) as $Val);
   }
 
@@ -1578,7 +1587,8 @@ abstract class _$$CoupletSearchResultImplCopyWith<$Res>
       @PlaceholderStringConverter() String? poemPublicId,
       @PlaceholderStringConverter() String? poemTitle,
       @PlaceholderStringConverter() String? poetPublicId,
-      @PlaceholderStringConverter() String? poetName});
+      @PlaceholderStringConverter() String? poetName,
+      @CoupletThemesConverter() List<CoupletTheme> themes});
 
   @override
   $PoemSummaryCopyWith<$Res>? get poem;
@@ -1615,6 +1625,7 @@ class __$$CoupletSearchResultImplCopyWithImpl<$Res>
     Object? poemTitle = freezed,
     Object? poetPublicId = freezed,
     Object? poetName = freezed,
+    Object? themes = null,
   }) {
     return _then(_$CoupletSearchResultImpl(
       publicId: null == publicId
@@ -1689,6 +1700,10 @@ class __$$CoupletSearchResultImplCopyWithImpl<$Res>
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
               as String?,
+      themes: null == themes
+          ? _value._themes
+          : themes // ignore: cast_nullable_to_non_nullable
+              as List<CoupletTheme>,
     ));
   }
 }
@@ -1714,8 +1729,11 @@ class _$CoupletSearchResultImpl extends _CoupletSearchResult {
       @PlaceholderStringConverter() this.poemPublicId,
       @PlaceholderStringConverter() this.poemTitle,
       @PlaceholderStringConverter() this.poetPublicId,
-      @PlaceholderStringConverter() this.poetName})
+      @PlaceholderStringConverter() this.poetName,
+      @CoupletThemesConverter()
+      final List<CoupletTheme> themes = const <CoupletTheme>[]})
       : _verses = verses,
+        _themes = themes,
         super._();
 
   factory _$CoupletSearchResultImpl.fromJson(Map<String, dynamic> json) =>
@@ -1781,10 +1799,21 @@ class _$CoupletSearchResultImpl extends _CoupletSearchResult {
   @override
   @PlaceholderStringConverter()
   final String? poetName;
+// Couplet themes (max 3, server-ranked); absent on production today.
+  final List<CoupletTheme> _themes;
+// Couplet themes (max 3, server-ranked); absent on production today.
+  @override
+  @JsonKey()
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes {
+    if (_themes is EqualUnmodifiableListView) return _themes;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_themes);
+  }
 
   @override
   String toString() {
-    return 'CoupletSearchResult(publicId: $publicId, coupletNumber: $coupletNumber, coupletType: $coupletType, coupletTypeName: $coupletTypeName, verses: $verses, poem: $poem, poet: $poet, likeCount: $likeCount, shareCount: $shareCount, bookmarkCount: $bookmarkCount, engagementScore: $engagementScore, isLiked: $isLiked, isBookmarked: $isBookmarked, createdAt: $createdAt, poemPublicId: $poemPublicId, poemTitle: $poemTitle, poetPublicId: $poetPublicId, poetName: $poetName)';
+    return 'CoupletSearchResult(publicId: $publicId, coupletNumber: $coupletNumber, coupletType: $coupletType, coupletTypeName: $coupletTypeName, verses: $verses, poem: $poem, poet: $poet, likeCount: $likeCount, shareCount: $shareCount, bookmarkCount: $bookmarkCount, engagementScore: $engagementScore, isLiked: $isLiked, isBookmarked: $isBookmarked, createdAt: $createdAt, poemPublicId: $poemPublicId, poemTitle: $poemTitle, poetPublicId: $poetPublicId, poetName: $poetName, themes: $themes)';
   }
 
   @override
@@ -1823,31 +1852,34 @@ class _$CoupletSearchResultImpl extends _CoupletSearchResult {
             (identical(other.poetPublicId, poetPublicId) ||
                 other.poetPublicId == poetPublicId) &&
             (identical(other.poetName, poetName) ||
-                other.poetName == poetName));
+                other.poetName == poetName) &&
+            const DeepCollectionEquality().equals(other._themes, _themes));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      publicId,
-      coupletNumber,
-      coupletType,
-      coupletTypeName,
-      const DeepCollectionEquality().hash(_verses),
-      poem,
-      poet,
-      likeCount,
-      shareCount,
-      bookmarkCount,
-      engagementScore,
-      isLiked,
-      isBookmarked,
-      createdAt,
-      poemPublicId,
-      poemTitle,
-      poetPublicId,
-      poetName);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        publicId,
+        coupletNumber,
+        coupletType,
+        coupletTypeName,
+        const DeepCollectionEquality().hash(_verses),
+        poem,
+        poet,
+        likeCount,
+        shareCount,
+        bookmarkCount,
+        engagementScore,
+        isLiked,
+        isBookmarked,
+        createdAt,
+        poemPublicId,
+        poemTitle,
+        poetPublicId,
+        poetName,
+        const DeepCollectionEquality().hash(_themes)
+      ]);
 
   @JsonKey(ignore: true)
   @override
@@ -1883,7 +1915,8 @@ abstract class _CoupletSearchResult extends CoupletSearchResult {
           @PlaceholderStringConverter() final String? poemPublicId,
           @PlaceholderStringConverter() final String? poemTitle,
           @PlaceholderStringConverter() final String? poetPublicId,
-          @PlaceholderStringConverter() final String? poetName}) =
+          @PlaceholderStringConverter() final String? poetName,
+          @CoupletThemesConverter() final List<CoupletTheme> themes}) =
       _$CoupletSearchResultImpl;
   const _CoupletSearchResult._() : super._();
 
@@ -1932,6 +1965,9 @@ abstract class _CoupletSearchResult extends CoupletSearchResult {
   @override
   @PlaceholderStringConverter()
   String? get poetName;
+  @override // Couplet themes (max 3, server-ranked); absent on production today.
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes;
   @override
   @JsonKey(ignore: true)
   _$$CoupletSearchResultImplCopyWith<_$CoupletSearchResultImpl> get copyWith =>
@@ -1958,7 +1994,10 @@ mixin _$VerseSearchResult {
   @PlaceholderStringConverter()
   String? get poetName => throw _privateConstructorUsedError;
   @PlaceholderStringConverter()
-  String? get poetProfileImageUrl => throw _privateConstructorUsedError;
+  String? get poetProfileImageUrl =>
+      throw _privateConstructorUsedError; // Themes of the verse's couplet, if the backend sends them.
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -1980,7 +2019,8 @@ abstract class $VerseSearchResultCopyWith<$Res> {
       @PlaceholderStringConverter() String? poetryTypeName,
       @PlaceholderStringConverter() String? poetPublicId,
       @PlaceholderStringConverter() String? poetName,
-      @PlaceholderStringConverter() String? poetProfileImageUrl});
+      @PlaceholderStringConverter() String? poetProfileImageUrl,
+      @CoupletThemesConverter() List<CoupletTheme> themes});
 
   $VerseModelCopyWith<$Res> get verse;
 }
@@ -2006,6 +2046,7 @@ class _$VerseSearchResultCopyWithImpl<$Res, $Val extends VerseSearchResult>
     Object? poetPublicId = freezed,
     Object? poetName = freezed,
     Object? poetProfileImageUrl = freezed,
+    Object? themes = null,
   }) {
     return _then(_value.copyWith(
       verse: null == verse
@@ -2040,6 +2081,10 @@ class _$VerseSearchResultCopyWithImpl<$Res, $Val extends VerseSearchResult>
           ? _value.poetProfileImageUrl
           : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      themes: null == themes
+          ? _value.themes
+          : themes // ignore: cast_nullable_to_non_nullable
+              as List<CoupletTheme>,
     ) as $Val);
   }
 
@@ -2068,7 +2113,8 @@ abstract class _$$VerseSearchResultImplCopyWith<$Res>
       @PlaceholderStringConverter() String? poetryTypeName,
       @PlaceholderStringConverter() String? poetPublicId,
       @PlaceholderStringConverter() String? poetName,
-      @PlaceholderStringConverter() String? poetProfileImageUrl});
+      @PlaceholderStringConverter() String? poetProfileImageUrl,
+      @CoupletThemesConverter() List<CoupletTheme> themes});
 
   @override
   $VerseModelCopyWith<$Res> get verse;
@@ -2093,6 +2139,7 @@ class __$$VerseSearchResultImplCopyWithImpl<$Res>
     Object? poetPublicId = freezed,
     Object? poetName = freezed,
     Object? poetProfileImageUrl = freezed,
+    Object? themes = null,
   }) {
     return _then(_$VerseSearchResultImpl(
       verse: null == verse
@@ -2127,6 +2174,10 @@ class __$$VerseSearchResultImplCopyWithImpl<$Res>
           ? _value.poetProfileImageUrl
           : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      themes: null == themes
+          ? _value._themes
+          : themes // ignore: cast_nullable_to_non_nullable
+              as List<CoupletTheme>,
     ));
   }
 }
@@ -2142,8 +2193,11 @@ class _$VerseSearchResultImpl extends _VerseSearchResult {
       @PlaceholderStringConverter() this.poetryTypeName,
       @PlaceholderStringConverter() this.poetPublicId,
       @PlaceholderStringConverter() this.poetName,
-      @PlaceholderStringConverter() this.poetProfileImageUrl})
-      : super._();
+      @PlaceholderStringConverter() this.poetProfileImageUrl,
+      @CoupletThemesConverter()
+      final List<CoupletTheme> themes = const <CoupletTheme>[]})
+      : _themes = themes,
+        super._();
 
   factory _$VerseSearchResultImpl.fromJson(Map<String, dynamic> json) =>
       _$$VerseSearchResultImplFromJson(json);
@@ -2171,10 +2225,21 @@ class _$VerseSearchResultImpl extends _VerseSearchResult {
   @override
   @PlaceholderStringConverter()
   final String? poetProfileImageUrl;
+// Themes of the verse's couplet, if the backend sends them.
+  final List<CoupletTheme> _themes;
+// Themes of the verse's couplet, if the backend sends them.
+  @override
+  @JsonKey()
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes {
+    if (_themes is EqualUnmodifiableListView) return _themes;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_themes);
+  }
 
   @override
   String toString() {
-    return 'VerseSearchResult(verse: $verse, poemPublicId: $poemPublicId, poemTitle: $poemTitle, poetryType: $poetryType, poetryTypeName: $poetryTypeName, poetPublicId: $poetPublicId, poetName: $poetName, poetProfileImageUrl: $poetProfileImageUrl)';
+    return 'VerseSearchResult(verse: $verse, poemPublicId: $poemPublicId, poemTitle: $poemTitle, poetryType: $poetryType, poetryTypeName: $poetryTypeName, poetPublicId: $poetPublicId, poetName: $poetName, poetProfileImageUrl: $poetProfileImageUrl, themes: $themes)';
   }
 
   @override
@@ -2196,13 +2261,23 @@ class _$VerseSearchResultImpl extends _VerseSearchResult {
             (identical(other.poetName, poetName) ||
                 other.poetName == poetName) &&
             (identical(other.poetProfileImageUrl, poetProfileImageUrl) ||
-                other.poetProfileImageUrl == poetProfileImageUrl));
+                other.poetProfileImageUrl == poetProfileImageUrl) &&
+            const DeepCollectionEquality().equals(other._themes, _themes));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, verse, poemPublicId, poemTitle,
-      poetryType, poetryTypeName, poetPublicId, poetName, poetProfileImageUrl);
+  int get hashCode => Object.hash(
+      runtimeType,
+      verse,
+      poemPublicId,
+      poemTitle,
+      poetryType,
+      poetryTypeName,
+      poetPublicId,
+      poetName,
+      poetProfileImageUrl,
+      const DeepCollectionEquality().hash(_themes));
 
   @JsonKey(ignore: true)
   @override
@@ -2228,7 +2303,8 @@ abstract class _VerseSearchResult extends VerseSearchResult {
           @PlaceholderStringConverter() final String? poetryTypeName,
           @PlaceholderStringConverter() final String? poetPublicId,
           @PlaceholderStringConverter() final String? poetName,
-          @PlaceholderStringConverter() final String? poetProfileImageUrl}) =
+          @PlaceholderStringConverter() final String? poetProfileImageUrl,
+          @CoupletThemesConverter() final List<CoupletTheme> themes}) =
       _$VerseSearchResultImpl;
   const _VerseSearchResult._() : super._();
 
@@ -2258,6 +2334,9 @@ abstract class _VerseSearchResult extends VerseSearchResult {
   @override
   @PlaceholderStringConverter()
   String? get poetProfileImageUrl;
+  @override // Themes of the verse's couplet, if the backend sends them.
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes;
   @override
   @JsonKey(ignore: true)
   _$$VerseSearchResultImplCopyWith<_$VerseSearchResultImpl> get copyWith =>

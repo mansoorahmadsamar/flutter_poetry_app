@@ -137,6 +137,32 @@ class LanguageTypography {
     );
   }
 
+  /// Style for a short label (a chip or tag) written in [languageCode]'s own
+  /// script: Nastaliq for Urdu/Arabic/Persian and Noto Sans Devanagari for
+  /// Hindi (Roboto has no Devanagari glyphs), Roboto otherwise. Size and line
+  /// height scale per language as in [createStyle].
+  static TextStyle labelStyleFor({
+    required String languageCode,
+    double baseFontSize = 12.0,
+    FontWeight? fontWeight,
+    Color? color,
+  }) {
+    if (languageCode.toLowerCase() == 'hi') {
+      return GoogleFonts.notoSansDevanagari(
+        fontSize: baseFontSize * hindiMultiplier,
+        height: hindiLineHeight,
+        fontWeight: fontWeight ?? FontWeight.w500,
+        color: color,
+      );
+    }
+    return createStyle(
+      baseFontSize: baseFontSize,
+      languageCode: languageCode,
+      fontWeight: fontWeight ?? FontWeight.w500,
+      color: color,
+    );
+  }
+
   /// Create verse text style (for poetry content)
   static TextStyle verseStyle({
     required String languageCode,

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 
 import '../../features/discover/models/discover_bundle_model.dart';
+import '../../features/hashtags/models/couplet_theme.dart';
 import '../../features/hashtags/models/hashtag_model.dart';
 import '../../features/main/tabs/poets/models/poem_model.dart';
 import '../../features/main/tabs/poets/models/poet_model.dart';
@@ -369,6 +370,8 @@ class GuestService {
       secondaryText: j['poetName']?.toString(),
       poetPublicId: presentOrNull(j['poetPublicId']?.toString()),
       poemPublicId: presentOrNull(j['poemPublicId']?.toString()),
+      coupletNumber: positiveIntOrNull(j['coupletNumber']),
+      themes: parseCoupletThemes(j['themes']),
       badge: j['coupletTypeName']?.toString(),
       badgeKey: j['coupletType']?.toString(),
       language: 'ur',

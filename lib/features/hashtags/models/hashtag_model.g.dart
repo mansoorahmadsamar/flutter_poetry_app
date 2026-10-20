@@ -20,6 +20,11 @@ _$HashtagDtoImpl _$$HashtagDtoImplFromJson(Map<String, dynamic> json) =>
       bookCount: (json['bookCount'] as num?)?.toInt() ?? 0,
       videoCount: (json['videoCount'] as num?)?.toInt() ?? 0,
       totalUsage: (json['totalUsage'] as num?)?.toInt() ?? 0,
+      nameUr: const PlaceholderStringConverter().fromJson(json['nameUr']),
+      nameEn: const PlaceholderStringConverter().fromJson(json['nameEn']),
+      nameHi: const PlaceholderStringConverter().fromJson(json['nameHi']),
+      definition:
+          const PlaceholderStringConverter().fromJson(json['definition']),
     );
 
 Map<String, dynamic> _$$HashtagDtoImplToJson(_$HashtagDtoImpl instance) =>
@@ -36,4 +41,9 @@ Map<String, dynamic> _$$HashtagDtoImplToJson(_$HashtagDtoImpl instance) =>
       'bookCount': instance.bookCount,
       'videoCount': instance.videoCount,
       'totalUsage': instance.totalUsage,
+      'nameUr': const PlaceholderStringConverter().toJson(instance.nameUr),
+      'nameEn': const PlaceholderStringConverter().toJson(instance.nameEn),
+      'nameHi': const PlaceholderStringConverter().toJson(instance.nameHi),
+      'definition':
+          const PlaceholderStringConverter().toJson(instance.definition),
     };

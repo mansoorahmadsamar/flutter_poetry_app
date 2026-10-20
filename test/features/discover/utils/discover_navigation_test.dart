@@ -31,6 +31,16 @@ void main() {
           '/main/poems/poem-1');
     });
 
+    test('a couplet with its number opens the poem at that couplet', () {
+      expect(discoverCardDestination(_couplet.copyWith(coupletNumber: 6))?.path,
+          '/main/poems/poem-1?couplet=6');
+      expect(
+          discoverCardDestination(
+                  _couplet.copyWith(type: 'VERSE', coupletNumber: 2))
+              ?.path,
+          '/main/poems/poem-1?couplet=2');
+    });
+
     test('a couplet without a poem id opens nothing', () {
       expect(discoverCardDestination(_coupletWithoutPoem), isNull);
     });

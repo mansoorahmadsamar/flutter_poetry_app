@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter_poetry_app/core/utils/api_placeholder.dart';
+import 'package:flutter_poetry_app/features/hashtags/models/couplet_theme.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poet_model.dart';
 
@@ -124,6 +125,8 @@ class CoupletSearchResult with _$CoupletSearchResult {
     @PlaceholderStringConverter() String? poemTitle,
     @PlaceholderStringConverter() String? poetPublicId,
     @PlaceholderStringConverter() String? poetName,
+    // Couplet themes (max 3, server-ranked); absent on production today.
+    @CoupletThemesConverter() @Default(<CoupletTheme>[]) List<CoupletTheme> themes,
   }) = _CoupletSearchResult;
 
   factory CoupletSearchResult.fromJson(Map<String, dynamic> json) =>
@@ -139,6 +142,10 @@ class CoupletSearchResult with _$CoupletSearchResult {
 
   /// Title of the parent poem, if known.
   String? get displayPoemTitle => poemTitle ?? presentOrNull(poem?.title);
+
+  /// The couplet's number inside its poem, for opening the poem at it
+  /// (`?couplet=`), or null when unknown (`0`).
+  int? get coupletNumberToOpen => positiveIntOrNull(coupletNumber);
 }
 
 /// A single matching verse (misra) from `/api/search` `verses[]`
@@ -161,6 +168,8 @@ class VerseSearchResult with _$VerseSearchResult {
     @PlaceholderStringConverter() String? poetPublicId,
     @PlaceholderStringConverter() String? poetName,
     @PlaceholderStringConverter() String? poetProfileImageUrl,
+    // Themes of the verse's couplet, if the backend sends them.
+    @CoupletThemesConverter() @Default(<CoupletTheme>[]) List<CoupletTheme> themes,
   }) = _VerseSearchResult;
 
   factory VerseSearchResult.fromJson(Map<String, dynamic> json) =>
@@ -169,6 +178,10 @@ class VerseSearchResult with _$VerseSearchResult {
   /// The poem a tap on this verse opens (`/main/poems/:id`), or null when the
   /// API did not say — the card is then not tappable. Never the verse's id.
   String? get poemIdToOpen => poemPublicId;
+
+  /// The number of the couplet this line belongs to, for opening the poem at
+  /// it (`?couplet=`), or null when unknown.
+  int? get coupletNumberToOpen => positiveIntOrNull(verse.coupletNumber);
 
   /// The verse's Roman transliteration, if the API sent one.
   String? get romanizedText => presentOrNull(verse.romanizedText);

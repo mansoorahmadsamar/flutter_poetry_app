@@ -9,9 +9,11 @@ import 'package:flutter_poetry_app/core/utils/api_placeholder.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/design_system/app_typography.dart';
 import 'package:flutter_poetry_app/core/providers/language_provider.dart';
+import 'package:flutter_poetry_app/core/routing/content_locations.dart';
 import 'package:flutter_poetry_app/features/auth/widgets/ensure_signed_in.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/couplet_providers.dart';
 import 'package:flutter_poetry_app/features/engagement/providers/reaction_providers.dart';
+import 'package:flutter_poetry_app/features/hashtags/widgets/couplet_theme_chips.dart';
 import 'package:flutter_poetry_app/features/hashtags/widgets/hashtag_pill.dart';
 import '../models/feed_content_data.dart';
 import '../models/feed_item.dart';
@@ -109,6 +111,12 @@ class CoupletFeedCard extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.sm),
                 HashtagSlugRow(slugs: data.tagSlugs),
               ],
+
+              // Theme chips (nothing when the couplet has no themes)
+              CoupletThemeChips(
+                themes: data.themes,
+                padding: const EdgeInsets.only(top: AppSpacing.sm),
+              ),
 
               // "Open poem →" CTA
               if (_poemId != null) ...[
@@ -345,7 +353,8 @@ class CoupletFeedCard extends ConsumerWidget {
     final poemId = _poemId;
     if (poemId == null) return;
     ref.read(feedProvider.notifier).trackAction(item, 'open_item');
-    context.push('/main/poems/$poemId');
+    context.push(
+        ContentLocations.poem(poemId, coupletNumber: data.coupletNumber));
   }
 
   void _onCopy(BuildContext context) {

@@ -7,6 +7,7 @@ import 'package:flutter_poetry_app/features/engagement/providers/couplet_provide
 import 'package:flutter_poetry_app/features/engagement/providers/reaction_providers.dart';
 import 'package:flutter_poetry_app/features/engagement/widgets/reaction_button.dart';
 import 'package:flutter_poetry_app/features/engagement/widgets/reaction_summary_bar.dart';
+import 'package:flutter_poetry_app/features/hashtags/widgets/couplet_theme_chips.dart';
 import 'package:flutter_poetry_app/features/image_poetry/widgets/share_options_sheet.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/couplet_model.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.dart';
@@ -22,6 +23,12 @@ class PoemReadingCard extends ConsumerWidget {
   final int? selectedSherIndex;
   final ValueChanged<int?> onSherSelected;
 
+  /// The couplet a deep link (`?couplet=`) opened the poem at, and the key
+  /// the screen scrolls into view; [focusedSherKey] is attached to that
+  /// couplet's block only.
+  final int? focusedSherIndex;
+  final GlobalKey? focusedSherKey;
+
   const PoemReadingCard({
     super.key,
     required this.poem,
@@ -29,7 +36,13 @@ class PoemReadingCard extends ConsumerWidget {
     required this.selectedScript,
     required this.selectedSherIndex,
     required this.onSherSelected,
+    this.focusedSherIndex,
+    this.focusedSherKey,
   });
+
+  /// Key of the block showing the couplet numbered [coupletNumber].
+  static Key coupletKey(int coupletNumber) =>
+      ValueKey('poem-couplet-$coupletNumber');
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -91,9 +104,12 @@ class PoemReadingCard extends ConsumerWidget {
     final label = typeCode == 'MATLA' ? 'مطلع' : 'مقطع';
     final verses = couplet.verses;
 
-    return GestureDetector(
+    final block = GestureDetector(
       onTap: () => onSherSelected(isSelected ? null : index),
       child: AnimatedContainer(
+        // Not on the GestureDetector: that is a Column child, and a poem
+        // with a repeated couplet number would give siblings equal keys.
+        key: coupletKey(couplet.coupletNumber),
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
         decoration: BoxDecoration(
@@ -112,6 +128,12 @@ class PoemReadingCard extends ConsumerWidget {
             // Remaining verse lines — centered normally
             ...verses.skip(1).map((v) => _verseLine(v.text)),
 
+            // Theme chips (nothing when the couplet has no themes)
+            CoupletThemeChips(
+              themes: couplet.themes,
+              padding: const EdgeInsets.only(top: 6),
+            ),
+
             if (isSelected) ...[
               const SizedBox(height: 8),
               _buildCoupletActionTray(context, ref, couplet),
@@ -120,6 +142,9 @@ class PoemReadingCard extends ConsumerWidget {
         ),
       ),
     );
+    return index == focusedSherIndex && focusedSherKey != null
+        ? KeyedSubtree(key: focusedSherKey, child: block)
+        : block;
   }
 
   /// First verse line with the maqta/matla label on the right margin,

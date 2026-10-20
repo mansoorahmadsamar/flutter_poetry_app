@@ -260,4 +260,32 @@ void main() {
       }
     });
   });
+
+  group('LanguageTypography.labelStyleFor (chips in the script of the name)',
+      () {
+    test('Urdu: bundled Nastaliq with the Urdu size and line height', () {
+      final style = LanguageTypography.labelStyleFor(languageCode: 'ur');
+      expect(style.fontFamily, AppTypography.urduFontFamily);
+      expect(style.fontSize, closeTo(12 * LanguageTypography.urduMultiplier, 1e-9));
+      expect(style.height, LanguageTypography.urduLineHeight);
+    });
+
+    // testWidgets, not test: the Google Fonts branches start an asset load
+    // that fails (no runtime fetching) and must stay inside the test zone.
+    testWidgets('Hindi: Noto Sans Devanagari (Roboto has no Devanagari glyphs)',
+        (tester) async {
+      final style = LanguageTypography.labelStyleFor(languageCode: 'hi');
+      expect(style.fontFamily, contains('NotoSansDevanagari'));
+      expect(style.fontSize, closeTo(12 * LanguageTypography.hindiMultiplier, 1e-9));
+      expect(style.height, LanguageTypography.hindiLineHeight);
+    });
+
+    testWidgets('English: Roboto, not Nastaliq', (tester) async {
+      final style = LanguageTypography.labelStyleFor(
+          languageCode: 'en', baseFontSize: 14, color: const Color(0xFF123456));
+      expect(style.fontFamily, contains('Roboto'));
+      expect(style.fontSize, 14);
+      expect(style.color, const Color(0xFF123456));
+    });
+  });
 }

@@ -1,5 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../../../core/utils/api_placeholder.dart';
+import '../../hashtags/models/couplet_theme.dart';
+
 part 'feed_content_data.freezed.dart';
 part 'feed_content_data.g.dart';
 
@@ -28,10 +31,15 @@ class CoupletContentData with _$CoupletContentData implements FeedContentData {
     int? poetDeathYear,
     String? poetName,
     String? poemPublicId,
+    /// The couplet's number in its poem, so a tap can open the poem at it.
+    /// The signed-in feed does not send it yet; `0`/absent read as null.
+    @PositiveIntConverter() int? coupletNumber,
     @Default(0) int likeCount,
     @Default(0) int shareCount,
     @Default(0) int bookmarkCount,
     @Default([]) List<String> tagSlugs,
+    // Couplet themes (max 3, server-ranked); absent on production today.
+    @CoupletThemesConverter() @Default(<CoupletTheme>[]) List<CoupletTheme> themes,
     // Reactions system (Section 19)
     Map<String, dynamic>? reactions,
   }) = _CoupletContentData;

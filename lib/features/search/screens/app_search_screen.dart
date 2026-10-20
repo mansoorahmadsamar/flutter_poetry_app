@@ -297,14 +297,20 @@ class _AppSearchScreenState extends ConsumerState<AppSearchScreen> {
   /// runs when there is one.
   void _openCoupletPoem(CoupletSearchResult couplet) {
     final poemId = couplet.poemIdToOpen;
-    if (poemId != null) SearchResultNavigation.openPoem(context, poemId);
+    if (poemId != null) {
+      SearchResultNavigation.openPoem(context, poemId,
+          coupletNumber: couplet.coupletNumberToOpen);
+    }
   }
 
   /// A verse opens its parent poem — never `/main/poems/:verseId`. Cards
   /// without a poem id are built without a tap handler.
   void _openVersePoem(VerseSearchResult verse) {
     final poemId = verse.poemIdToOpen;
-    if (poemId != null) SearchResultNavigation.openPoem(context, poemId);
+    if (poemId != null) {
+      SearchResultNavigation.openPoem(context, poemId,
+          coupletNumber: verse.coupletNumberToOpen);
+    }
   }
 
   /// There is no category screen; like the Discover category grid and the

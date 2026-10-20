@@ -999,6 +999,15 @@ mixin _$ContentCard {
   @PlaceholderStringConverter()
   String? get poemPublicId => throw _privateConstructorUsedError;
 
+  /// A COUPLET card's number in its poem (opens the poem at it). `null`
+  /// when absent or `0`.
+  @PositiveIntConverter()
+  int? get coupletNumber => throw _privateConstructorUsedError;
+
+  /// A COUPLET card's themes (max 3, server-ranked); absent on production.
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes => throw _privateConstructorUsedError;
+
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
   $ContentCardCopyWith<ContentCard> get copyWith =>
@@ -1025,7 +1034,9 @@ abstract class $ContentCardCopyWith<$Res> {
       String? imageUrl,
       @PlaceholderStringConverter() String? excerpt,
       @PlaceholderStringConverter() String? poetPublicId,
-      @PlaceholderStringConverter() String? poemPublicId});
+      @PlaceholderStringConverter() String? poemPublicId,
+      @PositiveIntConverter() int? coupletNumber,
+      @CoupletThemesConverter() List<CoupletTheme> themes});
 
   $ContentMetricsCopyWith<$Res>? get metrics;
 }
@@ -1057,6 +1068,8 @@ class _$ContentCardCopyWithImpl<$Res, $Val extends ContentCard>
     Object? excerpt = freezed,
     Object? poetPublicId = freezed,
     Object? poemPublicId = freezed,
+    Object? coupletNumber = freezed,
+    Object? themes = null,
   }) {
     return _then(_value.copyWith(
       type: null == type
@@ -1115,6 +1128,14 @@ class _$ContentCardCopyWithImpl<$Res, $Val extends ContentCard>
           ? _value.poemPublicId
           : poemPublicId // ignore: cast_nullable_to_non_nullable
               as String?,
+      coupletNumber: freezed == coupletNumber
+          ? _value.coupletNumber
+          : coupletNumber // ignore: cast_nullable_to_non_nullable
+              as int?,
+      themes: null == themes
+          ? _value.themes
+          : themes // ignore: cast_nullable_to_non_nullable
+              as List<CoupletTheme>,
     ) as $Val);
   }
 
@@ -1153,7 +1174,9 @@ abstract class _$$ContentCardImplCopyWith<$Res>
       String? imageUrl,
       @PlaceholderStringConverter() String? excerpt,
       @PlaceholderStringConverter() String? poetPublicId,
-      @PlaceholderStringConverter() String? poemPublicId});
+      @PlaceholderStringConverter() String? poemPublicId,
+      @PositiveIntConverter() int? coupletNumber,
+      @CoupletThemesConverter() List<CoupletTheme> themes});
 
   @override
   $ContentMetricsCopyWith<$Res>? get metrics;
@@ -1184,6 +1207,8 @@ class __$$ContentCardImplCopyWithImpl<$Res>
     Object? excerpt = freezed,
     Object? poetPublicId = freezed,
     Object? poemPublicId = freezed,
+    Object? coupletNumber = freezed,
+    Object? themes = null,
   }) {
     return _then(_$ContentCardImpl(
       type: null == type
@@ -1242,6 +1267,14 @@ class __$$ContentCardImplCopyWithImpl<$Res>
           ? _value.poemPublicId
           : poemPublicId // ignore: cast_nullable_to_non_nullable
               as String?,
+      coupletNumber: freezed == coupletNumber
+          ? _value.coupletNumber
+          : coupletNumber // ignore: cast_nullable_to_non_nullable
+              as int?,
+      themes: null == themes
+          ? _value._themes
+          : themes // ignore: cast_nullable_to_non_nullable
+              as List<CoupletTheme>,
     ));
   }
 }
@@ -1263,7 +1296,11 @@ class _$ContentCardImpl implements _ContentCard {
       this.imageUrl,
       @PlaceholderStringConverter() this.excerpt,
       @PlaceholderStringConverter() this.poetPublicId,
-      @PlaceholderStringConverter() this.poemPublicId});
+      @PlaceholderStringConverter() this.poemPublicId,
+      @PositiveIntConverter() this.coupletNumber,
+      @CoupletThemesConverter()
+      final List<CoupletTheme> themes = const <CoupletTheme>[]})
+      : _themes = themes;
 
   factory _$ContentCardImpl.fromJson(Map<String, dynamic> json) =>
       _$$ContentCardImplFromJson(json);
@@ -1312,9 +1349,28 @@ class _$ContentCardImpl implements _ContentCard {
   @PlaceholderStringConverter()
   final String? poemPublicId;
 
+  /// A COUPLET card's number in its poem (opens the poem at it). `null`
+  /// when absent or `0`.
+  @override
+  @PositiveIntConverter()
+  final int? coupletNumber;
+
+  /// A COUPLET card's themes (max 3, server-ranked); absent on production.
+  final List<CoupletTheme> _themes;
+
+  /// A COUPLET card's themes (max 3, server-ranked); absent on production.
+  @override
+  @JsonKey()
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes {
+    if (_themes is EqualUnmodifiableListView) return _themes;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_themes);
+  }
+
   @override
   String toString() {
-    return 'ContentCard(type: $type, publicId: $publicId, primaryText: $primaryText, secondaryText: $secondaryText, badge: $badge, badgeKey: $badgeKey, metrics: $metrics, language: $language, direction: $direction, score: $score, imageUrl: $imageUrl, excerpt: $excerpt, poetPublicId: $poetPublicId, poemPublicId: $poemPublicId)';
+    return 'ContentCard(type: $type, publicId: $publicId, primaryText: $primaryText, secondaryText: $secondaryText, badge: $badge, badgeKey: $badgeKey, metrics: $metrics, language: $language, direction: $direction, score: $score, imageUrl: $imageUrl, excerpt: $excerpt, poetPublicId: $poetPublicId, poemPublicId: $poemPublicId, coupletNumber: $coupletNumber, themes: $themes)';
   }
 
   @override
@@ -1344,7 +1400,10 @@ class _$ContentCardImpl implements _ContentCard {
             (identical(other.poetPublicId, poetPublicId) ||
                 other.poetPublicId == poetPublicId) &&
             (identical(other.poemPublicId, poemPublicId) ||
-                other.poemPublicId == poemPublicId));
+                other.poemPublicId == poemPublicId) &&
+            (identical(other.coupletNumber, coupletNumber) ||
+                other.coupletNumber == coupletNumber) &&
+            const DeepCollectionEquality().equals(other._themes, _themes));
   }
 
   @JsonKey(ignore: true)
@@ -1364,7 +1423,9 @@ class _$ContentCardImpl implements _ContentCard {
       imageUrl,
       excerpt,
       poetPublicId,
-      poemPublicId);
+      poemPublicId,
+      coupletNumber,
+      const DeepCollectionEquality().hash(_themes));
 
   @JsonKey(ignore: true)
   @override
@@ -1395,7 +1456,9 @@ abstract class _ContentCard implements ContentCard {
           final String? imageUrl,
           @PlaceholderStringConverter() final String? excerpt,
           @PlaceholderStringConverter() final String? poetPublicId,
-          @PlaceholderStringConverter() final String? poemPublicId}) =
+          @PlaceholderStringConverter() final String? poemPublicId,
+          @PositiveIntConverter() final int? coupletNumber,
+          @CoupletThemesConverter() final List<CoupletTheme> themes}) =
       _$ContentCardImpl;
 
   factory _ContentCard.fromJson(Map<String, dynamic> json) =
@@ -1440,6 +1503,17 @@ abstract class _ContentCard implements ContentCard {
   /// name signed-in couplets use. `null` when absent or `"-"`.
   @PlaceholderStringConverter()
   String? get poemPublicId;
+  @override
+
+  /// A COUPLET card's number in its poem (opens the poem at it). `null`
+  /// when absent or `0`.
+  @PositiveIntConverter()
+  int? get coupletNumber;
+  @override
+
+  /// A COUPLET card's themes (max 3, server-ranked); absent on production.
+  @CoupletThemesConverter()
+  List<CoupletTheme> get themes;
   @override
   @JsonKey(ignore: true)
   _$$ContentCardImplCopyWith<_$ContentCardImpl> get copyWith =>

@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_poetry_app/core/routing/app_router.dart';
+import 'package:flutter_poetry_app/core/routing/content_locations.dart';
 
 /// Where a tap on a search result goes — one place for every search surface
 /// ("All" preview, filtered tabs, autocomplete), so each result type always
@@ -20,11 +21,17 @@ abstract final class SearchResultNavigation {
   }
 
   /// `/main/poems/:publicId`. For a couplet or verse result this must be the
-  /// parent poem's id, never the couplet's.
-  static void openPoem(BuildContext context, String publicId) {
+  /// parent poem's id, never the couplet's; pass the result's
+  /// [coupletNumber] so the poem opens scrolled to it (`?couplet=`).
+  static void openPoem(
+    BuildContext context,
+    String publicId, {
+    int? coupletNumber,
+  }) {
     context.pushNamed(
       AppRoutes.poemDetailName,
       pathParameters: {'publicId': publicId},
+      queryParameters: ContentLocations.poemQuery(coupletNumber),
     );
   }
 

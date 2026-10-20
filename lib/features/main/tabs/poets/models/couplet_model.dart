@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter_poetry_app/core/utils/api_placeholder.dart';
+import 'package:flutter_poetry_app/features/hashtags/models/couplet_theme.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.dart';
 
 part 'couplet_model.freezed.dart';
@@ -20,6 +21,8 @@ class CoupletModel with _$CoupletModel {
     @JsonKey(name: 'isLiked') bool? isLikedByCurrentUser,
     @JsonKey(name: 'isBookmarked') bool? isBookmarkedByCurrentUser,
     @Default([]) List<String> tagSlugs,
+    // Couplet themes (max 3, server-ranked); absent on production today.
+    @CoupletThemesConverter() @Default(<CoupletTheme>[]) List<CoupletTheme> themes,
     DateTime? createdAt,
     // Reactions system (Section 19)
     Map<String, dynamic>? reactions,
@@ -62,6 +65,8 @@ class CoupletDetailResponse with _$CoupletDetailResponse {
     @JsonKey(name: 'isLiked') bool? isLikedByCurrentUser,
     @JsonKey(name: 'isBookmarked') bool? isBookmarkedByCurrentUser,
     @Default([]) List<String> tagSlugs,
+    // Couplet themes (max 3, server-ranked); absent on production today.
+    @CoupletThemesConverter() @Default(<CoupletTheme>[]) List<CoupletTheme> themes,
     DateTime? createdAt,
     DateTime? updatedAt,
     // Reactions system (Section 19)
@@ -97,6 +102,8 @@ class BookmarkedCoupletResponse with _$BookmarkedCoupletResponse {
     @JsonKey(name: 'isLiked') bool? isLikedByCurrentUser,
     @JsonKey(name: 'isBookmarked') bool? isBookmarkedByCurrentUser,
     @Default([]) List<String> tagSlugs,
+    // Couplet themes (max 3, server-ranked); absent on production today.
+    @CoupletThemesConverter() @Default(<CoupletTheme>[]) List<CoupletTheme> themes,
     DateTime? bookmarkedAt,
   }) = _BookmarkedCoupletResponse;
 

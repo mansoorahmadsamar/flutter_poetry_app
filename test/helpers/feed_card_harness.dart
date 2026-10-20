@@ -34,9 +34,11 @@ Future<void> pumpFeedCard(
   await tester.pump();
 }
 
-/// Like [pumpFeedCard], but inside a [GoRouter] whose poet and poem routes
-/// show `poet:<id>` / `poem:<id>`, so tap tests can assert where a tap went.
-/// Returns the router; its location starts at `/`.
+/// Like [pumpFeedCard], but inside a [GoRouter] whose poet, poem and hashtag
+/// routes show `poet:<id>` / `poem:<id>` / `hashtag:<slug>`, so tap tests can
+/// assert where a tap went (the poem's `?couplet=` is in
+/// `router.state.uri.queryParameters`). Returns the router; its location
+/// starts at `/`.
 Future<GoRouter> pumpFeedCardInRouter(
   WidgetTester tester,
   Widget card, {
@@ -55,6 +57,10 @@ Future<GoRouter> pumpFeedCardInRouter(
       GoRoute(
         path: '/main/poems/:publicId',
         builder: (_, state) => Text('poem:${state.pathParameters['publicId']}'),
+      ),
+      GoRoute(
+        path: '/hashtags/:slug',
+        builder: (_, state) => Text('hashtag:${state.pathParameters['slug']}'),
       ),
     ],
   );

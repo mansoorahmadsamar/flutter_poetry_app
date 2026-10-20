@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/routing/content_locations.dart';
 import '../../../core/utils/api_placeholder.dart';
 import '../../search/models/search_origin.dart';
 import '../models/discover_bundle_model.dart';
@@ -11,7 +12,8 @@ import '../models/discover_bundle_model.dart';
 /// A couplet or verse card opens its **poem** (`poemPublicId`), never
 /// `/main/poems/<couplet id>` — the guest bundle's trending couplets carry
 /// `poemPublicId`, but the card used to push its own (couplet) id (T-181).
-/// Without a poem id the card opens nothing rather than a wrong poem.
+/// Without a poem id the card opens nothing rather than a wrong poem. With a
+/// `coupletNumber` the poem opens scrolled to the couplet (`?couplet=`).
 ({String path, Object? extra})? discoverCardDestination(ContentCard card) {
   final id = presentOrNull(card.publicId);
   switch (card.type) {
@@ -22,7 +24,13 @@ import '../models/discover_bundle_model.dart';
     case 'VERSE':
     case 'COUPLET':
       final poemId = card.poemPublicId;
-      return poemId == null ? null : (path: '/main/poems/$poemId', extra: null);
+      return poemId == null
+          ? null
+          : (
+              path: ContentLocations.poem(poemId,
+                  coupletNumber: card.coupletNumber),
+              extra: null,
+            );
     case 'CATEGORY':
     case 'TAG':
       return (

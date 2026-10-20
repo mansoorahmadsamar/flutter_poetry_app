@@ -32,6 +32,7 @@ import '../../features/image_poetry/screens/saved_images_screen.dart';
 import '../../features/image_poetry/screens/image_detail_screen.dart';
 import '../../features/image_poetry/editor/screens/poetry_editor_screen.dart';
 import '../../features/hashtags/screens/hashtag_detail_screen.dart';
+import 'content_locations.dart';
 import '../auth/auth_provider.dart';
 
 /// App routes
@@ -175,6 +176,8 @@ final List<RouteBase> _appRoutes = [
         name: AppRoutes.poemDetailName,
         builder: (context, state) => PoemDetailScreen(
           publicId: state.pathParameters['publicId']!,
+          initialCoupletNumber:
+              ContentLocations.coupletFrom(state.uri.queryParameters),
         ),
       ),
       // ── Poet Mode (creator onboarding + dashboard) ──

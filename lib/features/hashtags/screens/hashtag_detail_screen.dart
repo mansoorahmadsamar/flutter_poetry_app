@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/design_system/app_colors.dart';
 import '../../../core/providers/language_provider.dart';
 import '../../../core/utils/color_parser.dart';
+import '../../../core/utils/language_typography.dart';
 import '../models/hashtag_model.dart';
 import '../services/hashtag_service.dart';
 import '../utils/hashtag_tabs.dart';
@@ -16,6 +17,9 @@ class HashtagDetailScreen extends ConsumerStatefulWidget {
   final String slug;
 
   const HashtagDetailScreen({required this.slug, super.key});
+
+  /// Key of the theme definition shown under the app bar.
+  static const definitionKey = Key('hashtag-definition');
 
   @override
   ConsumerState<HashtagDetailScreen> createState() =>
@@ -69,8 +73,13 @@ class _HashtagDetailScreenState extends ConsumerState<HashtagDetailScreen>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isRtl = ref.watch(selectedLanguageProvider) == 'ur';
-    final displayName = _meta?.name ?? widget.slug;
+    final appLanguage = ref.watch(selectedLanguageProvider);
+    final isRtl = appLanguage == 'ur';
+    // A theme tag's name in the app language (fallback Urdu, then English);
+    // other tags keep showing `name`, else the slug.
+    final localizedName = _meta?.localizedName(appLanguage);
+    final displayName = _meta?.displayName(appLanguage) ?? widget.slug;
+    final definition = _meta?.definition;
 
     final hashtagColor =
         parseHexColor(_meta?.color, fallback: AppColors.primary);
@@ -83,18 +92,32 @@ class _HashtagDetailScreenState extends ConsumerState<HashtagDetailScreen>
         appBar: AppBar(
           backgroundColor:
               isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-          title: Text(
-            '#$displayName',
-            style: TextStyle(
-              fontFamily: isRtl ? 'Jameel Noori Nastaleeq' : null,
-              fontSize: isRtl ? 20 : 18,
-              fontWeight: FontWeight.w600,
-              height: isRtl ? 1.8 : 1.4,
-              color: isDark
-                  ? AppColors.textPrimaryDark
-                  : AppColors.textPrimaryLight,
-            ),
-          ),
+          title: localizedName != null
+              ? Text(
+                  '#${localizedName.text}',
+                  textDirection: LanguageTypography.getTextDirection(
+                      localizedName.languageCode),
+                  style: LanguageTypography.labelStyleFor(
+                    languageCode: localizedName.languageCode,
+                    baseFontSize: 17,
+                    fontWeight: FontWeight.w600,
+                    color: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimaryLight,
+                  ),
+                )
+              : Text(
+                  '#$displayName',
+                  style: TextStyle(
+                    fontFamily: isRtl ? 'Jameel Noori Nastaleeq' : null,
+                    fontSize: isRtl ? 20 : 18,
+                    fontWeight: FontWeight.w600,
+                    height: isRtl ? 1.8 : 1.4,
+                    color: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimaryLight,
+                  ),
+                ),
           bottom: TabBar(
             controller: _tabController,
             labelColor: hashtagColor,
@@ -145,13 +168,26 @@ class _HashtagDetailScreenState extends ConsumerState<HashtagDetailScreen>
             ? const Center(child: CircularProgressIndicator())
             : _error != null
                 ? _buildError(isDark, isRtl)
-                : TabBarView(
-                    controller: _tabController,
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      HashtagCoupletsTab(slug: widget.slug),
-                      HashtagPoemsTab(slug: widget.slug),
-                      HashtagImagesTab(slug: widget.slug),
-                      HashtagPoetsTab(slug: widget.slug),
+                      if (definition != null)
+                        _HashtagDefinition(
+                          key: HashtagDetailScreen.definitionKey,
+                          text: definition,
+                          isDark: isDark,
+                        ),
+                      Expanded(
+                        child: TabBarView(
+                          controller: _tabController,
+                          children: [
+                            HashtagCoupletsTab(slug: widget.slug),
+                            HashtagPoemsTab(slug: widget.slug),
+                            HashtagImagesTab(slug: widget.slug),
+                            HashtagPoetsTab(slug: widget.slug),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
       ),
@@ -191,6 +227,42 @@ class _HashtagDetailScreenState extends ConsumerState<HashtagDetailScreen>
             child: Text(isRtl ? 'دوبارہ کوشش کریں' : 'Try Again'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// A theme tag's one-line definition, under the app bar, in its own script's
+/// typography and direction.
+class _HashtagDefinition extends StatelessWidget {
+  const _HashtagDefinition({
+    super.key,
+    required this.text,
+    required this.isDark,
+  });
+
+  final String text;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final lang = LanguageTypography.languageCodeForScript(text);
+    return Container(
+      color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 10),
+      child: Text(
+        text,
+        textDirection: LanguageTypography.getTextDirection(lang),
+        textAlign: TextAlign.start,
+        maxLines: 3,
+        overflow: TextOverflow.ellipsis,
+        style: LanguageTypography.createStyle(
+          baseFontSize: 13,
+          languageCode: lang,
+          color: isDark
+              ? AppColors.textSecondaryDark
+              : AppColors.textSecondaryLight,
+        ),
       ),
     );
   }

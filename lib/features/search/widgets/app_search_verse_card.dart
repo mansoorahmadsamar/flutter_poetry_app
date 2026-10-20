@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_poetry_app/core/design_system/app_colors.dart';
 import 'package:flutter_poetry_app/core/design_system/app_spacing.dart';
 import 'package:flutter_poetry_app/core/utils/language_typography.dart';
+import 'package:flutter_poetry_app/features/hashtags/widgets/couplet_theme_chips.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
 import 'package:flutter_poetry_app/features/search/utils/highlighted_text.dart';
 
@@ -96,6 +97,11 @@ class AppSearchVerseCard extends StatelessWidget {
                     ).copyWith(fontStyle: FontStyle.italic),
                   ),
                 ],
+                // Theme chips (nothing when the verse has no themes)
+                CoupletThemeChips(
+                  themes: result.themes,
+                  padding: EdgeInsets.only(top: AppSpacing.sm),
+                ),
                 SizedBox(height: AppSpacing.md),
                 _Attribution(
                   result: result,

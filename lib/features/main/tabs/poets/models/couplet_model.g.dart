@@ -24,6 +24,9 @@ _$CoupletModelImpl _$$CoupletModelImplFromJson(Map<String, dynamic> json) =>
               ?.map((e) => e as String)
               .toList() ??
           const [],
+      themes: json['themes'] == null
+          ? const <CoupletTheme>[]
+          : const CoupletThemesConverter().fromJson(json['themes']),
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
@@ -43,6 +46,7 @@ Map<String, dynamic> _$$CoupletModelImplToJson(_$CoupletModelImpl instance) =>
       'isLiked': instance.isLikedByCurrentUser,
       'isBookmarked': instance.isBookmarkedByCurrentUser,
       'tagSlugs': instance.tagSlugs,
+      'themes': const CoupletThemesConverter().toJson(instance.themes),
       'createdAt': instance.createdAt?.toIso8601String(),
       'reactions': instance.reactions,
     };
@@ -79,6 +83,9 @@ _$CoupletDetailResponseImpl _$$CoupletDetailResponseImplFromJson(
               ?.map((e) => e as String)
               .toList() ??
           const [],
+      themes: json['themes'] == null
+          ? const <CoupletTheme>[]
+          : const CoupletThemesConverter().fromJson(json['themes']),
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
@@ -115,6 +122,7 @@ Map<String, dynamic> _$$CoupletDetailResponseImplToJson(
       'isLiked': instance.isLikedByCurrentUser,
       'isBookmarked': instance.isBookmarkedByCurrentUser,
       'tagSlugs': instance.tagSlugs,
+      'themes': const CoupletThemesConverter().toJson(instance.themes),
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
       'reactions': instance.reactions,
@@ -146,6 +154,9 @@ _$BookmarkedCoupletResponseImpl _$$BookmarkedCoupletResponseImplFromJson(
               ?.map((e) => e as String)
               .toList() ??
           const [],
+      themes: json['themes'] == null
+          ? const <CoupletTheme>[]
+          : const CoupletThemesConverter().fromJson(json['themes']),
       bookmarkedAt: json['bookmarkedAt'] == null
           ? null
           : DateTime.parse(json['bookmarkedAt'] as String),
@@ -172,5 +183,6 @@ Map<String, dynamic> _$$BookmarkedCoupletResponseImplToJson(
       'isLiked': instance.isLikedByCurrentUser,
       'isBookmarked': instance.isBookmarkedByCurrentUser,
       'tagSlugs': instance.tagSlugs,
+      'themes': const CoupletThemesConverter().toJson(instance.themes),
       'bookmarkedAt': instance.bookmarkedAt?.toIso8601String(),
     };

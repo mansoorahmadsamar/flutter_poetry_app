@@ -168,6 +168,9 @@ _$CoupletSearchResultImpl _$$CoupletSearchResultImplFromJson(
       poetPublicId:
           const PlaceholderStringConverter().fromJson(json['poetPublicId']),
       poetName: const PlaceholderStringConverter().fromJson(json['poetName']),
+      themes: json['themes'] == null
+          ? const <CoupletTheme>[]
+          : const CoupletThemesConverter().fromJson(json['themes']),
     );
 
 Map<String, dynamic> _$$CoupletSearchResultImplToJson(
@@ -194,6 +197,7 @@ Map<String, dynamic> _$$CoupletSearchResultImplToJson(
       'poetPublicId':
           const PlaceholderStringConverter().toJson(instance.poetPublicId),
       'poetName': const PlaceholderStringConverter().toJson(instance.poetName),
+      'themes': const CoupletThemesConverter().toJson(instance.themes),
     };
 
 _$VerseSearchResultImpl _$$VerseSearchResultImplFromJson(
@@ -212,6 +216,9 @@ _$VerseSearchResultImpl _$$VerseSearchResultImplFromJson(
       poetName: const PlaceholderStringConverter().fromJson(json['poetName']),
       poetProfileImageUrl: const PlaceholderStringConverter()
           .fromJson(json['poetProfileImageUrl']),
+      themes: json['themes'] == null
+          ? const <CoupletTheme>[]
+          : const CoupletThemesConverter().fromJson(json['themes']),
     );
 
 Map<String, dynamic> _$$VerseSearchResultImplToJson(
@@ -231,6 +238,7 @@ Map<String, dynamic> _$$VerseSearchResultImplToJson(
       'poetName': const PlaceholderStringConverter().toJson(instance.poetName),
       'poetProfileImageUrl': const PlaceholderStringConverter()
           .toJson(instance.poetProfileImageUrl),
+      'themes': const CoupletThemesConverter().toJson(instance.themes),
     };
 
 _$PoemSummaryImpl _$$PoemSummaryImplFromJson(Map<String, dynamic> json) =>

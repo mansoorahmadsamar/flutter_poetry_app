@@ -26,3 +26,29 @@ class PlaceholderStringConverter implements JsonConverter<String?, Object?> {
   @override
   Object? toJson(String? value) => value;
 }
+
+/// Returns [value] as an int when it is a positive whole number (an `int`, a
+/// whole finite `double` or a numeric string), otherwise `null`. Production sends a
+/// null `Integer` as `0`, so `0` reads as absent too — e.g. a couplet number
+/// the backend does not know.
+int? positiveIntOrNull(Object? value) {
+  final int? parsed = switch (value) {
+    int v => v,
+    double v when v.isFinite && v == v.truncateToDouble() => v.toInt(),
+    String v => int.tryParse(v.trim()),
+    _ => null,
+  };
+  return parsed != null && parsed > 0 ? parsed : null;
+}
+
+/// Reads an optional positive int (see [positiveIntOrNull]): `0`, negative,
+/// fractional, `"-"` and non-numeric values are absent.
+class PositiveIntConverter implements JsonConverter<int?, Object?> {
+  const PositiveIntConverter();
+
+  @override
+  int? fromJson(Object? json) => positiveIntOrNull(json);
+
+  @override
+  Object? toJson(int? value) => value;
+}

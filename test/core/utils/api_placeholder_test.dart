@@ -53,4 +53,43 @@ void main() {
       expect(converter.toJson(null), isNull);
     });
   });
+
+  group('positiveIntOrNull', () {
+    test('positive ints, whole doubles and numeric strings are kept', () {
+      expect(positiveIntOrNull(7), 7);
+      expect(positiveIntOrNull(7.0), 7);
+      expect(positiveIntOrNull('12'), 12);
+      expect(positiveIntOrNull(' 3 '), 3);
+    });
+
+    test('regression: production sends a null Integer as 0 — absent', () {
+      expect(positiveIntOrNull(0), isNull);
+      expect(positiveIntOrNull('0'), isNull);
+    });
+
+    test('negative, fractional, non-finite, "-" and junk are absent', () {
+      for (final value in <Object?>[
+        -1,
+        1.5,
+        double.nan,
+        double.infinity,
+        '-',
+        '',
+        'abc',
+        null,
+        true,
+        const [1],
+      ]) {
+        expect(positiveIntOrNull(value), isNull, reason: '$value');
+      }
+    });
+
+    test('PositiveIntConverter reads the same way', () {
+      const converter = PositiveIntConverter();
+      expect(converter.fromJson(4), 4);
+      expect(converter.fromJson(0), isNull);
+      expect(converter.fromJson('-'), isNull);
+      expect(converter.toJson(4), 4);
+    });
+  });
 }

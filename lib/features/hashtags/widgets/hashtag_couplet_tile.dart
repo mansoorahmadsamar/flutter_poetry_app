@@ -4,6 +4,7 @@ import '../../../core/design_system/app_colors.dart';
 import '../../../core/utils/api_placeholder.dart';
 import '../../../core/widgets/localized_text.dart';
 import '../../main/tabs/poets/models/couplet_model.dart';
+import 'couplet_theme_chips.dart';
 import 'hashtag_pill.dart';
 
 /// One couplet in a hashtag's اشعار / Couplets tab.
@@ -18,11 +19,16 @@ class HashtagCoupletTile extends StatelessWidget {
   final bool isRtl;
   final VoidCallback? onTap;
 
+  /// The hashtag page this tile is listed on; its own theme chip is hidden
+  /// (it would reopen the same page).
+  final String? hashtagSlug;
+
   const HashtagCoupletTile({
     required this.couplet,
     required this.isDark,
     required this.isRtl,
     this.onTap,
+    this.hashtagSlug,
     super.key,
   });
 
@@ -70,6 +76,13 @@ class HashtagCoupletTile extends StatelessWidget {
                 const SizedBox(height: 8),
                 HashtagSlugRow(slugs: couplet.tagSlugs),
               ],
+              // Theme chips (nothing when the couplet has no themes)
+              CoupletThemeChips(
+                themes: couplet.themes,
+                excludeSlug: hashtagSlug,
+                alignment: WrapAlignment.start,
+                padding: const EdgeInsets.only(top: 8),
+              ),
               _CoupletSourceRow(
                 poetName: couplet.poetName,
                 poemTitle: couplet.poemTitle,

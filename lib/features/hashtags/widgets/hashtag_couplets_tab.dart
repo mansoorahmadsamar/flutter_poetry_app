@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/design_system/app_colors.dart';
 import '../../../core/providers/language_provider.dart';
+import '../../../core/routing/content_locations.dart';
 import '../../main/tabs/poets/models/couplet_model.dart';
 import '../services/hashtag_service.dart';
 import 'hashtag_couplet_tile.dart';
@@ -165,11 +166,14 @@ class _HashtagCoupletsTabState extends ConsumerState<HashtagCoupletsTab>
             couplet: couplet,
             isDark: isDark,
             isRtl: isRtl,
+            hashtagSlug: widget.slug,
             // Production's CoupletDto has no poem id (T-177): such a couplet
             // shows its verses but opens nothing, rather than /main/poems/null.
+            // With a couplet number the poem opens scrolled to the couplet.
             onTap: poemId == null
                 ? null
-                : () => context.push('/main/poems/$poemId'),
+                : () => context.push(ContentLocations.poem(poemId,
+                    coupletNumber: couplet.coupletNumber)),
           );
         },
       ),

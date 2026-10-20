@@ -14,6 +14,7 @@ import 'package:flutter_poetry_app/features/engagement/widgets/reaction_summary_
 import '../models/poem_model.dart';
 import '../models/couplet_model.dart';
 import '../providers/poem_providers.dart';
+import '../utils/couplet_deep_link.dart';
 import '../widgets/poem_more_from_poet_section.dart';
 import '../widgets/poem_reading_card.dart';
 import '../../creator/providers/creator_providers.dart';
@@ -24,9 +25,15 @@ const String _nastaleeq = 'Jameel Noori Nastaleeq';
 class PoemDetailScreen extends ConsumerStatefulWidget {
   final String publicId;
 
+  /// The couplet to open at (`/main/poems/:publicId?couplet=<n>`): once the
+  /// poem loads it is selected (highlighted) and scrolled into view. Null
+  /// opens the poem at the top.
+  final int? initialCoupletNumber;
+
   const PoemDetailScreen({
     super.key,
     required this.publicId,
+    this.initialCoupletNumber,
   });
 
   @override
@@ -37,6 +44,12 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
   String _selectedScript = 'ur';
   bool _scriptInitialized = false;
   int? _selectedSherIndex;
+
+  /// The couplet the route asked for ([PoemDetailScreen.initialCoupletNumber]),
+  /// resolved once, when the poem's couplets first arrive.
+  int? _deepLinkedSherIndex;
+  bool _deepLinkResolved = false;
+  final GlobalKey _deepLinkedSherKey = GlobalKey();
 
   @override
   void didChangeDependencies() {
@@ -96,6 +109,7 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
 
   Widget _buildContent(BuildContext context, PoemModel poem) {
     final couplets = poem.couplets.isNotEmpty ? poem.couplets : null;
+    _resolveDeepLink(couplets);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.only(left: 14, right: 14, top: 12, bottom: 32),
@@ -112,6 +126,8 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
             selectedScript: _selectedScript,
             selectedSherIndex: _selectedSherIndex,
             onSherSelected: (i) => setState(() => _selectedSherIndex = i),
+            focusedSherIndex: _deepLinkedSherIndex,
+            focusedSherKey: _deepLinkedSherKey,
           ),
           const SizedBox(height: 14),
           _buildPoemEngagementBar(context, poem, couplets),
@@ -126,6 +142,31 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
         ],
       ),
     );
+  }
+
+  /// Selects the deep-linked couplet the first time the poem's couplets are
+  /// available, then scrolls it into view after that frame is laid out. A
+  /// number with no matching couplet leaves the poem at the top.
+  void _resolveDeepLink(List<CoupletModel>? couplets) {
+    if (_deepLinkResolved || widget.initialCoupletNumber == null) return;
+    if (couplets == null) return;
+    _deepLinkResolved = true;
+    final index =
+        CoupletDeepLink.targetIndex(couplets, widget.initialCoupletNumber);
+    if (index == null) return;
+    // Called from build, before the reading card is built: plain assignment.
+    _deepLinkedSherIndex = index;
+    _selectedSherIndex = index;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final target = _deepLinkedSherKey.currentContext;
+      if (!mounted || target == null) return;
+      Scrollable.ensureVisible(
+        target,
+        alignment: CoupletDeepLink.scrollAlignment,
+        duration: CoupletDeepLink.scrollDuration,
+        curve: Curves.easeOutCubic,
+      );
+    });
   }
 
   /// "Is this you? Claim this page" hint — shown only when the viewer

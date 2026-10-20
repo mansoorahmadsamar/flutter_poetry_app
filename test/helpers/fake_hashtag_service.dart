@@ -89,7 +89,8 @@ HashtagService hashtagServiceOverAdapter({
 }
 
 /// Pumps [HashtagDetailScreen] for [slug] inside a [GoRouter] whose poem route
-/// shows `poem:<id>`, so tap tests can assert where a tap went.
+/// shows `poem:<id>` and whose other hashtag pages show `hashtag:<slug>`, so
+/// tap tests can assert where a tap went.
 Future<GoRouter> pumpHashtagScreen(
   WidgetTester tester, {
   required String slug,
@@ -105,6 +106,10 @@ Future<GoRouter> pumpHashtagScreen(
       GoRoute(
         path: '/main/poems/:publicId',
         builder: (_, state) => Text('poem:${state.pathParameters['publicId']}'),
+      ),
+      GoRoute(
+        path: '/hashtags/:slug',
+        builder: (_, state) => Text('hashtag:${state.pathParameters['slug']}'),
       ),
     ],
   );
