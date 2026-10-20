@@ -8,6 +8,7 @@ import 'package:flutter_poetry_app/features/engagement/providers/couplet_provide
 import 'package:flutter_poetry_app/features/engagement/providers/reaction_providers.dart';
 import 'package:flutter_poetry_app/features/engagement/widgets/reaction_button.dart';
 import 'package:flutter_poetry_app/features/image_poetry/widgets/share_options_sheet.dart';
+import 'package:flutter_poetry_app/features/engagement/models/reaction_models.dart';
 
 class CoupletEngagementButtons extends ConsumerWidget {
   final CoupletModel couplet;
@@ -129,8 +130,7 @@ class CoupletEngagementButtons extends ConsumerWidget {
   }
 
   String? _getUserReaction(Map<String, dynamic>? reactions) {
-    if (reactions == null) return null;
-    return reactions['userReaction'] as String?;
+    return userReactionIn(reactions);
   }
 
   Map<String, int>? _parseReactionsByType(Map<String, dynamic>? reactions) {

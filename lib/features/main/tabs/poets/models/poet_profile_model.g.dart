@@ -11,27 +11,33 @@ _$PoetProfileModelImpl _$$PoetProfileModelImplFromJson(
     _$PoetProfileModelImpl(
       publicId: json['publicId'] as String,
       name: json['name'] as String,
-      biography: json['biography'] as String?,
-      shortBio: json['shortBio'] as String,
-      gender: json['gender'] as String?,
-      era: json['era'] as String?,
+      biography: const PlaceholderStringConverter().fromJson(json['biography']),
+      shortBio: const PlaceholderStringConverter().fromJson(json['shortBio']),
+      gender: const PlaceholderStringConverter().fromJson(json['gender']),
+      era: const PlaceholderStringConverter().fromJson(json['era']),
       birthYear: (json['birthYear'] as num).toInt(),
       deathYear: (json['deathYear'] as num?)?.toInt(),
       birthDate: json['birthDate'] as String?,
       deathDate: json['deathDate'] as String?,
-      birthPlace: json['birthPlace'] as String?,
-      country: json['country'] as String?,
-      countryFlag: json['countryFlag'] as String?,
-      countryFlagUrl: json['countryFlagUrl'] as String?,
-      primaryLanguageCode: json['primaryLanguageCode'] as String?,
-      primaryLanguageName: json['primaryLanguageName'] as String?,
-      isFeatured: json['isFeatured'] as bool,
-      isTrending: json['isTrending'] as bool,
-      isVerified: json['isVerified'] as bool,
+      birthPlace:
+          const PlaceholderStringConverter().fromJson(json['birthPlace']),
+      country: const PlaceholderStringConverter().fromJson(json['country']),
+      countryFlag:
+          const PlaceholderStringConverter().fromJson(json['countryFlag']),
+      countryFlagUrl:
+          const PlaceholderStringConverter().fromJson(json['countryFlagUrl']),
+      primaryLanguageCode: const PlaceholderStringConverter()
+          .fromJson(json['primaryLanguageCode']),
+      primaryLanguageName: const PlaceholderStringConverter()
+          .fromJson(json['primaryLanguageName']),
+      isFeatured: json['isFeatured'] as bool? ?? false,
+      isTrending: json['isTrending'] as bool? ?? false,
+      isVerified: json['isVerified'] as bool? ?? false,
       viewCount: (json['viewCount'] as num).toInt(),
       followerCount: (json['followerCount'] as num).toInt(),
       poemCount: (json['poemCount'] as num).toInt(),
-      profileImageUrl: json['profileImageUrl'] as String?,
+      profileImageUrl:
+          const PlaceholderStringConverter().fromJson(json['profileImageUrl']),
       gallery: (json['gallery'] as List<dynamic>?)
           ?.map((e) => PoetImageModel.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -55,27 +61,34 @@ Map<String, dynamic> _$$PoetProfileModelImplToJson(
     <String, dynamic>{
       'publicId': instance.publicId,
       'name': instance.name,
-      'biography': instance.biography,
-      'shortBio': instance.shortBio,
-      'gender': instance.gender,
-      'era': instance.era,
+      'biography':
+          const PlaceholderStringConverter().toJson(instance.biography),
+      'shortBio': const PlaceholderStringConverter().toJson(instance.shortBio),
+      'gender': const PlaceholderStringConverter().toJson(instance.gender),
+      'era': const PlaceholderStringConverter().toJson(instance.era),
       'birthYear': instance.birthYear,
       'deathYear': instance.deathYear,
       'birthDate': instance.birthDate,
       'deathDate': instance.deathDate,
-      'birthPlace': instance.birthPlace,
-      'country': instance.country,
-      'countryFlag': instance.countryFlag,
-      'countryFlagUrl': instance.countryFlagUrl,
-      'primaryLanguageCode': instance.primaryLanguageCode,
-      'primaryLanguageName': instance.primaryLanguageName,
+      'birthPlace':
+          const PlaceholderStringConverter().toJson(instance.birthPlace),
+      'country': const PlaceholderStringConverter().toJson(instance.country),
+      'countryFlag':
+          const PlaceholderStringConverter().toJson(instance.countryFlag),
+      'countryFlagUrl':
+          const PlaceholderStringConverter().toJson(instance.countryFlagUrl),
+      'primaryLanguageCode': const PlaceholderStringConverter()
+          .toJson(instance.primaryLanguageCode),
+      'primaryLanguageName': const PlaceholderStringConverter()
+          .toJson(instance.primaryLanguageName),
       'isFeatured': instance.isFeatured,
       'isTrending': instance.isTrending,
       'isVerified': instance.isVerified,
       'viewCount': instance.viewCount,
       'followerCount': instance.followerCount,
       'poemCount': instance.poemCount,
-      'profileImageUrl': instance.profileImageUrl,
+      'profileImageUrl':
+          const PlaceholderStringConverter().toJson(instance.profileImageUrl),
       'gallery': instance.gallery,
       'books': instance.books,
       'videos': instance.videos,

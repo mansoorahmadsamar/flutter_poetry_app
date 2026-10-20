@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import '../../../../../core/utils/api_placeholder.dart';
 
 part 'poet_image_model.freezed.dart';
 part 'poet_image_model.g.dart';
@@ -8,12 +9,12 @@ class PoetImageModel with _$PoetImageModel {
   const factory PoetImageModel({
     required String publicId,
     @JsonKey(name: 'imageUrl') required String imageUrl,
-    @JsonKey(name: 'thumbnailUrl') String? thumbnailUrl,
+    @JsonKey(name: 'thumbnailUrl') @PlaceholderStringConverter() String? thumbnailUrl,
     String? caption,
-    @JsonKey(name: 'altText') required String altText,
-    @JsonKey(name: 'displayOrder') required int displayOrder,
-    @JsonKey(name: 'isProfileImage') required bool isProfileImage,
-    @JsonKey(name: 'imageType') required String imageType,
+    @JsonKey(name: 'altText') @Default('') String altText,
+    @JsonKey(name: 'displayOrder') @Default(0) int displayOrder,
+    @JsonKey(name: 'isProfileImage') @Default(false) bool isProfileImage,
+    @JsonKey(name: 'imageType') @Default('OTHER') String imageType,
   }) = _PoetImageModel;
 
   factory PoetImageModel.fromJson(Map<String, dynamic> json) =>

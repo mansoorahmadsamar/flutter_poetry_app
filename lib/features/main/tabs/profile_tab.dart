@@ -244,7 +244,7 @@ class ProfileTab extends ConsumerWidget {
 
               // Full name
               Text(
-                user.fullName,
+                user.displayName,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -253,14 +253,15 @@ class ProfileTab extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
 
-              // Username
-              Text(
-                '@${user.username}',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.white.withValues(alpha: 0.8),
-                      fontStyle: FontStyle.italic,
-                    ),
-              ),
+              // Username (absent for some accounts)
+              if (user.handle != null)
+                Text(
+                  user.handle!,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.white.withValues(alpha: 0.8),
+                        fontStyle: FontStyle.italic,
+                      ),
+                ),
               const SizedBox(height: 16),
 
               // Divider
@@ -284,7 +285,7 @@ class ProfileTab extends ConsumerWidget {
                     context,
                     icon: Icons.verified_user_outlined,
                     label: 'Provider',
-                    value: user.provider,
+                    value: user.provider ?? '—',
                   ),
                   const SizedBox(height: 12),
                   _buildProfileInfoRow(

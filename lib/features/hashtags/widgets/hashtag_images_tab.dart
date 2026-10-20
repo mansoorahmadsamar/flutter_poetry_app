@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/design_system/app_colors.dart';
 import '../../../core/providers/language_provider.dart';
 import '../services/hashtag_service.dart';
+import '../../../core/utils/api_placeholder.dart';
 
 class HashtagImagesTab extends ConsumerStatefulWidget {
   final String slug;
@@ -168,6 +169,14 @@ class _HashtagImagesTabState extends ConsumerState<HashtagImagesTab>
   }
 }
 
+String? _text(Object? value) => value is String ? presentOrNull(value) : null;
+
+/// The URL a hashtag image tile loads: the thumbnail, else the full image.
+/// `PoetImageDto` sends `"-"` for a missing thumbnail, which used to win over
+/// the image URL and load nothing (T-181).
+String? hashtagImageUrl(Map<String, dynamic> imageData) =>
+    _text(imageData['thumbnailUrl']) ?? _text(imageData['imageUrl']);
+
 class _ImageGridTile extends StatelessWidget {
   final Map<String, dynamic> imageData;
   final bool isDark;
@@ -179,9 +188,8 @@ class _ImageGridTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl =
-        imageData['thumbnailUrl'] as String? ?? imageData['imageUrl'] as String? ?? '';
-    final poetName = imageData['poetName'] as String? ?? '';
+    final imageUrl = hashtagImageUrl(imageData) ?? '';
+    final poetName = _text(imageData['poetName']) ?? '';
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),

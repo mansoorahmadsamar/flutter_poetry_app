@@ -22,10 +22,14 @@ PoetProfileModel _$PoetProfileModelFromJson(Map<String, dynamic> json) {
 mixin _$PoetProfileModel {
   String get publicId => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
   String? get biography => throw _privateConstructorUsedError;
   @JsonKey(name: 'shortBio')
-  String get shortBio => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get shortBio => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
   String? get gender => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
   String? get era => throw _privateConstructorUsedError;
   int get birthYear => throw _privateConstructorUsedError;
   int? get deathYear => throw _privateConstructorUsedError;
@@ -34,15 +38,21 @@ mixin _$PoetProfileModel {
   @JsonKey(name: 'deathDate')
   String? get deathDate => throw _privateConstructorUsedError;
   @JsonKey(name: 'birthPlace')
+  @PlaceholderStringConverter()
   String? get birthPlace => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
   String? get country => throw _privateConstructorUsedError;
   @JsonKey(name: 'countryFlag')
+  @PlaceholderStringConverter()
   String? get countryFlag => throw _privateConstructorUsedError;
   @JsonKey(name: 'countryFlagUrl')
+  @PlaceholderStringConverter()
   String? get countryFlagUrl => throw _privateConstructorUsedError;
   @JsonKey(name: 'primaryLanguageCode')
+  @PlaceholderStringConverter()
   String? get primaryLanguageCode => throw _privateConstructorUsedError;
   @JsonKey(name: 'primaryLanguageName')
+  @PlaceholderStringConverter()
   String? get primaryLanguageName => throw _privateConstructorUsedError;
   @JsonKey(name: 'isFeatured')
   bool get isFeatured => throw _privateConstructorUsedError;
@@ -57,6 +67,7 @@ mixin _$PoetProfileModel {
   @JsonKey(name: 'poemCount')
   int get poemCount => throw _privateConstructorUsedError;
   @JsonKey(name: 'profileImageUrl')
+  @PlaceholderStringConverter()
   String? get profileImageUrl => throw _privateConstructorUsedError;
   List<PoetImageModel>? get gallery => throw _privateConstructorUsedError;
   List<PoetBookModel>? get books => throw _privateConstructorUsedError;
@@ -83,27 +94,39 @@ abstract class $PoetProfileModelCopyWith<$Res> {
   $Res call(
       {String publicId,
       String name,
-      String? biography,
-      @JsonKey(name: 'shortBio') String shortBio,
-      String? gender,
-      String? era,
+      @PlaceholderStringConverter() String? biography,
+      @JsonKey(name: 'shortBio') @PlaceholderStringConverter() String? shortBio,
+      @PlaceholderStringConverter() String? gender,
+      @PlaceholderStringConverter() String? era,
       int birthYear,
       int? deathYear,
       @JsonKey(name: 'birthDate') String? birthDate,
       @JsonKey(name: 'deathDate') String? deathDate,
-      @JsonKey(name: 'birthPlace') String? birthPlace,
-      String? country,
-      @JsonKey(name: 'countryFlag') String? countryFlag,
-      @JsonKey(name: 'countryFlagUrl') String? countryFlagUrl,
-      @JsonKey(name: 'primaryLanguageCode') String? primaryLanguageCode,
-      @JsonKey(name: 'primaryLanguageName') String? primaryLanguageName,
+      @JsonKey(name: 'birthPlace')
+      @PlaceholderStringConverter()
+      String? birthPlace,
+      @PlaceholderStringConverter() String? country,
+      @JsonKey(name: 'countryFlag')
+      @PlaceholderStringConverter()
+      String? countryFlag,
+      @JsonKey(name: 'countryFlagUrl')
+      @PlaceholderStringConverter()
+      String? countryFlagUrl,
+      @JsonKey(name: 'primaryLanguageCode')
+      @PlaceholderStringConverter()
+      String? primaryLanguageCode,
+      @JsonKey(name: 'primaryLanguageName')
+      @PlaceholderStringConverter()
+      String? primaryLanguageName,
       @JsonKey(name: 'isFeatured') bool isFeatured,
       @JsonKey(name: 'isTrending') bool isTrending,
       @JsonKey(name: 'isVerified') bool isVerified,
       @JsonKey(name: 'viewCount') int viewCount,
       @JsonKey(name: 'followerCount') int followerCount,
       @JsonKey(name: 'poemCount') int poemCount,
-      @JsonKey(name: 'profileImageUrl') String? profileImageUrl,
+      @JsonKey(name: 'profileImageUrl')
+      @PlaceholderStringConverter()
+      String? profileImageUrl,
       List<PoetImageModel>? gallery,
       List<PoetBookModel>? books,
       List<PoetVideoModel>? videos,
@@ -129,7 +152,7 @@ class _$PoetProfileModelCopyWithImpl<$Res, $Val extends PoetProfileModel>
     Object? publicId = null,
     Object? name = null,
     Object? biography = freezed,
-    Object? shortBio = null,
+    Object? shortBio = freezed,
     Object? gender = freezed,
     Object? era = freezed,
     Object? birthYear = null,
@@ -170,10 +193,10 @@ class _$PoetProfileModelCopyWithImpl<$Res, $Val extends PoetProfileModel>
           ? _value.biography
           : biography // ignore: cast_nullable_to_non_nullable
               as String?,
-      shortBio: null == shortBio
+      shortBio: freezed == shortBio
           ? _value.shortBio
           : shortBio // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       gender: freezed == gender
           ? _value.gender
           : gender // ignore: cast_nullable_to_non_nullable
@@ -293,27 +316,39 @@ abstract class _$$PoetProfileModelImplCopyWith<$Res>
   $Res call(
       {String publicId,
       String name,
-      String? biography,
-      @JsonKey(name: 'shortBio') String shortBio,
-      String? gender,
-      String? era,
+      @PlaceholderStringConverter() String? biography,
+      @JsonKey(name: 'shortBio') @PlaceholderStringConverter() String? shortBio,
+      @PlaceholderStringConverter() String? gender,
+      @PlaceholderStringConverter() String? era,
       int birthYear,
       int? deathYear,
       @JsonKey(name: 'birthDate') String? birthDate,
       @JsonKey(name: 'deathDate') String? deathDate,
-      @JsonKey(name: 'birthPlace') String? birthPlace,
-      String? country,
-      @JsonKey(name: 'countryFlag') String? countryFlag,
-      @JsonKey(name: 'countryFlagUrl') String? countryFlagUrl,
-      @JsonKey(name: 'primaryLanguageCode') String? primaryLanguageCode,
-      @JsonKey(name: 'primaryLanguageName') String? primaryLanguageName,
+      @JsonKey(name: 'birthPlace')
+      @PlaceholderStringConverter()
+      String? birthPlace,
+      @PlaceholderStringConverter() String? country,
+      @JsonKey(name: 'countryFlag')
+      @PlaceholderStringConverter()
+      String? countryFlag,
+      @JsonKey(name: 'countryFlagUrl')
+      @PlaceholderStringConverter()
+      String? countryFlagUrl,
+      @JsonKey(name: 'primaryLanguageCode')
+      @PlaceholderStringConverter()
+      String? primaryLanguageCode,
+      @JsonKey(name: 'primaryLanguageName')
+      @PlaceholderStringConverter()
+      String? primaryLanguageName,
       @JsonKey(name: 'isFeatured') bool isFeatured,
       @JsonKey(name: 'isTrending') bool isTrending,
       @JsonKey(name: 'isVerified') bool isVerified,
       @JsonKey(name: 'viewCount') int viewCount,
       @JsonKey(name: 'followerCount') int followerCount,
       @JsonKey(name: 'poemCount') int poemCount,
-      @JsonKey(name: 'profileImageUrl') String? profileImageUrl,
+      @JsonKey(name: 'profileImageUrl')
+      @PlaceholderStringConverter()
+      String? profileImageUrl,
       List<PoetImageModel>? gallery,
       List<PoetBookModel>? books,
       List<PoetVideoModel>? videos,
@@ -337,7 +372,7 @@ class __$$PoetProfileModelImplCopyWithImpl<$Res>
     Object? publicId = null,
     Object? name = null,
     Object? biography = freezed,
-    Object? shortBio = null,
+    Object? shortBio = freezed,
     Object? gender = freezed,
     Object? era = freezed,
     Object? birthYear = null,
@@ -378,10 +413,10 @@ class __$$PoetProfileModelImplCopyWithImpl<$Res>
           ? _value.biography
           : biography // ignore: cast_nullable_to_non_nullable
               as String?,
-      shortBio: null == shortBio
+      shortBio: freezed == shortBio
           ? _value.shortBio
           : shortBio // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       gender: freezed == gender
           ? _value.gender
           : gender // ignore: cast_nullable_to_non_nullable
@@ -496,27 +531,39 @@ class _$PoetProfileModelImpl implements _PoetProfileModel {
   const _$PoetProfileModelImpl(
       {required this.publicId,
       required this.name,
-      this.biography,
-      @JsonKey(name: 'shortBio') required this.shortBio,
-      this.gender,
-      this.era,
+      @PlaceholderStringConverter() this.biography,
+      @JsonKey(name: 'shortBio') @PlaceholderStringConverter() this.shortBio,
+      @PlaceholderStringConverter() this.gender,
+      @PlaceholderStringConverter() this.era,
       required this.birthYear,
       this.deathYear,
       @JsonKey(name: 'birthDate') this.birthDate,
       @JsonKey(name: 'deathDate') this.deathDate,
-      @JsonKey(name: 'birthPlace') this.birthPlace,
-      this.country,
-      @JsonKey(name: 'countryFlag') this.countryFlag,
-      @JsonKey(name: 'countryFlagUrl') this.countryFlagUrl,
-      @JsonKey(name: 'primaryLanguageCode') this.primaryLanguageCode,
-      @JsonKey(name: 'primaryLanguageName') this.primaryLanguageName,
-      @JsonKey(name: 'isFeatured') required this.isFeatured,
-      @JsonKey(name: 'isTrending') required this.isTrending,
-      @JsonKey(name: 'isVerified') required this.isVerified,
+      @JsonKey(name: 'birthPlace')
+      @PlaceholderStringConverter()
+      this.birthPlace,
+      @PlaceholderStringConverter() this.country,
+      @JsonKey(name: 'countryFlag')
+      @PlaceholderStringConverter()
+      this.countryFlag,
+      @JsonKey(name: 'countryFlagUrl')
+      @PlaceholderStringConverter()
+      this.countryFlagUrl,
+      @JsonKey(name: 'primaryLanguageCode')
+      @PlaceholderStringConverter()
+      this.primaryLanguageCode,
+      @JsonKey(name: 'primaryLanguageName')
+      @PlaceholderStringConverter()
+      this.primaryLanguageName,
+      @JsonKey(name: 'isFeatured') this.isFeatured = false,
+      @JsonKey(name: 'isTrending') this.isTrending = false,
+      @JsonKey(name: 'isVerified') this.isVerified = false,
       @JsonKey(name: 'viewCount') required this.viewCount,
       @JsonKey(name: 'followerCount') required this.followerCount,
       @JsonKey(name: 'poemCount') required this.poemCount,
-      @JsonKey(name: 'profileImageUrl') this.profileImageUrl,
+      @JsonKey(name: 'profileImageUrl')
+      @PlaceholderStringConverter()
+      this.profileImageUrl,
       final List<PoetImageModel>? gallery,
       final List<PoetBookModel>? books,
       final List<PoetVideoModel>? videos,
@@ -538,13 +585,17 @@ class _$PoetProfileModelImpl implements _PoetProfileModel {
   @override
   final String name;
   @override
+  @PlaceholderStringConverter()
   final String? biography;
   @override
   @JsonKey(name: 'shortBio')
-  final String shortBio;
+  @PlaceholderStringConverter()
+  final String? shortBio;
   @override
+  @PlaceholderStringConverter()
   final String? gender;
   @override
+  @PlaceholderStringConverter()
   final String? era;
   @override
   final int birthYear;
@@ -558,20 +609,26 @@ class _$PoetProfileModelImpl implements _PoetProfileModel {
   final String? deathDate;
   @override
   @JsonKey(name: 'birthPlace')
+  @PlaceholderStringConverter()
   final String? birthPlace;
   @override
+  @PlaceholderStringConverter()
   final String? country;
   @override
   @JsonKey(name: 'countryFlag')
+  @PlaceholderStringConverter()
   final String? countryFlag;
   @override
   @JsonKey(name: 'countryFlagUrl')
+  @PlaceholderStringConverter()
   final String? countryFlagUrl;
   @override
   @JsonKey(name: 'primaryLanguageCode')
+  @PlaceholderStringConverter()
   final String? primaryLanguageCode;
   @override
   @JsonKey(name: 'primaryLanguageName')
+  @PlaceholderStringConverter()
   final String? primaryLanguageName;
   @override
   @JsonKey(name: 'isFeatured')
@@ -593,6 +650,7 @@ class _$PoetProfileModelImpl implements _PoetProfileModel {
   final int poemCount;
   @override
   @JsonKey(name: 'profileImageUrl')
+  @PlaceholderStringConverter()
   final String? profileImageUrl;
   final List<PoetImageModel>? _gallery;
   @override
@@ -767,37 +825,51 @@ class _$PoetProfileModelImpl implements _PoetProfileModel {
 
 abstract class _PoetProfileModel implements PoetProfileModel {
   const factory _PoetProfileModel(
-      {required final String publicId,
-      required final String name,
-      final String? biography,
-      @JsonKey(name: 'shortBio') required final String shortBio,
-      final String? gender,
-      final String? era,
-      required final int birthYear,
-      final int? deathYear,
-      @JsonKey(name: 'birthDate') final String? birthDate,
-      @JsonKey(name: 'deathDate') final String? deathDate,
-      @JsonKey(name: 'birthPlace') final String? birthPlace,
-      final String? country,
-      @JsonKey(name: 'countryFlag') final String? countryFlag,
-      @JsonKey(name: 'countryFlagUrl') final String? countryFlagUrl,
-      @JsonKey(name: 'primaryLanguageCode') final String? primaryLanguageCode,
-      @JsonKey(name: 'primaryLanguageName') final String? primaryLanguageName,
-      @JsonKey(name: 'isFeatured') required final bool isFeatured,
-      @JsonKey(name: 'isTrending') required final bool isTrending,
-      @JsonKey(name: 'isVerified') required final bool isVerified,
-      @JsonKey(name: 'viewCount') required final int viewCount,
-      @JsonKey(name: 'followerCount') required final int followerCount,
-      @JsonKey(name: 'poemCount') required final int poemCount,
-      @JsonKey(name: 'profileImageUrl') final String? profileImageUrl,
-      final List<PoetImageModel>? gallery,
-      final List<PoetBookModel>? books,
-      final List<PoetVideoModel>? videos,
-      final List<String>? facts,
-      final List<PoetTagModel>? tags,
-      @JsonKey(name: 'createdAt') final String? createdAt,
-      @JsonKey(name: 'updatedAt')
-      final String? updatedAt}) = _$PoetProfileModelImpl;
+          {required final String publicId,
+          required final String name,
+          @PlaceholderStringConverter() final String? biography,
+          @JsonKey(name: 'shortBio')
+          @PlaceholderStringConverter()
+          final String? shortBio,
+          @PlaceholderStringConverter() final String? gender,
+          @PlaceholderStringConverter() final String? era,
+          required final int birthYear,
+          final int? deathYear,
+          @JsonKey(name: 'birthDate') final String? birthDate,
+          @JsonKey(name: 'deathDate') final String? deathDate,
+          @JsonKey(name: 'birthPlace')
+          @PlaceholderStringConverter()
+          final String? birthPlace,
+          @PlaceholderStringConverter() final String? country,
+          @JsonKey(name: 'countryFlag')
+          @PlaceholderStringConverter()
+          final String? countryFlag,
+          @JsonKey(name: 'countryFlagUrl')
+          @PlaceholderStringConverter()
+          final String? countryFlagUrl,
+          @JsonKey(name: 'primaryLanguageCode')
+          @PlaceholderStringConverter()
+          final String? primaryLanguageCode,
+          @JsonKey(name: 'primaryLanguageName')
+          @PlaceholderStringConverter()
+          final String? primaryLanguageName,
+          @JsonKey(name: 'isFeatured') final bool isFeatured,
+          @JsonKey(name: 'isTrending') final bool isTrending,
+          @JsonKey(name: 'isVerified') final bool isVerified,
+          @JsonKey(name: 'viewCount') required final int viewCount,
+          @JsonKey(name: 'followerCount') required final int followerCount,
+          @JsonKey(name: 'poemCount') required final int poemCount,
+          @JsonKey(name: 'profileImageUrl')
+          @PlaceholderStringConverter()
+          final String? profileImageUrl,
+          final List<PoetImageModel>? gallery,
+          final List<PoetBookModel>? books,
+          final List<PoetVideoModel>? videos,
+          final List<String>? facts,
+          final List<PoetTagModel>? tags,
+          @JsonKey(name: 'createdAt') final String? createdAt,
+          @JsonKey(name: 'updatedAt') final String? updatedAt}) =
+      _$PoetProfileModelImpl;
 
   factory _PoetProfileModel.fromJson(Map<String, dynamic> json) =
       _$PoetProfileModelImpl.fromJson;
@@ -807,13 +879,17 @@ abstract class _PoetProfileModel implements PoetProfileModel {
   @override
   String get name;
   @override
+  @PlaceholderStringConverter()
   String? get biography;
   @override
   @JsonKey(name: 'shortBio')
-  String get shortBio;
+  @PlaceholderStringConverter()
+  String? get shortBio;
   @override
+  @PlaceholderStringConverter()
   String? get gender;
   @override
+  @PlaceholderStringConverter()
   String? get era;
   @override
   int get birthYear;
@@ -827,20 +903,26 @@ abstract class _PoetProfileModel implements PoetProfileModel {
   String? get deathDate;
   @override
   @JsonKey(name: 'birthPlace')
+  @PlaceholderStringConverter()
   String? get birthPlace;
   @override
+  @PlaceholderStringConverter()
   String? get country;
   @override
   @JsonKey(name: 'countryFlag')
+  @PlaceholderStringConverter()
   String? get countryFlag;
   @override
   @JsonKey(name: 'countryFlagUrl')
+  @PlaceholderStringConverter()
   String? get countryFlagUrl;
   @override
   @JsonKey(name: 'primaryLanguageCode')
+  @PlaceholderStringConverter()
   String? get primaryLanguageCode;
   @override
   @JsonKey(name: 'primaryLanguageName')
+  @PlaceholderStringConverter()
   String? get primaryLanguageName;
   @override
   @JsonKey(name: 'isFeatured')
@@ -862,6 +944,7 @@ abstract class _PoetProfileModel implements PoetProfileModel {
   int get poemCount;
   @override
   @JsonKey(name: 'profileImageUrl')
+  @PlaceholderStringConverter()
   String? get profileImageUrl;
   @override
   List<PoetImageModel>? get gallery;

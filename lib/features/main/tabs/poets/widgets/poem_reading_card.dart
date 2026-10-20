@@ -11,6 +11,7 @@ import 'package:flutter_poetry_app/features/image_poetry/widgets/share_options_s
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/couplet_model.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/models/poem_model.dart';
 import 'package:flutter_poetry_app/features/main/tabs/poets/providers/poem_providers.dart';
+import 'package:flutter_poetry_app/features/engagement/models/reaction_models.dart';
 
 const String _urduFontFamily = 'Jameel Noori Nastaleeq';
 
@@ -188,7 +189,7 @@ class PoemReadingCard extends ConsumerWidget {
     final isBookmarked = couplet.isBookmarkedByCurrentUser ?? false;
     final totalReactions = (couplet.reactions?['total'] as int?) ?? 0;
     // Only trust userReaction when total > 0 (guards against stale/leaked data)
-    final rawUserReaction = couplet.reactions?['userReaction'] as String?;
+    final rawUserReaction = userReactionIn(couplet.reactions);
     final userReaction = totalReactions > 0 ? rawUserReaction : null;
     final reactionsByType = couplet.reactions?['byType'] != null
         ? Map<String, int>.from(couplet.reactions!['byType'] as Map)
@@ -301,7 +302,7 @@ class PoemReadingCard extends ConsumerWidget {
   Widget _buildParsedSherBlock(
       BuildContext context, WidgetRef ref, int index, String sherText) {
     final isSelected = selectedSherIndex == index;
-    final userReaction = poem.reactions?['userReaction'] as String?;
+    final userReaction = userReactionIn(poem.reactions);
     final totalReactions = (poem.reactions?['total'] as int?) ?? 0;
     final reactionsByType = poem.reactions?['byType'] != null
         ? Map<String, int>.from(poem.reactions!['byType'] as Map)

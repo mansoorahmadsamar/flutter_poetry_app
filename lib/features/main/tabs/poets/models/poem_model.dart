@@ -46,7 +46,8 @@ class PoemModel with _$PoemModel {
     @JsonKey(name: 'poetryTypeName') String? poetryTypeName,
     String? poetryTypeUrduName,
     String? poetryTypeEnglishName,
-    required String contentType,
+    // Nullable column on the backend (PoemMapper passes it raw for details).
+    @Default('TEXT') String contentType,
     bool? requiresStructuredParsing,
     String? imageUrl,
     String? thumbnailUrl,

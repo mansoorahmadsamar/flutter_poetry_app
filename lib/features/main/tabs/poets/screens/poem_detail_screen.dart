@@ -17,6 +17,7 @@ import '../providers/poem_providers.dart';
 import '../widgets/poem_more_from_poet_section.dart';
 import '../widgets/poem_reading_card.dart';
 import '../../creator/providers/creator_providers.dart';
+import 'package:flutter_poetry_app/features/engagement/models/reaction_models.dart';
 
 const String _nastaleeq = 'Jameel Noori Nastaleeq';
 
@@ -409,7 +410,7 @@ class _PoemDetailScreenState extends ConsumerState<PoemDetailScreen> {
     final reactionTypes = ref.watch(reactionTypesProvider).valueOrNull ?? [];
 
     final isBookmarked = poem.isBookmarkedByCurrentUser ?? false;
-    final userReaction = poem.reactions?['userReaction'] as String?;
+    final userReaction = userReactionIn(poem.reactions);
     final poemReactionsByType = poem.reactions?['byType'] != null
         ? Map<String, int>.from(poem.reactions!['byType'] as Map)
         : null;

@@ -9,19 +9,21 @@ part of 'user_model.dart';
 UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
       id: json['id'] as String,
       email: json['email'] as String,
-      fullName: json['fullName'] as String,
-      username: json['username'] as String,
-      profileImageUrl: json['profileImageUrl'] as String?,
-      provider: json['provider'] as String,
-      isActive: json['isActive'] as bool,
+      fullName: const PlaceholderStringConverter().fromJson(json['fullName']),
+      username: const PlaceholderStringConverter().fromJson(json['username']),
+      profileImageUrl:
+          const PlaceholderStringConverter().fromJson(json['profileImageUrl']),
+      provider: const PlaceholderStringConverter().fromJson(json['provider']),
+      isActive: json['isActive'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
       'id': instance.id,
       'email': instance.email,
-      'fullName': instance.fullName,
-      'username': instance.username,
-      'profileImageUrl': instance.profileImageUrl,
-      'provider': instance.provider,
+      'fullName': const PlaceholderStringConverter().toJson(instance.fullName),
+      'username': const PlaceholderStringConverter().toJson(instance.username),
+      'profileImageUrl':
+          const PlaceholderStringConverter().toJson(instance.profileImageUrl),
+      'provider': const PlaceholderStringConverter().toJson(instance.provider),
       'isActive': instance.isActive,
     };

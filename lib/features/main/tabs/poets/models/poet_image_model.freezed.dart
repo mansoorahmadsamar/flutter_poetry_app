@@ -24,6 +24,7 @@ mixin _$PoetImageModel {
   @JsonKey(name: 'imageUrl')
   String get imageUrl => throw _privateConstructorUsedError;
   @JsonKey(name: 'thumbnailUrl')
+  @PlaceholderStringConverter()
   String? get thumbnailUrl => throw _privateConstructorUsedError;
   String? get caption => throw _privateConstructorUsedError;
   @JsonKey(name: 'altText')
@@ -50,7 +51,9 @@ abstract class $PoetImageModelCopyWith<$Res> {
   $Res call(
       {String publicId,
       @JsonKey(name: 'imageUrl') String imageUrl,
-      @JsonKey(name: 'thumbnailUrl') String? thumbnailUrl,
+      @JsonKey(name: 'thumbnailUrl')
+      @PlaceholderStringConverter()
+      String? thumbnailUrl,
       String? caption,
       @JsonKey(name: 'altText') String altText,
       @JsonKey(name: 'displayOrder') int displayOrder,
@@ -128,7 +131,9 @@ abstract class _$$PoetImageModelImplCopyWith<$Res>
   $Res call(
       {String publicId,
       @JsonKey(name: 'imageUrl') String imageUrl,
-      @JsonKey(name: 'thumbnailUrl') String? thumbnailUrl,
+      @JsonKey(name: 'thumbnailUrl')
+      @PlaceholderStringConverter()
+      String? thumbnailUrl,
       String? caption,
       @JsonKey(name: 'altText') String altText,
       @JsonKey(name: 'displayOrder') int displayOrder,
@@ -199,12 +204,14 @@ class _$PoetImageModelImpl implements _PoetImageModel {
   const _$PoetImageModelImpl(
       {required this.publicId,
       @JsonKey(name: 'imageUrl') required this.imageUrl,
-      @JsonKey(name: 'thumbnailUrl') this.thumbnailUrl,
+      @JsonKey(name: 'thumbnailUrl')
+      @PlaceholderStringConverter()
+      this.thumbnailUrl,
       this.caption,
-      @JsonKey(name: 'altText') required this.altText,
-      @JsonKey(name: 'displayOrder') required this.displayOrder,
-      @JsonKey(name: 'isProfileImage') required this.isProfileImage,
-      @JsonKey(name: 'imageType') required this.imageType});
+      @JsonKey(name: 'altText') this.altText = '',
+      @JsonKey(name: 'displayOrder') this.displayOrder = 0,
+      @JsonKey(name: 'isProfileImage') this.isProfileImage = false,
+      @JsonKey(name: 'imageType') this.imageType = 'OTHER'});
 
   factory _$PoetImageModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$PoetImageModelImplFromJson(json);
@@ -216,6 +223,7 @@ class _$PoetImageModelImpl implements _PoetImageModel {
   final String imageUrl;
   @override
   @JsonKey(name: 'thumbnailUrl')
+  @PlaceholderStringConverter()
   final String? thumbnailUrl;
   @override
   final String? caption;
@@ -282,12 +290,14 @@ abstract class _PoetImageModel implements PoetImageModel {
   const factory _PoetImageModel(
           {required final String publicId,
           @JsonKey(name: 'imageUrl') required final String imageUrl,
-          @JsonKey(name: 'thumbnailUrl') final String? thumbnailUrl,
+          @JsonKey(name: 'thumbnailUrl')
+          @PlaceholderStringConverter()
+          final String? thumbnailUrl,
           final String? caption,
-          @JsonKey(name: 'altText') required final String altText,
-          @JsonKey(name: 'displayOrder') required final int displayOrder,
-          @JsonKey(name: 'isProfileImage') required final bool isProfileImage,
-          @JsonKey(name: 'imageType') required final String imageType}) =
+          @JsonKey(name: 'altText') final String altText,
+          @JsonKey(name: 'displayOrder') final int displayOrder,
+          @JsonKey(name: 'isProfileImage') final bool isProfileImage,
+          @JsonKey(name: 'imageType') final String imageType}) =
       _$PoetImageModelImpl;
 
   factory _PoetImageModel.fromJson(Map<String, dynamic> json) =
@@ -300,6 +310,7 @@ abstract class _PoetImageModel implements PoetImageModel {
   String get imageUrl;
   @override
   @JsonKey(name: 'thumbnailUrl')
+  @PlaceholderStringConverter()
   String? get thumbnailUrl;
   @override
   String? get caption;

@@ -580,7 +580,8 @@ mixin _$PoemModel {
   @JsonKey(name: 'poetryTypeName')
   String? get poetryTypeName => throw _privateConstructorUsedError;
   String? get poetryTypeUrduName => throw _privateConstructorUsedError;
-  String? get poetryTypeEnglishName => throw _privateConstructorUsedError;
+  String? get poetryTypeEnglishName =>
+      throw _privateConstructorUsedError; // Nullable column on the backend (PoemMapper passes it raw for details).
   String get contentType => throw _privateConstructorUsedError;
   bool? get requiresStructuredParsing => throw _privateConstructorUsedError;
   String? get imageUrl => throw _privateConstructorUsedError;
@@ -1176,7 +1177,7 @@ class _$PoemModelImpl implements _PoemModel {
       @JsonKey(name: 'poetryTypeName') this.poetryTypeName,
       this.poetryTypeUrduName,
       this.poetryTypeEnglishName,
-      required this.contentType,
+      this.contentType = 'TEXT',
       this.requiresStructuredParsing,
       this.imageUrl,
       this.thumbnailUrl,
@@ -1233,7 +1234,9 @@ class _$PoemModelImpl implements _PoemModel {
   final String? poetryTypeUrduName;
   @override
   final String? poetryTypeEnglishName;
+// Nullable column on the backend (PoemMapper passes it raw for details).
   @override
+  @JsonKey()
   final String contentType;
   @override
   final bool? requiresStructuredParsing;
@@ -1478,7 +1481,7 @@ abstract class _PoemModel implements PoemModel {
       @JsonKey(name: 'poetryTypeName') final String? poetryTypeName,
       final String? poetryTypeUrduName,
       final String? poetryTypeEnglishName,
-      required final String contentType,
+      final String contentType,
       final bool? requiresStructuredParsing,
       final String? imageUrl,
       final String? thumbnailUrl,
@@ -1531,7 +1534,7 @@ abstract class _PoemModel implements PoemModel {
   String? get poetryTypeUrduName;
   @override
   String? get poetryTypeEnglishName;
-  @override
+  @override // Nullable column on the backend (PoemMapper passes it raw for details).
   String get contentType;
   @override
   bool? get requiresStructuredParsing;

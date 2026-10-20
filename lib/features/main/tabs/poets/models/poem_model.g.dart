@@ -72,7 +72,7 @@ _$PoemModelImpl _$$PoemModelImplFromJson(Map<String, dynamic> json) =>
       poetryTypeName: json['poetryTypeName'] as String?,
       poetryTypeUrduName: json['poetryTypeUrduName'] as String?,
       poetryTypeEnglishName: json['poetryTypeEnglishName'] as String?,
-      contentType: json['contentType'] as String,
+      contentType: json['contentType'] as String? ?? 'TEXT',
       requiresStructuredParsing: json['requiresStructuredParsing'] as bool?,
       imageUrl: json['imageUrl'] as String?,
       thumbnailUrl: json['thumbnailUrl'] as String?,

@@ -387,27 +387,28 @@ class _PoetDetailScreenState extends ConsumerState<PoetDetailScreen>
           ),
           const SizedBox(height: AppSpacing.md),
 
-          // Short Bio
-          LocalizedText(
-            poetProfile.shortBio,
-            style: isUrdu
-                ? AppTypography.urduPoetNameStyle.copyWith(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    height: 1.8,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondaryLight,
-                  )
-                : GoogleFonts.roboto(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    height: 1.5,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondaryLight,
-                  ),
-          ),
+          // Short Bio (absent: "-" / null)
+          if (poetProfile.shortBio != null)
+            LocalizedText(
+              poetProfile.shortBio!,
+              style: isUrdu
+                  ? AppTypography.urduPoetNameStyle.copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      height: 1.8,
+                      color: isDark
+                          ? AppColors.textSecondaryDark
+                          : AppColors.textSecondaryLight,
+                    )
+                  : GoogleFonts.roboto(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      height: 1.5,
+                      color: isDark
+                          ? AppColors.textSecondaryDark
+                          : AppColors.textSecondaryLight,
+                    ),
+            ),
           const SizedBox(height: AppSpacing.md),
 
           // Badges Row

@@ -1,0 +1,15 @@
+{
+  "_comment": "GET /api/auth/me on backend main: AuthController builds a HashMap, so null columns are JSON null (no \"-\" replacement). full_name is null when the sign-in provider gave no name; username and provider are nullable columns too. Values are synthetic.",
+  "success": true,
+  "message": "User profile retrieved successfully",
+  "data": {
+    "id": "6f1d2c1e-0000-4000-8000-000000000001",
+    "userId": 42,
+    "email": "reader@privaterelay.appleid.com",
+    "fullName": null,
+    "username": null,
+    "profileImageUrl": null,
+    "provider": null,
+    "isActive": null
+  }
+}
