@@ -464,16 +464,23 @@ CoupletDetailResponse _$CoupletDetailResponseFromJson(
 mixin _$CoupletDetailResponse {
   String get publicId => throw _privateConstructorUsedError;
   int get coupletNumber => throw _privateConstructorUsedError;
-  String get coupletType => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get coupletType => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
   String? get coupletTypeName => throw _privateConstructorUsedError;
   List<VerseModel> get verses =>
       throw _privateConstructorUsedError; // Poem context
-  String get poemPublicId => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get poemPublicId => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
   String? get poemTitle => throw _privateConstructorUsedError;
   int? get totalCoupletsInPoem => throw _privateConstructorUsedError;
   String? get poetryType => throw _privateConstructorUsedError; // Poet context
-  String get poetPublicId => throw _privateConstructorUsedError;
-  String get poetName => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get poetPublicId => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
+  String? get poetName => throw _privateConstructorUsedError;
+  @PlaceholderStringConverter()
   String? get poetProfileImageUrl =>
       throw _privateConstructorUsedError; // Engagement
   int get likeCount => throw _privateConstructorUsedError;
@@ -504,16 +511,16 @@ abstract class $CoupletDetailResponseCopyWith<$Res> {
   $Res call(
       {String publicId,
       int coupletNumber,
-      String coupletType,
-      String? coupletTypeName,
+      @PlaceholderStringConverter() String? coupletType,
+      @PlaceholderStringConverter() String? coupletTypeName,
       List<VerseModel> verses,
-      String poemPublicId,
-      String? poemTitle,
+      @PlaceholderStringConverter() String? poemPublicId,
+      @PlaceholderStringConverter() String? poemTitle,
       int? totalCoupletsInPoem,
       String? poetryType,
-      String poetPublicId,
-      String poetName,
-      String? poetProfileImageUrl,
+      @PlaceholderStringConverter() String? poetPublicId,
+      @PlaceholderStringConverter() String? poetName,
+      @PlaceholderStringConverter() String? poetProfileImageUrl,
       int likeCount,
       int bookmarkCount,
       int shareCount,
@@ -541,15 +548,15 @@ class _$CoupletDetailResponseCopyWithImpl<$Res,
   $Res call({
     Object? publicId = null,
     Object? coupletNumber = null,
-    Object? coupletType = null,
+    Object? coupletType = freezed,
     Object? coupletTypeName = freezed,
     Object? verses = null,
-    Object? poemPublicId = null,
+    Object? poemPublicId = freezed,
     Object? poemTitle = freezed,
     Object? totalCoupletsInPoem = freezed,
     Object? poetryType = freezed,
-    Object? poetPublicId = null,
-    Object? poetName = null,
+    Object? poetPublicId = freezed,
+    Object? poetName = freezed,
     Object? poetProfileImageUrl = freezed,
     Object? likeCount = null,
     Object? bookmarkCount = null,
@@ -570,10 +577,10 @@ class _$CoupletDetailResponseCopyWithImpl<$Res,
           ? _value.coupletNumber
           : coupletNumber // ignore: cast_nullable_to_non_nullable
               as int,
-      coupletType: null == coupletType
+      coupletType: freezed == coupletType
           ? _value.coupletType
           : coupletType // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       coupletTypeName: freezed == coupletTypeName
           ? _value.coupletTypeName
           : coupletTypeName // ignore: cast_nullable_to_non_nullable
@@ -582,10 +589,10 @@ class _$CoupletDetailResponseCopyWithImpl<$Res,
           ? _value.verses
           : verses // ignore: cast_nullable_to_non_nullable
               as List<VerseModel>,
-      poemPublicId: null == poemPublicId
+      poemPublicId: freezed == poemPublicId
           ? _value.poemPublicId
           : poemPublicId // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       poemTitle: freezed == poemTitle
           ? _value.poemTitle
           : poemTitle // ignore: cast_nullable_to_non_nullable
@@ -598,14 +605,14 @@ class _$CoupletDetailResponseCopyWithImpl<$Res,
           ? _value.poetryType
           : poetryType // ignore: cast_nullable_to_non_nullable
               as String?,
-      poetPublicId: null == poetPublicId
+      poetPublicId: freezed == poetPublicId
           ? _value.poetPublicId
           : poetPublicId // ignore: cast_nullable_to_non_nullable
-              as String,
-      poetName: null == poetName
+              as String?,
+      poetName: freezed == poetName
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       poetProfileImageUrl: freezed == poetProfileImageUrl
           ? _value.poetProfileImageUrl
           : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
@@ -662,16 +669,16 @@ abstract class _$$CoupletDetailResponseImplCopyWith<$Res>
   $Res call(
       {String publicId,
       int coupletNumber,
-      String coupletType,
-      String? coupletTypeName,
+      @PlaceholderStringConverter() String? coupletType,
+      @PlaceholderStringConverter() String? coupletTypeName,
       List<VerseModel> verses,
-      String poemPublicId,
-      String? poemTitle,
+      @PlaceholderStringConverter() String? poemPublicId,
+      @PlaceholderStringConverter() String? poemTitle,
       int? totalCoupletsInPoem,
       String? poetryType,
-      String poetPublicId,
-      String poetName,
-      String? poetProfileImageUrl,
+      @PlaceholderStringConverter() String? poetPublicId,
+      @PlaceholderStringConverter() String? poetName,
+      @PlaceholderStringConverter() String? poetProfileImageUrl,
       int likeCount,
       int bookmarkCount,
       int shareCount,
@@ -697,15 +704,15 @@ class __$$CoupletDetailResponseImplCopyWithImpl<$Res>
   $Res call({
     Object? publicId = null,
     Object? coupletNumber = null,
-    Object? coupletType = null,
+    Object? coupletType = freezed,
     Object? coupletTypeName = freezed,
     Object? verses = null,
-    Object? poemPublicId = null,
+    Object? poemPublicId = freezed,
     Object? poemTitle = freezed,
     Object? totalCoupletsInPoem = freezed,
     Object? poetryType = freezed,
-    Object? poetPublicId = null,
-    Object? poetName = null,
+    Object? poetPublicId = freezed,
+    Object? poetName = freezed,
     Object? poetProfileImageUrl = freezed,
     Object? likeCount = null,
     Object? bookmarkCount = null,
@@ -726,10 +733,10 @@ class __$$CoupletDetailResponseImplCopyWithImpl<$Res>
           ? _value.coupletNumber
           : coupletNumber // ignore: cast_nullable_to_non_nullable
               as int,
-      coupletType: null == coupletType
+      coupletType: freezed == coupletType
           ? _value.coupletType
           : coupletType // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       coupletTypeName: freezed == coupletTypeName
           ? _value.coupletTypeName
           : coupletTypeName // ignore: cast_nullable_to_non_nullable
@@ -738,10 +745,10 @@ class __$$CoupletDetailResponseImplCopyWithImpl<$Res>
           ? _value._verses
           : verses // ignore: cast_nullable_to_non_nullable
               as List<VerseModel>,
-      poemPublicId: null == poemPublicId
+      poemPublicId: freezed == poemPublicId
           ? _value.poemPublicId
           : poemPublicId // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       poemTitle: freezed == poemTitle
           ? _value.poemTitle
           : poemTitle // ignore: cast_nullable_to_non_nullable
@@ -754,14 +761,14 @@ class __$$CoupletDetailResponseImplCopyWithImpl<$Res>
           ? _value.poetryType
           : poetryType // ignore: cast_nullable_to_non_nullable
               as String?,
-      poetPublicId: null == poetPublicId
+      poetPublicId: freezed == poetPublicId
           ? _value.poetPublicId
           : poetPublicId // ignore: cast_nullable_to_non_nullable
-              as String,
-      poetName: null == poetName
+              as String?,
+      poetName: freezed == poetName
           ? _value.poetName
           : poetName // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       poetProfileImageUrl: freezed == poetProfileImageUrl
           ? _value.poetProfileImageUrl
           : poetProfileImageUrl // ignore: cast_nullable_to_non_nullable
@@ -811,17 +818,17 @@ class __$$CoupletDetailResponseImplCopyWithImpl<$Res>
 class _$CoupletDetailResponseImpl implements _CoupletDetailResponse {
   const _$CoupletDetailResponseImpl(
       {required this.publicId,
-      required this.coupletNumber,
-      required this.coupletType,
-      this.coupletTypeName,
-      required final List<VerseModel> verses,
-      required this.poemPublicId,
-      this.poemTitle,
+      this.coupletNumber = 0,
+      @PlaceholderStringConverter() this.coupletType,
+      @PlaceholderStringConverter() this.coupletTypeName,
+      final List<VerseModel> verses = const [],
+      @PlaceholderStringConverter() this.poemPublicId,
+      @PlaceholderStringConverter() this.poemTitle,
       this.totalCoupletsInPoem,
       this.poetryType,
-      required this.poetPublicId,
-      required this.poetName,
-      this.poetProfileImageUrl,
+      @PlaceholderStringConverter() this.poetPublicId,
+      @PlaceholderStringConverter() this.poetName,
+      @PlaceholderStringConverter() this.poetProfileImageUrl,
       this.likeCount = 0,
       this.bookmarkCount = 0,
       this.shareCount = 0,
@@ -841,13 +848,17 @@ class _$CoupletDetailResponseImpl implements _CoupletDetailResponse {
   @override
   final String publicId;
   @override
+  @JsonKey()
   final int coupletNumber;
   @override
-  final String coupletType;
+  @PlaceholderStringConverter()
+  final String? coupletType;
   @override
+  @PlaceholderStringConverter()
   final String? coupletTypeName;
   final List<VerseModel> _verses;
   @override
+  @JsonKey()
   List<VerseModel> get verses {
     if (_verses is EqualUnmodifiableListView) return _verses;
     // ignore: implicit_dynamic_type
@@ -856,8 +867,10 @@ class _$CoupletDetailResponseImpl implements _CoupletDetailResponse {
 
 // Poem context
   @override
-  final String poemPublicId;
+  @PlaceholderStringConverter()
+  final String? poemPublicId;
   @override
+  @PlaceholderStringConverter()
   final String? poemTitle;
   @override
   final int? totalCoupletsInPoem;
@@ -865,10 +878,13 @@ class _$CoupletDetailResponseImpl implements _CoupletDetailResponse {
   final String? poetryType;
 // Poet context
   @override
-  final String poetPublicId;
+  @PlaceholderStringConverter()
+  final String? poetPublicId;
   @override
-  final String poetName;
+  @PlaceholderStringConverter()
+  final String? poetName;
   @override
+  @PlaceholderStringConverter()
   final String? poetProfileImageUrl;
 // Engagement
   @override
@@ -1009,17 +1025,17 @@ class _$CoupletDetailResponseImpl implements _CoupletDetailResponse {
 abstract class _CoupletDetailResponse implements CoupletDetailResponse {
   const factory _CoupletDetailResponse(
       {required final String publicId,
-      required final int coupletNumber,
-      required final String coupletType,
-      final String? coupletTypeName,
-      required final List<VerseModel> verses,
-      required final String poemPublicId,
-      final String? poemTitle,
+      final int coupletNumber,
+      @PlaceholderStringConverter() final String? coupletType,
+      @PlaceholderStringConverter() final String? coupletTypeName,
+      final List<VerseModel> verses,
+      @PlaceholderStringConverter() final String? poemPublicId,
+      @PlaceholderStringConverter() final String? poemTitle,
       final int? totalCoupletsInPoem,
       final String? poetryType,
-      required final String poetPublicId,
-      required final String poetName,
-      final String? poetProfileImageUrl,
+      @PlaceholderStringConverter() final String? poetPublicId,
+      @PlaceholderStringConverter() final String? poetName,
+      @PlaceholderStringConverter() final String? poetProfileImageUrl,
       final int likeCount,
       final int bookmarkCount,
       final int shareCount,
@@ -1038,24 +1054,31 @@ abstract class _CoupletDetailResponse implements CoupletDetailResponse {
   @override
   int get coupletNumber;
   @override
-  String get coupletType;
+  @PlaceholderStringConverter()
+  String? get coupletType;
   @override
+  @PlaceholderStringConverter()
   String? get coupletTypeName;
   @override
   List<VerseModel> get verses;
   @override // Poem context
-  String get poemPublicId;
+  @PlaceholderStringConverter()
+  String? get poemPublicId;
   @override
+  @PlaceholderStringConverter()
   String? get poemTitle;
   @override
   int? get totalCoupletsInPoem;
   @override
   String? get poetryType;
   @override // Poet context
-  String get poetPublicId;
+  @PlaceholderStringConverter()
+  String? get poetPublicId;
   @override
-  String get poetName;
+  @PlaceholderStringConverter()
+  String? get poetName;
   @override
+  @PlaceholderStringConverter()
   String? get poetProfileImageUrl;
   @override // Engagement
   int get likeCount;
