@@ -1025,7 +1025,7 @@ Content-Type: application/json
 **Request Body:**
 ```json
 {
-  "firebaseToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjE5ZjE3...",
+  "firebaseToken": "<JWT_TOKEN>",
   "email": "user@example.com",
   "deviceType": "android",
   "deviceId": "unique-device-id"
@@ -1038,7 +1038,7 @@ Content-Type: application/json
   "success": true,
   "message": "Firebase authentication successful",
   "data": {
-    "accessToken": "eyJhbGciOiJIUzUxMiJ9...",
+    "accessToken": "<JWT_TOKEN>",
     "refreshToken": "550e8400-e29b-41d4-a716-446655440000",
     "type": "Bearer",
     "publicId": "usr_abc123def456",
@@ -1078,7 +1078,7 @@ Content-Type: application/json
 ```json
 {
   "email": "admin@system.com",
-  "password": "12345678"
+  "password": "<ADMIN_PASSWORD>"
 }
 ```
 
@@ -1088,7 +1088,7 @@ Content-Type: application/json
   "success": true,
   "message": "Admin authentication successful",
   "data": {
-    "accessToken": "eyJhbGciOiJIUzUxMiJ9...",
+    "accessToken": "<JWT_TOKEN>",
     "refreshToken": "550e8400-e29b-41d4-a716-446655440000",
     "type": "Bearer",
     "publicId": "usr_abc123def456",
@@ -1185,7 +1185,7 @@ Authorization: Bearer <access_token>
   "success": true,
   "message": "Token refreshed successfully!",
   "data": {
-    "accessToken": "eyJhbGciOiJIUzUxMiJ9...",
+    "accessToken": "<JWT_TOKEN>",
     "refreshToken": "660e8400-e29b-41d4-a716-446655440111",
     "type": "Bearer",
     "publicId": "usr_abc123def456",
@@ -8386,11 +8386,11 @@ ListView.builder(
 **Example Request:**
 ```bash
 # Authenticated request
-curl -H "Authorization: Bearer eyJhbGci..." \
+curl -H "Authorization: Bearer <JWT_TOKEN>" \
   "http://localhost:8081/api/discover?lang=ur"
 
 # With user ID for personalization
-curl -H "Authorization: Bearer eyJhbGci..." \
+curl -H "Authorization: Bearer <JWT_TOKEN>" \
      -H "X-User-Id: 12345" \
   "http://localhost:8081/api/discover?lang=ur"
 ```
@@ -10352,7 +10352,7 @@ Authorization: Bearer <jwt>
 
 **Example — Next page:**
 ```
-GET /api/feed?lang=ur&cursor=eyJzaWQiOiI1NTBlODQwMCIsInAiOjIsImxhbmciOiJ1ciJ9...
+GET /api/feed?lang=ur&cursor=<JWT_TOKEN>
 Authorization: Bearer <jwt>
 ```
 
@@ -10468,7 +10468,7 @@ Authorization: Bearer <jwt>
         }
       }
     ],
-    "nextCursor": "eyJzaWQiOiI1NTBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDAiLCJwIjoyLCJsYW5nIjoidXIiLCJzZWVkIjoxNzA5MDAwMDAwLCJzaWciOiJITUFDLVNIQTI1Ni4uLiJ9",
+    "nextCursor": "<JWT_TOKEN>",
     "hasMore": true,
     "isPersonalized": true,
     "sessionId": "550e8400-e29b-41d4-a716-446655440000",

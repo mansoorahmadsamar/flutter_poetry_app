@@ -40,7 +40,7 @@ Authorization: Bearer <firebase-id-token>
 
 **Example:**
 ```bash
-curl -H "Authorization: Bearer eyJhbGc..." \
+curl -H "Authorization: Bearer <JWT_TOKEN>" \
   https://134.199.243.167/api/poems
 ```
 
@@ -54,14 +54,14 @@ Content-Type: application/json
 
 {
   "email": "admin@system.com",
-  "password": "your-admin-password"
+  "password": "<ADMIN_PASSWORD>"
 }
 ```
 
 **Response:**
 ```json
 {
-  "token": "eyJhbGciOiJIUzM4NCJ9...",
+  "token": "<JWT_TOKEN>",
   "refreshToken": "refresh-token-here",
   "expiresIn": 8640000000
 }
@@ -69,7 +69,7 @@ Content-Type: application/json
 
 **Use Admin Token:**
 ```bash
-curl -H "Authorization: Bearer eyJhbGciOiJIUzM4NCJ9..." \
+curl -H "Authorization: Bearer <JWT_TOKEN>" \
   https://134.199.243.167/admin/users
 ```
 
@@ -312,7 +312,7 @@ curl -X GET "https://134.199.243.167/api/poets/1/profile" \
 # Login
 TOKEN=$(curl -X POST "https://134.199.243.167/api/auth/admin/login" \
   -H "Content-Type: application/json" \
-  -d '{"email":"admin@system.com","password":"your-password"}' \
+  -d '{"email":"admin@system.com","password":"<ADMIN_PASSWORD>"}' \
   | jq -r '.token')
 
 # Use token
@@ -355,7 +355,7 @@ if (!tokenExpiry || Date.now() > tokenExpiry) {
       mode: "raw",
       raw: JSON.stringify({
         email: "admin@system.com",
-        password: "your-password"
+        password: <ADMIN_PASSWORD>
       })
     }
   }, function(err, res) {
@@ -499,7 +499,7 @@ curl http://134.199.243.167:3000/api/health
 # For admin: Login again to get new token
 curl -X POST "https://134.199.243.167/api/auth/admin/login" \
   -H "Content-Type: application/json" \
-  -d '{"email":"admin@system.com","password":"your-password"}'
+  -d '{"email":"admin@system.com","password":"<ADMIN_PASSWORD>"}'
 ```
 
 ### Issue: Slow Responses
