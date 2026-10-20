@@ -10,6 +10,7 @@ import 'package:flutter_poetry_app/features/main/tabs/poets/models/poet_model.da
 import 'package:flutter_poetry_app/features/search/models/global_search_state.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
 import 'package:flutter_poetry_app/features/search/providers/global_search_provider.dart';
+import 'package:flutter_poetry_app/features/search/utils/search_segment_results.dart';
 import 'package:flutter_poetry_app/features/search/widgets/app_search_couplet_card.dart';
 import 'package:flutter_poetry_app/features/search/widgets/app_search_poet_card.dart';
 import 'package:flutter_poetry_app/features/search/widgets/app_search_poem_card.dart';
@@ -93,7 +94,7 @@ class AppSearchPreviewResults extends ConsumerWidget {
               AppSpacing.sm,
             ),
             child: Text(
-              _resultsText(query, unified.totalResults, languageCode),
+              _resultsText(query, unified.totalAcrossTabs, languageCode),
               textDirection: isUrdu ? TextDirection.rtl : TextDirection.ltr,
               style: TextStyle(
                 fontFamily: isUrdu ? 'Jameel Noori Nastaleeq' : null,

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter_poetry_app/features/search/models/global_search_state.dart';
 import 'package:flutter_poetry_app/features/search/models/search_models.dart';
 
@@ -108,3 +110,27 @@ List<T> _appendNew<T>(List<T> existing, List<T> page, String Function(T) id) {
 
 bool _stillMore(bool pageHasMore, List<Object?> before, List<Object?> after) =>
     pageHasMore && after.length > before.length;
+
+/// The tabs that list results — every tab except the grouped "All" preview —
+/// in tab-bar order.
+final List<DiscoverSegment> resultListSegments = [
+  for (final segment in DiscoverSegment.values)
+    if (segment != DiscoverSegment.all) segment,
+];
+
+extension UnifiedSearchTabTotals on UnifiedSearchResponse {
+  /// The number of matches the "All" header reports: the sum of the counts
+  /// the result tabs show ([SearchSegmentResults.total]), so the header agrees
+  /// with the tabs (T-179). A tab whose total is missing (0) but which has
+  /// items counts its loaded items instead.
+  ///
+  /// Not [UnifiedSearchResponse.totalResults]: the backend sets that to the
+  /// number of items **on this page** across all types (`calculateTotals` in
+  /// `UnifiedSearchResult`, main and develop), at most 10 per type — e.g. 23
+  /// for "afsoos" while the غزلیں tab alone reports 693.
+  int get totalAcrossTabs => resultListSegments.fold(
+        0,
+        (sum, segment) =>
+            sum + math.max(segment.total(this), segment.loadedCount(this)),
+      );
+}
